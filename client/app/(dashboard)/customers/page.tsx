@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Search from "@/components/dashboard/Search";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface Customer {
   _id: string;
@@ -38,6 +39,7 @@ type SortKey = "name" | "createdAt";
 type SortDirection = "asc" | "desc";
 
 export default function CustomersPage() {
+  const { t } = useTranslation('common');
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -119,7 +121,7 @@ export default function CustomersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this customer?")) {
+    if (confirm(t('customers.delete_confirm'))) {
       try {
         const response = await fetch(`/api/customers/${id}`, {
           method: "DELETE",
@@ -146,9 +148,9 @@ export default function CustomersPage() {
       {/* Header */}
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('customers.title')}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Manage your customer database and contact information.
+            {t('customers.description')}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
@@ -157,7 +159,7 @@ export default function CustomersPage() {
             className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Customer
+            {t('customers.add_customer')}
           </Link>
         </div>
       </div>
@@ -168,7 +170,7 @@ export default function CustomersPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="w-full md:w-1/2">
               <Search<Customer>
-                placeholder="Search for a customer..."
+                placeholder={t('customers.search_placeholder')}
                 fetchSuggestions={fetchCustomerSuggestions}
                 onSearch={(customer) =>
                   router.push(`/customers/${customer._id}`)
@@ -184,8 +186,7 @@ export default function CustomersPage() {
               />
             </div>
             <div className="text-sm text-gray-500">
-              {sortedCustomers.length} customer
-              {sortedCustomers.length !== 1 ? "s" : ""}
+              {t(sortedCustomers.length === 1 ? 'customers.customer_count' : 'customers.customer_count_plural', { count: sortedCustomers.length })}
             </div>
           </div>
         </div>
@@ -201,28 +202,28 @@ export default function CustomersPage() {
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort("name")}
                 >
-                  Customer <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
+                  {t('customers.name')} <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contact
+                  {t('customers.contact')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Address
+                  {t('customers.address')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vehicles
+                  {t('customers.vehicles')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t('customers.status')}
                 </th>
                 <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort("createdAt")}
                 >
-                  Created <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
+                  {t('customers.created')} <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('customers.actions')}
                 </th>
               </tr>
             </thead>
@@ -283,7 +284,7 @@ export default function CustomersPage() {
                           : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {customer.isActive ? "Active" : "Inactive"}
+                      {customer.isActive ? t('customers.active') : t('customers.inactive')}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -322,12 +323,12 @@ export default function CustomersPage() {
         <div className="text-center py-12">
           <Users className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No customers found
+            {t('customers.no_customers_found')}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {searchTerm
-              ? "Try adjusting your search terms."
-              : "Get started by adding your first customer."}
+              ? t('customers.adjust_search')
+              : t('customers.get_started')}
           </p>
           {!searchTerm && (
             <div className="mt-6">
@@ -336,7 +337,7 @@ export default function CustomersPage() {
                 className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Add Customer
+                {t('customers.add_customer')}
               </Link>
             </div>
           )}

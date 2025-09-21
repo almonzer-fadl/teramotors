@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Plus, Trash2 } from "lucide-react";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface CustomerMinimal {
   _id: string;
@@ -58,6 +59,7 @@ interface EstimateFormData {
 }
 
 export default function EstimateForm({ estimateId }: { estimateId?: string }) {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [customers, setCustomers] = useState<CustomerMinimal[]>([]);
@@ -269,12 +271,12 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? "Edit Estimate" : "New Estimate"}
+              {isEditing ? t('forms.edit_estimate') : t('forms.new_estimate')}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
               {isEditing
-                ? "Update estimate details."
-                : "Create a new service estimate."}
+                ? t('forms.update_estimate_details')
+                : t('forms.create_new_estimate')}
             </p>
           </div>
         </div>
@@ -288,7 +290,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
         </div>
 
         <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Services</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('forms.services')}</h3>
           {formData.services.map((service, index) => (
             <div
               key={index}
@@ -301,7 +303,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                 }
                 className="col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="">Select Service</option>
+                <option value="">{t('forms.select_service')}</option>
                 {services.map((s) => (
                   <option key={s._id} value={s._id}>
                     {s.name}
@@ -357,22 +359,22 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
             className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Service
+            {t('forms.add_service')}
           </button>
         </div>
 
         <div className="bg-white shadow rounded-lg p-6 mt-6">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <span className="font-medium">Subtotal:</span> $
+              <span className="font-medium">{t('forms.subtotal')}:</span> $
               {formData.subtotal.toFixed(2)}
             </div>
             <div>
-              <span className="font-medium">Tax:</span> $
+              <span className="font-medium">{t('forms.tax')}:</span> $
               {formData.tax.toFixed(2)}
             </div>
             <div>
-              <span className="font-medium text-lg">Total:</span> $
+              <span className="font-medium text-lg">{t('forms.total')}:</span> $
               {formData.total.toFixed(2)}
             </div>
           </div>
@@ -385,7 +387,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <X className="mr-2 h-4 w-4" />
-            Cancel
+            {t('forms.cancel')}
           </button>
           <button
             type="submit"
@@ -394,10 +396,10 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
           >
             <Save className="mr-2 h-4 w-4" />
             {loading
-              ? "Saving..."
+              ? t('forms.saving')
               : isEditing
-              ? "Update Estimate"
-              : "Save Estimate"}
+              ? t('forms.update_estimate')
+              : t('forms.save_estimate')}
           </button>
         </div>
       </form>

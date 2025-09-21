@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Plus, Trash2 } from "lucide-react";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface VehicleMinimal {
   _id: string;
@@ -48,6 +49,7 @@ export default function InspectionForm({
 }: {
   inspectionId?: string;
 }) {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [vehicles, setVehicles] = useState<VehicleMinimal[]>([]);
@@ -177,12 +179,12 @@ export default function InspectionForm({
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? "Edit Inspection" : "New Inspection"}
+              {isEditing ? t('forms.edit_inspection') : t('forms.new_inspection')}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
               {isEditing
-                ? "Update inspection details."
-                : "Create a new vehicle inspection."}
+                ? t('forms.update_inspection_details')
+                : t('forms.create_new_inspection')}
             </p>
           </div>
         </div>
@@ -193,7 +195,7 @@ export default function InspectionForm({
 
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Inspection Items
+            {t('forms.inspection_items')}
           </h3>
           {formData.items.map((item, index) => (
             <div
@@ -223,7 +225,7 @@ export default function InspectionForm({
               </select>
               <input
                 type="text"
-                placeholder="Notes"
+                placeholder={t('forms.notes')}
                 value={item.notes}
                 onChange={(e) =>
                   handleItemChange(index, "notes", e.target.value)
@@ -245,7 +247,7 @@ export default function InspectionForm({
             className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Item
+            {t('forms.add_item')}
           </button>
         </div>
 
@@ -256,7 +258,7 @@ export default function InspectionForm({
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <X className="mr-2 h-4 w-4" />
-            Cancel
+            {t('forms.cancel')}
           </button>
           <button
             type="submit"
@@ -265,10 +267,10 @@ export default function InspectionForm({
           >
             <Save className="mr-2 h-4 w-4" />
             {loading
-              ? "Saving..."
+              ? t('forms.saving')
               : isEditing
-              ? "Update Inspection"
-              : "Save Inspection"}
+              ? t('forms.update_inspection')
+              : t('forms.save_inspection')}
           </button>
         </div>
       </form>

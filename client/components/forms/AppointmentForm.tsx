@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X } from "lucide-react";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface CustomerMinimal {
   _id: string;
@@ -47,6 +48,7 @@ export default function AppointmentForm({
 }: {
   appointmentId?: string;
 }) {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [customers, setCustomers] = useState<CustomerMinimal[]>([]);
@@ -216,12 +218,12 @@ export default function AppointmentForm({
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? "Edit Appointment" : "New Appointment"}
+              {isEditing ? t('forms.edit_appointment') : t('forms.new_appointment')}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
               {isEditing
-                ? "Update appointment details."
-                : "Schedule a new appointment."}
+                ? t('forms.update_appointment_details')
+                : t('forms.schedule_new_appointment')}
             </p>
           </div>
         </div>
@@ -232,7 +234,7 @@ export default function AppointmentForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Customer
+                {t('forms.customer')}
               </label>
               <select
                 required
@@ -242,7 +244,7 @@ export default function AppointmentForm({
                 }
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="">Select Customer</option>
+                <option value="">{t('forms.select_customer')}</option>
                 {customers.map((c) => (
                   <option key={c._id} value={c._id}>
                     {c.firstName} {c.lastName}
@@ -252,7 +254,7 @@ export default function AppointmentForm({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Vehicle
+                {t('forms.vehicle')}
               </label>
               <select
                 required
@@ -260,7 +262,7 @@ export default function AppointmentForm({
                 onChange={(e) => handleInputChange("vehicleId", e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="">Select Vehicle</option>
+                <option value="">{t('forms.select_vehicle')}</option>
                 {vehicles
                   .filter(
                     (v) =>
@@ -277,7 +279,7 @@ export default function AppointmentForm({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Service
+                {t('forms.service')}
               </label>
               <select
                 required
@@ -285,7 +287,7 @@ export default function AppointmentForm({
                 onChange={(e) => handleInputChange("serviceId", e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="">Select Service</option>
+                <option value="">{t('forms.select_service')}</option>
                 {services.map((s) => (
                   <option key={s._id.toString()} value={s._id.toString()}>
                     {s.name}
@@ -295,7 +297,7 @@ export default function AppointmentForm({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Mechanic
+                {t('forms.mechanic')}
               </label>
               <select
                 required
@@ -305,7 +307,7 @@ export default function AppointmentForm({
                 }
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="">Assign Mechanic</option>
+                <option value="">{t('forms.assign_mechanic')}</option>
                 {mechanics.map((m) => (
                   <option key={m._id} value={m._id}>
                     {m.fullName || m.name || "Unnamed"}
@@ -315,7 +317,7 @@ export default function AppointmentForm({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Appointment Date
+                {t('forms.appointment_date')}
               </label>
               <input
                 type="date"
@@ -330,7 +332,7 @@ export default function AppointmentForm({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Start Time
+                  {t('forms.start_time')}
                 </label>
                 <select
                   required
@@ -340,7 +342,7 @@ export default function AppointmentForm({
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="">Select Time</option>
+                  <option value="">{t('forms.select_time')}</option>
                   {availableSlots.map((slot) => (
                     <option key={slot} value={slot}>
                       {slot}
@@ -350,7 +352,7 @@ export default function AppointmentForm({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  End Time
+                  {t('forms.end_time')}
                 </label>
                 <input
                   type="time"
@@ -363,37 +365,37 @@ export default function AppointmentForm({
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Priority
+                {t('forms.priority')}
               </label>
               <select
                 value={formData.priority}
                 onChange={(e) => handleInputChange("priority", e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
+                <option value="low">{t('forms.low')}</option>
+                <option value="medium">{t('forms.medium')}</option>
+                <option value="high">{t('forms.high')}</option>
+                <option value="urgent">{t('forms.urgent')}</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Status
+                {t('forms.status')}
               </label>
               <select
                 value={formData.status}
                 onChange={(e) => handleInputChange("status", e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="scheduled">Scheduled</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="scheduled">{t('forms.scheduled')}</option>
+                <option value="in-progress">{t('forms.in_progress')}</option>
+                <option value="completed">{t('forms.completed')}</option>
+                <option value="cancelled">{t('forms.cancelled')}</option>
               </select>
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700">
-                Estimated Cost ($)
+                {t('forms.estimated_cost')}
               </label>
               <input
                 type="number"
@@ -407,7 +409,7 @@ export default function AppointmentForm({
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700">
-                Notes
+                {t('forms.notes')}
               </label>
               <textarea
                 value={formData.notes}
@@ -426,7 +428,7 @@ export default function AppointmentForm({
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <X className="mr-2 h-4 w-4" />
-            Cancel
+            {t('forms.cancel')}
           </button>
           <button
             type="submit"
@@ -435,10 +437,10 @@ export default function AppointmentForm({
           >
             <Save className="mr-2 h-4 w-4" />
             {loading
-              ? "Saving..."
+              ? t('forms.saving')
               : isEditing
-              ? "Update Appointment"
-              : "Save Appointment"}
+              ? t('forms.update_appointment')
+              : t('forms.save_appointment')}
           </button>
         </div>
       </form>

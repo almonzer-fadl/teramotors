@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import JobCardGrid from "@/components/dashboard/JobCardGrid";
 import { socket } from "@/lib/services/socket";
-import e from "express";
+import { useTranslation } from "react-i18next";
 
 interface DashboardStats {
   totalCustomers: number;
@@ -29,6 +29,7 @@ interface DashboardStats {
 }
 
 export default function DashboardPage() {
+  const { t } = useTranslation('common');
   const [stats, setStats] = useState<DashboardStats>({
     totalCustomers: 0,
     totalVehicles: 0,
@@ -88,56 +89,56 @@ export default function DashboardPage() {
 
   const statCards = [
     {
-      title: "Total Customers",
+      title: t('dashboard.total_customers'),
       value: stats.totalCustomers,
       icon: Users,
       color: "bg-blue-500",
       href: "/customers",
     },
     {
-      title: "Total Vehicles",
+      title: t('dashboard.total_vehicles'),
       value: stats.totalVehicles,
       icon: Car,
       color: "bg-green-500",
       href: "/vehicles",
     },
     {
-      title: "Pending Appointments",
+      title: t('dashboard.pending_appointments'),
       value: stats.pendingAppointments,
       icon: Calendar,
       color: "bg-yellow-500",
       href: "/appointments",
     },
     {
-      title: "Active Job Cards",
+      title: t('dashboard.active_job_cards'),
       value: stats.activeJobCards,
       icon: ClipboardList,
       color: "bg-purple-500",
       href: "/job-cards",
     },
     {
-      title: "Monthly Revenue",
+      title: t('dashboard.monthly_revenue'),
       value: `${stats.monthlyRevenue.toLocaleString()}`,
       icon: DollarSign,
       color: "bg-emerald-500",
       href: "/reports",
     },
     {
-      title: "Revenue Growth",
+      title: t('dashboard.revenue_growth'),
       value: `${stats.revenueGrowth > 0 ? "+" : ""}${stats.revenueGrowth}%`,
       icon: TrendingUp,
       color: stats.revenueGrowth >= 0 ? "bg-green-500" : "bg-red-500",
       href: "/reports",
     },
     {
-      title: "Avg Job Time",
+      title: t('dashboard.avg_job_time'),
       value: `${stats.avgJobTime}h`,
       icon: Clock,
       color: "bg-indigo-500",
       href: "/job-cards",
     },
     {
-      title: "Low Stock Parts",
+      title: t('dashboard.low_stock_parts'),
       value: stats.lowStockParts,
       icon: AlertTriangle,
       color: "bg-orange-500",
@@ -157,9 +158,9 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
         <p className="mt-1 text-sm text-gray-500">
-          Welcome back! Here&apos;s what&apos;s happening at your shop today.
+          {t('dashboard.welcome')}
         </p>
       </div>
 
@@ -197,7 +198,7 @@ export default function DashboardPage() {
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Quick Actions
+            {t('dashboard.quick_actions')}
           </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link
@@ -205,28 +206,28 @@ export default function DashboardPage() {
               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               <Users className="mr-2 h-4 w-4" />
-              Add Customer
+              {t('dashboard.add_customer')}
             </Link>
             <Link
               href="/vehicles/new"
               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               <Car className="mr-2 h-4 w-4" />
-              Add Vehicle
+              {t('dashboard.add_vehicle')}
             </Link>
             <Link
               href="/inspections/new"
               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               <Search className="mr-2 h-4 w-4" />
-              Create Inspection
+              {t('dashboard.create_inspection')}
             </Link>
             <Link
               href="/job-cards/new"
               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               <ClipboardList className="mr-2 h-4 w-4" />
-              Create Job Card
+              {t('dashboard.create_job_card')}
             </Link>
           </div>
         </div>
@@ -236,7 +237,7 @@ export default function DashboardPage() {
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Active Job Cards
+            {t('dashboard.active_job_cards')}
           </h3>
           <JobCardGrid />
         </div>

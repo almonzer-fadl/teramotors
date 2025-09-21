@@ -8,6 +8,7 @@ import { Calendar, Clock, Car, User, Wrench, DollarSign, X } from 'lucide-react'
 import StatusBadge from '@/components/dashboard/StatusBadge';
 import Modal from '@/components/dashboard/Modal';
 import { useToast } from '@/lib/hooks/useToast';
+import { useTranslation } from 'react-i18next';
 
 interface Appointment {
   _id: string;
@@ -23,6 +24,7 @@ interface Appointment {
 }
 
 export default function AppointmentDetailPage() {
+  const { t } = useTranslation('common');
   const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [loading, setLoading] = useState(true);
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
@@ -63,14 +65,14 @@ export default function AppointmentDetailPage() {
       });
 
       if (res.ok) {
-        addToast('Appointment cancelled successfully', 'success');
+        addToast(t('appointments.appointment_cancelled_successfully'), 'success');
         router.push('/appointments');
       } else {
-        addToast('Failed to cancel appointment', 'error');
+        addToast(t('appointments.failed_to_cancel_appointment'), 'error');
       }
     } catch (error) {
       console.error('Failed to cancel appointment', error);
-      addToast('Failed to cancel appointment', 'error');
+      addToast(t('appointments.failed_to_cancel_appointment'), 'error');
     } finally {
       setCancelModalOpen(false);
     }
@@ -89,7 +91,7 @@ export default function AppointmentDetailPage() {
       <div className="bg-white shadow rounded-lg p-6 mb-6">
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-2xl font-bold mb-2">Appointment Details</h1>
+            <h1 className="text-2xl font-bold mb-2">{t('appointments.appointment_details')}</h1>
             <StatusBadge status={appointment.status} />
           </div>
           {appointment.status === 'scheduled' && (
@@ -98,38 +100,38 @@ export default function AppointmentDetailPage() {
               className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 flex items-center"
             >
               <X className="h-4 w-4 mr-2" />
-              Cancel Appointment
+              {t('appointments.cancel_appointment')}
             </button>
           )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div>
-            <h2 className="text-lg font-semibold mb-2">Customer & Vehicle</h2>
+            <h2 className="text-lg font-semibold mb-2">{t('appointments.customer_vehicle')}</h2>
             <p><User className="inline-block h-4 w-4 mr-2" /> <Link href={`/customers/${appointment.customerId._id}`} className="text-indigo-600 hover:text-indigo-900">{appointment.customerId.firstName} {appointment.customerId.lastName}</Link></p>
             <p><Car className="inline-block h-4 w-4 mr-2" /> <Link href={`/vehicles/${appointment.vehicleId._id}`} className="text-indigo-600 hover:text-indigo-900">{appointment.vehicleId.year} {appointment.vehicleId.make} {appointment.vehicleId.model}</Link></p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Service & Mechanic</h2>
+            <h2 className="text-lg font-semibold mb-2">{t('appointments.service_mechanic')}</h2>
             <p><Wrench className="inline-block h-4 w-4 mr-2" /> {appointment.serviceId.name}</p>
             <p><User className="inline-block h-4 w-4 mr-2" /> {appointment.mechanicId.firstName} {appointment.mechanicId.lastName}</p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Date & Time</h2>
+            <h2 className="text-lg font-semibold mb-2">{t('appointments.date_time')}</h2>
             <p><Calendar className="inline-block h-4 w-4 mr-2" /> {new Date(appointment.appointmentDate).toLocaleDateString()}</p>
             <p><Clock className="inline-block h-4 w-4 mr-2" /> {appointment.startTime} - {appointment.endTime}</p>
           </div>
           <div>
-            <h2 className="text-lg font-semibold mb-2">Cost</h2>
-            <p><DollarSign className="inline-block h-4 w-4 mr-2" /> Estimated: ${appointment.estimatedCost.toFixed(2)}</p>
+            <h2 className="text-lg font-semibold mb-2">{t('appointments.cost')}</h2>
+            <p><DollarSign className="inline-block h-4 w-4 mr-2" /> {t('appointments.estimated')}: ${appointment.estimatedCost.toFixed(2)}</p>
           </div>
         </div>
       </div>
 
-      <Modal isOpen={isCancelModalOpen} onClose={() => setCancelModalOpen(false)} title="Confirm Cancellation">
-        <p>Are you sure you want to cancel this appointment?</p>
+      <Modal isOpen={isCancelModalOpen} onClose={() => setCancelModalOpen(false)} title={t('appointments.confirm_cancellation')}>
+        <p>{t('appointments.confirm_cancellation_message')}</p>
         <div className="flex justify-end space-x-4 mt-4">
-          <button onClick={() => setCancelModalOpen(false)} className="px-4 py-2 rounded-md border">No</button>
-          <button onClick={handleCancel} className="px-4 py-2 rounded-md bg-red-500 text-white">Yes, Cancel</button>
+          <button onClick={() => setCancelModalOpen(false)} className="px-4 py-2 rounded-md border">{t('appointments.no')}</button>
+          <button onClick={handleCancel} className="px-4 py-2 rounded-md bg-red-500 text-white">{t('appointments.yes_cancel')}</button>
         </div>
       </Modal>
     </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Plus, Trash2 } from "lucide-react";
 import { socket } from "../../lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface AppointmentMinimal {
   _id: string;
@@ -57,6 +58,7 @@ export default function JobCardForm({
   jobCardId?: string;
   appointmentId?: string;
 }) {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState<AppointmentMinimal[]>([]);
@@ -222,12 +224,12 @@ export default function JobCardForm({
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? "Edit Job Card" : "New Job Card"}
+              {isEditing ? t('forms.edit_job_card') : t('forms.new_job_card')}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
               {isEditing
-                ? "Update job card details."
-                : "Create a new job card."}
+                ? t('forms.update_job_card_details')
+                : t('forms.create_new_job_card')}
             </p>
           </div>
         </div>
@@ -237,65 +239,65 @@ export default function JobCardForm({
         <div className="bg-white shadow rounded-lg p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Customer</label>
+              <label className="block text-sm font-medium text-gray-700">{t('forms.customer')}</label>
               <select required value={formData.customerId} onChange={(e) => handleInputChange('customerId', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Select Customer</option>
+                <option value="">{t('forms.select_customer')}</option>
                 {customers.map(c => <option key={c._id} value={c._id}>{c.firstName} {c.lastName}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Vehicle</label>
+              <label className="block text-sm font-medium text-gray-700">{t('forms.vehicle')}</label>
               <select required value={formData.vehicleId} onChange={(e) => handleInputChange('vehicleId', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Select Vehicle</option>
+                <option value="">{t('forms.select_vehicle')}</option>
                 {vehicles.filter(v => v.customerId === formData.customerId).map(v => <option key={v._id} value={v._id}>{v.make} {v.model} ({v.year})</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Mechanic</label>
+              <label className="block text-sm font-medium text-gray-700">{t('forms.mechanic')}</label>
               <select required value={formData.mechanicId} onChange={(e) => handleInputChange('mechanicId', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">Assign Mechanic</option>
+                <option value="">{t('forms.assign_mechanic')}</option>
                 {mechanics.map(m => <option key={m._id} value={m._id}>{m.fullName || m.name || 'Unnamed'}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Status</label>
+              <label className="block text-sm font-medium text-gray-700">{t('forms.status')}</label>
               <select value={formData.status} onChange={(e) => handleInputChange('status', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="pending">Pending</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="pending">{t('forms.pending')}</option>
+                <option value="in-progress">{t('forms.in_progress')}</option>
+                <option value="completed">{t('forms.completed')}</option>
+                <option value="cancelled">{t('forms.cancelled')}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Priority</label>
+              <label className="block text-sm font-medium text-gray-700">{t('forms.priority')}</label>
               <select value={formData.priority} onChange={(e) => handleInputChange('priority', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
+                <option value="low">{t('forms.low')}</option>
+                <option value="medium">{t('forms.medium')}</option>
+                <option value="high">{t('forms.high')}</option>
+                <option value="urgent">{t('forms.urgent')}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Estimated Start Time</label>
+              <label className="block text-sm font-medium text-gray-700">{t('forms.estimated_start_time')}</label>
               <input type="datetime-local" required value={formData.estimatedStartTime} onChange={(e) => handleInputChange('estimatedStartTime', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Estimated End Time</label>
+              <label className="block text-sm font-medium text-gray-700">{t('forms.estimated_end_time')}</label>
               <input type="datetime-local" required value={formData.estimatedEndTime} onChange={(e) => handleInputChange('estimatedEndTime', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Labor Hours</label>
+              <label className="block text-sm font-medium text-gray-700">{t('forms.labor_hours')}</label>
               <input type="number" required value={formData.laborHours} onChange={(e) => handleInputChange('laborHours', parseFloat(e.target.value))} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">Notes</label>
+              <label className="block text-sm font-medium text-gray-700">{t('forms.notes')}</label>
               <textarea value={formData.notes} onChange={(e) => handleInputChange('notes', e.target.value)} rows={4} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
             </div>
           </div>
         </div>
 
         <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Parts Used</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('forms.parts_used')}</h3>
           {formData.partsUsed.map((part, index) => (
             <div
               key={index}
@@ -308,7 +310,7 @@ export default function JobCardForm({
                 }
                 className="col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="">Select Part</option>
+                <option value="">{t('forms.select_part')}</option>
                 {parts.map((p) => (
                   <option key={p._id} value={p._id}>
                     {p.name}
@@ -348,7 +350,7 @@ export default function JobCardForm({
             className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Part
+            {t('forms.add_part')}
           </button>
         </div>
 
@@ -359,7 +361,7 @@ export default function JobCardForm({
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <X className="mr-2 h-4 w-4" />
-            Cancel
+            {t('forms.cancel')}
           </button>
           <button
             type="submit"
@@ -368,10 +370,10 @@ export default function JobCardForm({
           >
             <Save className="mr-2 h-4 w-4" />
             {loading
-              ? "Saving..."
+              ? t('forms.saving')
               : isEditing
-              ? "Update Job Card"
-              : "Save Job Card"}
+              ? t('forms.update_job_card')
+              : t('forms.save_job_card')}
           </button>
         </div>
       </form>

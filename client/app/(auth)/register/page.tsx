@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useTranslation } from 'react-i18next'
 
 export default function RegisterPage() {
+  const { t } = useTranslation('common');
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -33,30 +35,30 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white shadow rounded-lg p-6">
-        <h1 className="text-xl font-semibold text-gray-900 mb-6">Create your account</h1>
+        <h1 className="text-xl font-semibold text-gray-900 mb-6">{t('auth.create_your_account')}</h1>
         {success ? (
           <div className="space-y-4">
-            <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded p-3">Account created. You can now sign in.</div>
-            <Link href="/login" className="inline-flex justify-center rounded-md bg-blue-600 px-4 py-2 text-white text-sm font-medium hover:bg-blue-700">Go to login</Link>
+            <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded p-3">{t('auth.account_created')}</div>
+            <Link href="/login" className="inline-flex justify-center rounded-md bg-blue-600 px-4 py-2 text-white text-sm font-medium hover:bg-blue-700">{t('auth.go_to_login')}</Link>
           </div>
         ) : (
           <>
             {error && <div className="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded p-3">{error}</div>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.email')}</label>
                 <input name="email" type="email" required className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.password')}</label>
                 <input name="password" type="password" required minLength={8} className="w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" />
               </div>
               <button type="submit" disabled={isLoading} className="w-full inline-flex justify-center rounded-md bg-blue-600 px-4 py-2 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-50">
-                {isLoading ? 'Creating...' : 'Create account'}
+                {isLoading ? t('auth.creating_account') : t('auth.create_account')}
               </button>
             </form>
             <div className="mt-6 text-sm">
-              <Link href="/login" className="text-blue-600 hover:text-blue-700">Already have an account? Sign in</Link>
+              <Link href="/login" className="text-blue-600 hover:text-blue-700">{t('auth.already_have_account')}</Link>
             </div>
           </>
         )}

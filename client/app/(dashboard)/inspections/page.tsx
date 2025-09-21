@@ -13,6 +13,7 @@ import {
   FileText,
 } from "lucide-react";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface InspectionTemplate {
   _id: string;
@@ -72,6 +73,7 @@ interface VehicleInspection {
 }
 
 export default function InspectionsPage() {
+  const { t } = useTranslation('common');
   const [inspections, setInspections] = useState<VehicleInspection[]>([]);
   const [templates, setTemplates] = useState<InspectionTemplate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -176,11 +178,10 @@ export default function InspectionsPage() {
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Vehicle Inspections
+            {t('inspections.title')}
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Conduct comprehensive vehicle inspections and generate detailed
-            reports.
+            {t('inspections.description')}
           </p>
         </div>
         <div className="mt-4 sm:mt-0 flex space-x-3">
@@ -189,14 +190,14 @@ export default function InspectionsPage() {
             className="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500"
           >
             <FileText className="mr-2 h-4 w-4" />
-            Templates
+            {t('inspections.templates')}
           </Link>
           <Link
             href="/inspections/new"
             className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
           >
             <Plus className="mr-2 h-4 w-4" />
-            New Inspection
+            {t('inspections.new_inspection')}
           </Link>
         </div>
       </div>
@@ -210,7 +211,7 @@ export default function InspectionsPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search inspections..."
+                  placeholder={t('inspections.search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -221,15 +222,14 @@ export default function InspectionsPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="all">All Status</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="all">{t('inspections.all_status')}</option>
+                <option value="in-progress">{t('inspections.in_progress')}</option>
+                <option value="completed">{t('inspections.completed')}</option>
+                <option value="cancelled">{t('inspections.cancelled')}</option>
               </select>
             </div>
             <div className="text-sm text-gray-500">
-              {filteredInspections.length} inspection
-              {filteredInspections.length !== 1 ? "s" : ""}
+              {t(filteredInspections.length === 1 ? 'inspections.inspection_count' : 'inspections.inspection_count_plural', { count: filteredInspections.length })}
             </div>
           </div>
         </div>
@@ -242,28 +242,28 @@ export default function InspectionsPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Inspection
+                  {t('inspections.inspection')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer
+                  {t('inspections.customer')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vehicle
+                  {t('inspections.vehicle')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Template
+                  {t('inspections.template')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Overall Condition
+                  {t('inspections.overall_condition')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estimated Cost
+                  {t('inspections.estimated_cost')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t('inspections.status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('inspections.actions')}
                 </th>
               </tr>
             </thead>
@@ -371,12 +371,12 @@ export default function InspectionsPage() {
         <div className="text-center py-12">
           <CheckCircle className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No inspections found
+            {t('inspections.no_inspections_found')}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {searchTerm || statusFilter !== "all"
-              ? "Try adjusting your search or filter terms."
-              : "Get started by creating your first inspection."}
+              ? t('inspections.adjust_search_filters')
+              : t('inspections.get_started_creating')}
           </p>
           {!searchTerm && statusFilter === "all" && (
             <div className="mt-6">
@@ -385,7 +385,7 @@ export default function InspectionsPage() {
                 className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                New Inspection
+                {t('inspections.new_inspection')}
               </Link>
             </div>
           )}

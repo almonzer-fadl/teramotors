@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Search, Edit, Trash2, ArrowUpDown } from "lucide-react";
 import StatusBadge from "@/components/dashboard/StatusBadge";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface Part {
   _id: string;
@@ -25,6 +26,7 @@ type SortKey = "name" | "partNumber" | "stockQuantity" | "createdAt";
 type SortDirection = "asc" | "desc";
 
 export default function InventoryPage() {
+  const { t } = useTranslation('common');
   const [parts, setParts] = useState<Part[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -93,7 +95,7 @@ export default function InventoryPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this part?")) {
+    if (confirm(t('inventory.delete_confirm'))) {
       try {
         const response = await fetch(`/api/parts/${id}`, {
           method: "DELETE",
@@ -120,9 +122,9 @@ export default function InventoryPage() {
       {/* Header */}
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Parts Inventory</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('inventory.title')}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Manage your parts inventory and stock levels.
+            {t('inventory.description')}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
@@ -131,7 +133,7 @@ export default function InventoryPage() {
             className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Part
+            {t('inventory.add_part')}
           </Link>
         </div>
       </div>
@@ -144,14 +146,14 @@ export default function InventoryPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search parts..."
+                placeholder={t('inventory.search_placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div className="text-sm text-gray-500">
-              {sortedParts.length} part{sortedParts.length !== 1 ? "s" : ""}
+              {t(sortedParts.length === 1 ? 'inventory.part_count' : 'inventory.part_count_plural', { count: sortedParts.length })}
             </div>
           </div>
         </div>
@@ -167,35 +169,35 @@ export default function InventoryPage() {
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort("name")}
                 >
-                  Name <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
+                  {t('inventory.name')} <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
                 <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort("partNumber")}
                 >
-                  Part Number{" "}
+                  {t('inventory.part_number')}{" "}
                   <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
+                  {t('inventory.category')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Stock
+                  {t('inventory.stock')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
+                  {t('inventory.price')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t('inventory.status')}
                 </th>
                 <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort("createdAt")}
                 >
-                  Created <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
+                  {t('inventory.created')} <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('inventory.actions')}
                 </th>
               </tr>
             </thead>
@@ -251,12 +253,12 @@ export default function InventoryPage() {
       {sortedParts.length === 0 && (
         <div className="text-center py-12">
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No parts found
+            {t('inventory.no_parts_found')}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {searchTerm
-              ? "Try adjusting your search terms."
-              : "Get started by adding your first part."}
+              ? t('inventory.adjust_search')
+              : t('inventory.get_started_adding')}
           </p>
           {!searchTerm && (
             <div className="mt-6">
@@ -265,7 +267,7 @@ export default function InventoryPage() {
                 className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Add Part
+                {t('inventory.add_part')}
               </Link>
             </div>
           )}

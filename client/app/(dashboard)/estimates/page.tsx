@@ -13,6 +13,7 @@ import {
   Clock,
 } from "lucide-react";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface Estimate {
   _id: string;
@@ -55,6 +56,7 @@ interface Estimate {
 }
 
 export default function EstimatesPage() {
+  const { t } = useTranslation('common');
   const [estimates, setEstimates] = useState<Estimate[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -143,9 +145,9 @@ export default function EstimatesPage() {
       {/* Header */}
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Estimates</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('estimates.title')}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Create and manage service estimates for customers.
+            {t('estimates.description')}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
@@ -154,7 +156,7 @@ export default function EstimatesPage() {
             className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Create Estimate
+            {t('estimates.create_estimate')}
           </Link>
         </div>
       </div>
@@ -168,7 +170,7 @@ export default function EstimatesPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search estimates..."
+                  placeholder={t('estimates.search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -179,15 +181,14 @@ export default function EstimatesPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
+                <option value="all">{t('estimates.all_status')}</option>
+                <option value="pending">{t('estimates.pending')}</option>
+                <option value="approved">{t('estimates.approved')}</option>
+                <option value="rejected">{t('estimates.rejected')}</option>
               </select>
             </div>
             <div className="text-sm text-gray-500">
-              {filteredEstimates.length} estimate
-              {filteredEstimates.length !== 1 ? "s" : ""}
+              {t(filteredEstimates.length === 1 ? 'estimates.estimate_count' : 'estimates.estimate_count_plural', { count: filteredEstimates.length })}
             </div>
           </div>
         </div>
@@ -200,28 +201,28 @@ export default function EstimatesPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estimate
+                  {t('estimates.estimate')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer
+                  {t('estimates.customer')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vehicle
+                  {t('estimates.vehicle')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Services
+                  {t('estimates.services')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total
+                  {t('estimates.total')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t('estimates.status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Valid Until
+                  {t('estimates.valid_until')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('estimates.actions')}
                 </th>
               </tr>
             </thead>
@@ -338,12 +339,12 @@ export default function EstimatesPage() {
         <div className="text-center py-12">
           <FileText className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No estimates found
+            {t('estimates.no_estimates_found')}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {searchTerm || statusFilter !== "all"
-              ? "Try adjusting your search or filter terms."
-              : "Get started by creating your first estimate."}
+              ? t('estimates.adjust_search_filters')
+              : t('estimates.get_started_creating')}
           </p>
           {!searchTerm && statusFilter === "all" && (
             <div className="mt-6">
@@ -352,7 +353,7 @@ export default function EstimatesPage() {
                 className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Create Estimate
+                {t('estimates.create_estimate')}
               </Link>
             </div>
           )}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AlertTriangle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface Part {
   _id: string
@@ -13,6 +14,7 @@ interface Part {
 }
 
 export default function InventoryAlertsPage() {
+  const { t } = useTranslation('common');
   const [parts, setParts] = useState<Part[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -41,9 +43,9 @@ export default function InventoryAlertsPage() {
     <div className="space-y-6">
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Low Stock Alerts</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('inventory_alerts.title')}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Parts that are below their minimum stock level.
+            {t('inventory_alerts.description')}
           </p>
         </div>
       </div>
@@ -53,10 +55,10 @@ export default function InventoryAlertsPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Part Number</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Min Stock</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory_alerts.part')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory_alerts.part_number')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory_alerts.stock')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('inventory_alerts.min_stock')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
