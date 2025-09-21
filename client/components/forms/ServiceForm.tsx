@@ -7,6 +7,7 @@ import Part from "@/lib/models/Part";
 
 import { Combobox } from "@/components/ui/Combobox";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface ServiceFormData {
   name: string;
@@ -26,6 +27,7 @@ export default function ServiceForm({
   serviceId?: string;
   fromTemplate?: boolean;
 }) {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [parts, setParts] = useState<Array<InstanceType<typeof Part>>>([]);
@@ -176,10 +178,10 @@ export default function ServiceForm({
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? "Edit Service" : "New Service"}
+              {isEditing ? t('forms.edit_service') : t('forms.new_service')}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
-              {isEditing ? "Update service details." : "Create a new service."}
+              {isEditing ? t('forms.update_service_details') : t('forms.create_new_service')}
             </p>
           </div>
         </div>
@@ -189,13 +191,13 @@ export default function ServiceForm({
         {fromTemplate && (
           <div className="bg-white shadow rounded-lg p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Create from Template
+              {t('forms.create_from_template')}
             </h3>
             <select
               onChange={(e) => handleTemplateChange(e.target.value)}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
             >
-              <option value="">Select a Template</option>
+              <option value="">{t('forms.select_template')}</option>
               {templates.map((t) => (
                 <option key={(t as any)._id} value={(t as any)._id}>
                   {t.name}
@@ -208,7 +210,7 @@ export default function ServiceForm({
         <div className="bg-white shadow rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <input
             type="text"
-            placeholder="Name"
+            placeholder={t('forms.name')}
             required
             value={formData.name}
             onChange={(e) => handleInputChange("name", e.target.value)}
@@ -218,13 +220,13 @@ export default function ServiceForm({
             options={categories.map((c) => ({ label: c, value: c }))}
             value={formData.category}
             onChange={(value) => handleInputChange("category", value)}
-            placeholder="Select a category"
-            searchPlaceholder="Search or add category..."
-            emptyPlaceholder="No categories found."
+            placeholder={t('forms.select_category')}
+            searchPlaceholder={t('forms.search_or_add_category')}
+            emptyPlaceholder={t('forms.no_categories_found')}
           />
           <input
             type="number"
-            placeholder="Labor Rate"
+            placeholder={t('forms.labor_rate')}
             required
             value={formData.laborRate}
             onChange={(e) =>
@@ -234,7 +236,7 @@ export default function ServiceForm({
           />
           <input
             type="number"
-            placeholder="Labor Hours"
+            placeholder={t('forms.labor_hours')}
             required
             value={formData.laborHours}
             onChange={(e) =>
@@ -243,7 +245,7 @@ export default function ServiceForm({
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           />
           <textarea
-            placeholder="Description"
+            placeholder={t('forms.description')}
             value={formData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
             className="md:col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm"
@@ -262,14 +264,14 @@ export default function ServiceForm({
               htmlFor="isTemplate"
               className="ml-3 min-w-0 flex-1 text-gray-500"
             >
-              Save as template
+              {t('forms.save_as_template')}
             </label>
           </div>
         </div>
 
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Parts Required
+            {t('forms.parts_required')}
           </h3>
           {formData.partsRequired.map((part, index) => (
             <div
@@ -283,7 +285,7 @@ export default function ServiceForm({
                 }
                 className="col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="">Select Part</option>
+                <option value="">{t('forms.select_part')}</option>
                 {parts.map((p) => (
                   <option key={p._id} value={p._id}>
                     {p.name}
@@ -323,7 +325,7 @@ export default function ServiceForm({
             className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Part
+            {t('forms.add_part')}
           </button>
         </div>
 
@@ -334,7 +336,7 @@ export default function ServiceForm({
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <X className="mr-2 h-4 w-4" />
-            Cancel
+            {t('forms.cancel')}
           </button>
           <button
             type="submit"
@@ -343,10 +345,10 @@ export default function ServiceForm({
           >
             <Save className="mr-2 h-4 w-4" />
             {loading
-              ? "Saving..."
+              ? t('forms.saving')
               : isEditing
-              ? "Update Service"
-              : "Save Service"}
+              ? t('forms.update_service')
+              : t('forms.save_service')}
           </button>
         </div>
       </form>

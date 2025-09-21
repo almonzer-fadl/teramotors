@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 import dayjs from 'dayjs';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { useTranslation } from 'react-i18next';
 
 const localizer = dayjsLocalizer(dayjs);
 
@@ -15,6 +16,7 @@ interface Appointment {
 }
 
 export default function AppointmentsCalendarPage() {
+  const { t } = useTranslation('common');
   const [events, setEvents] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,7 +54,7 @@ export default function AppointmentsCalendarPage() {
 
   return (
     <div className="bg-white shadow rounded-lg p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-4">Appointments Calendar</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('appointments.calendar_title')}</h1>
       <div style={{ height: '70vh' }}>
         <Calendar
           localizer={localizer}

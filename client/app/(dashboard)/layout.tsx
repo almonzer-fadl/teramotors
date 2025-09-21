@@ -27,6 +27,9 @@ import {
   Bell,
   User,
 } from "lucide-react";
+import { I18nextProvider, useTranslation } from "react-i18next";
+import i18n from "@/i18n";
+import LanguageSwitcher from "@/components/dashboard/LanguageSwitcher";
 
 // Icon mapping for dynamic navigation
 const iconMap = {
@@ -43,10 +46,11 @@ const iconMap = {
   Settings,
 }
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const { user } = useSession();
+  const { t } = useTranslation('common');
   
   // Get role-based navigation items
   const userRole = (user as any)?.role || 'mechanic'
@@ -154,6 +158,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1"></div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
+              <LanguageSwitcher />
               <button
                 type="button"
                 className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
@@ -174,7 +179,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   className="flex items-center gap-x-2 text-sm text-gray-500 hover:text-gray-700"
                 >
                   <LogOut className="h-4 w-4" />
-                  Sign out
+                  {t('header.sign_out')}
                 </button>
               </div>
             </div>
@@ -190,5 +195,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
     </div>
+  );
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <I18nextProvider i18n={i18n}>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </I18nextProvider>
   );
 }

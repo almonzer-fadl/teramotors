@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from 'next-auth/react'
+import I18nProvider from "./i18n-provider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,10 +30,9 @@ export default function RootLayout({
         className={`${inter.variable} ${robotoMono.variable} antialiased`}
       >
         <SessionProvider>
-          
-          {children}
-
-
+          <I18nProvider>
+            {children}
+          </I18nProvider>
         </SessionProvider>
       </body>
     </html>

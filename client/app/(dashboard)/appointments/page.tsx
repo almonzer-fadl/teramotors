@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Search, Edit, Eye, Calendar, Clock } from "lucide-react";
 import StatusBadge from "@/components/dashboard/StatusBadge";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface Appointment {
   _id: string;
@@ -40,6 +41,7 @@ interface Appointment {
 }
 
 export default function AppointmentsPage() {
+  const { t } = useTranslation('common');
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -93,9 +95,9 @@ export default function AppointmentsPage() {
       {/* Header */}
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('appointments.title')}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Schedule and manage customer appointments.
+            {t('appointments.description')}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
@@ -104,7 +106,7 @@ export default function AppointmentsPage() {
             className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Schedule Appointment
+            {t('appointments.schedule_appointment')}
           </Link>
         </div>
       </div>
@@ -118,7 +120,7 @@ export default function AppointmentsPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search appointments..."
+                  placeholder={t('appointments.search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -129,26 +131,25 @@ export default function AppointmentsPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="all">All Status</option>
-                <option value="scheduled">Scheduled</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="all">{t('appointments.all_status')}</option>
+                <option value="scheduled">{t('appointments.scheduled')}</option>
+                <option value="in-progress">{t('appointments.in_progress')}</option>
+                <option value="completed">{t('appointments.completed')}</option>
+                <option value="cancelled">{t('appointments.cancelled')}</option>
               </select>
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
                 className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="all">All Dates</option>
-                <option value="today">Today</option>
-                <option value="tomorrow">Tomorrow</option>
-                <option value="this-week">This Week</option>
+                <option value="all">{t('appointments.all_dates')}</option>
+                <option value="today">{t('appointments.today')}</option>
+                <option value="tomorrow">{t('appointments.tomorrow')}</option>
+                <option value="this-week">{t('appointments.this_week')}</option>
               </select>
             </div>
             <div className="text-sm text-gray-500">
-              {appointments.length} appointment
-              {appointments.length !== 1 ? "s" : ""}
+              {t(appointments.length === 1 ? 'appointments.appointment_count' : 'appointments.appointment_count_plural', { count: appointments.length })}
             </div>
           </div>
         </div>
@@ -161,31 +162,31 @@ export default function AppointmentsPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Appointment
+                  {t('appointments.appointment')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer
+                  {t('appointments.customer')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vehicle
+                  {t('appointments.vehicle')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Service
+                  {t('appointments.service')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date & Time
+                  {t('appointments.date_time')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Mechanic
+                  {t('appointments.mechanic')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Cost
+                  {t('appointments.cost')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t('appointments.status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('appointments.actions')}
                 </th>
               </tr>
             </thead>
@@ -290,12 +291,12 @@ export default function AppointmentsPage() {
         <div className="text-center py-12">
           <Calendar className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No appointments found
+            {t('appointments.no_appointments_found')}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {searchTerm || statusFilter !== "all" || dateFilter !== "all"
-              ? "Try adjusting your search or filter terms."
-              : "Get started by scheduling your first appointment."}
+              ? t('appointments.adjust_search_filters')
+              : t('appointments.get_started_scheduling')}
           </p>
           {!searchTerm && statusFilter === "all" && dateFilter === "all" && (
             <div className="mt-6">
@@ -304,7 +305,7 @@ export default function AppointmentsPage() {
                 className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Schedule Appointment
+                {t('appointments.schedule_appointment')}
               </Link>
             </div>
           )}

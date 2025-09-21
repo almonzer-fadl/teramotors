@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X } from "lucide-react";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface CustomerFormData {
   firstName: string;
@@ -26,6 +27,7 @@ interface CustomerFormData {
 }
 
 export default function CustomerForm({ customerId }: { customerId?: string }) {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CustomerFormData>({
@@ -151,12 +153,12 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? "Edit Customer" : "Add New Customer"}
+              {isEditing ? t('forms.edit_customer') : t('forms.add_new_customer')}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
               {isEditing
-                ? "Update customer information"
-                : "Enter customer details to add to your database"}
+                ? t('forms.update_customer_information')
+                : t('forms.enter_customer_details')}
             </p>
           </div>
         </div>
@@ -167,12 +169,12 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Basic Information
+              {t('forms.basic_information')}
             </h3>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  First Name *
+                  {t('forms.first_name')}
                 </label>
                 <input
                   type="text"
@@ -186,7 +188,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Last Name *
+                  {t('forms.last_name')}
                 </label>
                 <input
                   type="text"
@@ -200,7 +202,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Email Address *
+                  {t('forms.email_address')}
                 </label>
                 <input
                   type="email"
@@ -212,7 +214,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Phone Number *
+                  {t('forms.phone_number')}
                 </label>
                 <input
                   type="tel"
@@ -229,12 +231,12 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Address Information
+              {t('forms.address_information')}
             </h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Street Address
+                  {t('forms.street_address')}
                 </label>
                 <input
                   type="text"
@@ -248,7 +250,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    City
+                    {t('forms.city')}
                   </label>
                   <input
                     type="text"
@@ -261,7 +263,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    State
+                    {t('forms.state')}
                   </label>
                   <input
                     type="text"
@@ -274,7 +276,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    ZIP Code
+                    {t('forms.zip_code')}
                   </label>
                   <input
                     type="text"
@@ -293,12 +295,12 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Emergency Contact
+              {t('forms.emergency_contact')}
             </h3>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Contact Name
+                  {t('forms.contact_name')}
                 </label>
                 <input
                   type="text"
@@ -311,7 +313,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Contact Phone
+                  {t('forms.contact_phone')}
                 </label>
                 <input
                   type="tel"
@@ -324,7 +326,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Relationship
+                  {t('forms.relationship')}
                 </label>
                 <input
                   type="text"
@@ -345,11 +347,11 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Additional Notes
+              {t('forms.additional_notes')}
             </h3>
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Notes
+                {t('forms.notes')}
               </label>
               <textarea
                 rows={4}
@@ -370,7 +372,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <X className="mr-2 h-4 w-4" />
-            Cancel
+            {t('forms.cancel')}
           </button>
           <button
             type="submit"
@@ -379,10 +381,10 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
           >
             <Save className="mr-2 h-4 w-4" />
             {loading
-              ? "Saving..."
+              ? t('forms.saving')
               : isEditing
-              ? "Update Customer"
-              : "Save Customer"}
+              ? t('forms.update_customer')
+              : t('forms.save_customer')}
           </button>
         </div>
       </form>

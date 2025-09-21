@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Plus } from "lucide-react";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface CompatibleVehicle {
   make: string;
@@ -26,6 +27,7 @@ interface PartFormData {
 }
 
 export default function PartForm({ partId }: { partId?: string }) {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<PartFormData>({
@@ -144,12 +146,12 @@ export default function PartForm({ partId }: { partId?: string }) {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? "Edit Part" : "New Part"}
+              {isEditing ? t('forms.edit_part') : t('forms.new_part')}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
               {isEditing
-                ? "Update part details."
-                : "Add a new part to inventory."}
+                ? t('forms.update_part_details')
+                : t('forms.add_new_part')}
             </p>
           </div>
         </div>
@@ -160,7 +162,7 @@ export default function PartForm({ partId }: { partId?: string }) {
         <div className="bg-white shadow rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <input
             type="text"
-            placeholder="Name"
+            placeholder={t('forms.name')}
             required
             value={formData.name}
             onChange={(e) => handleInputChange("name", e.target.value)}
@@ -168,7 +170,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="text"
-            placeholder="Part Number"
+            placeholder={t('forms.part_number')}
             required
             value={formData.partNumber}
             onChange={(e) => handleInputChange("partNumber", e.target.value)}
@@ -176,7 +178,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="text"
-            placeholder="Category"
+            placeholder={t('forms.category')}
             required
             value={formData.category}
             onChange={(e) => handleInputChange("category", e.target.value)}
@@ -184,14 +186,14 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="text"
-            placeholder="Manufacturer"
+            placeholder={t('forms.manufacturer')}
             value={formData.manufacturer}
             onChange={(e) => handleInputChange("manufacturer", e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           />
           <input
             type="number"
-            placeholder="Cost"
+            placeholder={t('forms.cost')}
             required
             value={formData.cost}
             onChange={(e) =>
@@ -201,7 +203,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="number"
-            placeholder="Selling Price"
+            placeholder={t('forms.selling_price')}
             required
             value={formData.sellingPrice}
             onChange={(e) =>
@@ -211,7 +213,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="number"
-            placeholder="Stock Quantity"
+            placeholder={t('forms.stock_quantity')}
             required
             value={formData.stockQuantity}
             onChange={(e) =>
@@ -221,7 +223,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="number"
-            placeholder="Min Stock Level"
+            placeholder={t('forms.min_stock_level')}
             required
             value={formData.minStockLevel}
             onChange={(e) =>
@@ -231,13 +233,13 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="text"
-            placeholder="Location"
+            placeholder={t('forms.location')}
             value={formData.location}
             onChange={(e) => handleInputChange("location", e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           />
           <textarea
-            placeholder="Description"
+            placeholder={t('forms.description')}
             value={formData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
             className="md:col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm"
@@ -246,7 +248,7 @@ export default function PartForm({ partId }: { partId?: string }) {
 
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Compatible Vehicles
+            {t('forms.compatible_vehicles')}
           </h3>
           {formData.compatibleVehicles.map((vehicle, index) => (
             <div
@@ -255,7 +257,7 @@ export default function PartForm({ partId }: { partId?: string }) {
             >
               <input
                 type="text"
-                placeholder="Make"
+                placeholder={t('forms.make')}
                 value={vehicle.make}
                 onChange={(e) =>
                   handleCompatibleVehicleChange(index, "make", e.target.value)
@@ -264,7 +266,7 @@ export default function PartForm({ partId }: { partId?: string }) {
               />
               <input
                 type="text"
-                placeholder="Model"
+                placeholder={t('forms.model')}
                 value={vehicle.model}
                 onChange={(e) =>
                   handleCompatibleVehicleChange(index, "model", e.target.value)
@@ -273,7 +275,7 @@ export default function PartForm({ partId }: { partId?: string }) {
               />
               <input
                 type="number"
-                placeholder="Year"
+                placeholder={t('forms.year')}
                 value={vehicle.year}
                 onChange={(e) =>
                   handleCompatibleVehicleChange(
@@ -299,7 +301,7 @@ export default function PartForm({ partId }: { partId?: string }) {
             className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Vehicle
+            {t('forms.add_vehicle')}
           </button>
         </div>
 
@@ -310,7 +312,7 @@ export default function PartForm({ partId }: { partId?: string }) {
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <X className="mr-2 h-4 w-4" />
-            Cancel
+            {t('forms.cancel')}
           </button>
           <button
             type="submit"
@@ -318,7 +320,7 @@ export default function PartForm({ partId }: { partId?: string }) {
             className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
           >
             <Save className="mr-2 h-4 w-4" />
-            {loading ? "Saving..." : isEditing ? "Update Part" : "Save Part"}
+            {loading ? t('forms.saving') : isEditing ? t('forms.update_part') : t('forms.save_part')}
           </button>
         </div>
       </form>

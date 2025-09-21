@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Plus } from "lucide-react";
 import FileUpload from "@/components/dashboard/FileUpload";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface CustomerMinimal {
   _id: string;
@@ -28,6 +29,7 @@ interface VehicleFormData {
 }
 
 export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [customers, setCustomers] = useState<CustomerMinimal[]>([]);
@@ -160,12 +162,12 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? "Edit Vehicle" : "Add New Vehicle"}
+              {isEditing ? t('forms.edit_vehicle') : t('forms.new_vehicle')}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
               {isEditing
-                ? "Update vehicle information"
-                : "Enter vehicle details to add to your database"}
+                ? t('forms.update_vehicle_information')
+                : t('forms.enter_vehicle_details')}
             </p>
           </div>
         </div>
@@ -175,12 +177,12 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Vehicle Information
+              {t('forms.vehicle_information')}
             </h3>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Customer *
+                  {t('forms.customer')} *
                 </label>
                 <select
                   required
@@ -190,7 +192,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="">Select a customer</option>
+                  <option value="">{t('forms.select_customer')}</option>
                   {customers.map((customer) => (
                     <option
                       key={customer._id.toString()}
@@ -214,7 +216,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Make *
+                  {t('forms.make')} *
                 </label>
                 <input
                   type="text"
@@ -226,7 +228,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Model *
+                  {t('forms.model')} *
                 </label>
                 <input
                   type="text"
@@ -238,7 +240,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Year *
+                  {t('forms.year')} *
                 </label>
                 <input
                   type="number"
@@ -252,7 +254,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Color
+                  {t('forms.color')}
                 </label>
                 <input
                   type="text"
@@ -263,7 +265,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  License Plate *
+                  {t('forms.license_plate')} *
                 </label>
                 <input
                   type="text"
@@ -277,7 +279,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Mileage
+                  {t('forms.mileage')}
                 </label>
                 <input
                   type="number"
@@ -290,7 +292,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Engine Type
+                  {t('forms.engine_type')}
                 </label>
                 <input
                   type="text"
@@ -303,7 +305,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Transmission
+                  {t('forms.transmission')}
                 </label>
                 <select
                   value={formData.transmission}
@@ -312,14 +314,14 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="automatic">Automatic</option>
-                  <option value="manual">Manual</option>
-                  <option value="cvt">CVT</option>
+                  <option value="automatic">{t('forms.automatic')}</option>
+                  <option value="manual">{t('forms.manual')}</option>
+                  <option value="cvt">{t('forms.cvt')}</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Fuel Type
+                  {t('forms.fuel_type')}
                 </label>
                 <select
                   value={formData.fuelType}
@@ -328,10 +330,10 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                   }
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="gasoline">Gasoline</option>
-                  <option value="diesel">Diesel</option>
-                  <option value="hybrid">Hybrid</option>
-                  <option value="electric">Electric</option>
+                  <option value="gasoline">{t('forms.gasoline')}</option>
+                  <option value="diesel">{t('forms.diesel')}</option>
+                  <option value="hybrid">{t('forms.hybrid')}</option>
+                  <option value="electric">{t('forms.electric')}</option>
                 </select>
               </div>
             </div>
@@ -341,7 +343,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
-              Vehicle Photos
+              {t('forms.vehicle_photos')}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {formData.photos.map((photo, index) => (
@@ -372,7 +374,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <X className="mr-2 h-4 w-4" />
-            Cancel
+            {t('forms.cancel')}
           </button>
           <button
             type="submit"
@@ -381,10 +383,10 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
           >
             <Save className="mr-2 h-4 w-4" />
             {loading
-              ? "Saving..."
+              ? t('forms.saving')
               : isEditing
-              ? "Update Vehicle"
-              : "Save Vehicle"}
+              ? t('forms.update_vehicle')
+              : t('forms.save_vehicle')}
           </button>
         </div>
       </form>
