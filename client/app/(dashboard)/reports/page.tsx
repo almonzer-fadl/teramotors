@@ -1,45 +1,50 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { TrendingUp, DollarSign, Users, Car, Calendar, Package, FileText, Download } from 'lucide-react'
-import Chart from '@/components/dashboard/Chart'
+import { useSession } from '@/lib/hooks/useSession'
+import { hasPermission } from '@/lib/roles'
+import { 
+  BarChart3, 
+  TrendingUp, 
+  Users, 
+  Car, 
+  Calendar, 
+  Package,
+  DollarSign,
+  FileText,
+  Download,
+  Filter,
+  Calendar as CalendarIcon
+} from 'lucide-react'
 
 interface ReportData {
-  revenue: {
-    monthly: Array<{ month: string, revenue: number }>
-    daily: Array<{ date: string, revenue: number }>
-  }
-  customers: {
-    total: number
-    newThisMonth: number
-    growth: number
-  }
-  vehicles: {
-    total: number
-    servicedThisMonth: number
-  }
-  appointments: {
-    total: number
-    completed: number
-    cancelled: number
-    thisMonth: number
-  }
-  inventory: {
-    totalParts: number
-    lowStock: number
-    outOfStock: number
-    totalValue: number
-  }
-  services: {
-    popular: Array<{ name: string, count: number }>
-    revenue: Array<{ name: string, revenue: number }>
-  }
+  totalCustomers: number
+  totalVehicles: number
+  totalAppointments: number
+  totalJobs: number
+  totalRevenue: number
+  totalParts: number
+  monthlyRevenue: Array<{ month: string; revenue: number }>
+  topServices: Array<{ name: string; count: number; revenue: number }>
+  customerGrowth: Array<{ month: string; customers: number }>
 }
 
 export default function ReportsPage() {
+  const { user } = useSession()
   const [reportData, setReportData] = useState<ReportData | null>(null)
   const [loading, setLoading] = useState(true)
   const [dateRange, setDateRange] = useState('30')
+  const [reportType, setReportType] = useState('overview')
+
+  // Check if user has admin permissions
+  const userRole = (user as any)?.role || 'mechanic'
+  const canAccessReports = hasPermission(userRole, 'canAccessReports')
+
+  useEffect(() => {
+    if (canAccessReports) {
+      fetchReportData()
+    }
+  }, [canAccessReports, dateRange])
 
   const fetchReportData = async () => {
     try {
@@ -49,30 +54,51 @@ export default function ReportsPage() {
         setReportData(data)
       }
     } catch (error) {
-      console.error('Failed to fetch report data:', error)
+      console.error('Error fetching report data:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    fetchReportData()
-  }, [dateRange])
+  const handleExportReport = async (format: 'pdf' | 'excel') => {
+    try {
+      const response = await fetch(`/api/reports/export?format=${format}&range=${dateRange}`, {
+        method: 'POST',
+      })
+      
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `report-${new Date().toISOString().split('T')[0]}.${format}`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      }
+    } catch (error) {
+      console.error('Error exporting report:', error)
+    }
+  }
+
+  if (!canAccessReports) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900">Access Denied</h3>
+          <p className="text-gray-500">You don't have permission to access reports.</p>
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    )
-  }
-
-  if (!reportData) {
-    return (
-      <div className="text-center py-12">
-        <FileText className="mx-auto h-12 w-12 text-gray-400" />
-        <h3 className="mt-2 text-sm font-medium text-gray-900">No report data available</h3>
-        <p className="mt-1 text-sm text-gray-500">Unable to load report data at this time.</p>
+        <p className="ml-2 text-gray-500">Loading reports...</p>
       </div>
     )
   }
@@ -80,188 +106,168 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="sm:flex sm:items-center sm:justify-between">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Comprehensive business insights and performance metrics.
-          </p>
+          <p className="text-gray-600">Business insights and performance metrics</p>
         </div>
-        <div className="mt-4 sm:mt-0 flex space-x-3">
+        <div className="flex items-center gap-2">
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            className="border rounded-lg px-3 py-2 text-sm"
           >
             <option value="7">Last 7 days</option>
             <option value="30">Last 30 days</option>
             <option value="90">Last 90 days</option>
             <option value="365">Last year</option>
           </select>
-          <button className="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500">
-            <Download className="mr-2 h-4 w-4" />
-            Export Report
+          <button
+            onClick={() => handleExportReport('pdf')}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+          >
+            <Download className="h-4 w-4" />
+            Export PDF
+          </button>
+          <button
+            onClick={() => handleExportReport('excel')}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          >
+            <Download className="h-4 w-4" />
+            Export Excel
           </button>
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <DollarSign className="h-6 w-6 text-green-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Total Revenue</dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    ${reportData.revenue.monthly.reduce((sum, item) => sum + item.revenue, 0).toFixed(2)}
-                  </dd>
-                </dl>
-              </div>
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Users className="h-6 w-6 text-blue-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Customers</p>
+              <p className="text-2xl font-bold text-gray-900">{reportData?.totalCustomers || 0}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Users className="h-6 w-6 text-blue-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Total Customers</dt>
-                  <dd className="text-lg font-medium text-gray-900">{reportData.customers.total}</dd>
-                </dl>
-              </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <Car className="h-6 w-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Vehicles</p>
+              <p className="text-2xl font-bold text-gray-900">{reportData?.totalVehicles || 0}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Car className="h-6 w-6 text-purple-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Vehicles Serviced</dt>
-                  <dd className="text-lg font-medium text-gray-900">{reportData.vehicles.servicedThisMonth}</dd>
-                </dl>
-              </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <Calendar className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Appointments</p>
+              <p className="text-2xl font-bold text-gray-900">{reportData?.totalAppointments || 0}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Calendar className="h-6 w-6 text-orange-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Appointments</dt>
-                  <dd className="text-lg font-medium text-gray-900">{reportData.appointments.thisMonth}</dd>
-                </dl>
-              </div>
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <DollarSign className="h-6 w-6 text-yellow-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+              <p className="text-2xl font-bold text-gray-900">${reportData?.totalRevenue?.toLocaleString() || 0}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Chart */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Revenue Trend</h3>
-          <Chart type="line" data={reportData.revenue.daily} dataKey="revenue" category="date" />
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Monthly Revenue</h3>
+            <TrendingUp className="h-5 w-5 text-green-500" />
+          </div>
+          <div className="h-64 flex items-end justify-between gap-2">
+            {reportData?.monthlyRevenue?.map((item, index) => (
+              <div key={index} className="flex flex-col items-center">
+                <div
+                  className="bg-blue-500 rounded-t w-8 mb-2"
+                  style={{ height: `${(item.revenue / Math.max(...(reportData?.monthlyRevenue?.map(r => r.revenue) || [1])) * 200)}px` }}
+                ></div>
+                <span className="text-xs text-gray-500">{item.month}</span>
+                <span className="text-xs font-medium">${item.revenue.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Popular Services */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Popular Services</h3>
-          <Chart type="bar" data={reportData.services.popular} dataKey="count" category="name" />
-        </div>
-
-        {/* Service Revenue */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Service Revenue</h3>
-          <Chart type="pie" data={reportData.services.revenue} dataKey="revenue" category="name" />
-        </div>
-
-        {/* Monthly Revenue */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Monthly Revenue</h3>
-          <Chart type="bar" data={reportData.revenue.monthly} dataKey="revenue" category="month" colors={['#82ca9d']} />
+        {/* Top Services */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Top Services</h3>
+            <FileText className="h-5 w-5 text-blue-500" />
+          </div>
+          <div className="space-y-3">
+            {reportData?.topServices?.slice(0, 5).map((service, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                  <span className="text-sm font-medium">{service.name}</span>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-medium">${service.revenue.toLocaleString()}</div>
+                  <div className="text-xs text-gray-500">{service.count} jobs</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Detailed Stats */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Customer Growth */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Customer Growth</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">New This Month</span>
-              <span className="text-sm font-medium text-gray-900">{reportData.customers.newThisMonth}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Growth Rate</span>
-              <span className={`text-sm font-medium ${reportData.customers.growth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {reportData.customers.growth > 0 ? '+' : ''}{reportData.customers.growth}%
-              </span>
-            </div>
-          </div>
+      {/* Detailed Reports */}
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-6 border-b">
+          <h3 className="text-lg font-semibold">Detailed Reports</h3>
         </div>
-
-        {/* Appointment Stats */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Appointment Stats</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Completed</span>
-              <span className="text-sm font-medium text-gray-900">{reportData.appointments.completed}</span>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+              <div className="flex items-center gap-3">
+                <Users className="h-8 w-8 text-blue-500" />
+                <div>
+                  <h4 className="font-medium">Customer Report</h4>
+                  <p className="text-sm text-gray-500">Customer demographics and activity</p>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Cancelled</span>
-              <span className="text-sm font-medium text-gray-900">{reportData.appointments.cancelled}</span>
+            <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+              <div className="flex items-center gap-3">
+                <Car className="h-8 w-8 text-green-500" />
+                <div>
+                  <h4 className="font-medium">Vehicle Report</h4>
+                  <p className="text-sm text-gray-500">Vehicle service history and trends</p>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Completion Rate</span>
-              <span className="text-sm font-medium text-gray-900">
-                {reportData.appointments.total > 0 
-                  ? ((reportData.appointments.completed / reportData.appointments.total) * 100).toFixed(1)
-                  : 0}%
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Inventory Stats */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Inventory Status</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Total Parts</span>
-              <span className="text-sm font-medium text-gray-900">{reportData.inventory.totalParts}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Low Stock</span>
-              <span className="text-sm font-medium text-yellow-600">{reportData.inventory.lowStock}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Out of Stock</span>
-              <span className="text-sm font-medium text-red-600">{reportData.inventory.outOfStock}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Total Value</span>
-              <span className="text-sm font-medium text-gray-900">${reportData.inventory.totalValue.toFixed(2)}</span>
+            <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer">
+              <div className="flex items-center gap-3">
+                <Package className="h-8 w-8 text-purple-500" />
+                <div>
+                  <h4 className="font-medium">Inventory Report</h4>
+                  <p className="text-sm text-gray-500">Parts usage and stock levels</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

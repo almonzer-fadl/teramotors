@@ -1,35 +1,20 @@
+import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db'
 import User from '@/lib/models/User'
 import { auth } from '@/lib/auth'
-import { NextRequest } from 'next/server'
 
-export const dynamic = 'force-dynamic';
+export async function GET() {
+  const session = await auth()
+  if (!session || (session.user as any).role !== 'admin') {
+    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 })
+  }
 
-export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
-    if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     await connectToDatabase()
-
-    const { searchParams } = new URL(request.url)
-    const role = searchParams.get('role')
-
-    let query: any = {}
-
-    if (role) {
-      query.role = role
-    }
-
-    const users = await User.find(query)
-      .select('_id fullName email role')
-      .sort({ fullName: 1 })
-
-    return Response.json(users)
+    const users = await User.find({})
+    return NextResponse.json(users, { status: 200 })
   } catch (error) {
     console.error('Error fetching users:', error)
-    return Response.json({ error: 'Failed to fetch users' }, { status: 500 })
+    return NextResponse.json({ message: 'Error fetching users' }, { status: 500 })
   }
 }
