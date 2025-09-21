@@ -30,6 +30,11 @@ interface PartMinimal {
   compatibleVehicles?: string[];
 }
 
+interface ServiceMinimal {
+  _id: string;
+  name: string;
+}
+
 interface JobCardFormData {
   appointmentId: string;
   customerId: string;
@@ -41,6 +46,7 @@ interface JobCardFormData {
   estimatedEndTime: string;
   laborHours: number;
   partsUsed: { partId: string; quantity: number; cost: number }[];
+  services: { serviceId: string; quantity: number; laborCost: number }[];
   notes: string;
 }
 
@@ -228,7 +234,65 @@ export default function JobCardForm({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Form fields for job card details */}
+        <div className="bg-white shadow rounded-lg p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Customer</label>
+              <select required value={formData.customerId} onChange={(e) => handleInputChange('customerId', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="">Select Customer</option>
+                {customers.map(c => <option key={c._id} value={c._id}>{c.firstName} {c.lastName}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Vehicle</label>
+              <select required value={formData.vehicleId} onChange={(e) => handleInputChange('vehicleId', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="">Select Vehicle</option>
+                {vehicles.filter(v => v.customerId === formData.customerId).map(v => <option key={v._id} value={v._id}>{v.make} {v.model} ({v.year})</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Mechanic</label>
+              <select required value={formData.mechanicId} onChange={(e) => handleInputChange('mechanicId', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="">Assign Mechanic</option>
+                {mechanics.map(m => <option key={m._id} value={m._id}>{m.fullName || m.name || 'Unnamed'}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Status</label>
+              <select value={formData.status} onChange={(e) => handleInputChange('status', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="pending">Pending</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Priority</label>
+              <select value={formData.priority} onChange={(e) => handleInputChange('priority', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Estimated Start Time</label>
+              <input type="datetime-local" required value={formData.estimatedStartTime} onChange={(e) => handleInputChange('estimatedStartTime', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Estimated End Time</label>
+              <input type="datetime-local" required value={formData.estimatedEndTime} onChange={(e) => handleInputChange('estimatedEndTime', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Labor Hours</label>
+              <input type="number" required value={formData.laborHours} onChange={(e) => handleInputChange('laborHours', parseFloat(e.target.value))} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Notes</label>
+              <textarea value={formData.notes} onChange={(e) => handleInputChange('notes', e.target.value)} rows={4} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+            </div>
+          </div>
+        </div>
 
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Parts Used</h3>

@@ -11,7 +11,7 @@ const ServiceHistorySchema = new Schema({
 
 const VehicleSchema = new Schema({
   customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: false },  
-  vin: { type: String, required: false, unique: true },
+  vin: { type: String, required: false, unique: true, sparse: true },
   make: { type: String, required: true },
   model: { type: String, required: true },
   year: { type: Number, required: true, min: 1900, max: new Date().getFullYear() + 1 }, 

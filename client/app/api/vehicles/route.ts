@@ -46,10 +46,16 @@ export async function POST(request: Request) {
     if (!session) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
     await connectToDatabase()
     
     const body = await request.json()
+    
+    if (body.vin === '') {
+      body.vin = null;
+    }
+    if (body.licensePlate === '') {
+      body.licensePlate = null;
+    }
     
     // Check if customer exists
     const customer = await Customer.findById(body.customerId)
@@ -57,16 +63,20 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Customer not found' }, { status: 400 })
     }
 
-    // Check if VIN already exists
-    const existingVehicle = await Vehicle.findOne({ vin: body.vin })
-    if (existingVehicle) {
-      return Response.json({ error: 'Vehicle with this VIN already exists' }, { status: 400 })
+    // Check if VIN already exists for a different vehicle
+    if (body.vin) {
+      const existingVehicle = await Vehicle.findOne({ vin: body.vin });
+      if (existingVehicle) {
+        return Response.json({ message: 'Vehicle with this VIN already exists' }, { status: 400 });
+      }
     }
 
-    // Check if license plate already exists
-    const existingLicensePlate = await Vehicle.findOne({ licensePlate: body.licensePlate })
-    if (existingLicensePlate) {
-      return Response.json({ error: 'Vehicle with this license plate already exists' }, { status: 400 })
+    // Check if license plate already exists for a different vehicle
+    if (body.licensePlate) {
+      const existingLicensePlate = await Vehicle.findOne({ licensePlate: body.licensePlate });
+      if (existingLicensePlate) {
+        return Response.json({ message: 'Vehicle with this license plate already exists' }, { status: 400 });
+      }
     }
 
     const vehicle = new Vehicle({
