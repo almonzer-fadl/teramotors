@@ -168,6 +168,7 @@ export default function JobCardForm({
 
       if (response.ok) {
         //TODO: create an emit to update job cards for all users
+        socket.emit("job-created");
         router.push("/job-cards");
       } else {
         const error = await response.json();

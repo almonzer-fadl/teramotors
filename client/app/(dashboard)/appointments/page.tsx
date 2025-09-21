@@ -1,76 +1,91 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { Plus, Search, Edit, Eye, Calendar, Clock } from 'lucide-react'
-import StatusBadge from '@/components/dashboard/StatusBadge'
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Plus, Search, Edit, Eye, Calendar, Clock } from "lucide-react";
+import StatusBadge from "@/components/dashboard/StatusBadge";
+import { socket } from "@/lib/services/socket";
 
 interface Appointment {
-  _id: string
+  _id: string;
   customerId: {
-    _id: string
-    firstName: string
-    lastName: string
-  }
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
   vehicleId: {
-    _id: string
-    make: string
-    model: string
-    year: number
-    licensePlate: string
-  }
+    _id: string;
+    make: string;
+    model: string;
+    year: number;
+    licensePlate: string;
+  };
   mechanicId: {
-    _id: string
-    fullName: string
-  }
+    _id: string;
+    fullName: string;
+  };
   serviceId: {
-    _id: string
-    name: string
-  }
-  appointmentDate: string
-  startTime: string
-  endTime: string
-  status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled'
-  priority: 'low' | 'medium' | 'high' | 'urgent'
-  notes?: string
-  estimatedCost: number
-  actualCost?: number
-  createdAt: string
+    _id: string;
+    name: string;
+  };
+  appointmentDate: string;
+  startTime: string;
+  endTime: string;
+  status: "scheduled" | "in-progress" | "completed" | "cancelled";
+  priority: "low" | "medium" | "high" | "urgent";
+  notes?: string;
+  estimatedCost: number;
+  actualCost?: number;
+  createdAt: string;
 }
 
 export default function AppointmentsPage() {
-  const [appointments, setAppointments] = useState<Appointment[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [dateFilter, setDateFilter] = useState('all')
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("all");
 
   useEffect(() => {
-    fetchAppointments(searchTerm, statusFilter, dateFilter)
-  }, [searchTerm, statusFilter, dateFilter])
+    socket.on("update-appointments", () => {
+      fetchAppointments(searchTerm, statusFilter, dateFilter);
+    });
 
-  const fetchAppointments = async (search: string, status: string, date: string) => {
+    return () => {
+      socket.off("update-appointment");
+    };
+  });
+
+  useEffect(() => {
+    fetchAppointments(searchTerm, statusFilter, dateFilter);
+  }, [searchTerm, statusFilter, dateFilter]);
+
+  const fetchAppointments = async (
+    search: string,
+    status: string,
+    date: string
+  ) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ search, status, date });
-      const response = await fetch(`/api/appointments?${params.toString()}`)
+      const response = await fetch(`/api/appointments?${params.toString()}`);
       if (response.ok) {
-        const data = await response.json()
-        setAppointments(data)
+        const data = await response.json();
+        setAppointments(data);
       }
     } catch (error) {
-      console.error('Failed to fetch appointments:', error)
+      console.error("Failed to fetch appointments:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -132,7 +147,8 @@ export default function AppointmentsPage() {
               </select>
             </div>
             <div className="text-sm text-gray-500">
-              {appointments.length} appointment{appointments.length !== 1 ? 's' : ''}
+              {appointments.length} appointment
+              {appointments.length !== 1 ? "s" : ""}
             </div>
           </div>
         </div>
@@ -193,12 +209,14 @@ export default function AppointmentsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {appointment.customerId.firstName} {appointment.customerId.lastName}
+                      {appointment.customerId.firstName}{" "}
+                      {appointment.customerId.lastName}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {appointment.vehicleId.year} {appointment.vehicleId.make} {appointment.vehicleId.model}
+                      {appointment.vehicleId.year} {appointment.vehicleId.make}{" "}
+                      {appointment.vehicleId.model}
                     </div>
                     <div className="text-sm text-gray-500">
                       {appointment.vehicleId.licensePlate}
@@ -211,7 +229,9 @@ export default function AppointmentsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {new Date(appointment.appointmentDate).toLocaleDateString()}
+                      {new Date(
+                        appointment.appointmentDate
+                      ).toLocaleDateString()}
                     </div>
                     <div className="text-sm text-gray-500 flex items-center">
                       <Clock className="h-3 w-3 mr-1" />
@@ -269,11 +289,15 @@ export default function AppointmentsPage() {
       {appointments.length === 0 && (
         <div className="text-center py-12">
           <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No appointments found</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No appointments found
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== 'all' || dateFilter !== 'all' ? 'Try adjusting your search or filter terms.' : 'Get started by scheduling your first appointment.'}
+            {searchTerm || statusFilter !== "all" || dateFilter !== "all"
+              ? "Try adjusting your search or filter terms."
+              : "Get started by scheduling your first appointment."}
           </p>
-          {!searchTerm && statusFilter === 'all' && dateFilter === 'all' && (
+          {!searchTerm && statusFilter === "all" && dateFilter === "all" && (
             <div className="mt-6">
               <Link
                 href="/appointments/new"
@@ -287,5 +311,5 @@ export default function AppointmentsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
