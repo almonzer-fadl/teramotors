@@ -1,6 +1,6 @@
 # TeraMotors - Auto Repair Shop Management System 🚗
 
-A comprehensive cross-platform application for managing auto repair shop operations, built with modern web technologies.
+A comprehensive cross-platform application for managing auto repair shop operations, built with modern web technologies.1
 
 ## 🎯 Project Overview
 
@@ -10,6 +10,7 @@ A comprehensive cross-platform application for managing auto repair shop operati
 **Business Model:** Single shop initially, expandable to multi-tenant SaaS or one-time purchase desktop app
 
 ### Core Features
+
 - Customer and vehicle management
 - Service estimates and invoicing
 - Appointment scheduling
@@ -24,6 +25,7 @@ A comprehensive cross-platform application for managing auto repair shop operati
 ## 🏗️ Technical Stack
 
 ### Frontend
+
 - **Framework:** Next.js 15 with App Router
 - **UI:** React 19 + Tailwind CSS + Shadcn/ui
 - **State Management:** Zustand
@@ -31,6 +33,7 @@ A comprehensive cross-platform application for managing auto repair shop operati
 - **Language:** TypeScript
 
 ### Backend
+
 - **Server:** Next.js API Routes
 - **Database:** MongoDB Atlas
 - **Real-time:** Socket.io server
@@ -39,12 +42,14 @@ A comprehensive cross-platform application for managing auto repair shop operati
 - **Payment Processing:** Stripe
 
 ### Desktop Application
+
 - **Framework:** Electron
 - **Cross-platform:** Windows, Linux, Mac
 - **Offline capability:** Local database sync
 - **Auto-updates:** Electron updater
 
 ### Additional Tools
+
 - **PDF Generation:** React-PDF
 - **Date/Time:** Day.js
 - **Form Handling:** React Hook Form + Zod
@@ -56,6 +61,7 @@ A comprehensive cross-platform application for managing auto repair shop operati
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 18+ (LTS version)
 - npm or yarn
 - MongoDB Atlas account
@@ -64,18 +70,21 @@ A comprehensive cross-platform application for managing auto repair shop operati
 ### Installation
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/yourusername/teramotors.git
 cd teramotors
 ```
 
 2. **Install dependencies**
+
 ```bash
 npm install
 ```
 
 3. **Set up environment variables**
-Create a `.env.local` file in the root directory:
+   Create a `.env.local` file in the root directory:
+
 ```env
 # Database
 MONGODB_URI=your_mongodb_atlas_connection_string
@@ -98,12 +107,13 @@ STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 ```
 
 4. **Run the development server**
+
 ```bash
 npm run dev
 ```
 
 5. **Open your browser**
-Navigate to [http://localhost:3000](http://localhost:3000)
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -151,48 +161,56 @@ teramotors/
 ## 🎯 Features
 
 ### Authentication & Authorization
+
 - User registration and login
 - Role-based access control (Admin, Mechanic, Customer)
 - Session management
 - Protected routes
 
 ### Customer Management
+
 - Customer profiles and information
 - Vehicle registration and history
 - Service history tracking
 - Communication tools
 
 ### Appointment System
+
 - Calendar-based scheduling
 - Time slot management
 - Appointment reminders
 - Real-time availability
 
 ### Service Management
+
 - Service catalog with pricing
 - Labor time calculation
 - Parts integration
 - Estimate generation
 
 ### Job Tracking
+
 - Work order creation
 - Real-time job status updates
 - Progress tracking
 - Photo documentation
 
 ### Vehicle Inspection System
+
 - Digital inspection checklists
 - Photo documentation
 - Condition ratings
 - Auto-estimate generation
 
 ### Financial Features
+
 - Payment processing with Stripe
 - Invoice generation
 - Financial reporting
 - Revenue analytics
 
 ### Real-time Features
+
 - Live job updates
 - Instant notifications
 - Real-time chat
@@ -203,7 +221,9 @@ teramotors/
 ## 🚀 Deployment
 
 ### Web Application
+
 1. **Vercel Deployment** (Recommended)
+
    - Connect your GitHub repository
    - Set environment variables
    - Deploy automatically
@@ -214,17 +234,21 @@ teramotors/
    - DigitalOcean App Platform
 
 ### Desktop Application
+
 1. **Build for Windows**
+
 ```bash
 npm run build:win
 ```
 
 2. **Build for Linux**
+
 ```bash
 npm run build:linux
 ```
 
 3. **Build for macOS**
+
 ```bash
 npm run build:mac
 ```
