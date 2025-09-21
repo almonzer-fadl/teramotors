@@ -1,135 +1,171 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { Plus, Search, Edit, Eye, Clock, User, Car, Calendar, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  Plus,
+  Search,
+  Edit,
+  Eye,
+  Clock,
+  User,
+  Car,
+  Calendar,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
+import { socket } from "@/lib/services/socket";
 
 interface JobCard {
-  _id: string
+  _id: string;
   appointmentId: {
-    _id: string
-    appointmentDate: string
-    startTime: string
-    endTime: string
-  }
+    _id: string;
+    appointmentDate: string;
+    startTime: string;
+    endTime: string;
+  };
   customerId: {
-    _id: string
-    firstName: string
-    lastName: string
-  }
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
   vehicleId: {
-    _id: string
-    make: string
-    model: string
-    year: number
-    licensePlate: string
-  }
+    _id: string;
+    make: string;
+    model: string;
+    year: number;
+    licensePlate: string;
+  };
   mechanicId: {
-    _id: string
-    fullName: string
-  }
-  status: 'pending' | 'in-progress' | 'completed' | 'cancelled'
-  priority: 'low' | 'medium' | 'high' | 'urgent'
-  estimatedStartTime: string
-  estimatedEndTime: string
-  actualStartTime?: string
-  actualEndTime?: string
-  laborHours: number
-  notes?: string
-  createdAt: string
+    _id: string;
+    fullName: string;
+  };
+  status: "pending" | "in-progress" | "completed" | "cancelled";
+  priority: "low" | "medium" | "high" | "urgent";
+  estimatedStartTime: string;
+  estimatedEndTime: string;
+  actualStartTime?: string;
+  actualEndTime?: string;
+  laborHours: number;
+  notes?: string;
+  createdAt: string;
 }
 
 export default function JobCardsPage() {
-  const [jobCards, setJobCards] = useState<JobCard[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [jobCards, setJobCards] = useState<JobCard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
-    fetchJobCards()
-  }, [])
+    fetchJobCards();
+
+    socket.on("update-jobs", () => {
+      fetchJobCards();
+    });
+
+    return () => {
+      socket.off("update-jobs");
+    };
+  }, []);
 
   const fetchJobCards = async () => {
     try {
-      const response = await fetch('/api/job-cards')
+      const response = await fetch("/api/job-cards");
       if (response.ok) {
-        const data = await response.json()
-        setJobCards(data)
+        const data = await response.json();
+        setJobCards(data);
       }
     } catch (error) {
-      console.error('Failed to fetch job cards:', error)
+      console.error("Failed to fetch job cards:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const filteredJobCards = jobCards.filter(jobCard => {
-    const matchesSearch = 
-      `${jobCard.customerId.firstName} ${jobCard.customerId.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      `${jobCard.vehicleId.year} ${jobCard.vehicleId.make} ${jobCard.vehicleId.model}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      jobCard.vehicleId.licensePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      jobCard.mechanicId.fullName.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    const matchesStatus = statusFilter === 'all' || jobCard.status === statusFilter
-    
-    return matchesSearch && matchesStatus
-  })
+  const filteredJobCards = jobCards.filter((jobCard) => {
+    const matchesSearch =
+      `${jobCard.customerId.firstName} ${jobCard.customerId.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      `${jobCard.vehicleId.year} ${jobCard.vehicleId.make} ${jobCard.vehicleId.model}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      jobCard.vehicleId.licensePlate
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      jobCard.mechanicId.fullName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || jobCard.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
-      case 'in-progress':
-        return <Clock className="h-4 w-4 text-blue-500" />
-      case 'cancelled':
-        return <XCircle className="h-4 w-4 text-red-500" />
+      case "completed":
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "in-progress":
+        return <Clock className="h-4 w-4 text-blue-500" />;
+      case "cancelled":
+        return <XCircle className="h-4 w-4 text-red-500" />;
       default:
-        return <AlertCircle className="h-4 w-4 text-yellow-500" />
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
     }
-  }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800'
-      case 'in-progress':
-        return 'bg-blue-100 text-blue-800'
-      case 'cancelled':
-        return 'bg-red-100 text-red-800'
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "in-progress":
+        return "bg-blue-100 text-blue-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-yellow-100 text-yellow-800'
+        return "bg-yellow-100 text-yellow-800";
     }
-  }
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent':
-        return 'bg-red-100 text-red-800'
-      case 'high':
-        return 'bg-orange-100 text-orange-800'
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800'
+      case "urgent":
+        return "bg-red-100 text-red-800";
+      case "high":
+        return "bg-orange-100 text-orange-800";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return 'bg-gray-100 text-gray-800'
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
 
   const handleStatusChange = async (id: string, status: string) => {
     try {
       const response = await fetch(`/api/job-cards/${id}/status`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status }),
       });
 
       if (response.ok) {
         const updatedJobCard = await response.json();
-        setJobCards(jobCards.map(jc => jc._id === id ? { ...jc, status: updatedJobCard.jobCard.status } : jc));
+        setJobCards(
+          jobCards.map((jc) =>
+            jc._id === id
+              ? { ...jc, status: updatedJobCard.jobCard.status }
+              : jc
+          )
+        );
       }
     } catch (error) {
-      console.error('Failed to update job card status:', error);
+      console.error("Failed to update job card status:", error);
     }
   };
 
@@ -138,7 +174,7 @@ export default function JobCardsPage() {
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -190,7 +226,8 @@ export default function JobCardsPage() {
               </select>
             </div>
             <div className="text-sm text-gray-500">
-              {filteredJobCards.length} job card{filteredJobCards.length !== 1 ? 's' : ''}
+              {filteredJobCards.length} job card
+              {filteredJobCards.length !== 1 ? "s" : ""}
             </div>
           </div>
         </div>
@@ -199,16 +236,27 @@ export default function JobCardsPage() {
       {/* Job Cards Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {filteredJobCards.map((jobCard) => (
-          <div key={jobCard._id} className="bg-white shadow rounded-lg overflow-hidden">
+          <div
+            key={jobCard._id}
+            className="bg-white shadow rounded-lg overflow-hidden"
+          >
             <div className="px-4 py-5 sm:p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
                   {getStatusIcon(jobCard.status)}
-                  <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(jobCard.status)}`}>
-                    {jobCard.status.replace('-', ' ')}
+                  <span
+                    className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                      jobCard.status
+                    )}`}
+                  >
+                    {jobCard.status.replace("-", " ")}
                   </span>
                 </div>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(jobCard.priority)}`}>
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(
+                    jobCard.priority
+                  )}`}
+                >
                   {jobCard.priority}
                 </span>
               </div>
@@ -220,25 +268,29 @@ export default function JobCardsPage() {
                     {jobCard.customerId.firstName} {jobCard.customerId.lastName}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center text-sm">
                   <Car className="h-4 w-4 text-gray-400 mr-2" />
                   <span className="text-gray-900">
-                    {jobCard.vehicleId.year} {jobCard.vehicleId.make} {jobCard.vehicleId.model}
+                    {jobCard.vehicleId.year} {jobCard.vehicleId.make}{" "}
+                    {jobCard.vehicleId.model}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center text-sm">
                   <Calendar className="h-4 w-4 text-gray-400 mr-2" />
                   <span className="text-gray-900">
-                    {new Date(jobCard.appointmentId.appointmentDate).toLocaleDateString()}
+                    {new Date(
+                      jobCard.appointmentId.appointmentDate
+                    ).toLocaleDateString()}
                   </span>
                 </div>
 
                 <div className="flex items-center text-sm">
                   <Clock className="h-4 w-4 text-gray-400 mr-2" />
                   <span className="text-gray-900">
-                    {jobCard.appointmentId.startTime} - {jobCard.appointmentId.endTime}
+                    {jobCard.appointmentId.startTime} -{" "}
+                    {jobCard.appointmentId.endTime}
                   </span>
                 </div>
 
@@ -274,7 +326,9 @@ export default function JobCardsPage() {
                 </Link>
                 <select
                   value={jobCard.status}
-                  onChange={(e) => handleStatusChange(jobCard._id, e.target.value)}
+                  onChange={(e) =>
+                    handleStatusChange(jobCard._id, e.target.value)
+                  }
                   className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                 >
                   <option value="pending">Pending</option>
@@ -291,11 +345,15 @@ export default function JobCardsPage() {
       {filteredJobCards.length === 0 && (
         <div className="text-center py-12">
           <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No job cards found</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No job cards found
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== 'all' ? 'Try adjusting your search or filter terms.' : 'Get started by creating your first job card.'}
+            {searchTerm || statusFilter !== "all"
+              ? "Try adjusting your search or filter terms."
+              : "Get started by creating your first job card."}
           </p>
-          {!searchTerm && statusFilter === 'all' && (
+          {!searchTerm && statusFilter === "all" && (
             <div className="mt-6">
               <Link
                 href="/job-cards/new"
@@ -309,5 +367,5 @@ export default function JobCardsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

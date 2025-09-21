@@ -1,37 +1,46 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useMemo } from 'react'
-import Link from 'next/link'
-import { Plus, Search, Edit, Trash2, Eye, ArrowUpDown } from 'lucide-react'
-import StatusBadge from '@/components/dashboard/StatusBadge'
+import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
+import { Plus, Search, Edit, Trash2, Eye, ArrowUpDown } from "lucide-react";
+import StatusBadge from "@/components/dashboard/StatusBadge";
+import { socket } from "@/lib/services/socket";
 
 interface Service {
-  _id: string
-  name: string
-  description: string
-  category: string
-  laborRate: number
-  laborHours: number
-  isActive: boolean
-  createdAt: string
+  _id: string;
+  name: string;
+  description: string;
+  category: string;
+  laborRate: number;
+  laborHours: number;
+  isActive: boolean;
+  createdAt: string;
 }
 
-type SortKey = 'name' | 'category' | 'laborRate' | 'laborHours' | 'createdAt';
-type SortDirection = 'asc' | 'desc';
+type SortKey = "name" | "category" | "laborRate" | "laborHours" | "createdAt";
+type SortDirection = "asc" | "desc";
 
 export default function ServicesPage() {
-  const [services, setServices] = useState<Service[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [sortKey, setSortKey] = useState<SortKey>('name')
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
-    fetchServices(searchTerm, sortKey, sortDirection, selectedCategory)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, sortKey, sortDirection, selectedCategory])
+    fetchServices(searchTerm, sortKey, sortDirection, selectedCategory);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, sortKey, sortDirection, selectedCategory]);
+  useEffect(() => {
+    socket.on("update-services", () => {
+      fetchServices(searchTerm, sortKey, sortDirection, selectedCategory);
+    });
+    return () => {
+      socket.off("update-services");
+    };
+  });
 
   useEffect(() => {
     fetchCategories();
@@ -39,40 +48,45 @@ export default function ServicesPage() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/services/categories');
+      const response = await fetch("/api/services/categories");
       if (response.ok) {
         setCategories(await response.json());
       }
     } catch (error) {
-      console.error('Failed to fetch categories:', error);
+      console.error("Failed to fetch categories:", error);
     }
   };
 
-  const fetchServices = async (search: string, sort: SortKey, direction: SortDirection, category: string) => {
+  const fetchServices = async (
+    search: string,
+    sort: SortKey,
+    direction: SortDirection,
+    category: string
+  ) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ search, sort, direction, category });
-      const response = await fetch(`/api/services?${params.toString()}`)
+      const response = await fetch(`/api/services?${params.toString()}`);
       if (response.ok) {
-        const data = await response.json()
-        setServices(data)
+        const data = await response.json();
+        setServices(data);
       }
     } catch (error) {
-      console.error('Failed to fetch services:', error)
+      console.error("Failed to fetch services:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const sortedServices = useMemo(() => {
     return [...services].sort((a, b) => {
       let aVal: any;
       let bVal: any;
 
-      if (sortKey === 'name' || sortKey === 'category') {
+      if (sortKey === "name" || sortKey === "category") {
         aVal = a[sortKey].toLowerCase();
         bVal = b[sortKey].toLowerCase();
-      } else if (sortKey === 'laborRate' || sortKey === 'laborHours') {
+      } else if (sortKey === "laborRate" || sortKey === "laborHours") {
         aVal = a[sortKey];
         bVal = b[sortKey];
       } else {
@@ -80,42 +94,42 @@ export default function ServicesPage() {
         bVal = b.createdAt;
       }
 
-      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
       return 0;
     });
   }, [services, sortKey, sortDirection]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortKey(key);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this service?')) {
+    if (confirm("Are you sure you want to delete this service?")) {
       try {
         const response = await fetch(`/api/services/${id}`, {
-          method: 'DELETE'
-        })
+          method: "DELETE",
+        });
         if (response.ok) {
-          setServices(services.filter(s => s._id !== id))
+          setServices(services.filter((s) => s._id !== id));
         }
       } catch (error) {
-        console.error('Failed to delete service:', error)
+        console.error("Failed to delete service:", error);
       }
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -168,14 +182,17 @@ export default function ServicesPage() {
                   className="pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Categories</option>
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
             <div className="text-sm text-gray-500">
-              {sortedServices.length} service{sortedServices.length !== 1 ? 's' : ''}
+              {sortedServices.length} service
+              {sortedServices.length !== 1 ? "s" : ""}
             </div>
           </div>
         </div>
@@ -187,22 +204,39 @@ export default function ServicesPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('name')}>
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("name")}
+                >
                   Name <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('category')}>
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("category")}
+                >
                   Category <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('laborRate')}>
-                  Labor Rate <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("laborRate")}
+                >
+                  Labor Rate{" "}
+                  <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('laborHours')}>
-                  Labor Hours <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("laborHours")}
+                >
+                  Labor Hours{" "}
+                  <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('createdAt')}>
+                <th
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  onClick={() => handleSort("createdAt")}
+                >
                   Created <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -226,7 +260,9 @@ export default function ServicesPage() {
                     {service.laborHours} hrs
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <StatusBadge status={service.isActive ? 'active' : 'inactive'} />
+                    <StatusBadge
+                      status={service.isActive ? "active" : "inactive"}
+                    />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(service.createdAt).toLocaleDateString()}
@@ -256,9 +292,13 @@ export default function ServicesPage() {
 
       {sortedServices.length === 0 && (
         <div className="text-center py-12">
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No services found</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No services found
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first service.'}
+            {searchTerm
+              ? "Try adjusting your search terms."
+              : "Get started by adding your first service."}
           </p>
           {!searchTerm && (
             <div className="mt-6">
@@ -274,5 +314,5 @@ export default function ServicesPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
