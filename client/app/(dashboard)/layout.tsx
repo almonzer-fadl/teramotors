@@ -7,6 +7,7 @@ import { useSession } from '@/lib/hooks/useSession'
 import { signOut } from 'next-auth/react'
 import Breadcrumbs from '@/components/dashboard/Breadcrumbs';
 import ToastProvider from '@/components/dashboard/ToastProvider';
+import { getNavigationItems, roleDisplayNames } from '@/lib/roles';
 import { 
   LayoutDashboard, 
   Users, 
@@ -26,24 +27,30 @@ import {
   User
 } from 'lucide-react'
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Customers', href: '/customers', icon: Users },
-  { name: 'Vehicles', href: '/vehicles', icon: Car },
-  { name: 'Appointments', href: '/appointments', icon: Calendar },
-  { name: 'Job Cards', href: '/job-cards', icon: ClipboardList },
-  { name: 'Estimates', href: '/estimates', icon: FileText },
-  { name: 'Invoices', href: '/invoices', icon: CreditCard },
-  { name: 'Parts Inventory', href: '/inventory', icon: Package },
-  { name: 'Inspections', href: '/inspections', icon: Search },
-  { name: 'Reports', href: '/reports', icon: BarChart3 },
-  { name: 'Settings', href: '/settings', icon: Settings },
-]
+// Icon mapping for dynamic navigation
+const iconMap = {
+  LayoutDashboard,
+  Users,
+  Car,
+  Calendar,
+  ClipboardList,
+  FileText,
+  Package,
+  Search,
+  CreditCard,
+  BarChart3,
+  Settings,
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
   const { user } = useSession()
+  console.log('user in layout', user);
+  
+  // Get role-based navigation items
+  const userRole = (user as any)?.role || 'mechanic'
+  const navigation = getNavigationItems(userRole)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -60,7 +67,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <nav className="flex-1 px-4 py-4">
             <ul className="space-y-2">
               {navigation.map((item) => {
-                const Icon = item.icon
+                const Icon = iconMap[item.icon as keyof typeof iconMap]
                 return (
                   <li key={item.name}>
                     <Link
@@ -92,7 +99,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <nav className="flex-1 px-4 py-4">
             <ul className="space-y-2">
               {navigation.map((item) => {
-                const Icon = item.icon
+                const Icon = iconMap[item.icon as keyof typeof iconMap]
                 return (
                   <li key={item.name}>
                     <Link
@@ -137,10 +144,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <div className="flex items-center gap-x-2">
                 <div className="flex items-center gap-x-2">
                   <User className="h-6 w-6 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700">{user?.name}</span>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-700">{user?.name}</span>
+                    <span className="text-xs text-gray-500">{roleDisplayNames[userRole as keyof typeof roleDisplayNames]}</span>
+                  </div>
                 </div>
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => signOut({ callbackUrl: '/login' })}
                   className="flex items-center gap-x-2 text-sm text-gray-500 hover:text-gray-700"
                 >
                   <LogOut className="h-4 w-4" />
