@@ -10,8 +10,10 @@ import {
   DollarSign, 
   TrendingUp,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  Search
 } from 'lucide-react'
+import JobCardGrid from '@/components/dashboard/JobCardGrid'
 
 interface DashboardStats {
   totalCustomers: number
@@ -88,7 +90,7 @@ export default function DashboardPage() {
     },
     {
       title: 'Monthly Revenue',
-      value: `$${stats.monthlyRevenue.toLocaleString()}`,
+      value: `${stats.monthlyRevenue.toLocaleString()}`,
       icon: DollarSign,
       color: 'bg-emerald-500',
       href: '/reports'
@@ -184,11 +186,11 @@ export default function DashboardPage() {
               Add Vehicle
             </Link>
             <Link
-              href="/appointments/new"
+              href="/inspections/new"
               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              <Calendar className="mr-2 h-4 w-4" />
-              Schedule Appointment
+              <Search className="mr-2 h-4 w-4" />
+              Create Inspection
             </Link>
             <Link
               href="/job-cards/new"
@@ -201,77 +203,11 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Recent Activity */}
+      {/* Active Job Cards */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
-          <div className="flow-root">
-            <ul className="-mb-8">
-              <li>
-                <div className="relative pb-8">
-                  <div className="relative flex space-x-3">
-                    <div>
-                      <span className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
-                        <Users className="h-4 w-4 text-white" />
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                      <div>
-                        <p className="text-sm text-gray-500">
-                          New customer <span className="font-medium text-gray-900">John Doe</span> registered
-                        </p>
-                      </div>
-                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                        <time>2h ago</time>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div className="relative pb-8">
-                  <div className="relative flex space-x-3">
-                    <div>
-                      <span className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
-                        <Car className="h-4 w-4 text-white" />
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                      <div>
-                        <p className="text-sm text-gray-500">
-                          Vehicle <span className="font-medium text-gray-900">2020 Toyota Camry</span> added
-                        </p>
-                      </div>
-                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                        <time>4h ago</time>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div className="relative">
-                  <div className="relative flex space-x-3">
-                    <div>
-                      <span className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center ring-8 ring-white">
-                        <ClipboardList className="h-4 w-4 text-white" />
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                      <div>
-                        <p className="text-sm text-gray-500">
-                          Job card <span className="font-medium text-gray-900">#JC-001</span> completed
-                        </p>
-                      </div>
-                      <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                        <time>6h ago</time>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Active Job Cards</h3>
+          <JobCardGrid />
         </div>
       </div>
     </div>
