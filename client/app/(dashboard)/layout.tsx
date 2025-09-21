@@ -1,31 +1,32 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useSession } from '@/lib/hooks/useSession'
-import { signOut } from 'next-auth/react'
-import Breadcrumbs from '@/components/dashboard/Breadcrumbs';
-import ToastProvider from '@/components/dashboard/ToastProvider';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useSession } from "@/lib/hooks/useSession";
+import { signOut } from "next-auth/react";
+import Breadcrumbs from "@/components/dashboard/Breadcrumbs";
+import ToastProvider from "@/components/dashboard/ToastProvider";
 import { getNavigationItems, roleDisplayNames } from '@/lib/roles';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Car, 
-  Calendar, 
-  ClipboardList, 
-  FileText, 
-  Package, 
-  Search, 
-  CreditCard, 
+import { socket } from "@/lib/services/socket";
+import {
+  LayoutDashboard,
+  Users,
+  Car,
+  Calendar,
+  ClipboardList,
+  FileText,
+  Package,
+  Search,
+  CreditCard,
   BarChart3,
   Settings,
   LogOut,
   Menu,
   X,
   Bell,
-  User
-} from 'lucide-react'
+  User,
+} from "lucide-react";
 
 // Icon mapping for dynamic navigation
 const iconMap = {
@@ -43,20 +44,36 @@ const iconMap = {
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const pathname = usePathname()
-  const { user } = useSession()
-  console.log('user in layout', user);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const { user } = useSession();
   
   // Get role-based navigation items
   const userRole = (user as any)?.role || 'mechanic'
   const navigation = getNavigationItems(userRole)
 
+  useEffect(() => {
+    socket.connect();
+    console.log("Connecting to socket...");
+
+    return () => {
+      socket.disconnect();
+      console.log("Disconnecting from socket...");
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar */}
-      <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+      <div
+        className={`fixed inset-0 z-50 lg:hidden ${
+          sidebarOpen ? "block" : "hidden"
+        }`}
+      >
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          onClick={() => setSidebarOpen(false)}
+        />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
           <div className="flex h-16 items-center justify-between px-4">
             <h1 className="text-xl font-bold text-gray-900">TeraMotors</h1>
@@ -74,8 +91,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       href={item.href}
                       className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium ${
                         pathname === item.href
-                          ? 'bg-blue-50 text-blue-700'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? "bg-blue-50 text-blue-700"
+                          : "text-gray-700 hover:bg-gray-100"
                       }`}
                       onClick={() => setSidebarOpen(false)}
                     >
@@ -83,7 +100,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       {item.name}
                     </Link>
                   </li>
-                )
+                );
               })}
             </ul>
           </nav>
@@ -106,15 +123,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       href={item.href}
                       className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium ${
                         pathname === item.href
-                          ? 'bg-blue-50 text-blue-700'
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? "bg-blue-50 text-blue-700"
+                          : "text-gray-700 hover:bg-gray-100"
                       }`}
                     >
                       <Icon className="mr-3 h-5 w-5" />
                       {item.name}
                     </Link>
                   </li>
-                )
+                );
               })}
             </ul>
           </nav>
@@ -137,7 +154,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1"></div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <button type="button" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
+              <button
+                type="button"
+                className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
+              >
                 <Bell className="h-6 w-6" />
               </button>
 
@@ -161,8 +181,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
 
-        
-
         {/* Page content */}
         <main className="py-6">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -172,5 +190,5 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
     </div>
-  )
+  );
 }
