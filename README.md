@@ -1,6 +1,6 @@
 # TeraMotors - Auto Repair Shop Management System 🚗
 
-A comprehensive cross-platform application for managing auto repair shop operations, built with modern web technologies.1
+A comprehensive cross-platform application for managing auto repair shop operations, built with modern web technologies.
 
 ## 🎯 Project Overview
 
