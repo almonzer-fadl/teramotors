@@ -1,80 +1,93 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { Plus, Search, Edit, Trash2, Eye, Car, Wrench } from 'lucide-react'
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Plus, Search, Edit, Trash2, Eye, Car, Wrench } from "lucide-react";
+import { socket } from "@/lib/services/socket";
 
 interface Vehicle {
-  _id: string
+  _id: string;
   customerId: {
-    _id: string
-    firstName: string
-    lastName: string
-  }
-  vin: string
-  make: string
-  model: string
-  year: number
-  color: string
-  licensePlate: string
-  mileage: number
-  transmission: string
-  fuelType: string
-  isActive: boolean
-  createdAt: string
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
+  vin: string;
+  make: string;
+  model: string;
+  year: number;
+  color: string;
+  licensePlate: string;
+  mileage: number;
+  transmission: string;
+  fuelType: string;
+  isActive: boolean;
+  createdAt: string;
 }
 
 export default function VehiclesPage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    fetchVehicles()
-  }, [])
+    fetchVehicles();
+
+    socket.on("update-vehicles", () => {
+      fetchVehicles();
+    });
+    return () => {
+      socket.off("update-vehicels");
+    };
+  }, []);
 
   const fetchVehicles = async () => {
     try {
-      const response = await fetch('/api/vehicles')
+      const response = await fetch("/api/vehicles");
       if (response.ok) {
-        const data = await response.json()
-        setVehicles(data)
+        const data = await response.json();
+        setVehicles(data);
       }
     } catch (error) {
-      console.error('Failed to fetch vehicles:', error)
+      console.error("Failed to fetch vehicles:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const filteredVehicles = vehicles.filter(vehicle =>
-    `${vehicle.make} ${vehicle.model}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.licensePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.vin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    `${vehicle.customerId.firstName} ${vehicle.customerId.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredVehicles = vehicles.filter(
+    (vehicle) =>
+      `${vehicle.make} ${vehicle.model}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      vehicle.licensePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.vin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      `${vehicle.customerId.firstName} ${vehicle.customerId.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+  );
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this vehicle?')) {
+    if (confirm("Are you sure you want to delete this vehicle?")) {
       try {
         const response = await fetch(`/api/vehicles/${id}`, {
-          method: 'DELETE'
-        })
+          method: "DELETE",
+        });
         if (response.ok) {
-          setVehicles(vehicles.filter(v => v._id !== id))
+          setVehicles(vehicles.filter((v) => v._id !== id));
         }
       } catch (error) {
-        console.error('Failed to delete vehicle:', error)
+        console.error("Failed to delete vehicle:", error);
       }
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -115,7 +128,8 @@ export default function VehiclesPage() {
               </div>
             </div>
             <div className="text-sm text-gray-500">
-              {filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''}
+              {filteredVehicles.length} vehicle
+              {filteredVehicles.length !== 1 ? "s" : ""}
             </div>
           </div>
         </div>
@@ -172,7 +186,8 @@ export default function VehiclesPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {vehicle.customerId.firstName} {vehicle.customerId.lastName}
+                      {vehicle.customerId.firstName}{" "}
+                      {vehicle.customerId.lastName}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -187,12 +202,14 @@ export default function VehiclesPage() {
                     {vehicle.transmission}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      vehicle.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {vehicle.isActive ? 'Active' : 'Inactive'}
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        vehicle.isActive
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {vehicle.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -233,9 +250,13 @@ export default function VehiclesPage() {
       {filteredVehicles.length === 0 && (
         <div className="text-center py-12">
           <Car className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No vehicles found</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No vehicles found
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first vehicle.'}
+            {searchTerm
+              ? "Try adjusting your search terms."
+              : "Get started by adding your first vehicle."}
           </p>
           {!searchTerm && (
             <div className="mt-6">
@@ -251,5 +272,5 @@ export default function VehiclesPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

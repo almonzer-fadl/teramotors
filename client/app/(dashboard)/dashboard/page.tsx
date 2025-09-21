@@ -1,30 +1,42 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { 
-  Users, 
-  Car, 
-  Calendar, 
-  ClipboardList, 
-  DollarSign, 
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  Users,
+  Car,
+  Calendar,
+  ClipboardList,
+  DollarSign,
   TrendingUp,
   Clock,
   AlertTriangle,
-  Search
-} from 'lucide-react'
-import JobCardGrid from '@/components/dashboard/JobCardGrid'
+  Search,
+} from "lucide-react";
+import JobCardGrid from "@/components/dashboard/JobCardGrid";
+import { socket } from "@/lib/services/socket";
+import e from "express";
 
 interface DashboardStats {
-  totalCustomers: number
-  totalVehicles: number
-  pendingAppointments: number
-  activeJobCards: number
-  monthlyRevenue: number
-  revenueGrowth: number
-  avgJobTime: number
-  lowStockParts: number
+  totalCustomers: number;
+  totalVehicles: number;
+  pendingAppointments: number;
+  activeJobCards: number;
+  monthlyRevenue: number;
+  revenueGrowth: number;
+  avgJobTime: number;
+  lowStockParts: number;
 }
+const eventNames = [
+  "update-jobs",
+  "update-inspections",
+  "update-parts",
+  "update-appointments",
+  "update-customers",
+  "update-estimates",
+  "update-services",
+  "update-vehicles",
+];
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({
@@ -35,95 +47,109 @@ export default function DashboardPage() {
     monthlyRevenue: 0,
     revenueGrowth: 0,
     avgJobTime: 0,
-    lowStockParts: 0
-  })
+    lowStockParts: 0,
+  });
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch dashboard stats
+
+    console.log("you entered dashboard");
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/dashboard/stats')
+        const response = await fetch("/api/dashboard/stats");
         if (response.ok) {
-          const data = await response.json()
-          setStats(data)
+          const data = await response.json();
+          setStats(data);
         }
       } catch (error) {
-        console.error('Failed to fetch dashboard stats:', error)
+        console.error("Failed to fetch dashboard stats:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchStats()
-  }, [])
+    fetchStats();
+
+    for (let ev in eventNames) {
+      socket.on(ev, () => {
+        console.log(`[${ev}] was triggered, fetching stats`);
+        fetchStats();
+      });
+    }
+    return () => {
+      for (let ev in eventNames) {
+        socket.off(ev);
+      }
+    };
+  }, []);
 
   const statCards = [
     {
-      title: 'Total Customers',
+      title: "Total Customers",
       value: stats.totalCustomers,
       icon: Users,
-      color: 'bg-blue-500',
-      href: '/customers'
+      color: "bg-blue-500",
+      href: "/customers",
     },
     {
-      title: 'Total Vehicles',
+      title: "Total Vehicles",
       value: stats.totalVehicles,
       icon: Car,
-      color: 'bg-green-500',
-      href: '/vehicles'
+      color: "bg-green-500",
+      href: "/vehicles",
     },
     {
-      title: 'Pending Appointments',
+      title: "Pending Appointments",
       value: stats.pendingAppointments,
       icon: Calendar,
-      color: 'bg-yellow-500',
-      href: '/appointments'
+      color: "bg-yellow-500",
+      href: "/appointments",
     },
     {
-      title: 'Active Job Cards',
+      title: "Active Job Cards",
       value: stats.activeJobCards,
       icon: ClipboardList,
-      color: 'bg-purple-500',
-      href: '/job-cards'
+      color: "bg-purple-500",
+      href: "/job-cards",
     },
     {
-      title: 'Monthly Revenue',
+      title: "Monthly Revenue",
       value: `${stats.monthlyRevenue.toLocaleString()}`,
       icon: DollarSign,
-      color: 'bg-emerald-500',
-      href: '/reports'
+      color: "bg-emerald-500",
+      href: "/reports",
     },
     {
-      title: 'Revenue Growth',
-      value: `${stats.revenueGrowth > 0 ? '+' : ''}${stats.revenueGrowth}%`,
+      title: "Revenue Growth",
+      value: `${stats.revenueGrowth > 0 ? "+" : ""}${stats.revenueGrowth}%`,
       icon: TrendingUp,
-      color: stats.revenueGrowth >= 0 ? 'bg-green-500' : 'bg-red-500',
-      href: '/reports'
+      color: stats.revenueGrowth >= 0 ? "bg-green-500" : "bg-red-500",
+      href: "/reports",
     },
     {
-      title: 'Avg Job Time',
+      title: "Avg Job Time",
       value: `${stats.avgJobTime}h`,
       icon: Clock,
-      color: 'bg-indigo-500',
-      href: '/job-cards'
+      color: "bg-indigo-500",
+      href: "/job-cards",
     },
     {
-      title: 'Low Stock Parts',
+      title: "Low Stock Parts",
       value: stats.lowStockParts,
       icon: AlertTriangle,
-      color: 'bg-orange-500',
-      href: '/inventory'
-    }
-  ]
+      color: "bg-orange-500",
+      href: "/inventory",
+    },
+  ];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -139,7 +165,7 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map((card) => {
-          const Icon = card.icon
+          const Icon = card.icon;
           return (
             <Link
               key={card.title}
@@ -162,14 +188,16 @@ export default function DashboardPage() {
                 </div>
               </div>
             </Link>
-          )
+          );
         })}
       </div>
 
       {/* Quick Actions */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Actions</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Quick Actions
+          </h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Link
               href="/customers/new"
@@ -206,10 +234,12 @@ export default function DashboardPage() {
       {/* Active Job Cards */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Active Job Cards</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Active Job Cards
+          </h3>
           <JobCardGrid />
         </div>
       </div>
     </div>
-  )
+  );
 }
