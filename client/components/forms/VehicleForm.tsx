@@ -99,6 +99,10 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
     try {
       const url = isEditing ? `/api/vehicles/${vehicleId}` : "/api/vehicles";
       const method = isEditing ? "PUT" : "POST";
+      setFormData({
+        ...formData,
+        vin: formData.vin !== "" ? formData.vin : "N/A",
+      });
 
       const response = await fetch(url, {
         method,

@@ -37,7 +37,7 @@ export default function VehiclesPage() {
       fetchVehicles();
     });
     return () => {
-      socket.off("update-vehicels");
+      socket.off("update-vehicles");
     };
   }, []);
 
@@ -60,8 +60,8 @@ export default function VehiclesPage() {
       `${vehicle.make} ${vehicle.model}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      vehicle.licensePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.vin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.licensePlate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vehicle.vin?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       `${vehicle.customerId.firstName} ${vehicle.customerId.lastName}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase())
@@ -179,7 +179,7 @@ export default function VehiclesPage() {
                           {vehicle.year} {vehicle.make} {vehicle.model}
                         </div>
                         <div className="text-sm text-gray-500">
-                          VIN: {vehicle.vin.slice(-8)}
+                          VIN: {vehicle.vin?.slice(-8) || "N/A"}
                         </div>
                       </div>
                     </div>
