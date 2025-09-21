@@ -27,16 +27,6 @@ interface DashboardStats {
   avgJobTime: number;
   lowStockParts: number;
 }
-const eventNames = [
-  "update-jobs",
-  "update-inspections",
-  "update-parts",
-  "update-appointments",
-  "update-customers",
-  "update-estimates",
-  "update-services",
-  "update-vehicles",
-];
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({
@@ -49,6 +39,17 @@ export default function DashboardPage() {
     avgJobTime: 0,
     lowStockParts: 0,
   });
+
+  const eventNames = [
+    "update-jobs",
+    "update-inspections",
+    "update-parts",
+    "update-appointments",
+    "update-customers",
+    "update-estimates",
+    "update-services",
+    "update-vehicles",
+  ];
 
   const [loading, setLoading] = useState(true);
 
