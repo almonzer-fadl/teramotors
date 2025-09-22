@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from '@/lib/hooks/useSession'
 import { RoleGuard } from '@/components/RoleGuard'
 import { hasPermission, roleDisplayNames, roleDescriptions } from '@/lib/roles'
+import { useTranslation } from 'react-i18next'
 import { 
   Users, 
   UserPlus, 
@@ -38,7 +39,7 @@ export default function SettingsPage() {
   const [showAddUser, setShowAddUser] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-
+  const { t } = useTranslation()
   // Check if user has admin permissions
   const userRole = (user as any)?.role || 'mechanic'
   const canManageUsers = hasPermission(userRole, 'canManageUsers')
@@ -143,8 +144,8 @@ export default function SettingsPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">Access Denied</h3>
-          <p className="text-gray-500">You don't have permission to access this page.</p>
+          <h3 className="text-lg font-medium text-gray-900">{t('settings.access_denied')}</h3>
+          <p className="text-gray-500">{t('settings.access_denied_description')}</p>
         </div>
       </div>
     )
@@ -155,21 +156,21 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600">Manage users and system settings</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('settings.title')}</h1>
+          <p className="text-gray-600">{t('settings.description')}</p>
         </div>
         <button
           onClick={() => setShowAddUser(true)}
           className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
         >
           <UserPlus className="h-4 w-4" />
-          Add User
+          {t('settings.add_user')}
         </button>
       </div>
 
       {/* Role Information */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">Role Permissions</h2>
+        <h2 className="text-lg font-semibold mb-4">{t('settings.role_permissions')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {Object.entries(roleDisplayNames).map(([role, displayName]) => (
             <div key={role} className="border rounded-lg p-4">
@@ -189,12 +190,12 @@ export default function SettingsPage() {
       <div className="bg-white rounded-lg shadow">
         <div className="p-6 border-b">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">User Management</h2>
+            <h2 className="text-lg font-semibold">{t('settings.user_management')}</h2>
             <div className="flex items-center gap-2">
               <Search className="h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search users..."
+                placeholder={t('settings.search_users')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="border rounded-lg px-3 py-1 text-sm"
@@ -206,7 +207,7 @@ export default function SettingsPage() {
         {loading ? (
           <div className="p-6 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-gray-500">Loading users...</p>
+            <p className="mt-2 text-gray-500">{t('settings.loading_users')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -214,19 +215,19 @@ export default function SettingsPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    User
+                    {t('settings.user')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Role
+                    {t('settings.role')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                    {t('settings.status')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Last Login
+                    {t('settings.last_login')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                    {t('settings.actions')}
                   </th>
                 </tr>
               </thead>
@@ -287,7 +288,7 @@ export default function SettingsPage() {
                           {new Date(user.lastLogin).toLocaleDateString()}
                         </div>
                       ) : (
-                        'Never'
+                        t('settings.never')
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -304,7 +305,7 @@ export default function SettingsPage() {
                             user.isActive ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'
                           }`}
                         >
-                          {user.isActive ? 'Deactivate' : 'Activate'}
+                          {user.isActive ? t('settings.deactivate') : t('settings.activate')}
                         </button>
                         <button
                           onClick={() => handleDeleteUser(user._id)}
@@ -326,46 +327,46 @@ export default function SettingsPage() {
       {showAddUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Add New User</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('settings.add_user_title')}</h3>
             <form className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
+                  {t('settings.full_name')}
                 </label>
                 <input
                   type="text"
                   className="w-full border rounded-lg px-3 py-2"
-                  placeholder="Enter full name"
+                  placeholder={t('settings.full_name_placeholder')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                  {t('settings.email')}
                 </label>
                 <input
                   type="email"
                   className="w-full border rounded-lg px-3 py-2"
-                  placeholder="Enter email"
+                  placeholder={t('settings.email_placeholder')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Role
+                  {t('settings.role')}
                 </label>
                 <select className="w-full border rounded-lg px-3 py-2">
-                  <option value="mechanic">Mechanic</option>
-                  <option value="inspector">Inspector</option>
-                  <option value="admin">Administrator</option>
+                  <option value="mechanic">{t('settings.mechanic')}</option>
+                  <option value="inspector">{t('settings.inspector')}</option>
+                  <option value="admin">{t('settings.administrator')}</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone (Optional)
+                  {t('settings.phone_optional')}
                 </label>
                 <input
                   type="tel"
                   className="w-full border rounded-lg px-3 py-2"
-                  placeholder="Enter phone number"
+                  placeholder={t('settings.phone_placeholder')}
                 />
               </div>
               <div className="flex justify-end gap-2">
@@ -374,13 +375,13 @@ export default function SettingsPage() {
                   onClick={() => setShowAddUser(false)}
                   className="px-4 py-2 text-gray-600 border rounded-lg hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('settings.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  Add User
+                  {t('settings.add_user_button')}
                 </button>
               </div>
             </form>
@@ -392,7 +393,7 @@ export default function SettingsPage() {
       {editingUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Edit User Role</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('settings.edit_user_role_title')}</h3>
             <form onSubmit={(e) => {
               e.preventDefault();
               const form = e.target as HTMLFormElement;
@@ -401,18 +402,18 @@ export default function SettingsPage() {
             }}>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  User
+                  {t('settings.user')}
                 </label>
                 <p>{editingUser.fullName} ({editingUser.email})</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Role
+                  {t('settings.role')}
                 </label>
                 <select name="role" defaultValue={editingUser.role} className="w-full border rounded-lg px-3 py-2">
-                  <option value="mechanic">Mechanic</option>
-                  <option value="inspector">Inspector</option>
-                  <option value="admin">Administrator</option>
+                  <option value="mechanic">{t('settings.mechanic')}</option>
+                  <option value="inspector">{t('settings.inspector')}</option>
+                  <option value="admin">{t('settings.administrator')}</option>
                 </select>
               </div>
               <div className="flex justify-end gap-2 mt-4">
@@ -421,13 +422,13 @@ export default function SettingsPage() {
                   onClick={() => setEditingUser(null)}
                   className="px-4 py-2 text-gray-600 border rounded-lg hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('forms.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  Save Changes
+                  {t('settings.save_changes')}
                 </button>
               </div>
             </form>
@@ -437,3 +438,5 @@ export default function SettingsPage() {
     </div>
   )
 }
+
+
