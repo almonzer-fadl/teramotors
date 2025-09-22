@@ -1,13 +1,15 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Customer from '@/lib/models/Customer';
 import Vehicle from '@/lib/models/Vehicle';
 import { auth } from '@/lib/auth';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -15,7 +17,7 @@ export async function GET(
 
     await connectToDatabase();
     
-    const customer = await Customer.findById(params.id)
+    const customer = await Customer.findById(id)
       .populate('vehicles');
     
     if (!customer) {
@@ -30,10 +32,11 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -44,7 +47,7 @@ export async function PUT(
     const body = await request.json();
     
     const customer = await Customer.findByIdAndUpdate(
-      params.id,
+      id,
       {
         firstName: body.firstName,
         lastName: body.lastName,
@@ -70,10 +73,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -82,7 +86,7 @@ export async function DELETE(
     await connectToDatabase();
     
     // Check if customer has vehicles
-    const vehicles = await Vehicle.find({ customerId: params.id });
+    const vehicles = await Vehicle.find({ customerId: id });
     if (vehicles.length > 0) {
       return new Response(JSON.stringify({ 
         error: 'Cannot delete customer with existing vehicles. Please remove vehicles first.' 
@@ -90,7 +94,7 @@ export async function DELETE(
     }
 
     const customer = await Customer.findByIdAndUpdate(
-      params.id,
+      id,
       { isActive: false },
       { new: true }
     );

@@ -1,13 +1,14 @@
-
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Part from '@/lib/models/Part';
 import { auth } from '@/lib/auth';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -15,7 +16,7 @@ export async function GET(
 
     await connectToDatabase();
     
-    const part = await Part.findById(params.id);
+    const part = await Part.findById(id);
     
     if (!part) {
       return new Response(JSON.stringify({ error: 'Part not found' }), { status: 404 });
@@ -29,10 +30,11 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -43,7 +45,7 @@ export async function PUT(
     const body = await request.json();
     
     const part = await Part.findByIdAndUpdate(
-      params.id,
+      id,
       body,
       { new: true }
     );
@@ -60,10 +62,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -72,7 +75,7 @@ export async function DELETE(
     await connectToDatabase();
     
     const part = await Part.findByIdAndUpdate(
-      params.id,
+      id,
       { isActive: false },
       { new: true }
     );

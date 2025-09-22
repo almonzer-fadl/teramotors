@@ -3,6 +3,7 @@ import VehicleInspection from '@/lib/models/VehicleInspection'
 import InspectionTemplate from '@/lib/models/InspectionTemplate'
 import Vehicle from '@/lib/models/Vehicle'
 import Customer from '@/lib/models/Customer'
+import Mechanic from '@/lib/models/Mechanic'
 import User from '@/lib/models/User'
 import { auth } from '@/lib/auth'
 
@@ -18,7 +19,12 @@ export async function GET() {
     const inspections = await VehicleInspection.find({})
       .populate('vehicleId', 'make model year licensePlate')
       .populate('customerId', 'firstName lastName')
-      .populate('mechanicId', 'fullName')
+      .populate({        path: 'mechanicId',
+        populate: {
+          path: 'userId',
+          select: 'firstName lastName'
+        }
+      })
       .populate('templateId', 'name')
       .sort({ createdAt: -1 })
 
@@ -54,7 +60,7 @@ export async function POST(request: Request) {
     }
 
     // Validate that mechanic exists
-    const mechanic = await User.findById(body.mechanicId)
+    const mechanic = await Mechanic.findById(body.mechanicId)
     if (!mechanic) {
       return Response.json({ error: 'Mechanic not found' }, { status: 400 })
     }
@@ -88,7 +94,7 @@ export async function POST(request: Request) {
     const populatedInspection = await VehicleInspection.findById(inspection._id)
       .populate('vehicleId', 'make model year licensePlate')
       .populate('customerId', 'firstName lastName')
-      .populate('mechanicId', 'fullName')
+      .populate({        path: 'mechanicId',        populate: {          path: 'userId',          select: 'firstName lastName'        }      })
       .populate('templateId', 'name')
 
     return Response.json({ 

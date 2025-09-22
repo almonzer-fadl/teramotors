@@ -17,10 +17,13 @@ interface CustomerMinimal {
   firstName: string;
   lastName: string;
 }
-interface UserMinimal {
+interface MechanicMinimal {
   _id: string;
-  name?: string;
-  fullName?: string;
+  userId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
 }
 interface TemplateMinimal {
   _id: string;
@@ -54,7 +57,7 @@ export default function InspectionForm({
   const [loading, setLoading] = useState(false);
   const [vehicles, setVehicles] = useState<VehicleMinimal[]>([]);
   const [customers, setCustomers] = useState<CustomerMinimal[]>([]);
-  const [mechanics, setMechanics] = useState<UserMinimal[]>([]);
+  const [mechanics, setMechanics] = useState<MechanicMinimal[]>([]);
   const [templates, setTemplates] = useState<TemplateMinimal[]>([]);
   const [formData, setFormData] = useState<InspectionFormData>({
     vehicleId: "",
@@ -83,7 +86,7 @@ export default function InspectionForm({
         await Promise.all([
           fetch("/api/vehicles"),
           fetch("/api/customers"),
-          fetch("/api/users?role=mechanic"),
+          fetch("/api/mechanics"),
           fetch("/api/inspection-templates"),
         ]);
       if (vehiclesRes.ok) setVehicles(await vehiclesRes.json());
@@ -191,6 +194,31 @@ export default function InspectionForm({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white shadow rounded-lg p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                {t('forms.mechanic')}
+              </label>
+              <select
+                required
+                value={formData.mechanicId}
+                onChange={(e) =>
+                  handleInputChange("mechanicId", e.target.value)
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="">{t('forms.assign_mechanic')}</option>
+                {mechanics.map((m) => (
+                  <option key={m._id} value={m._id}>
+                    {m.userId.firstName} {m.userId.lastName}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
         {/* Form fields for inspection details */}
 
         <div className="bg-white shadow rounded-lg p-6">

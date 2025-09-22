@@ -1,10 +1,9 @@
-
 'use client'
 
 import { useState, useEffect } from 'react';
 import { ArrowLeft, Edit } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 
 interface Part {
   _id: string;
@@ -28,18 +27,21 @@ interface JobCard {
   createdAt: string;
 }
 
-export default function PartDetailsPage({ params }: { params: { id: string } }) {
+export default function PartDetailsPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
   const [part, setPart] = useState<Part | null>(null);
   const [usage, setUsage] = useState<JobCard[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!id) return;
     async function fetchData() {
       try {
         const [partRes, usageRes] = await Promise.all([
-          fetch(`/api/parts/${params.id}`),
-          fetch(`/api/parts/${params.id}/usage`),
+          fetch(`/api/parts/${id}`),
+          fetch(`/api/parts/${id}/usage`),
         ]);
 
         if (partRes.ok) {
@@ -59,7 +61,7 @@ export default function PartDetailsPage({ params }: { params: { id: string } }) 
     }
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
     return <div>Loading...</div>;

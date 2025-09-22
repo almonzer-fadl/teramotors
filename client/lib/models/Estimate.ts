@@ -5,7 +5,7 @@ const EstimateSchema = new Schema({
   jobCardId: { type: Schema.Types.ObjectId, ref: 'JobCard', required: true },
   customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
-  mechanicId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: true },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   notes: { type: String, required: false },
   services: [{

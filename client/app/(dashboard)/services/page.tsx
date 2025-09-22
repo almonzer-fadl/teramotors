@@ -33,12 +33,11 @@ export default function ServicesPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   // Check if user has admin permissions
-  const userRole = (user as any)?.role || 'mechanic';
-  const canDeleteServices = hasPermission(userRole, 'canDeleteServices');
+  const userRole = (user as any)?.role || 'inspector';
+  const canDeleteServices = hasPermission(userRole, 'canDelete');
 
   useEffect(() => {
     fetchServices(searchTerm, sortKey, sortDirection, selectedCategory);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, sortKey, sortDirection, selectedCategory]);
   useEffect(() => {
     socket.on("update-services", () => {

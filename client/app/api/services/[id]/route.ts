@@ -1,14 +1,15 @@
-
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Service from '@/lib/models/Service';
 import { auth } from '@/lib/auth';
 import { hasPermission } from '@/lib/roles';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -16,7 +17,7 @@ export async function GET(
 
     await connectToDatabase();
     
-    const service = await Service.findById(params.id);
+    const service = await Service.findById(id);
     
     if (!service) {
       return new Response(JSON.stringify({ error: 'Service not found' }), { status: 404 });
@@ -30,10 +31,11 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -44,7 +46,7 @@ export async function PUT(
     const body = await request.json();
     
     const service = await Service.findByIdAndUpdate(
-      params.id,
+      id,
       body,
       { new: true }
     );
@@ -61,18 +63,19 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
     // Check if user has admin permissions for hard deletion
-    const userRole = (session.user as any)?.role || 'mechanic';
-    const canDeleteServices = hasPermission(userRole, 'canDeleteServices');
+    const userRole = (session.user as any)?.role || 'inspector';
+    const canDeleteServices = hasPermission(userRole, 'canDelete');
     
     if (!canDeleteServices) {
       return new Response(JSON.stringify({ error: 'Insufficient permissions' }), { status: 403 });
@@ -81,7 +84,7 @@ export async function DELETE(
     await connectToDatabase();
     
     // For admin users, perform hard deletion
-    const service = await Service.findByIdAndDelete(params.id);
+    const service = await Service.findByIdAndDelete(id);
 
     if (!service) {
       return new Response(JSON.stringify({ error: 'Service not found' }), { status: 404 });

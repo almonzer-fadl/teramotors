@@ -4,11 +4,12 @@ import { sendEmail } from '@/lib/email';
 import Customer from '@/lib/models/Customer';
 import { connectToDatabase } from '@/lib/db';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await context.params;
     await connectToDatabase();
 
-    const customer = await Customer.findById(params.id);
+    const customer = await Customer.findById(id);
 
     if (!customer) {
       return NextResponse.json({ success: false, error: { message: 'Customer not found' } }, { status: 404 });

@@ -1,13 +1,14 @@
-
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Estimate from '@/lib/models/Estimate';
 import { auth } from '@/lib/auth';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -15,7 +16,7 @@ export async function GET(
 
     await connectToDatabase();
     
-    const estimate = await Estimate.findById(params.id)
+    const estimate = await Estimate.findById(id)
       .populate('customerId', 'firstName lastName email phone')
       .populate('vehicleId', 'make model year licensePlate')
       .populate('services.serviceId', 'name');
@@ -32,10 +33,11 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -46,7 +48,7 @@ export async function PUT(
     const body = await request.json();
     
     const estimate = await Estimate.findByIdAndUpdate(
-      params.id,
+      id,
       body,
       { new: true }
     );
@@ -63,10 +65,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -74,7 +77,7 @@ export async function DELETE(
 
     await connectToDatabase();
     
-    const estimate = await Estimate.findByIdAndDelete(params.id);
+    const estimate = await Estimate.findByIdAndDelete(id);
 
     if (!estimate) {
       return new Response(JSON.stringify({ error: 'Estimate not found' }), { status: 404 });

@@ -1,13 +1,14 @@
-
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Appointment from '@/lib/models/Appointment';
 import { auth } from '@/lib/auth';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -15,10 +16,10 @@ export async function GET(
 
     await connectToDatabase();
     
-    const appointment = await Appointment.findById(params.id)
+    const appointment = await Appointment.findById(id)
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate('mechanicId', 'firstName lastName')
+      .populate({        path: 'mechanicId',        populate: {          path: 'userId',          select: 'firstName lastName'        }      })
       .populate('serviceId', 'name');
     
     if (!appointment) {
@@ -33,10 +34,11 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -47,7 +49,7 @@ export async function PUT(
     const body = await request.json();
     
     const appointment = await Appointment.findByIdAndUpdate(
-      params.id,
+      id,
       body,
       { new: true }
     );

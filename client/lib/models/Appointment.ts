@@ -12,7 +12,7 @@ const AppointmentSchema = new Schema({
   notes: { type: String, required: false },
   estimatedCost: { type: Number, required: true, min: 0 },
   actualCost: { type: Number, required: false, min: 0 },
-  mechanicId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: true },
   priority: { type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

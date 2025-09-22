@@ -1,7 +1,5 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
-import multer from 'multer';
 import { Readable } from 'stream';
 
 // Configure Cloudinary
@@ -11,35 +9,16 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Configure Multer for memory storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-// Helper to run multer middleware
-function runMiddleware(req: NextRequest, res: NextResponse, fn: any) {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result: any) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
-    });
-  });
-}
-
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   try {
-    // We need to access the underlying Node.js request object for multer to work.
-    // This is a bit of a hack, but it's a common way to use multer with Next.js App Router.
-    const anyReq = req as any;
-    const anyRes = res as any;
+    const formData = await req.formData();
+    const file = formData.get('file') as File | null;
 
-    await runMiddleware(anyReq, anyRes, upload.single('file'));
-
-    const file = anyReq.file;
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded.' }, { status: 400 });
     }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
 
     // Upload file to Cloudinary
     const uploadPromise = new Promise((resolve, reject) => {
@@ -52,7 +31,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
       const readableStream = new Readable();
       readableStream._read = () => {}; // _read is required but you can noop it
-      readableStream.push(file.buffer);
+      readableStream.push(buffer);
       readableStream.push(null);
       readableStream.pipe(stream);
     });
