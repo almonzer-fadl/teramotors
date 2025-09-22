@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -96,11 +96,11 @@ export default function PartForm({ partId }: { partId?: string }) {
         router.push("/inventory");
       } else {
         const error = await response.json();
-        alert(error.message || "Failed to save part");
+        alert(error.message || t('forms.failed_to_save_part'));
       }
     } catch (error) {
       console.error("Failed to save part:", error);
-      alert("Failed to save part");
+      alert(t('forms.failed_to_save_part'));
     } finally {
       setLoading(false);
     }
@@ -162,7 +162,7 @@ export default function PartForm({ partId }: { partId?: string }) {
         <div className="bg-white shadow rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <input
             type="text"
-            placeholder={t('forms.name')}
+            placeholder={t('inventory.name')}
             required
             value={formData.name}
             onChange={(e) => handleInputChange("name", e.target.value)}
@@ -170,7 +170,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="text"
-            placeholder={t('forms.part_number')}
+            placeholder={t('inventory.part_number')}
             required
             value={formData.partNumber}
             onChange={(e) => handleInputChange("partNumber", e.target.value)}
@@ -178,7 +178,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="text"
-            placeholder={t('forms.category')}
+            placeholder={t('inventory.category')}
             required
             value={formData.category}
             onChange={(e) => handleInputChange("category", e.target.value)}
@@ -193,7 +193,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="number"
-            placeholder={t('forms.cost')}
+            placeholder={t('job_cards.cost')}
             required
             value={formData.cost}
             onChange={(e) =>
@@ -203,7 +203,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="number"
-            placeholder={t('forms.selling_price')}
+            placeholder={t('inventory.price')}
             required
             value={formData.sellingPrice}
             onChange={(e) =>
@@ -213,7 +213,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="number"
-            placeholder={t('forms.stock_quantity')}
+            placeholder={t('inventory.stock')}
             required
             value={formData.stockQuantity}
             onChange={(e) =>
@@ -223,7 +223,7 @@ export default function PartForm({ partId }: { partId?: string }) {
           />
           <input
             type="number"
-            placeholder={t('forms.min_stock_level')}
+            placeholder={t('inventory_alerts.min_stock')}
             required
             value={formData.minStockLevel}
             onChange={(e) =>
@@ -239,7 +239,7 @@ export default function PartForm({ partId }: { partId?: string }) {
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           />
           <textarea
-            placeholder={t('forms.description')}
+            placeholder={t('vehicles.description')}
             value={formData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
             className="md:col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm"
@@ -257,7 +257,7 @@ export default function PartForm({ partId }: { partId?: string }) {
             >
               <input
                 type="text"
-                placeholder={t('forms.make')}
+                placeholder={t('vehicles.make')}
                 value={vehicle.make}
                 onChange={(e) =>
                   handleCompatibleVehicleChange(index, "make", e.target.value)
@@ -266,7 +266,7 @@ export default function PartForm({ partId }: { partId?: string }) {
               />
               <input
                 type="text"
-                placeholder={t('forms.model')}
+                placeholder={t('vehicles.model')}
                 value={vehicle.model}
                 onChange={(e) =>
                   handleCompatibleVehicleChange(index, "model", e.target.value)
@@ -275,7 +275,7 @@ export default function PartForm({ partId }: { partId?: string }) {
               />
               <input
                 type="number"
-                placeholder={t('forms.year')}
+                placeholder={t('vehicles.year')}
                 value={vehicle.year}
                 onChange={(e) =>
                   handleCompatibleVehicleChange(

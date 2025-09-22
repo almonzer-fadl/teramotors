@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -172,11 +172,11 @@ export default function AppointmentForm({
         router.push("/appointments");
       } else {
         const error = await response.json();
-        alert(error.message || "Failed to save appointment");
+        alert(error.message || t('forms.failed_to_save_appointment'));
       }
     } catch (error) {
       console.error("Failed to save appointment:", error);
-      alert("Failed to save appointment");
+      alert(t('forms.failed_to_save_appointment'));
     } finally {
       setLoading(false);
     }
@@ -310,7 +310,7 @@ export default function AppointmentForm({
                 <option value="">{t('forms.assign_mechanic')}</option>
                 {mechanics.map((m) => (
                   <option key={m._id} value={m._id}>
-                    {m.fullName || m.name || "Unnamed"}
+                    {m.fullName || m.name || t('forms.unnamed')}
                   </option>
                 ))}
               </select>

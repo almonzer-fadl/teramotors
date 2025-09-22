@@ -149,7 +149,29 @@
     "enter_vehicle_details": "أدخل تفاصيل المركبة لإضافتها إلى قاعدة بياناتك",
     "vehicle_photos": "صور المركبة",
     "update_vehicle": "تحديث المركبة",
-    "save_vehicle": "حفظ المركبة"
+    "save_vehicle": "حفظ المركبة",
+    "unnamed": "بدون اسم",
+    "notes_placeholder": "أي ملاحظات إضافية عن هذا العميل...",
+    "qty_placeholder": "الكمية",
+    "labor_placeholder": "العمل",
+    "parts_placeholder": "قطع الغيار",
+    "total_placeholder": "المجموع",
+    "item_id_placeholder": "معرف العنصر",
+    "cost_placeholder": "التكلفة",
+    "condition_good": "جيد",
+    "condition_fair": "مقبول",
+    "condition_poor": "ضعيف",
+    "condition_critical": "حرج",
+    "vehicle_photo_alt": "صورة المركبة {{index}}",
+    "na": "غير متاح",
+    "failed_to_save_appointment": "فشل حفظ الموعد",
+    "failed_to_save_customer": "فشل حفظ العميل",
+    "failed_to_save_estimate": "فشل حفظ التقدير",
+    "failed_to_save_inspection": "فشل حفظ الفحص",
+    "failed_to_save_job_card": "فشل حفظ بطاقة العمل",
+    "failed_to_save_part": "فشل حفظ قطعة الغيار",
+    "failed_to_save_service": "فشل حفظ الخدمة",
+    "failed_to_save_vehicle": "فشل حفظ المركبة"
   },
   "header": {
     "language": "اللغة",
@@ -321,7 +343,7 @@
     "description": "تتبع أوامر العمل وتقدم المهمة.",
     "create": "إنشاء بطاقة عمل",
     "search_placeholder": "البحث في بطاقات العمل...",
-    "job_card_count": "بطاقة عمل واحدة",
+    "job_card_count": "{{count}} بطاقة عمل",
     "job_card_count_plural": "{{count}} بطاقات عمل",
     "mechanic": "الميكانيكي:",
     "labor_hours": "ساعات العمل:",
@@ -343,7 +365,13 @@
     "progress_photo_alt": "صورة التقدم {{index}}",
     "not_found": "بطاقة العمل غير موجودة",
     "failed_to_save_parts": "فشل حفظ الأجزاء",
-    "failed_to_save_notes": "فشل حفظ الملاحظات"
+    "failed_to_save_notes": "فشل حفظ الملاحظات",
+    "no_active_job_cards": "لا توجد بطاقات عمل نشطة",
+    "no_active_job_cards_description": "لا توجد بطاقات عمل بحالة 'تم الإنشاء' أو 'قيد التقدم'.",
+    "status_created": "تم الإنشاء",
+    "status_in_progress": "قيد التقدم",
+    "services_label": "الخدمات:",
+    "and_more": "...و {{count}} أخرى"
   },
   "vehicles": {
     "title": "المركبات",
@@ -397,5 +425,47 @@
       "name": "مفتش",
       "description": "يمكنه إجراء فحوصات المركبات وإنشاء تقديرات. لا يمكنه حذف البيانات أو الوصول إلى ميزات المسؤول."
     }
+  },
+  "common": {
+    "view": "عرض",
+    "edit": "تعديل",
+    "new": "جديد",
+    "breadcrumbs": {
+      "label": "مسار التنقل"
+    }
+  },
+  "settings": {
+    "description": "إدارة المستخدمين وإعدادات النظام",
+    "add_user": "إضافة مستخدم",
+    "role_permissions": "أذونات الأدوار",
+    "user_management": "إدارة المستخدمين",
+    "search_placeholder": "البحث عن مستخدمين...",
+    "loading_users": "جارٍ تحميل المستخدمين...",
+    "user": "المستخدم",
+    "role": "الدور",
+    "status": "الحالة",
+    "last_login": "آخر تسجيل دخول",
+    "actions": "الإجراءات",
+    "never": "أبدًا",
+    "deactivate": "إلغاء التنشيط",
+    "activate": "تنشيط",
+    "add_user_title": "إضافة مستخدم جديد",
+    "full_name": "الاسم الكامل",
+    "full_name_placeholder": "أدخل الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "email_placeholder": "أدخل البريد الإلكتروني",
+    "phone_optional": "الهاتف (اختياري)",
+    "phone_placeholder": "أدخل رقم الهاتف",
+    "edit_user_role_title": "تعديل دور المستخدم",
+    "save_changes": "حفظ التغييرات",
+    "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.",
+    "delete_success": "تم حذف المستخدم بنجاح",
+    "delete_fail": "فشل حذف المستخدم",
+    "delete_error": "خطأ في حذف المستخدم",
+    "update_status_fail": "فشل تحديث حالة المستخدم",
+    "update_status_error": "خطأ في تحديث المستخدم",
+    "update_role_success": "تم تحديث دور المستخدم بنجاح",
+    "update_role_fail": "فشل تحديث دور المستخدم",
+    "update_role_error": "خطأ في تحديث دور المستخدم"
   }
 }

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -88,8 +88,6 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
     }
   }, [customerId, isEditing]);
 
-  // duplicate removed
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -111,11 +109,11 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
         router.push("/customers");
       } else {
         const error = await response.json();
-        alert(error.message || "Failed to save customer");
+        alert(error.message || t('forms.failed_to_save_customer'));
       }
     } catch (error) {
       console.error("Failed to save customer:", error);
-      alert("Failed to save customer");
+      alert(t('forms.failed_to_save_customer'));
     } finally {
       setLoading(false);
     }
@@ -358,7 +356,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                 value={formData.notes}
                 onChange={(e) => handleInputChange("notes", e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="Any additional notes about this customer..."
+                placeholder={t('forms.notes_placeholder')}
               />
             </div>
           </div>

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -161,11 +161,11 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
         router.push("/estimates");
       } else {
         const error = await response.json();
-        alert(error.message || "Failed to save estimate");
+        alert(error.message || t('forms.failed_to_save_estimate'));
       }
     } catch (error) {
       console.error("Failed to save estimate:", error);
-      alert("Failed to save estimate");
+      alert(t('forms.failed_to_save_estimate'));
     } finally {
       setLoading(false);
     }
@@ -312,7 +312,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
               </select>
               <input
                 type="number"
-                placeholder="Qty"
+                placeholder={t('forms.qty_placeholder')}
                 value={service.quantity}
                 onChange={(e) =>
                   handleServiceChange(
@@ -325,21 +325,21 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
               />
               <input
                 type="number"
-                placeholder="Labor"
+                placeholder={t('forms.labor_placeholder')}
                 value={service.laborCost.toFixed(2)}
                 readOnly
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
               />
               <input
                 type="number"
-                placeholder="Parts"
+                placeholder={t('forms.parts_placeholder')}
                 value={service.partsCost.toFixed(2)}
                 readOnly
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
               />
               <input
                 type="number"
-                placeholder="Total"
+                placeholder={t('forms.total_placeholder')}
                 value={service.totalCost.toFixed(2)}
                 readOnly
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"

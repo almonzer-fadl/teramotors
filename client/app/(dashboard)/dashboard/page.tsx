@@ -205,28 +205,28 @@ export default function DashboardPage() {
               href="/customers/new"
               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              <Users className="mr-2 h-4 w-4" />
+              <Users className="me-2 h-4 w-4" />
               {t("dashboard.add_customer")}
             </Link>
             <Link
               href="/vehicles/new"
               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              <Car className="mr-2 h-4 w-4" />
+              <Car className="me-2 h-4 w-4" />
               {t("dashboard.add_vehicle")}
             </Link>
             <Link
               href="/inspections/new"
               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              <Search className="mr-2 h-4 w-4" />
+              <Search className="me-2 h-4 w-4" />
               {t("dashboard.create_inspection")}
             </Link>
             <Link
               href="/job-cards/new"
               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              <ClipboardList className="mr-2 h-4 w-4" />
+              <ClipboardList className="me-2 h-4 w-4" />
               {t("dashboard.create_job_card")}
             </Link>
           </div>
