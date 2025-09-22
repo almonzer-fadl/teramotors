@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Plus, Search, Edit, Trash2, Eye, ArrowUpDown } from "lucide-react";
 import StatusBadge from "@/components/dashboard/StatusBadge";
 import { socket } from "@/lib/services/socket";
+import { useSession } from "@/lib/hooks/useSession";
+import { hasPermission } from "@/lib/roles";
 
 interface Service {
   _id: string;
@@ -21,6 +23,7 @@ type SortKey = "name" | "category" | "laborRate" | "laborHours" | "createdAt";
 type SortDirection = "asc" | "desc";
 
 export default function ServicesPage() {
+  const { user } = useSession();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,6 +31,10 @@ export default function ServicesPage() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+
+  // Check if user has admin permissions
+  const userRole = (user as any)?.role || 'mechanic';
+  const canDeleteServices = hasPermission(userRole, 'canDeleteServices');
 
   useEffect(() => {
     fetchServices(searchTerm, sortKey, sortDirection, selectedCategory);
@@ -275,12 +282,14 @@ export default function ServicesPage() {
                       >
                         <Edit className="h-4 w-4" />
                       </Link>
-                      <button
-                        onClick={() => handleDelete(service._id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      {canDeleteServices && (
+                        <button
+                          onClick={() => handleDelete(service._id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

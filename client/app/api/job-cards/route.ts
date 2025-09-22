@@ -3,7 +3,7 @@ import JobCard from '@/lib/models/JobCard'
 import Appointment from '@/lib/models/Appointment'
 import Customer from '@/lib/models/Customer'
 import Vehicle from '@/lib/models/Vehicle'
-import User from '@/lib/models/User'
+import Service from '@/lib/models/Service'
 import { auth } from '@/lib/auth'
 
 export async function GET() {
@@ -19,7 +19,7 @@ export async function GET() {
       .populate('appointmentId', 'appointmentDate startTime endTime')
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate('mechanicId', 'fullName')
+      .populate('services.serviceId', 'name laborHours laborRate')
       .sort({ createdAt: -1 })
 
     return Response.json(jobCards)
@@ -41,10 +41,11 @@ export async function POST(request: Request) {
     
     const body = await request.json()
     
-    // Validate that appointment exists
-    const appointment = await Appointment.findById(body.appointmentId)
-    if (!appointment) {
-      return Response.json({ error: 'Appointment not found' }, { status: 400 })
+    if (body.appointmentId) {
+      const appointment = await Appointment.findById(body.appointmentId)
+      if (!appointment) {
+        return Response.json({ error: 'Appointment not found' }, { status: 400 })
+      }
     }
 
     // Validate that customer exists
@@ -59,38 +60,53 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Vehicle not found' }, { status: 400 })
     }
 
-    // Validate that mechanic exists
-    const mechanic = await User.findById(body.mechanicId)
-    if (!mechanic) {
-      return Response.json({ error: 'Mechanic not found' }, { status: 400 })
+    // Validate that services exist
+    if (body.services && body.services.length > 0) {
+      for (const serviceItem of body.services) {
+        const service = await Service.findById(serviceItem.serviceId)
+        if (!service) {
+          return Response.json({ error: `Service ${serviceItem.serviceId} not found` }, { status: 400 })
+        }
+      }
     }
 
-    const jobCard = new JobCard({
-      appointmentId: body.appointmentId,
+    const jobCardData: any = {
       customerId: body.customerId,
       vehicleId: body.vehicleId,
-      mechanicId: body.mechanicId,
       status: body.status || 'pending',
       priority: body.priority || 'medium',
-      estimatedStartTime: body.estimatedStartTime,
-      estimatedEndTime: body.estimatedEndTime,
-      laborHours: body.laborHours,
+      services: body.services || [],
       partsUsed: body.partsUsed || [],
       notes: body.notes
-    })
+    };
+
+    if (body.appointmentId) {
+      jobCardData.appointmentId = body.appointmentId;
+    }
+
+    if (body.estimatedStartTime) {
+      jobCardData.estimatedStartTime = new Date(body.estimatedStartTime);
+    }
+
+    if (body.estimatedEndTime) {
+      jobCardData.estimatedEndTime = new Date(body.estimatedEndTime);
+    }
+
+    const jobCard = new JobCard(jobCardData)
 
     await jobCard.save()
 
-    // Update appointment status to in-progress
-    await Appointment.findByIdAndUpdate(body.appointmentId, {
-      status: 'in-progress'
-    })
+    if (body.appointmentId) {
+      await Appointment.findByIdAndUpdate(body.appointmentId, {
+        status: 'in-progress'
+      })
+    }
 
     const populatedJobCard = await JobCard.findById(jobCard._id)
       .populate('appointmentId', 'appointmentDate startTime endTime')
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate('mechanicId', 'fullName')
+      .populate('services.serviceId', 'name laborHours laborRate')
 
     return Response.json({ 
       success: true, 

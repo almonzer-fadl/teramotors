@@ -21,10 +21,11 @@ interface VehicleMinimal {
   year: number;
   customerId: string | { _id: string };
 }
-interface UserMinimal {
+interface ServiceMinimal {
   _id: string;
-  name?: string;
-  fullName?: string;
+  name: string;
+  laborHours: number;
+  laborRate: number;
 }
 interface PartMinimal {
   _id: string;
@@ -36,12 +37,11 @@ interface JobCardFormData {
   appointmentId: string;
   customerId: string;
   vehicleId: string;
-  mechanicId: string;
   status: "pending" | "in-progress" | "completed" | "cancelled";
   priority: "low" | "medium" | "high" | "urgent";
   estimatedStartTime: string;
   estimatedEndTime: string;
-  laborHours: number;
+  services: { serviceId: string; quantity: number; laborHours: number; laborRate: number }[];
   partsUsed: { partId: string; quantity: number; cost: number }[];
   notes: string;
 }
@@ -59,18 +59,17 @@ export default function JobCardForm({
   const [appointments, setAppointments] = useState<AppointmentMinimal[]>([]);
   const [customers, setCustomers] = useState<CustomerMinimal[]>([]);
   const [vehicles, setVehicles] = useState<VehicleMinimal[]>([]);
-  const [mechanics, setMechanics] = useState<UserMinimal[]>([]);
+  const [services, setServices] = useState<ServiceMinimal[]>([]);
   const [parts, setParts] = useState<PartMinimal[]>([]);
   const [formData, setFormData] = useState<JobCardFormData>({
     appointmentId: "",
     customerId: "",
     vehicleId: "",
-    mechanicId: "",
     status: "pending",
     priority: "medium",
     estimatedStartTime: "",
     estimatedEndTime: "",
-    laborHours: 0,
+    services: [],
     partsUsed: [],
     notes: "",
   });
@@ -112,19 +111,19 @@ export default function JobCardForm({
         appointmentsRes,
         customersRes,
         vehiclesRes,
-        mechanicsRes,
+        servicesRes,
         partsRes,
       ] = await Promise.all([
         fetch("/api/appointments"),
         fetch("/api/customers"),
         fetch("/api/vehicles"),
-        fetch("/api/users?role=mechanic"),
+        fetch("/api/services"),
         fetch("/api/parts"),
       ]);
       if (appointmentsRes.ok) setAppointments(await appointmentsRes.json());
       if (customersRes.ok) setCustomers(await customersRes.json());
       if (vehiclesRes.ok) setVehicles(await vehiclesRes.json());
-      if (mechanicsRes.ok) setMechanics(await mechanicsRes.json());
+      if (servicesRes.ok) setServices(await servicesRes.json());
       if (partsRes.ok) setParts(await partsRes.json());
     } catch (error) {
       console.error("Failed to fetch initial data:", error);
@@ -141,7 +140,6 @@ export default function JobCardForm({
           appointmentId: appointment._id,
           customerId: appointment.customerId._id,
           vehicleId: appointment.vehicleId._id,
-          mechanicId: appointment.mechanicId._id,
         }));
       }
     } catch (error) {
@@ -180,8 +178,61 @@ export default function JobCardForm({
     }
   };
 
+  const handleServiceChange = (index: number, field: string, value: any) => {
+    const updatedServices = [...formData.services];
+    updatedServices[index] = { ...updatedServices[index], [field]: value };
+
+    if (field === 'serviceId') {
+      const service = services.find(s => s._id === value);
+      if (service) {
+        updatedServices[index].laborHours = service.laborHours;
+        updatedServices[index].laborRate = service.laborRate;
+      }
+    }
+
+    // Recalculate end time based on total labor hours
+    let estimatedEndTime = '';
+    if (formData.estimatedStartTime) {
+        const totalLaborHours = updatedServices.reduce((sum, s) => sum + (s.laborHours || 0), 0);
+        const startTime = new Date(formData.estimatedStartTime);
+        const endTime = new Date(startTime.getTime() + (totalLaborHours * 60 * 60 * 1000));
+        estimatedEndTime = endTime.toISOString().slice(0, 16);
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      services: updatedServices,
+      estimatedEndTime: estimatedEndTime
+    }));
+  };
+
+  const addService = () => {
+    handleInputChange("services", [
+      ...formData.services,
+      { serviceId: "", quantity: 1, laborHours: 0, laborRate: 0 },
+    ]);
+  };
+
+  const removeService = (index: number) => {
+    const updatedServices = formData.services.filter((_, i) => i !== index);
+    handleInputChange("services", updatedServices);
+  };
+
   const handleInputChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const newFormData = { ...prev, [field]: value };
+      if (field === 'customerId') {
+        newFormData.vehicleId = '';
+        const customerVehicles = vehicles.filter(v => {
+            const customerId = typeof v.customerId === 'object' ? v.customerId._id : v.customerId;
+            return customerId === value;
+        });
+        if (customerVehicles.length > 0) {
+            newFormData.vehicleId = customerVehicles[0]._id;
+        }
+      }
+      return newFormData;
+    });
   };
 
   const handlePartChange = (index: number, field: string, value: any) => {
@@ -257,35 +308,20 @@ export default function JobCardForm({
                 value={formData.vehicleId}
                 onChange={(e) => handleInputChange("vehicleId", e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                disabled={!formData.customerId}
               >
                 <option value="">{t("forms.select_vehicle")}</option>
                 {vehicles
-                  .filter((v) => v.customerId === formData.customerId)
+                  .filter((v) => {
+                    if (!formData.customerId) return false;
+                    const customerId = typeof v.customerId === 'object' ? v.customerId._id : v.customerId;
+                    return customerId === formData.customerId;
+                  })
                   .map((v) => (
                     <option key={v._id} value={v._id}>
                       {v.make} {v.model} ({v.year})
                     </option>
                   ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                {t("forms.mechanic")}
-              </label>
-              <select
-                required
-                value={formData.mechanicId}
-                onChange={(e) =>
-                  handleInputChange("mechanicId", e.target.value)
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="">{t("forms.assign_mechanic")}</option>
-                {mechanics.map((m) => (
-                  <option key={m._id} value={m._id}>
-                    {m.fullName || m.name || t("forms.unnamed")}
-                  </option>
-                ))}
               </select>
             </div>
             <div>
@@ -324,7 +360,6 @@ export default function JobCardForm({
               </label>
               <input
                 type="datetime-local"
-                required
                 value={formData.estimatedStartTime}
                 onChange={(e) =>
                   handleInputChange("estimatedStartTime", e.target.value)
@@ -338,24 +373,9 @@ export default function JobCardForm({
               </label>
               <input
                 type="datetime-local"
-                required
                 value={formData.estimatedEndTime}
                 onChange={(e) =>
                   handleInputChange("estimatedEndTime", e.target.value)
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                {t("job_cards.labor_hours")}
-              </label>
-              <input
-                type="number"
-                required
-                value={formData.laborHours}
-                onChange={(e) =>
-                  handleInputChange("laborHours", parseFloat(e.target.value))
                 }
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
@@ -372,6 +392,66 @@ export default function JobCardForm({
               ></textarea>
             </div>
           </div>
+        </div>
+
+        <div className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            {t("forms.services")}
+          </h3>
+          {formData.services.map((service, index) => (
+            <div
+              key={index}
+              className="grid grid-cols-5 gap-4 items-center mb-4"
+            >
+              <select
+                value={service.serviceId}
+                onChange={(e) =>
+                  handleServiceChange(index, "serviceId", e.target.value)
+                }
+                className="col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="">{t("forms.select_service")}</option>
+                {services.map((s) => (
+                  <option key={s._id} value={s._id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                placeholder={t("forms.qty_placeholder")}
+                value={service.quantity}
+                onChange={(e) =>
+                  handleServiceChange(index, "quantity", parseInt(e.target.value))
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+.              <input
+                type="number"
+                placeholder={t("forms.labor_placeholder")}
+                value={service.laborHours}
+                onChange={(e) =>
+                  handleServiceChange(index, "laborHours", parseFloat(e.target.value))
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+              <button
+                type="button"
+                onClick={() => removeService(index)}
+                className="text-red-500 hover:text-red-700"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addService}
+            className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            {t("forms.add_service")}
+          </button>
         </div>
 
         <div className="bg-white shadow rounded-lg p-6">

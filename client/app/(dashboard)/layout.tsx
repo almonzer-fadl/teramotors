@@ -26,6 +26,7 @@ import {
   X,
   Bell,
   User,
+  Wrench,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/dashboard/LanguageSwitcher";
@@ -43,6 +44,7 @@ const iconMap = {
   CreditCard,
   BarChart3,
   Settings,
+  Wrench,
 };
 
 export default function DashboardLayout({

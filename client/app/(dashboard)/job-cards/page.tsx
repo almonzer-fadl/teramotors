@@ -38,17 +38,23 @@ interface JobCard {
     year: number;
     licensePlate: string;
   };
-  mechanicId: {
-    _id: string;
-    fullName: string;
-  };
   status: "pending" | "in-progress" | "completed" | "cancelled";
   priority: "low" | "medium" | "high" | "urgent";
   estimatedStartTime: string;
   estimatedEndTime: string;
   actualStartTime?: string;
   actualEndTime?: string;
-  laborHours: number;
+  services: Array<{
+    serviceId: {
+      _id: string;
+      name: string;
+      laborHours: number;
+      laborRate: number;
+    };
+    quantity: number;
+    laborHours: number;
+    laborRate: number;
+  }>;
   notes?: string;
   createdAt: string;
 }
@@ -97,9 +103,9 @@ export default function JobCardsPage() {
       jobCard.vehicleId.licensePlate
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      jobCard.mechanicId.fullName
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+      jobCard.services.some(service => 
+        service.serviceId.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
     const matchesStatus =
       statusFilter === "all" || jobCard.status === statusFilter;
@@ -296,11 +302,11 @@ export default function JobCardsPage() {
                 </div>
 
                 <div className="text-sm text-gray-500">
-                  <strong>{t('job_cards.mechanic')}</strong> {jobCard.mechanicId.fullName}
+                  <strong>{t('job_cards.services_label')}</strong> {jobCard.services.map(s => s.serviceId.name).join(', ')}
                 </div>
 
                 <div className="text-sm text-gray-500">
-                  <strong>{t('job_cards.labor_hours')}</strong> {jobCard.laborHours}h
+                  <strong>{t('job_cards.labor_hours')}</strong> {jobCard.services.reduce((sum, s) => sum + s.laborHours, 0)}h
                 </div>
 
                 {jobCard.notes && (
