@@ -7,7 +7,9 @@ export default function LanguageSwitcher() {
   const { i18n } = useTranslation()
 
   const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng)
+    i18n.changeLanguage(lng).then(() => {
+      window.location.reload();
+    });
   }
 
   return (
