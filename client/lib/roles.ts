@@ -69,3 +69,17 @@ export const permissions = {
 export const hasPermission = (userRole: string, permission: keyof typeof permissions.admin): boolean => {
   return permissions[userRole as keyof typeof permissions]?.[permission] || false
 }
+
+// Role display names
+export const roleDisplayNames = {
+  admin: 'Administrator',
+  mechanic: 'Mechanic',
+  inspector: 'Inspector',
+}
+
+// Role descriptions
+export const roleDescriptions = {
+  admin: 'Full system access including user management, settings, and reports. Can delete any data.',
+  mechanic: 'Can manage customers, vehicles, appointments, jobs, and estimates. Cannot delete data or access admin features.',
+  inspector: 'Can perform vehicle inspections and create estimates. Cannot delete data or access admin features.',
+}

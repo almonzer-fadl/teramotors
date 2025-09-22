@@ -16,6 +16,7 @@ import {
   Filter,
   Calendar as CalendarIcon
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface ReportData {
   totalCustomers: number
@@ -35,7 +36,7 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true)
   const [dateRange, setDateRange] = useState('30')
   const [reportType, setReportType] = useState('overview')
-
+  const { t } = useTranslation()
   // Check if user has admin permissions
   const userRole = (user as any)?.role || 'mechanic'
   const canAccessReports = hasPermission(userRole, 'canAccessReports')
@@ -87,8 +88,8 @@ export default function ReportsPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900">Access Denied</h3>
-          <p className="text-gray-500">You don't have permission to access reports.</p>
+          <h3 className="text-lg font-medium text-gray-900">{t('reports.access_denied')}</h3>
+          <p className="text-gray-500">{t('reports.access_denied_description')}</p>
         </div>
       </div>
     )
@@ -98,7 +99,7 @@ export default function ReportsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="ml-2 text-gray-500">Loading reports...</p>
+        <p className="ml-2 text-gray-500">{t('reports.loading')}</p>
       </div>
     )
   }
@@ -108,8 +109,8 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-          <p className="text-gray-600">Business insights and performance metrics</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('reports.title')}</h1>
+          <p className="text-gray-600">{t('reports.description')}</p>
         </div>
         <div className="flex items-center gap-2">
           <select
@@ -117,24 +118,24 @@ export default function ReportsPage() {
             onChange={(e) => setDateRange(e.target.value)}
             className="border rounded-lg px-3 py-2 text-sm"
           >
-            <option value="7">Last 7 days</option>
-            <option value="30">Last 30 days</option>
-            <option value="90">Last 90 days</option>
-            <option value="365">Last year</option>
+            <option value="7">{t('reports.last_7_days')}</option>
+            <option value="30">{t('reports.last_30_days')}</option>
+            <option value="90">{t('reports.last_90_days')}</option>
+            <option value="365">{t('reports.last_year')}</option>
           </select>
           <button
             onClick={() => handleExportReport('pdf')}
             className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
           >
             <Download className="h-4 w-4" />
-            Export PDF
+            {t('reports.export_pdf')}
           </button>
           <button
             onClick={() => handleExportReport('excel')}
             className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
           >
             <Download className="h-4 w-4" />
-            Export Excel
+            {t('reports.export_excel')}
           </button>
         </div>
       </div>
@@ -147,7 +148,7 @@ export default function ReportsPage() {
               <Users className="h-6 w-6 text-blue-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Customers</p>
+              <p className="text-sm font-medium text-gray-600">{t('reports.total_customers')}</p>
               <p className="text-2xl font-bold text-gray-900">{reportData?.totalCustomers || 0}</p>
             </div>
           </div>
@@ -159,7 +160,7 @@ export default function ReportsPage() {
               <Car className="h-6 w-6 text-green-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Vehicles</p>
+              <p className="text-sm font-medium text-gray-600">{t('reports.total_vehicles')}</p>
               <p className="text-2xl font-bold text-gray-900">{reportData?.totalVehicles || 0}</p>
             </div>
           </div>
@@ -171,7 +172,7 @@ export default function ReportsPage() {
               <Calendar className="h-6 w-6 text-purple-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Appointments</p>
+              <p className="text-sm font-medium text-gray-600">{t('reports.total_appointments')}</p>
               <p className="text-2xl font-bold text-gray-900">{reportData?.totalAppointments || 0}</p>
             </div>
           </div>
@@ -183,7 +184,7 @@ export default function ReportsPage() {
               <DollarSign className="h-6 w-6 text-yellow-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Revenue</p>
+              <p className="text-sm font-medium text-gray-600">{t('reports.total_revenue')}</p>
               <p className="text-2xl font-bold text-gray-900">${reportData?.totalRevenue?.toLocaleString() || 0}</p>
             </div>
           </div>
@@ -195,7 +196,7 @@ export default function ReportsPage() {
         {/* Revenue Chart */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Monthly Revenue</h3>
+            <h3 className="text-lg font-semibold">{t('reports.monthly_revenue')}</h3>
             <TrendingUp className="h-5 w-5 text-green-500" />
           </div>
           <div className="h-64 flex items-end justify-between gap-2">
@@ -215,7 +216,7 @@ export default function ReportsPage() {
         {/* Top Services */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Top Services</h3>
+            <h3 className="text-lg font-semibold">{t('reports.top_services')}</h3>
             <FileText className="h-5 w-5 text-blue-500" />
           </div>
           <div className="space-y-3">
@@ -227,7 +228,7 @@ export default function ReportsPage() {
                 </div>
                 <div className="text-right">
                   <div className="text-sm font-medium">${service.revenue.toLocaleString()}</div>
-                  <div className="text-xs text-gray-500">{service.count} jobs</div>
+                  <div className="text-xs text-gray-500">{t('reports.jobs')}: {service.count}</div>
                 </div>
               </div>
             ))}
@@ -238,7 +239,7 @@ export default function ReportsPage() {
       {/* Detailed Reports */}
       <div className="bg-white rounded-lg shadow">
         <div className="p-6 border-b">
-          <h3 className="text-lg font-semibold">Detailed Reports</h3>
+          <h3 className="text-lg font-semibold">{t('reports.detailed_reports')}</h3>
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -246,8 +247,8 @@ export default function ReportsPage() {
               <div className="flex items-center gap-3">
                 <Users className="h-8 w-8 text-blue-500" />
                 <div>
-                  <h4 className="font-medium">Customer Report</h4>
-                  <p className="text-sm text-gray-500">Customer demographics and activity</p>
+                  <h4 className="font-medium">{t('reports.customer_report')}</h4>
+                  <p className="text-sm text-gray-500">{t('reports.customer_report_desc')}</p>
                 </div>
               </div>
             </div>
@@ -255,8 +256,8 @@ export default function ReportsPage() {
               <div className="flex items-center gap-3">
                 <Car className="h-8 w-8 text-green-500" />
                 <div>
-                  <h4 className="font-medium">Vehicle Report</h4>
-                  <p className="text-sm text-gray-500">Vehicle service history and trends</p>
+                  <h4 className="font-medium">{t('reports.vehicle_report')}</h4>
+                  <p className="text-sm text-gray-500">{t('reports.vehicle_report_desc')}</p>
                 </div>
               </div>
             </div>
@@ -264,8 +265,8 @@ export default function ReportsPage() {
               <div className="flex items-center gap-3">
                 <Package className="h-8 w-8 text-purple-500" />
                 <div>
-                  <h4 className="font-medium">Inventory Report</h4>
-                  <p className="text-sm text-gray-500">Parts usage and stock levels</p>
+                  <h4 className="font-medium">{t('reports.inventory_report')}</h4>
+                  <p className="text-sm text-gray-500">{t('reports.inventory_report_desc')}</p>
                 </div>
               </div>
             </div>
