@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Plus, Search, Edit, Eye, CreditCard, DollarSign, CheckCircle, XCircle, Clock, FileText } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface Invoice {
   _id: string
@@ -37,6 +38,7 @@ interface Invoice {
 }
 
 export default function InvoicesPage() {
+  const { t } = useTranslation('common');
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -133,9 +135,9 @@ export default function InvoicesPage() {
       {/* Header */}
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Invoices</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('invoices.title')}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Manage customer invoices and payment tracking.
+            {t('invoices.description')}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
@@ -144,7 +146,7 @@ export default function InvoicesPage() {
             className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Create Invoice
+            {t('invoices.create_invoice')}
           </Link>
         </div>
       </div>
@@ -159,7 +161,7 @@ export default function InvoicesPage() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Total Revenue</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">{t('invoices.total_revenue')}</dt>
                   <dd className="text-lg font-medium text-gray-900">${totalRevenue.toFixed(2)}</dd>
                 </dl>
               </div>
@@ -175,7 +177,7 @@ export default function InvoicesPage() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Pending Amount</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">{t('invoices.pending_amount')}</dt>
                   <dd className="text-lg font-medium text-gray-900">${pendingAmount.toFixed(2)}</dd>
                 </dl>
               </div>
@@ -191,7 +193,7 @@ export default function InvoicesPage() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Total Invoices</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">{t('invoices.total_invoices')}</dt>
                   <dd className="text-lg font-medium text-gray-900">{invoices.length}</dd>
                 </dl>
               </div>
@@ -209,7 +211,7 @@ export default function InvoicesPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search invoices..."
+                  placeholder={t('invoices.search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -220,24 +222,24 @@ export default function InvoicesPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="paid">Paid</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="all">{t('invoices.all_status')}</option>
+                <option value="pending">{t('estimates.pending')}</option>
+                <option value="paid">{t('invoices.paid')}</option>
+                <option value="cancelled">{t('appointments.cancelled')}</option>
               </select>
               <select
                 value={paymentFilter}
                 onChange={(e) => setPaymentFilter(e.target.value)}
                 className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="all">All Payments</option>
-                <option value="pending">Payment Pending</option>
-                <option value="paid">Payment Received</option>
-                <option value="failed">Payment Failed</option>
+                <option value="all">{t('invoices.all_payments')}</option>
+                <option value="pending">{t('invoices.payment_pending')}</option>
+                <option value="paid">{t('invoices.payment_received')}</option>
+                <option value="failed">{t('invoices.payment_failed')}</option>
               </select>
             </div>
             <div className="text-sm text-gray-500">
-              {filteredInvoices.length} invoice{filteredInvoices.length !== 1 ? 's' : ''}
+              {t(filteredInvoices.length === 1 ? 'invoices.invoice_count' : 'invoices.invoice_count_plural', { count: filteredInvoices.length })}
             </div>
           </div>
         </div>
@@ -250,28 +252,28 @@ export default function InvoicesPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Invoice
+                  {t('invoices.invoice')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Customer
+                  {t('appointments.customer')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vehicle
+                  {t('appointments.vehicle')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amount
+                  {t('invoices.amount')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Due Date
+                  {t('invoices.due_date')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Payment Status
+                  {t('invoices.payment_status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t('customers.status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('customers.actions')}
                 </th>
               </tr>
             </thead>
@@ -314,7 +316,7 @@ export default function InvoicesPage() {
                     </div>
                     {invoice.paidAmount && (
                       <div className="text-sm text-gray-500">
-                        Paid: ${invoice.paidAmount.toFixed(2)}
+                        {t('invoices.paid_amount', { amount: invoice.paidAmount.toFixed(2) })}
                       </div>
                     )}
                   </td>
@@ -323,7 +325,7 @@ export default function InvoicesPage() {
                       {new Date(invoice.dueDate).toLocaleDateString()}
                     </div>
                     {isOverdue(invoice.dueDate) && (
-                      <div className="text-xs text-red-500">Overdue</div>
+                      <div className="text-xs text-red-500">{t('invoices.overdue')}</div>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -371,9 +373,9 @@ export default function InvoicesPage() {
       {filteredInvoices.length === 0 && (
         <div className="text-center py-12">
           <CreditCard className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No invoices found</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">{t('invoices.no_invoices_found')}</h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== 'all' || paymentFilter !== 'all' ? 'Try adjusting your search or filter terms.' : 'Get started by creating your first invoice.'}
+            {searchTerm || statusFilter !== 'all' || paymentFilter !== 'all' ? t('invoices.adjust_search') : t('invoices.get_started')}
           </p>
           {!searchTerm && statusFilter === 'all' && paymentFilter === 'all' && (
             <div className="mt-6">
@@ -382,7 +384,7 @@ export default function InvoicesPage() {
                 className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Create Invoice
+                {t('invoices.create_invoice')}
               </Link>
             </div>
           )}

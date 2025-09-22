@@ -178,7 +178,7 @@ export default function DashboardPage() {
                 <div className={`flex-shrink-0 rounded-md p-3 ${card.color}`}>
                   <Icon className="h-6 w-6 text-white" />
                 </div>
-                <div className="ml-4 w-0 flex-1">
+                <div className="ms-4 w-0 flex-1">
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">
                       {card.title}

@@ -10,12 +10,14 @@ i18n
   .init({
     resources: {
       en: {
-        translation: enTranslation,
+        common: enTranslation,
       },
       ar: {
-        translation: arTranslation,
+        common: arTranslation,
       },
     },
+    ns: ['common'],
+    defaultNS: 'common',
     fallbackLng: "en",
     interpolation: {
       escapeValue: false,
