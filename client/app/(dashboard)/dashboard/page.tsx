@@ -73,13 +73,13 @@ export default function DashboardPage() {
     };
 
     fetchStats();
-
-    for (let ev in eventNames) {
+    eventNames.forEach((ev) => {
       socket.on(ev, () => {
-        console.log(`[${ev}] was triggered, fetching stats`);
         fetchStats();
+        console.log(`[${ev}] was triggered, fetching stats`);
       });
-    }
+    });
+
     return () => {
       for (let ev in eventNames) {
         socket.off(ev);

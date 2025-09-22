@@ -19,6 +19,7 @@ interface VehicleMinimal {
   make: string;
   model: string;
   year: number;
+  customerId: string | { _id: string };
 }
 interface UserMinimal {
   _id: string;

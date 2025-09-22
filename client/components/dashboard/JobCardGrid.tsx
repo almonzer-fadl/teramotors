@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ClipboardList, User, Car, Wrench, Clock } from "lucide-react";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface JobCard {
   _id: string;
@@ -25,6 +26,7 @@ interface JobCard {
 }
 
 export default function JobCardGrid() {
+  const { t } = useTranslation('common');
   const [jobCards, setJobCards] = useState<JobCard[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -74,10 +76,10 @@ export default function JobCardGrid() {
       <div className="bg-white shadow rounded-lg p-6 text-center">
         <ClipboardList className="h-12 w-12 text-gray-400 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-gray-900">
-          No Active Job Cards
+          {t('job_cards.no_active_job_cards')}
         </h3>
         <p className="text-gray-500">
-          There are no job cards with 'Created' or 'In Progress' status.
+          {t('job_cards.no_active_job_cards_description')}
         </p>
       </div>
     );
@@ -120,7 +122,7 @@ export default function JobCardGrid() {
                 </span>
               </div>
               <div className="text-sm text-gray-600">
-                <p className="font-medium mb-1">Services:</p>
+                <p className="font-medium mb-1">{t('job_cards.services_label')}</p>
                 <ul className="list-disc list-inside">
                   {jobCard.services.slice(0, 2).map((service, index) => (
                     <li key={index} className="truncate">
@@ -129,7 +131,7 @@ export default function JobCardGrid() {
                   ))}
                   {jobCard.services.length > 2 && (
                     <li className="text-xs text-gray-400">
-                      ...and {jobCard.services.length - 2} more
+                      {t('job_cards.and_more', { count: jobCard.services.length - 2 })}
                     </li>
                   )}
                 </ul>
