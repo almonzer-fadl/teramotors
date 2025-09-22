@@ -7,7 +7,7 @@ import { useSession } from "@/lib/hooks/useSession";
 import { signOut } from "next-auth/react";
 import Breadcrumbs from "@/components/dashboard/Breadcrumbs";
 import ToastProvider from "@/components/dashboard/ToastProvider";
-import { getNavigationItems, roleDisplayNames } from '@/lib/roles';
+import { getNavigationItems, roleDisplayNames } from "@/lib/roles";
 import { socket } from "@/lib/services/socket";
 import {
   LayoutDashboard,
@@ -43,17 +43,21 @@ const iconMap = {
   CreditCard,
   BarChart3,
   Settings,
-}
+};
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const { user } = useSession();
-  const { t } = useTranslation('common');
-  
+  const { t } = useTranslation("common");
+
   // Get role-based navigation items
-  const userRole = (user as any)?.role || 'mechanic'
-  const navigation = getNavigationItems(userRole)
+  const userRole = (user as any)?.role || "mechanic";
+  const navigation = getNavigationItems(userRole);
 
   useEffect(() => {
     socket.connect();
@@ -77,7 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           className="fixed inset-0 bg-gray-600 bg-opacity-75"
           onClick={() => setSidebarOpen(false)}
         />
-        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
+        <div className="fixed inset-y-0 start-0 flex w-64 flex-col bg-white shadow-xl">
           <div className="flex h-16 items-center justify-between px-4">
             <h1 className="text-xl font-bold text-gray-900">TeraMotors</h1>
             <button onClick={() => setSidebarOpen(false)}>
@@ -87,7 +91,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <nav className="flex-1 px-4 py-4">
             <ul className="space-y-2">
               {navigation.map((item) => {
-                const Icon = iconMap[item.icon as keyof typeof iconMap]
+                const Icon = iconMap[item.icon as keyof typeof iconMap];
                 return (
                   <li key={item.name}>
                     <Link
@@ -119,7 +123,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <nav className="flex-1 px-4 py-4">
             <ul className="space-y-2">
               {navigation.map((item) => {
-                const Icon = iconMap[item.icon as keyof typeof iconMap]
+                const Icon = iconMap[item.icon as keyof typeof iconMap];
                 return (
                   <li key={item.name}>
                     <Link
@@ -142,7 +146,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="lg:ps-64">
         <ToastProvider />
         {/* Top bar */}
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
@@ -169,16 +173,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="flex items-center gap-x-2">
                   <User className="h-6 w-6 text-gray-400" />
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-700">{user?.name}</span>
-                    <span className="text-xs text-gray-500">{roleDisplayNames[userRole as keyof typeof roleDisplayNames]}</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      {user?.name}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {
+                        roleDisplayNames[
+                          userRole as keyof typeof roleDisplayNames
+                        ]
+                      }
+                    </span>
                   </div>
                 </div>
                 <button
-                  onClick={() => signOut({ callbackUrl: '/login' })}
+                  onClick={() => signOut({ callbackUrl: "/login" })}
                   className="flex items-center gap-x-2 text-sm text-gray-500 hover:text-gray-700"
                 >
                   <LogOut className="h-4 w-4" />
-                  {t('header.sign_out')}
+                  {t("header.sign_out")}
                 </button>
               </div>
             </div>

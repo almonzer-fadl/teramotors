@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -16,6 +16,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface JobCard {
   _id: string;
@@ -53,6 +54,7 @@ interface JobCard {
 }
 
 export default function JobCardsPage() {
+  const { t } = useTranslation('common');
   const [jobCards, setJobCards] = useState<JobCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -182,9 +184,9 @@ export default function JobCardsPage() {
       {/* Header */}
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Job Cards</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('job_cards.title')}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Track work orders and job progress.
+            {t('job_cards.description')}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
@@ -193,7 +195,7 @@ export default function JobCardsPage() {
             className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Create Job Card
+            {t('job_cards.create')}
           </Link>
         </div>
       </div>
@@ -207,7 +209,7 @@ export default function JobCardsPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search job cards..."
+                  placeholder={t('job_cards.search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -218,16 +220,15 @@ export default function JobCardsPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="all">{t('appointments.all_status')}</option>
+                <option value="pending">{t('estimates.pending')}</option>
+                <option value="in-progress">{t('appointments.in_progress')}</option>
+                <option value="completed">{t('appointments.completed')}</option>
+                <option value="cancelled">{t('appointments.cancelled')}</option>
               </select>
             </div>
             <div className="text-sm text-gray-500">
-              {filteredJobCards.length} job card
-              {filteredJobCards.length !== 1 ? "s" : ""}
+              {t(filteredJobCards.length === 1 ? 'job_cards.job_card_count' : 'job_cards.job_card_count_plural', { count: filteredJobCards.length })}
             </div>
           </div>
         </div>
@@ -295,16 +296,16 @@ export default function JobCardsPage() {
                 </div>
 
                 <div className="text-sm text-gray-500">
-                  <strong>Mechanic:</strong> {jobCard.mechanicId.fullName}
+                  <strong>{t('job_cards.mechanic')}</strong> {jobCard.mechanicId.fullName}
                 </div>
 
                 <div className="text-sm text-gray-500">
-                  <strong>Labor Hours:</strong> {jobCard.laborHours}h
+                  <strong>{t('job_cards.labor_hours')}</strong> {jobCard.laborHours}h
                 </div>
 
                 {jobCard.notes && (
                   <div className="text-sm text-gray-500">
-                    <strong>Notes:</strong> {jobCard.notes}
+                    <strong>{t('forms.notes')}:</strong> {jobCard.notes}
                   </div>
                 )}
               </div>
@@ -315,14 +316,14 @@ export default function JobCardsPage() {
                   className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                 >
                   <Eye className="h-3 w-3 mr-1" />
-                  View
+                  {t('common.view')}
                 </Link>
                 <Link
                   href={`/job-cards/${jobCard._id}/edit`}
                   className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <Edit className="h-3 w-3 mr-1" />
-                  Edit
+                  {t('common.edit')}
                 </Link>
                 <select
                   value={jobCard.status}
@@ -331,10 +332,10 @@ export default function JobCardsPage() {
                   }
                   className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
                 >
-                  <option value="pending">Pending</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="pending">{t('estimates.pending')}</option>
+                  <option value="in-progress">{t('appointments.in_progress')}</option>
+                  <option value="completed">{t('appointments.completed')}</option>
+                  <option value="cancelled">{t('appointments.cancelled')}</option>
                 </select>
               </div>
             </div>
@@ -346,12 +347,12 @@ export default function JobCardsPage() {
         <div className="text-center py-12">
           <Calendar className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No job cards found
+            {t('job_cards.no_job_cards_found')}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {searchTerm || statusFilter !== "all"
-              ? "Try adjusting your search or filter terms."
-              : "Get started by creating your first job card."}
+              ? t('job_cards.adjust_search')
+              : t('job_cards.get_started')}
           </p>
           {!searchTerm && statusFilter === "all" && (
             <div className="mt-6">
@@ -360,7 +361,7 @@ export default function JobCardsPage() {
                 className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Create Job Card
+                {t('job_cards.create')}
               </Link>
             </div>
           )}

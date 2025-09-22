@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Edit, Trash2, Eye, Car, Wrench } from "lucide-react";
 import { socket } from "@/lib/services/socket";
+import { useTranslation } from "react-i18next";
 
 interface Vehicle {
   _id: string;
@@ -26,6 +27,7 @@ interface Vehicle {
 }
 
 export default function VehiclesPage() {
+  const { t } = useTranslation('common');
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,7 +70,7 @@ export default function VehiclesPage() {
   );
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this vehicle?")) {
+    if (confirm(t('vehicles.delete_confirm'))) {
       try {
         const response = await fetch(`/api/vehicles/${id}`, {
           method: "DELETE",
@@ -95,9 +97,9 @@ export default function VehiclesPage() {
       {/* Header */}
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Vehicles</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('vehicles.title')}</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Manage vehicle information and service history.
+            {t('vehicles.description')}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
@@ -106,7 +108,7 @@ export default function VehiclesPage() {
             className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add Vehicle
+            {t('vehicles.add_vehicle')}
           </Link>
         </div>
       </div>
@@ -120,7 +122,7 @@ export default function VehiclesPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search vehicles..."
+                  placeholder={t('vehicles.search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -128,8 +130,7 @@ export default function VehiclesPage() {
               </div>
             </div>
             <div className="text-sm text-gray-500">
-              {filteredVehicles.length} vehicle
-              {filteredVehicles.length !== 1 ? "s" : ""}
+              {t(filteredVehicles.length === 1 ? 'vehicles.vehicle_count' : 'vehicles.vehicle_count_plural', { count: filteredVehicles.length })}
             </div>
           </div>
         </div>
@@ -142,25 +143,25 @@ export default function VehiclesPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Vehicle
+                  {t('vehicles.vehicle')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Owner
+                  {t('vehicles.owner')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  License Plate
+                  {t('vehicles.license_plate')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Mileage
+                  {t('vehicles.mileage')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Transmission
+                  {t('vehicles.transmission')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  {t('customers.status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('customers.actions')}
                 </th>
               </tr>
             </thead>
@@ -179,7 +180,7 @@ export default function VehiclesPage() {
                           {vehicle.year} {vehicle.make} {vehicle.model}
                         </div>
                         <div className="text-sm text-gray-500">
-                          VIN: {vehicle.vin?.slice(-8) || "N/A"}
+                          {t('vehicles.vin')} {vehicle.vin?.slice(-8) || "N/A"}
                         </div>
                       </div>
                     </div>
@@ -196,7 +197,7 @@ export default function VehiclesPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {vehicle.mileage.toLocaleString()} miles
+                    {t('vehicles.miles', { count: vehicle.mileage.toLocaleString() })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {vehicle.transmission}
@@ -209,7 +210,7 @@ export default function VehiclesPage() {
                           : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {vehicle.isActive ? "Active" : "Inactive"}
+                      {vehicle.isActive ? t('vehicles.active') : t('vehicles.inactive')}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -229,6 +230,7 @@ export default function VehiclesPage() {
                       <Link
                         href={`/vehicles/${vehicle._id}/service-history`}
                         className="text-green-600 hover:text-green-900"
+                        title={t('vehicles.service_history')}
                       >
                         <Wrench className="h-4 w-4" />
                       </Link>
@@ -251,12 +253,12 @@ export default function VehiclesPage() {
         <div className="text-center py-12">
           <Car className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No vehicles found
+            {t('vehicles.no_vehicles_found')}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {searchTerm
-              ? "Try adjusting your search terms."
-              : "Get started by adding your first vehicle."}
+              ? t('vehicles.adjust_search')
+              : t('vehicles.get_started')}
           </p>
           {!searchTerm && (
             <div className="mt-6">
@@ -265,7 +267,7 @@ export default function VehiclesPage() {
                 className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Add Vehicle
+                {t('vehicles.add_vehicle')}
               </Link>
             </div>
           )}
