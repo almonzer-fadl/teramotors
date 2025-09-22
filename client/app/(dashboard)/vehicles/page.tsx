@@ -197,7 +197,7 @@ export default function VehiclesPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {t('vehicles.miles', { count: vehicle.mileage.toLocaleString() })}
+                    {t('vehicles.miles', { count: vehicle.mileage }).toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {vehicle.transmission}

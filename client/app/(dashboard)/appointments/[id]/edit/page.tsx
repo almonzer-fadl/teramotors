@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-async-client-component */
 'use client'
 
-import AppointmentForm from '@/components/forms/AppointmentForm'
+import AppointmentForm from '@/components/forms/AppointmentForm'  
 
-export default function EditAppointmentPage({ params }: { params: { id: string } }) {
-  return <AppointmentForm appointmentId={params.id} />
+export default async function EditPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <AppointmentForm appointmentId={id} />
 }

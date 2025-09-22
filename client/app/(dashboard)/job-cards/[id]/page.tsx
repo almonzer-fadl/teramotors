@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -49,7 +50,6 @@ export default function JobCardDetailsPage() {
       fetchJobCard()
       fetchParts()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   const fetchJobCard = async () => {

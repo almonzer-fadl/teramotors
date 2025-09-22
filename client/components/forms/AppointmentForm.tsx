@@ -23,10 +23,13 @@ interface ServiceMinimal {
   name: string;
   laborHours: number;
 }
-interface UserMinimal {
+interface MechanicMinimal {
   _id: string;
-  name?: string;
-  fullName?: string;
+  userId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
 }
 
 interface AppointmentFormData {
@@ -54,7 +57,7 @@ export default function AppointmentForm({
   const [customers, setCustomers] = useState<CustomerMinimal[]>([]);
   const [vehicles, setVehicles] = useState<VehicleMinimal[]>([]);
   const [services, setServices] = useState<ServiceMinimal[]>([]);
-  const [mechanics, setMechanics] = useState<UserMinimal[]>([]);
+  const [mechanics, setMechanics] = useState<MechanicMinimal[]>([]);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [formData, setFormData] = useState<AppointmentFormData>({
     customerId: "",
@@ -118,7 +121,7 @@ export default function AppointmentForm({
           fetch("/api/customers"),
           fetch("/api/vehicles"),
           fetch("/api/services"),
-          fetch("/api/users?role=mechanic"), // Assuming you have a way to filter users by role
+          fetch("/api/mechanics"),
         ]);
       if (customersRes.ok) setCustomers(await customersRes.json());
       if (vehiclesRes.ok) setVehicles(await vehiclesRes.json());
@@ -310,7 +313,7 @@ export default function AppointmentForm({
                 <option value="">{t('forms.assign_mechanic')}</option>
                 {mechanics.map((m) => (
                   <option key={m._id} value={m._id}>
-                    {m.fullName || m.name || t('forms.unnamed')}
+                    {m.userId.firstName} {m.userId.lastName}
                   </option>
                 ))}
               </select>

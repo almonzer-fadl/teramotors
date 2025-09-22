@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const VehicleInspectionSchema = new Schema({
   vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
   customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
-  mechanicId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: true },
   templateId: { type: Schema.Types.ObjectId, ref: 'InspectionTemplate', required: true },
   inspectionDate: { type: Date, required: true },
   mileage: { type: Number, required: true },

@@ -30,7 +30,6 @@ export default function EstimateDetailsPage() {
     if (id) {
       fetchEstimate()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   const fetchEstimate = async () => {

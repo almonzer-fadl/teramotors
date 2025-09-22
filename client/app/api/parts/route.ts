@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'name';
     const direction = searchParams.get('direction') || 'asc';
 
-    let query: any = { isActive: true };
+    const query: any = { isActive: true };
 
     if (search) {
       const searchRegex = new RegExp(search, 'i');

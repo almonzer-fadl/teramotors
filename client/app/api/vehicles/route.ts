@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
 
-    let query: any = { isActive: true }
+    const query: any = { isActive: true }
 
     if (search) {
       const searchRegex = new RegExp(search, 'i')

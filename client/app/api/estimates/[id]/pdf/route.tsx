@@ -8,9 +8,10 @@ import EstimateDocument from '@/components/pdf/EstimateDocument';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -18,7 +19,7 @@ export async function GET(
 
     await connectToDatabase();
 
-    const estimate = await Estimate.findById(params.id)
+    const estimate = await Estimate.findById(id)
       .populate('customerId')
       .populate('vehicleId')
       .populate('services.serviceId');

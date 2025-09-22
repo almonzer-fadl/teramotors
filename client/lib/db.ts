@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 // track the connection
 let isConnected = false;
+let listenersAdded = false;
 
 export const connectToDatabase = async () => {
   mongoose.set("strictQuery", true);
@@ -10,9 +11,11 @@ export const connectToDatabase = async () => {
   if (isConnected && mongoose.connection.readyState === 1) {
     try {
       // Ping the database to check if connection is still alive
-      await mongoose.connection.db.admin().ping();
-      console.log("DB connection verified");
-      return;
+      if (mongoose.connection.db) {
+        await mongoose.connection.db.admin().ping();
+        console.log("DB connection verified");
+        return;
+      }
     } catch (error) {
       console.log("DB connection lost, reconnecting...");
       isConnected = false;
@@ -24,11 +27,6 @@ export const connectToDatabase = async () => {
   }
   
   try {
-    // Only disconnect if we're in a connected state
-    if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
-    }
-    
     await mongoose.connect(process.env.MONGODB_URI, {
       dbName: "teramotors",
       serverSelectionTimeoutMS: 10000, // Increased to 10 seconds
@@ -43,20 +41,23 @@ export const connectToDatabase = async () => {
     console.log("MongoDB connected successfully");
     
     // Handle connection events
-    mongoose.connection.on('error', (err) => {
-      console.error('MongoDB connection error:', err);
-      isConnected = false;
-    });
-    
-    mongoose.connection.on('disconnected', () => {
-      console.log('MongoDB disconnected');
-      isConnected = false;
-    });
-    
-    mongoose.connection.on('reconnected', () => {
-      console.log('MongoDB reconnected');
-      isConnected = true;
-    });
+    if (!listenersAdded) {
+      mongoose.connection.on('error', (err) => {
+        console.error('MongoDB connection error:', err);
+        isConnected = false;
+      });
+      
+      mongoose.connection.on('disconnected', () => {
+        console.log('MongoDB disconnected');
+        isConnected = false;
+      });
+      
+      mongoose.connection.on('reconnected', () => {
+        console.log('MongoDB reconnected');
+        isConnected = true;
+      });
+      listenersAdded = true;
+    }
     
   } catch (error) {
     console.error("MongoDB connection error:", error);

@@ -24,7 +24,7 @@ export function RoleGuard({
     return fallback || <div>Please log in</div>
   }
 
-  const userRole = (user as any).role || 'mechanic'
+  const userRole = (user as any).role || 'inspector'
   
   // Check role-based access
   if (allowedRoles && !allowedRoles.includes(userRole)) {
@@ -83,7 +83,7 @@ export function DeleteButton({
   [key: string]: any
 }) {
   const { user } = useSession()
-  const userRole = (user as any)?.role || 'mechanic'
+  const userRole = (user as any)?.role || 'inspector'
   const canDelete = hasPermission(userRole, 'canDelete')
 
   if (!canDelete) {

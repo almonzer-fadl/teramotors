@@ -1,19 +1,70 @@
+'use client';
 
-import { notFound } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
 
-async function getCustomer(id: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/customers/${id}`, {
-    cache: 'no-store', // Fetch fresh data for each request
-  });
-  if (!res.ok) {
-    return notFound();
-  }
-  return res.json();
+interface Vehicle {
+  _id: string;
+  make: string;
+  model: string;
+  year: number;
+  licensePlate: string;
 }
 
-export default async function CustomerDetailPage({ params }: { params: { id: string } }) {
-  const customer = await getCustomer(params.id);
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+}
+
+interface Customer {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address?: Address;
+  notes?: string;
+  vehicles: Vehicle[];
+}
+
+export default function CustomerDetailPage() {
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [loading, setLoading] = useState(true);
+  const params = useParams();
+  const { id } = params;
+
+  useEffect(() => {
+    if (id) {
+      const fetchCustomer = async (customerId: string) => {
+        try {
+          const res = await fetch(`/api/customers/${customerId}`, {
+            cache: 'no-store',
+          });
+          if (!res.ok) {
+            return notFound();
+          }
+          const data = await res.json();
+          setCustomer(data);
+        } catch (error) {
+          console.error('Failed to fetch customer', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchCustomer(id as string);
+    }
+  }, [id]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!customer) {
+    return notFound();
+  }
 
   return (
     <div className="p-6">

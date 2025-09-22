@@ -55,7 +55,6 @@ export default function ServiceForm({
     } else if (fromTemplate) {
       fetchTemplates();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceId, isEditing, fromTemplate]);
 
   const fetchCategories = async () => {

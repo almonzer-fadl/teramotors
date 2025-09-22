@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category') || '';
     const isTemplate = searchParams.get('isTemplate') === 'true';
 
-    let query: any = { isActive: true };
+    const query: any = { isActive: true };
 
     if (isTemplate) {
       query.isTemplate = true;

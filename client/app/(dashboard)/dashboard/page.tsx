@@ -81,7 +81,7 @@ export default function DashboardPage() {
     });
 
     return () => {
-      for (let ev in eventNames) {
+      for (const ev of eventNames) {
         socket.off(ev);
       }
     };

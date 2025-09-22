@@ -1,9 +1,11 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import JobCard from '@/lib/models/JobCard';
 import { auth } from '@/lib/auth';
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -13,7 +15,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     
     const { photos } = await request.json();
     
-    const updatedJobCard = await JobCard.findByIdAndUpdate(params.id, { photos }, { new: true });
+    const updatedJobCard = await JobCard.findByIdAndUpdate(id, { photos }, { new: true });
 
     if (!updatedJobCard) {
       return new Response(JSON.stringify({ error: 'Job card not found' }), { status: 404 });

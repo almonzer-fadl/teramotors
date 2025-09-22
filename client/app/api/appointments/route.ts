@@ -2,6 +2,7 @@ import { connectToDatabase } from '@/lib/db'
 import Appointment from '@/lib/models/Appointment'
 import Customer from '@/lib/models/Customer'
 import Vehicle from '@/lib/models/Vehicle'
+import Mechanic from '@/lib/models/Mechanic'
 import User from '@/lib/models/User'
 import Service from '@/lib/models/Service'
 import { auth } from '@/lib/auth'
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('dateFrom')
     const dateTo = searchParams.get('dateTo')
 
-    let query: any = {}
+    const query: any = {}
 
     if (status) {
       query.status = status
@@ -41,7 +42,13 @@ export async function GET(request: NextRequest) {
     const appointments = await Appointment.find(query)
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate('mechanicId', 'fullName')
+      .populate({
+        path: 'mechanicId',
+        populate: {
+          path: 'userId',
+          select: 'firstName lastName'
+        }
+      })
       .populate('serviceId', 'name')
       .sort({ appointmentDate: 1, startTime: 1 })
 
@@ -77,7 +84,7 @@ export async function POST(request: Request) {
     }
 
     // Validate that mechanic exists
-    const mechanic = await User.findById(body.mechanicId)
+    const mechanic = await Mechanic.findById(body.mechanicId)
     if (!mechanic) {
       return Response.json({ error: 'Mechanic not found' }, { status: 400 })
     }
@@ -126,7 +133,7 @@ export async function POST(request: Request) {
     const populatedAppointment = await Appointment.findById(appointment._id)
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate('mechanicId', 'fullName')
+      .populate({        path: 'mechanicId',        populate: {          path: 'userId',          select: 'firstName lastName'        }      })
       .populate('serviceId', 'name')
 
     return Response.json({ 

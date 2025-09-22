@@ -1,10 +1,37 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
-export default function VehicleDetail({ vehicle }: { vehicle: any }) {
+export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
   const { t } = useTranslation('common');
+  const [vehicle, setVehicle] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function getVehicle() {
+      if (!vehicleId) return;
+      const res = await fetch(`/api/vehicles/${vehicleId}`);
+      if (!res.ok) {
+        setVehicle(null);
+        setLoading(false);
+        return;
+      }
+      const data = await res.json();
+      setVehicle(data);
+      setLoading(false);
+    }
+    getVehicle();
+  }, [vehicleId]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!vehicle) {
+    return <div>Vehicle not found</div>;
+  }
 
   return (
     <div className="p-6">

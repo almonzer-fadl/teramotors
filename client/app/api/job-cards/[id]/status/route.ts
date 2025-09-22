@@ -1,10 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { auth } from '@/lib/auth';
 import JobCard from '@/lib/models/JobCard';
 import Part from '@/lib/models/Part';
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await context.params;
     const session = await auth();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
@@ -14,7 +16,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     
     const { status } = await request.json();
     
-    const updatedJobCard = await JobCard.findByIdAndUpdate(params.id, { status }, { new: true });
+    const updatedJobCard = await JobCard.findByIdAndUpdate(id, { status }, { new: true });
 
     if (status === 'completed') {
       for (const part of updatedJobCard.partsUsed) {
