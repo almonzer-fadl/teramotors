@@ -14,6 +14,7 @@ export const getNavigationItems = (userRole: string) => {
     { tKey: 'sidebar.invoices', href: '/invoices', icon: 'CreditCard', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.inventory', href: '/inventory', icon: 'Package', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.inspections', href: '/inspections', icon: 'Search', roles: ['admin', 'mechanic', 'inspector'] },
+    { tKey: 'sidebar.services', href: '/services', icon: 'Wrench', roles: ['admin', 'mechanic', 'inspector'] },
   ]
 
   // Admin-only items

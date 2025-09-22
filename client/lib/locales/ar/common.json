@@ -371,7 +371,9 @@
     "status_created": "تم الإنشاء",
     "status_in_progress": "قيد التقدم",
     "services_label": "الخدمات:",
-    "and_more": "...و {{count}} أخرى"
+    "and_more": "...و {{count}} أخرى",
+    "estimated_start_time": "وقت البدء المتوقع",
+    "estimated_end_time": "وقت الانتهاء المتوقع"
   },
   "vehicles": {
     "title": "المركبات",
@@ -421,6 +423,7 @@
     "invoices": "الفواتير",
     "inventory": "جرد قطع الغيار",
     "inspections": "الفحوصات",
+    "services": "الخدمات",
     "reports": "التقارير",
     "settings": "الإعدادات"
   },
@@ -548,5 +551,26 @@
     "total_vehicles": "إجمالي المركبات",
     "total_appointments": "إجمالي المواعيد",
     "jobs": "الوظائف"
+  },
+  "services": {
+    "title": "الخدمات",
+    "description": "إدارة كتالوج الخدمات الخاص بك.",
+    "add_service": "إضافة خدمة",
+    "new_from_template": "جديد من قالب",
+    "search_placeholder": "البحث في الخدمات...",
+    "all_categories": "كل الفئات",
+    "service_count": "{{count}} خدمة",
+    "service_count_plural": "{{count}} خدمات",
+    "name": "الاسم",
+    "category": "الفئة",
+    "labor_rate": "معدل العمل",
+    "labor_hours": "ساعات العمل",
+    "status": "الحالة",
+    "created": "أنشئت",
+    "actions": "الإجراءات",
+    "no_services_found": "لم يتم العثور على خدمات",
+    "adjust_search": "حاول تعديل شروط البحث الخاصة بك.",
+    "get_started": "ابدأ بإضافة خدمتك الأولى.",
+    "delete_confirm": "هل أنت متأكد أنك تريد حذف هذه الخدمة؟"
   }
 }

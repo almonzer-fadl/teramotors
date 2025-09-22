@@ -14,14 +14,23 @@ interface JobCard {
   appointmentId: { _id: string; appointmentDate: string; startTime: string; endTime: string }
   customerId: { _id: string; firstName: string; lastName: string }
   vehicleId: { _id: string; make: string; model: string; year: number; licensePlate: string }
-  mechanicId: { _id: string; fullName: string }
   status: 'pending' | 'in-progress' | 'completed' | 'cancelled'
   priority: 'low' | 'medium' | 'high' | 'urgent'
   estimatedStartTime: string
   estimatedEndTime: string
   actualStartTime?: string
   actualEndTime?: string
-  laborHours: number
+  services: Array<{
+    serviceId: {
+      _id: string;
+      name: string;
+      laborHours: number;
+      laborRate: number;
+    };
+    quantity: number;
+    laborHours: number;
+    laborRate: number;
+  }>;
   notes?: string
   photos: string[]
   partsUsed: { partId: string; quantity: number; cost: number }[]
