@@ -39,7 +39,7 @@ type SortKey = "name" | "createdAt";
 type SortDirection = "asc" | "desc";
 
 export default function CustomersPage() {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -121,7 +121,7 @@ export default function CustomersPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm(t('customers.delete_confirm'))) {
+    if (confirm(t("customers.delete_confirm"))) {
       try {
         const response = await fetch(`/api/customers/${id}`, {
           method: "DELETE",
@@ -148,9 +148,11 @@ export default function CustomersPage() {
       {/* Header */}
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('customers.title')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {t("customers.title")}
+          </h1>
           <p className="mt-1 text-sm text-gray-500">
-            {t('customers.description')}
+            {t("customers.description")}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">
@@ -159,7 +161,7 @@ export default function CustomersPage() {
             className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
           >
             <Plus className="mr-2 h-4 w-4" />
-            {t('customers.add_customer')}
+            {t("customers.add_customer")}
           </Link>
         </div>
       </div>
@@ -170,7 +172,7 @@ export default function CustomersPage() {
           <div className="flex items-center justify-between mb-4">
             <div className="w-full md:w-1/2">
               <Search<Customer>
-                placeholder={t('customers.search_placeholder')}
+                placeholder={t("customers.search_placeholder")}
                 fetchSuggestions={fetchCustomerSuggestions}
                 onSearch={(customer) =>
                   router.push(`/customers/${customer._id}`)
@@ -186,7 +188,12 @@ export default function CustomersPage() {
               />
             </div>
             <div className="text-sm text-gray-500">
-              {t(sortedCustomers.length === 1 ? 'customers.customer_count' : 'customers.customer_count_plural', { count: sortedCustomers.length })}
+              {t(
+                sortedCustomers.length === 1
+                  ? "customers.customer_count"
+                  : "customers.customer_count_plural",
+                { count: sortedCustomers.length }
+              )}
             </div>
           </div>
         </div>
@@ -199,31 +206,33 @@ export default function CustomersPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort("name")}
                 >
-                  {t('customers.name')} <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
+                  {t("customers.name")}{" "}
+                  <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('customers.contact')}
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {t("customers.contact")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('customers.address')}
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {t("customers.address")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('customers.vehicles')}
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {t("customers.vehicles")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('customers.status')}
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {t("customers.status")}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSort("createdAt")}
                 >
-                  {t('customers.created')} <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
+                  {t("customers.created")}{" "}
+                  <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('customers.actions')}
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {t("customers.actions")}
                 </th>
               </tr>
             </thead>
@@ -240,7 +249,7 @@ export default function CustomersPage() {
                           </span>
                         </div>
                       </div>
-                      <div className="ml-4">
+                      <div className="ms-4">
                         <div className="text-sm font-medium text-gray-900">
                           {customer.firstName} {customer.lastName}
                         </div>
@@ -256,13 +265,13 @@ export default function CustomersPage() {
                       {customer.email}
                     </div>
                     <div className="text-sm text-gray-500 flex items-center">
-                      <Phone className="h-4 w-4 mr-2 text-gray-400" />
+                      <Phone className="h-4 w-4 me-2 text-gray-400" />
                       {customer.phone}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 flex items-center">
-                      <MapPin className="h-4 w-4 mr-2 text-gray-400" />
+                      <MapPin className="h-4 w-4 me-2 text-gray-400" />
                       {customer.address.street}
                     </div>
                     <div className="text-sm text-gray-500">
@@ -284,7 +293,9 @@ export default function CustomersPage() {
                           : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {customer.isActive ? t('customers.active') : t('customers.inactive')}
+                      {customer.isActive
+                        ? t("customers.active")
+                        : t("customers.inactive")}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -323,12 +334,12 @@ export default function CustomersPage() {
         <div className="text-center py-12">
           <Users className="mx-auto h-12 w-12 text-gray-400" />
           <h3 className="mt-2 text-sm font-medium text-gray-900">
-            {t('customers.no_customers_found')}
+            {t("customers.no_customers_found")}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
             {searchTerm
-              ? t('customers.adjust_search')
-              : t('customers.get_started')}
+              ? t("customers.adjust_search")
+              : t("customers.get_started")}
           </p>
           {!searchTerm && (
             <div className="mt-6">
@@ -337,7 +348,7 @@ export default function CustomersPage() {
                 className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                {t('customers.add_customer')}
+                {t("customers.add_customer")}
               </Link>
             </div>
           )}

@@ -391,7 +391,19 @@
     "no_vehicles_found": "No vehicles found",
     "adjust_search": "Try adjusting your search terms.",
     "get_started": "Get started by adding your first vehicle.",
-    "delete_confirm": "Are you sure you want to delete this vehicle?"
+    "delete_confirm": "Are you sure you want to delete this vehicle?",
+    "color": "Color",
+    "year": "Year",
+    "make": "Make",
+    "model": "Model",
+    "automatic": "Automatic",
+    "manual": "Manual",
+    "cvt": "CVT",
+    "fuel_type": "Fuel Type",
+    "gasoline": "Gasoline",
+    "diesel": "Deisel",
+    "electric": "Electric",
+    "hybrid": "Hybrid"
   },
   "sidebar": {
     "dashboard": "Dashboard",
