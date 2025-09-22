@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -134,11 +134,11 @@ export default function ServiceForm({
         router.push("/services");
       } else {
         const error = await response.json();
-        alert(error.message || "Failed to save service");
+        alert(error.message || t('forms.failed_to_save_service'));
       }
     } catch (error) {
       console.error("Failed to save service:", error);
-      alert("Failed to save service");
+      alert(t('forms.failed_to_save_service'));
     } finally {
       setLoading(false);
     }
@@ -210,7 +210,7 @@ export default function ServiceForm({
         <div className="bg-white shadow rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <input
             type="text"
-            placeholder={t('forms.name')}
+            placeholder={t('inventory.name')}
             required
             value={formData.name}
             onChange={(e) => handleInputChange("name", e.target.value)}
@@ -226,7 +226,7 @@ export default function ServiceForm({
           />
           <input
             type="number"
-            placeholder={t('forms.labor_rate')}
+            placeholder={t('job_cards.labor_rate')}
             required
             value={formData.laborRate}
             onChange={(e) =>
@@ -236,7 +236,7 @@ export default function ServiceForm({
           />
           <input
             type="number"
-            placeholder={t('forms.labor_hours')}
+            placeholder={t('job_cards.labor_hours')}
             required
             value={formData.laborHours}
             onChange={(e) =>
@@ -245,7 +245,7 @@ export default function ServiceForm({
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           />
           <textarea
-            placeholder={t('forms.description')}
+            placeholder={t('vehicles.description')}
             value={formData.description}
             onChange={(e) => handleInputChange("description", e.target.value)}
             className="md:col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm"
@@ -285,7 +285,7 @@ export default function ServiceForm({
                 }
                 className="col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="">{t('forms.select_part')}</option>
+                <option value="">{t('job_cards.select_part')}</option>
                 {parts.map((p) => (
                   <option key={p._id} value={p._id}>
                     {p.name}
@@ -294,7 +294,7 @@ export default function ServiceForm({
               </select>
               <input
                 type="number"
-                placeholder="Qty"
+                placeholder={t('job_cards.qty')}
                 value={part.quantity}
                 onChange={(e) =>
                   handlePartChange(index, "quantity", parseInt(e.target.value))
@@ -303,7 +303,7 @@ export default function ServiceForm({
               />
               <input
                 type="number"
-                placeholder="Cost"
+                placeholder={t('job_cards.cost')}
                 value={part.cost}
                 onChange={(e) =>
                   handlePartChange(index, "cost", parseFloat(e.target.value))

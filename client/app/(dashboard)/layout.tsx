@@ -7,7 +7,7 @@ import { useSession } from "@/lib/hooks/useSession";
 import { signOut } from "next-auth/react";
 import Breadcrumbs from "@/components/dashboard/Breadcrumbs";
 import ToastProvider from "@/components/dashboard/ToastProvider";
-import { getNavigationItems, roleDisplayNames } from "@/lib/roles";
+import { getNavigationItems } from "@/lib/roles";
 import { socket } from "@/lib/services/socket";
 import {
   LayoutDashboard,
@@ -93,7 +93,7 @@ export default function DashboardLayout({
               {navigation.map((item) => {
                 const Icon = iconMap[item.icon as keyof typeof iconMap];
                 return (
-                  <li key={item.name}>
+                  <li key={item.tKey}>
                     <Link
                       href={item.href}
                       className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium ${
@@ -104,7 +104,7 @@ export default function DashboardLayout({
                       onClick={() => setSidebarOpen(false)}
                     >
                       <Icon className="mr-3 h-5 w-5" />
-                      {item.name}
+                      {t(item.tKey)}
                     </Link>
                   </li>
                 );
@@ -125,7 +125,7 @@ export default function DashboardLayout({
               {navigation.map((item) => {
                 const Icon = iconMap[item.icon as keyof typeof iconMap];
                 return (
-                  <li key={item.name}>
+                  <li key={item.tKey}>
                     <Link
                       href={item.href}
                       className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium ${
@@ -135,7 +135,7 @@ export default function DashboardLayout({
                       }`}
                     >
                       <Icon className="mr-3 h-5 w-5" />
-                      {item.name}
+                      {t(item.tKey)}
                     </Link>
                   </li>
                 );
@@ -177,11 +177,7 @@ export default function DashboardLayout({
                       {user?.name}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {
-                        roleDisplayNames[
-                          userRole as keyof typeof roleDisplayNames
-                        ]
-                      }
+                      {t(`roles.${userRole}.name`)}
                     </span>
                   </div>
                 </div>

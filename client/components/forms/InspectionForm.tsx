@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -135,11 +135,11 @@ export default function InspectionForm({
         router.push("/inspections");
       } else {
         const error = await response.json();
-        alert(error.message || "Failed to save inspection");
+        alert(error.message || t('forms.failed_to_save_inspection'));
       }
     } catch (error) {
       console.error("Failed to save inspection:", error);
-      alert("Failed to save inspection");
+      alert(t('forms.failed_to_save_inspection'));
     } finally {
       setLoading(false);
     }
@@ -204,7 +204,7 @@ export default function InspectionForm({
             >
               <input
                 type="text"
-                placeholder="Item ID"
+                placeholder={t('forms.item_id_placeholder')}
                 value={item.itemId}
                 onChange={(e) =>
                   handleItemChange(index, "itemId", e.target.value)
@@ -218,10 +218,10 @@ export default function InspectionForm({
                 }
                 className="col-span-1 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="good">Good</option>
-                <option value="fair">Fair</option>
-                <option value="poor">Poor</option>
-                <option value="critical">Critical</option>
+                <option value="good">{t('forms.condition_good')}</option>
+                <option value="fair">{t('forms.condition_fair')}</option>
+                <option value="poor">{t('forms.condition_poor')}</option>
+                <option value="critical">{t('forms.condition_critical')}</option>
               </select>
               <input
                 type="text"

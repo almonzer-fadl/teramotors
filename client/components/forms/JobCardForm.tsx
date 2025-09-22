@@ -31,11 +31,6 @@ interface PartMinimal {
   compatibleVehicles?: string[];
 }
 
-interface ServiceMinimal {
-  _id: string;
-  name: string;
-}
-
 interface JobCardFormData {
   appointmentId: string;
   customerId: string;
@@ -47,7 +42,6 @@ interface JobCardFormData {
   estimatedEndTime: string;
   laborHours: number;
   partsUsed: { partId: string; quantity: number; cost: number }[];
-  services: { serviceId: string; quantity: number; laborCost: number }[];
   notes: string;
 }
 
@@ -58,7 +52,7 @@ export default function JobCardForm({
   jobCardId?: string;
   appointmentId?: string;
 }) {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [appointments, setAppointments] = useState<AppointmentMinimal[]>([]);
@@ -66,7 +60,6 @@ export default function JobCardForm({
   const [vehicles, setVehicles] = useState<VehicleMinimal[]>([]);
   const [mechanics, setMechanics] = useState<UserMinimal[]>([]);
   const [parts, setParts] = useState<PartMinimal[]>([]);
-  const [showCompatibleParts, setShowCompatibleParts] = useState(false);
   const [formData, setFormData] = useState<JobCardFormData>({
     appointmentId: "",
     customerId: "",
@@ -148,15 +141,12 @@ export default function JobCardForm({
           customerId: appointment.customerId._id,
           vehicleId: appointment.vehicleId._id,
           mechanicId: appointment.mechanicId._id,
-          // You might want to map services from the appointment to partsUsed or a new services field
         }));
       }
     } catch (error) {
       console.error("Failed to fetch appointment details:", error);
     }
   };
-
-  // duplicate removed
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -175,16 +165,15 @@ export default function JobCardForm({
       });
 
       if (response.ok) {
-        //TODO: create an emit to update job cards for all users
         socket.emit("job-created");
         router.push("/job-cards");
       } else {
         const error = await response.json();
-        alert(error.message || "Failed to save job card");
+        alert(error.message || t("forms.failed_to_save_job_card"));
       }
     } catch (error) {
       console.error("Failed to save job card:", error);
-      alert("Failed to save job card");
+      alert(t("forms.failed_to_save_job_card"));
     } finally {
       setLoading(false);
     }
@@ -224,12 +213,12 @@ export default function JobCardForm({
           </button>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? t('forms.edit_job_card') : t('forms.new_job_card')}
+              {isEditing ? t("forms.edit_job_card") : t("forms.new_job_card")}
             </h1>
             <p className="mt-1 text-sm text-gray-500">
               {isEditing
-                ? t('forms.update_job_card_details')
-                : t('forms.create_new_job_card')}
+                ? t("forms.update_job_card_details")
+                : t("forms.create_new_job_card")}
             </p>
           </div>
         </div>
@@ -239,65 +228,155 @@ export default function JobCardForm({
         <div className="bg-white shadow rounded-lg p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">{t('forms.customer')}</label>
-              <select required value={formData.customerId} onChange={(e) => handleInputChange('customerId', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">{t('forms.select_customer')}</option>
-                {customers.map(c => <option key={c._id} value={c._id}>{c.firstName} {c.lastName}</option>)}
+              <label className="block text-sm font-medium text-gray-700">
+                {t("forms.customer")}
+              </label>
+              <select
+                required
+                value={formData.customerId}
+                onChange={(e) =>
+                  handleInputChange("customerId", e.target.value)
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="">{t("forms.select_customer")}</option>
+                {customers.map((c) => (
+                  <option key={c._id} value={c._id}>
+                    {c.firstName} {c.lastName}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">{t('forms.vehicle')}</label>
-              <select required value={formData.vehicleId} onChange={(e) => handleInputChange('vehicleId', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">{t('forms.select_vehicle')}</option>
-                {vehicles.filter(v => v.customerId === formData.customerId).map(v => <option key={v._id} value={v._id}>{v.make} {v.model} ({v.year})</option>)}
+              <label className="block text-sm font-medium text-gray-700">
+                {t("forms.vehicle")}
+              </label>
+              <select
+                required
+                value={formData.vehicleId}
+                onChange={(e) => handleInputChange("vehicleId", e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="">{t("forms.select_vehicle")}</option>
+                {vehicles
+                  .filter((v) => v.customerId === formData.customerId)
+                  .map((v) => (
+                    <option key={v._id} value={v._id}>
+                      {v.make} {v.model} ({v.year})
+                    </option>
+                  ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">{t('forms.mechanic')}</label>
-              <select required value={formData.mechanicId} onChange={(e) => handleInputChange('mechanicId', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="">{t('forms.assign_mechanic')}</option>
-                {mechanics.map(m => <option key={m._id} value={m._id}>{m.fullName || m.name || 'Unnamed'}</option>)}
+              <label className="block text-sm font-medium text-gray-700">
+                {t("forms.mechanic")}
+              </label>
+              <select
+                required
+                value={formData.mechanicId}
+                onChange={(e) =>
+                  handleInputChange("mechanicId", e.target.value)
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="">{t("forms.assign_mechanic")}</option>
+                {mechanics.map((m) => (
+                  <option key={m._id} value={m._id}>
+                    {m.fullName || m.name || t("forms.unnamed")}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">{t('forms.status')}</label>
-              <select value={formData.status} onChange={(e) => handleInputChange('status', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="pending">{t('forms.pending')}</option>
-                <option value="in-progress">{t('forms.in_progress')}</option>
-                <option value="completed">{t('forms.completed')}</option>
-                <option value="cancelled">{t('forms.cancelled')}</option>
+              <label className="block text-sm font-medium text-gray-700">
+                {t("forms.status")}
+              </label>
+              <select
+                value={formData.status}
+                onChange={(e) => handleInputChange("status", e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="pending">{t("estimates.pending")}</option>
+                <option value="in-progress">{t("forms.in_progress")}</option>
+                <option value="completed">{t("forms.completed")}</option>
+                <option value="cancelled">{t("forms.cancelled")}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">{t('forms.priority')}</label>
-              <select value={formData.priority} onChange={(e) => handleInputChange('priority', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                <option value="low">{t('forms.low')}</option>
-                <option value="medium">{t('forms.medium')}</option>
-                <option value="high">{t('forms.high')}</option>
-                <option value="urgent">{t('forms.urgent')}</option>
+              <label className="block text-sm font-medium text-gray-700">
+                {t("forms.priority")}
+              </label>
+              <select
+                value={formData.priority}
+                onChange={(e) => handleInputChange("priority", e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                <option value="low">{t("forms.low")}</option>
+                <option value="medium">{t("forms.medium")}</option>
+                <option value="high">{t("forms.high")}</option>
+                <option value="urgent">{t("forms.urgent")}</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">{t('forms.estimated_start_time')}</label>
-              <input type="datetime-local" required value={formData.estimatedStartTime} onChange={(e) => handleInputChange('estimatedStartTime', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+              <label className="block text-sm font-medium text-gray-700">
+                {t("job_cards.estimated_start_time")}
+              </label>
+              <input
+                type="datetime-local"
+                required
+                value={formData.estimatedStartTime}
+                onChange={(e) =>
+                  handleInputChange("estimatedStartTime", e.target.value)
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">{t('forms.estimated_end_time')}</label>
-              <input type="datetime-local" required value={formData.estimatedEndTime} onChange={(e) => handleInputChange('estimatedEndTime', e.target.value)} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+              <label className="block text-sm font-medium text-gray-700">
+                {t("job_cards.estimated_end_time")}
+              </label>
+              <input
+                type="datetime-local"
+                required
+                value={formData.estimatedEndTime}
+                onChange={(e) =>
+                  handleInputChange("estimatedEndTime", e.target.value)
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">{t('forms.labor_hours')}</label>
-              <input type="number" required value={formData.laborHours} onChange={(e) => handleInputChange('laborHours', parseFloat(e.target.value))} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" />
+              <label className="block text-sm font-medium text-gray-700">
+                {t("job_cards.labor_hours")}
+              </label>
+              <input
+                type="number"
+                required
+                value={formData.laborHours}
+                onChange={(e) =>
+                  handleInputChange("laborHours", parseFloat(e.target.value))
+                }
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">{t('forms.notes')}</label>
-              <textarea value={formData.notes} onChange={(e) => handleInputChange('notes', e.target.value)} rows={4} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+              <label className="block text-sm font-medium text-gray-700">
+                {t("forms.notes")}
+              </label>
+              <textarea
+                value={formData.notes}
+                onChange={(e) => handleInputChange("notes", e.target.value)}
+                rows={4}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              ></textarea>
             </div>
           </div>
         </div>
 
         <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">{t('forms.parts_used')}</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            {t("forms.parts_used")}
+          </h3>
           {formData.partsUsed.map((part, index) => (
             <div
               key={index}
@@ -310,7 +389,7 @@ export default function JobCardForm({
                 }
                 className="col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="">{t('forms.select_part')}</option>
+                <option value="">{t("job_cards.select_part")}</option>
                 {parts.map((p) => (
                   <option key={p._id} value={p._id}>
                     {p.name}
@@ -319,7 +398,7 @@ export default function JobCardForm({
               </select>
               <input
                 type="number"
-                placeholder="Qty"
+                placeholder={t("job_cards.qty")}
                 value={part.quantity}
                 onChange={(e) =>
                   handlePartChange(index, "quantity", parseInt(e.target.value))
@@ -328,7 +407,7 @@ export default function JobCardForm({
               />
               <input
                 type="number"
-                placeholder="Cost"
+                placeholder={t("job_cards.cost")}
                 value={part.cost}
                 onChange={(e) =>
                   handlePartChange(index, "cost", parseFloat(e.target.value))
@@ -350,7 +429,7 @@ export default function JobCardForm({
             className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <Plus className="mr-2 h-4 w-4" />
-            {t('forms.add_part')}
+            {t("forms.add_part")}
           </button>
         </div>
 
@@ -361,7 +440,7 @@ export default function JobCardForm({
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
             <X className="mr-2 h-4 w-4" />
-            {t('forms.cancel')}
+            {t("forms.cancel")}
           </button>
           <button
             type="submit"
@@ -370,10 +449,10 @@ export default function JobCardForm({
           >
             <Save className="mr-2 h-4 w-4" />
             {loading
-              ? t('forms.saving')
+              ? t("forms.saving")
               : isEditing
-              ? t('forms.update_job_card')
-              : t('forms.save_job_card')}
+              ? t("forms.update_job_card")
+              : t("forms.save_job_card")}
           </button>
         </div>
       </form>
