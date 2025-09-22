@@ -20,6 +20,11 @@ i18n
     interpolation: {
       escapeValue: false,
     },
+    detection: {
+      order: ['localStorage', 'cookie'],
+      caches: ['localStorage', 'cookie'],
+      lookupLocalStorage: 'i18nextLng',
+    }
   });
 
 export default i18n;

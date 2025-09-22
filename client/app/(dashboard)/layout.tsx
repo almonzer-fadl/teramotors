@@ -27,8 +27,7 @@ import {
   Bell,
   User,
 } from "lucide-react";
-import { I18nextProvider, useTranslation } from "react-i18next";
-import i18n from "@/i18n";
+import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/dashboard/LanguageSwitcher";
 
 // Icon mapping for dynamic navigation
@@ -46,7 +45,7 @@ const iconMap = {
   Settings,
 }
 
-function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const { user } = useSession();
@@ -195,13 +194,5 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </div>
-  );
-}
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <I18nextProvider i18n={i18n}>
-      <DashboardLayoutContent>{children}</DashboardLayoutContent>
-    </I18nextProvider>
   );
 }
