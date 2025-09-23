@@ -14,6 +14,22 @@ const InvoiceSchema = new Schema({
   paymentMethod: { type: String, enum: ['cash', 'card', 'bank_transfer', 'other'], required: false }, // Make optional
   paymentStatus: { type: String, enum: ['pending', 'paid', 'failed'], default: 'pending' },
   paymentDate: { type: Date, required: false },
+  
+  // ZATCA compliance fields
+  zatca: {
+    qrCode: { type: String, required: false },
+    invoiceNumber: { type: String, required: false },
+    invoiceDate: { type: Date, required: false },
+    vatAmount: { type: Number, required: false },
+    subtotal: { type: Number, required: false },
+    compliance: {
+      phase: { type: Number, default: 1 },
+      isCompliant: { type: Boolean, default: true },
+      errors: [{ type: String }],
+      warnings: [{ type: String }]
+    }
+  },
+  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

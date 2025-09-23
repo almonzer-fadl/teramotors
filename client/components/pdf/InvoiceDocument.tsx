@@ -1,6 +1,7 @@
+/* eslint-disable jsx-a11y/alt-text */
 'use client';
 
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
 
 // Register a font that supports Arabic shaping (Amiri as an example if available in environment)
 // Consumers can pass custom font family via props if needed
@@ -20,6 +21,17 @@ const styles = StyleSheet.create({
   tableCol: { width: '25%', borderStyle: 'solid', borderWidth: 1, borderColor: '#e5e7eb', padding: 6, fontSize: 10 },
   totalsRow: { marginTop: 8 },
   rtl: { direction: 'rtl', fontFamily: 'Amiri' },
+  qrContainer: { 
+    position: 'absolute', 
+    top: 30, 
+    right: 30, 
+    width: 100, 
+    height: 100,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  qrCode: { width: 80, height: 80 },
+  qrLabel: { fontSize: 8, marginTop: 4, textAlign: 'center' },
 });
 
 type Language = 'en' | 'ar';
@@ -76,9 +88,10 @@ interface InvoiceDocumentProps {
   invoice: any;
   jobCard?: any;
   language?: Language;
+  qrCodeData?: string;
 }
 
-const InvoiceDocument = ({ invoice, jobCard, language = 'en' }: InvoiceDocumentProps) => {
+const InvoiceDocument = ({ invoice, jobCard, language = 'en', qrCodeData }: InvoiceDocumentProps) => {
   const isArabic = language === 'ar';
   const tr = isArabic ? tAr : tEn;
 
@@ -89,9 +102,20 @@ const InvoiceDocument = ({ invoice, jobCard, language = 'en' }: InvoiceDocumentP
   const subtotal = servicesTotal + partsTotal;
   const grandTotal = typeof invoice.totalAmount === 'number' ? invoice.totalAmount : subtotal;
 
+  // Generate QR code URL if we have QR data
+  const qrCodeUrl = qrCodeData ? `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(qrCodeData)}` : null;
+
   return (
     <Document>
       <Page size="A4" style={[styles.page, isArabic ? styles.rtl : {}] as any}>
+        {/* QR Code in top right corner */}
+        {qrCodeUrl && (
+          <View style={styles.qrContainer}>
+            <Image style={styles.qrCode} src={qrCodeUrl} />
+            <Text style={styles.qrLabel}>ZATCA QR</Text>
+          </View>
+        )}
+
         <Text style={styles.header}>
           {tr('invoice')} #{String(invoice._id || '').slice(-6)}
         </Text>
