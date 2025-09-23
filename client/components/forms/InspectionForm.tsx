@@ -230,36 +230,46 @@ export default function InspectionForm({
               key={index}
               className="grid grid-cols-4 gap-4 items-center mb-4"
             >
-              <input
-                type="text"
-                placeholder={t('forms.item_id_placeholder')}
-                value={item.itemId}
-                onChange={(e) =>
-                  handleItemChange(index, "itemId", e.target.value)
-                }
-                className="col-span-1 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              <select
-                value={item.condition}
-                onChange={(e) =>
-                  handleItemChange(index, "condition", e.target.value)
-                }
-                className="col-span-1 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="good">{t('forms.condition_good')}</option>
-                <option value="fair">{t('forms.condition_fair')}</option>
-                <option value="poor">{t('forms.condition_poor')}</option>
-                <option value="critical">{t('forms.condition_critical')}</option>
-              </select>
-              <input
-                type="text"
-                placeholder={t('forms.notes')}
-                value={item.notes}
-                onChange={(e) =>
-                  handleItemChange(index, "notes", e.target.value)
-                }
-                className="col-span-1 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
+              <div>
+                <label htmlFor={`itemId-${index}`} className="block text-sm font-medium text-gray-700">{t('forms.item_id')}</label>
+                <input
+                  type="text"
+                  id={`itemId-${index}`}
+                  value={item.itemId}
+                  onChange={(e) =>
+                    handleItemChange(index, "itemId", e.target.value)
+                  }
+                  className="col-span-1 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label htmlFor={`condition-${index}`} className="block text-sm font-medium text-gray-700">{t('inspections.overall_condition')}</label>
+                <select
+                  id={`condition-${index}`}
+                  value={item.condition}
+                  onChange={(e) =>
+                    handleItemChange(index, "condition", e.target.value)
+                  }
+                  className="col-span-1 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="good">{t('forms.condition_good')}</option>
+                  <option value="fair">{t('forms.condition_fair')}</option>
+                  <option value="poor">{t('forms.condition_poor')}</option>
+                  <option value="critical">{t('forms.condition_critical')}</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor={`notes-${index}`} className="block text-sm font-medium text-gray-700">{t('forms.notes')}</label>
+                <input
+                  type="text"
+                  id={`notes-${index}`}
+                  value={item.notes}
+                  onChange={(e) =>
+                    handleItemChange(index, "notes", e.target.value)
+                  }
+                  className="col-span-1 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
               <button
                 type="button"
                 onClick={() => removeItem(index)}

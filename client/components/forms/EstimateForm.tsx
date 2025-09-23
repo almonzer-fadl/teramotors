@@ -319,54 +319,65 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
               key={index}
               className="grid grid-cols-6 gap-4 items-center mb-4"
             >
-              <select
-                value={service.serviceId}
-                onChange={(e) =>
-                  handleServiceChange(index, "serviceId", e.target.value)
-                }
-                className="col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="">{t('forms.select_service')}</option>
-                {services.map((s) => (
-                  <option key={s._id} value={s._id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                placeholder={t('forms.qty_placeholder')}
-                value={service.quantity}
-                onChange={(e) =>
-                  handleServiceChange(
-                    index,
-                    "quantity",
-                    parseInt(e.target.value)
-                  )
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              <input
-                type="number"
-                placeholder={t('forms.labor_placeholder')}
-                value={service.laborCost.toFixed(2)}
-                readOnly
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
-              />
-              <input
-                type="number"
-                placeholder={t('forms.parts_placeholder')}
-                value={service.partsCost.toFixed(2)}
-                readOnly
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
-              />
-              <input
-                type="number"
-                placeholder={t('forms.total_placeholder')}
-                value={service.totalCost.toFixed(2)}
-                readOnly
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
-              />
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700">{t('forms.service')}</label>
+                <select
+                  value={service.serviceId}
+                  onChange={(e) =>
+                    handleServiceChange(index, "serviceId", e.target.value)
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="">{t('forms.select_service')}</option>
+                  {services.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">{t('forms.qty')}</label>
+                <input
+                  type="number"
+                  value={service.quantity}
+                  onChange={(e) =>
+                    handleServiceChange(
+                      index,
+                      "quantity",
+                      parseInt(e.target.value)
+                    )
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">{t('forms.labor_cost')}</label>
+                <input
+                  type="number"
+                  value={service.laborCost.toFixed(2)}
+                  readOnly
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">{t('forms.parts_cost')}</label>
+                <input
+                  type="number"
+                  value={service.partsCost.toFixed(2)}
+                  readOnly
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">{t('forms.total')}</label>
+                <input
+                  type="number"
+                  value={service.totalCost.toFixed(2)}
+                  readOnly
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100"
+                />
+              </div>
               <button
                 type="button"
                 onClick={() => removeService(index)}

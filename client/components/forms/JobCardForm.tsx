@@ -403,38 +403,56 @@ export default function JobCardForm({
               key={index}
               className="grid grid-cols-5 gap-4 items-center mb-4"
             >
-              <select
-                value={service.serviceId}
-                onChange={(e) =>
-                  handleServiceChange(index, "serviceId", e.target.value)
-                }
-                className="col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="">{t("forms.select_service")}</option>
-                {services.map((s) => (
-                  <option key={s._id} value={s._id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                placeholder={t("forms.qty_placeholder")}
-                value={service.quantity}
-                onChange={(e) =>
-                  handleServiceChange(index, "quantity", parseInt(e.target.value))
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-.              <input
-                type="number"
-                placeholder={t("forms.labor_placeholder")}
-                value={service.laborHours}
-                onChange={(e) =>
-                  handleServiceChange(index, "laborHours", parseFloat(e.target.value))
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700">{t('forms.service')}</label>
+                <select
+                  value={service.serviceId}
+                  onChange={(e) =>
+                    handleServiceChange(index, "serviceId", e.target.value)
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="">{t("forms.select_service")}</option>
+                  {services.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">{t('forms.qty')}</label>
+                <input
+                  type="number"
+                  value={service.quantity}
+                  onChange={(e) =>
+                    handleServiceChange(index, "quantity", parseInt(e.target.value))
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">{t('job_cards.labor_hours')}</label>
+                <input
+                  type="number"
+                  value={service.laborHours}
+                  onChange={(e) =>
+                    handleServiceChange(index, "laborHours", parseFloat(e.target.value))
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">{t('job_cards.labor_rate')}</label>
+                <input
+                  type="number"
+                  value={service.laborRate}
+                  onChange={(e) =>
+                    handleServiceChange(index, "laborRate", parseFloat(e.target.value))
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
               <button
                 type="button"
                 onClick={() => removeService(index)}
@@ -463,38 +481,46 @@ export default function JobCardForm({
               key={index}
               className="grid grid-cols-4 gap-4 items-center mb-4"
             >
-              <select
-                value={part.partId}
-                onChange={(e) =>
-                  handlePartChange(index, "partId", e.target.value)
-                }
-                className="col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="">{t("job_cards.select_part")}</option>
-                {parts.map((p) => (
-                  <option key={p._id} value={p._id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                placeholder={t("job_cards.qty")}
-                value={part.quantity}
-                onChange={(e) =>
-                  handlePartChange(index, "quantity", parseInt(e.target.value))
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              <input
-                type="number"
-                placeholder={t("job_cards.cost")}
-                value={part.cost}
-                onChange={(e) =>
-                  handlePartChange(index, "cost", parseFloat(e.target.value))
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700">{t('job_cards.select_part')}</label>
+                <select
+                  value={part.partId}
+                  onChange={(e) =>
+                    handlePartChange(index, "partId", e.target.value)
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="">{t("job_cards.select_part")}</option>
+                  {parts.map((p) => (
+                    <option key={p._id} value={p._id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">{t('job_cards.qty')}</label>
+                <input
+                  type="number"
+                  value={part.quantity}
+                  onChange={(e) =>
+                    handlePartChange(index, "quantity", parseInt(e.target.value))
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">{t('job_cards.cost')}</label>
+                <input
+                  type="number"
+                  name="cost"
+                  value={part.cost}
+                  onChange={(e) =>
+                    handlePartChange(index, "cost", parseFloat(e.target.value))
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
               <button
                 type="button"
                 onClick={() => removePart(index)}

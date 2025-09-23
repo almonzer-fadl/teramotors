@@ -157,6 +157,7 @@
     "parts_placeholder": "Parts",
     "total_placeholder": "Total",
     "item_id_placeholder": "Item ID",
+    "item_id": "Item ID",
     "cost_placeholder": "Cost",
     "condition_good": "Good",
     "condition_fair": "Fair",
@@ -328,7 +329,19 @@
     "no_parts_found": "No parts found",
     "adjust_search": "Try adjusting your search terms.",
     "get_started_adding": "Get started by adding your first part.",
-    "delete_confirm": "Are you sure you want to delete this part?"
+    "delete_confirm": "Are you sure you want to delete this part?",
+    "categories": {
+      "engine": "Engine",
+      "transmission": "Transmission",
+      "brakes": "Brakes",
+      "suspension": "Suspension",
+      "electrical": "Electrical",
+      "lighting": "Lighting",
+      "wheels_tires": "Wheels & Tires",
+      "body_exterior": "Body & Exterior",
+      "interior": "Interior",
+      "exhaust": "Exhaust"
+    }
   },
   "inventory_alerts": {
     "title": "Low Stock Alerts",
@@ -571,6 +584,18 @@
     "no_services_found": "No services found",
     "adjust_search": "Try adjusting your search terms.",
     "get_started": "Get started by adding your first service.",
-    "delete_confirm": "Are you sure you want to delete this service?"
+    "delete_confirm": "Are you sure you want to delete this service?",
+    "categories": {
+      "general_maintenance": "General Maintenance",
+      "engine_services": "Engine Services",
+      "transmission_services": "Transmission Services",
+      "brake_services": "Brake Services",
+      "tire_wheel_services": "Tire and Wheel Services",
+      "suspension_steering": "Suspension and Steering",
+      "electrical_services": "Electrical Services",
+      "ac_heating": "Air Conditioning and Heating",
+      "exhaust_services": "Exhaust System Services",
+      "inspection_services": "Inspection Services"
+    }
   }
 }
