@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Plus, Trash2 } from "lucide-react";
-import { socket } from "../../lib/services/socket";
+import { socketService } from "../../lib/services/socket";
 import { useTranslation } from "react-i18next";
 
 interface AppointmentMinimal {
@@ -164,7 +164,7 @@ export default function JobCardForm({
       });
 
       if (response.ok) {
-        socket.emit("job-created");
+        socketService.emitJobCreated();
         router.push("/job-cards");
       } else {
         const error = await response.json();

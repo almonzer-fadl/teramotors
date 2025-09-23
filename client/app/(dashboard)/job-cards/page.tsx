@@ -15,7 +15,7 @@ import {
   XCircle,
   AlertCircle,
 } from "lucide-react";
-import { socket } from "@/lib/services/socket";
+import { socketService } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
 interface JobCard {
@@ -69,12 +69,44 @@ export default function JobCardsPage() {
   useEffect(() => {
     fetchJobCards();
 
-    socket.on("update-jobs", () => {
+    // Real-time job card updates
+    const handleJobCardCreated = (jobCard: any) => {
+      setJobCards(prev => [jobCard, ...prev]);
+    };
+
+    const handleJobCardStatusUpdated = (updatedJobCard: any) => {
+      setJobCards(prev => 
+        prev.map(jobCard => 
+          jobCard._id === updatedJobCard._id ? updatedJobCard : jobCard
+        )
+      );
+    };
+
+    const handleJobCardProgressUpdated = (updatedJobCard: any) => {
+      setJobCards(prev => 
+        prev.map(jobCard => 
+          jobCard._id === updatedJobCard._id ? updatedJobCard : jobCard
+        )
+      );
+    };
+
+    // Generic update handler for backward compatibility
+    const handleUpdateJobs = () => {
       fetchJobCards();
-    });
+    };
+
+    // Register event listeners
+    socketService.onJobCardCreated(handleJobCardCreated);
+    socketService.onJobCardStatusUpdated(handleJobCardStatusUpdated);
+    socketService.onJobCardProgressUpdated(handleJobCardProgressUpdated);
+    socketService.onUpdateJobs(handleUpdateJobs);
 
     return () => {
-      socket.off("update-jobs");
+      // Cleanup event listeners
+      socketService.off('jobcard_created', handleJobCardCreated);
+      socketService.off('jobcard_status_updated', handleJobCardStatusUpdated);
+      socketService.off('jobcard_progress_updated', handleJobCardProgressUpdated);
+      socketService.off('update-jobs', handleUpdateJobs);
     };
   }, []);
 
