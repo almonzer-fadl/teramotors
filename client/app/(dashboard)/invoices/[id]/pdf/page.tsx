@@ -32,7 +32,12 @@ export default function InvoicePdfPage() {
 
   const doc = useMemo(() => {
     if (!data) return null;
-    return <InvoiceDocument invoice={data.invoice} jobCard={data.jobCard} language={language} />;
+    return <InvoiceDocument 
+      invoice={data.invoice} 
+      jobCard={data.jobCard} 
+      language={language} 
+      qrCodeData={data.invoice.zatca?.qrCode}
+    />;
   }, [data, language]);
 
   if (loading) {

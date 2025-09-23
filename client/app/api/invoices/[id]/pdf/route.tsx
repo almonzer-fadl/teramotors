@@ -36,7 +36,12 @@ export async function GET(
         .populate('partsUsed.partId');
     }
 
-    const doc = <InvoiceDocument invoice={invoice.toObject()} jobCard={jobCard?.toObject?.() || jobCard} language={language} />;
+    const doc = <InvoiceDocument 
+      invoice={invoice.toObject()} 
+      jobCard={jobCard?.toObject?.() || jobCard} 
+      language={language} 
+      qrCodeData={invoice.zatca?.qrCode}
+    />;
     const pdfStream = await pdf(doc).toBlob();
 
     return new Response(pdfStream, {
