@@ -5,11 +5,12 @@ import { useEffect, useState } from 'react';
 const URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
 
 class SocketService {
-  emit(arg0: string) {
-    throw new Error("Method not implemented.");
+  emit(event: string, ...args: any[]) {
+    this.socket?.emit(event, ...args);
   }
-  on(arg0: string, handleConnect: () => void) {
-    throw new Error('Method not implemented.');
+
+  on(event: string, callback: (...args: any[]) => void) {
+    this.socket?.on(event, callback);
   }
   private socket: Socket | null = null;
   private reconnectAttempts = 0;
