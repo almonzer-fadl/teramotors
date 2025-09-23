@@ -413,11 +413,11 @@ export default function InvoicesPage() {
                       >
                         <Edit className="h-4 w-4" />
                       </Link>
-                      <Link
-                        href={`/invoices/${invoice._id}/pdf`}
-                        className="text-green-600 hover:text-green-900"
-                      >
+                      <Link href={`/api/invoices/${invoice._id}/pdf?lang=en`} className="text-green-600 hover:text-green-900" prefetch={false}>
                         <FileText className="h-4 w-4" />
+                      </Link>
+                      <Link href={`/api/invoices/${invoice._id}/pdf?lang=ar`} className="text-emerald-600 hover:text-emerald-900 ms-2" prefetch={false}>
+                        AR
                       </Link>
                     </div>
                   </td>
