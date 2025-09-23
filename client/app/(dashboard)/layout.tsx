@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/dashboard/LanguageSwitcher";
+import { NotificationBell } from "@/components/dashboard/NotificationBell";
 
 // Icon mapping for dynamic navigation
 const iconMap = {
@@ -164,12 +165,7 @@ export default function DashboardLayout({
             <div className="flex flex-1"></div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <LanguageSwitcher />
-              <button
-                type="button"
-                className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
-              >
-                <Bell className="h-6 w-6" />
-              </button>
+              <NotificationBell />
 
               <div className="flex items-center gap-x-2">
                 <div className="flex items-center gap-x-2">

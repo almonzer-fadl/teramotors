@@ -14,7 +14,7 @@ import {
   Search,
 } from "lucide-react";
 import JobCardGrid from "@/components/dashboard/JobCardGrid";
-import { socket } from "@/lib/services/socket";
+import { socketService } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
 interface DashboardStats {
@@ -73,17 +73,33 @@ export default function DashboardPage() {
     };
 
     fetchStats();
-    eventNames.forEach((ev) => {
-      socket.on(ev, () => {
+
+    // Real-time dashboard updates
+    const handleDashboardStatsUpdated = (stats: any) => {
+      setStats(stats);
+    };
+
+    // Generic update handlers for backward compatibility
+    const updateHandlers = eventNames.map(ev => {
+      const handler = () => {
         fetchStats();
         console.log(`[${ev}] was triggered, fetching stats`);
-      });
+      };
+      return { event: ev, handler };
+    });
+
+    // Register event listeners
+    socketService.onDashboardStatsUpdated(handleDashboardStatsUpdated);
+    updateHandlers.forEach(({ event, handler }) => {
+      socketService.on(event, handler);
     });
 
     return () => {
-      for (const ev of eventNames) {
-        socket.off(ev);
-      }
+      // Cleanup event listeners
+      socketService.off('dashboard_stats_updated', handleDashboardStatsUpdated);
+      updateHandlers.forEach(({ event, handler }) => {
+        socketService.off(event, handler);
+      });
     };
   }, []);
 
