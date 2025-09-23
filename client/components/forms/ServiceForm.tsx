@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Key } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Plus, Trash2 } from "lucide-react";
 import Part from "@/lib/models/Part";
@@ -28,20 +28,10 @@ export default function ServiceForm({
   fromTemplate?: boolean;
 }) {
   const { t } = useTranslation('common');
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [parts, setParts] = useState<Array<InstanceType<typeof Part>>>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [formData, setFormData] = useState<ServiceFormData>({
-    name: "",
-    description: "",
-    category: "",
-    laborRate: 0,
-    laborHours: 0,
-    partsRequired: [],
-    isActive: true,
-    isTemplate: false,
-  });
+  const serviceCategories = Object.keys(t('services.categories', { returnObjects: true })).map(key => ({
+    value: key,
+    label: t(`services.categories.${key}`)
+  }));
 
   const [templates, setTemplates] = useState<ServiceFormData[]>([]);
 
@@ -49,24 +39,12 @@ export default function ServiceForm({
 
   useEffect(() => {
     fetchParts();
-    fetchCategories();
     if (isEditing) {
       fetchService();
     } else if (fromTemplate) {
       fetchTemplates();
     }
   }, [serviceId, isEditing, fromTemplate]);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch("/api/services/categories");
-      if (response.ok) {
-        setCategories(await response.json());
-      }
-    } catch (error) {
-      console.error("Failed to fetch categories:", error);
-    }
-  };
 
   const fetchTemplates = async () => {
     try {
@@ -207,48 +185,64 @@ export default function ServiceForm({
         )}
         {/* Form fields for service details */}
         <div className="bg-white shadow rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <input
-            type="text"
-            placeholder={t('inventory.name')}
-            required
-            value={formData.name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <Combobox
-            options={categories.map((c) => ({ label: c, value: c }))}
-            value={formData.category}
-            onChange={(value) => handleInputChange("category", value)}
-            placeholder={t('forms.select_category')}
-            searchPlaceholder={t('forms.search_or_add_category')}
-            emptyPlaceholder={t('forms.no_categories_found')}
-          />
-          <input
-            type="number"
-            placeholder={t('job_cards.labor_rate')}
-            required
-            value={formData.laborRate}
-            onChange={(e) =>
-              handleInputChange("laborRate", parseFloat(e.target.value))
-            }
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <input
-            type="number"
-            placeholder={t('job_cards.labor_hours')}
-            required
-            value={formData.laborHours}
-            onChange={(e) =>
-              handleInputChange("laborHours", parseFloat(e.target.value))
-            }
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <textarea
-            placeholder={t('vehicles.description')}
-            value={formData.description}
-            onChange={(e) => handleInputChange("description", e.target.value)}
-            className="md:col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">{t('inventory.name')}</label>
+            <input
+              type="text"
+              id="name"
+              required
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="category" className="block text-sm font-medium text-gray-700">{t('forms.select_category')}</label>
+            <Combobox
+              options={serviceCategories}
+              value={formData.category}
+              onChange={(value) => handleInputChange("category", value)}
+              placeholder={t('forms.select_category')}
+              searchPlaceholder={t('forms.search_or_add_category')}
+              emptyPlaceholder={t('forms.no_categories_found')}
+            />
+          </div>
+          <div>
+            <label htmlFor="laborRate" className="block text-sm font-medium text-gray-700">{t('job_cards.labor_rate')}</label>
+            <input
+              type="number"
+              id="laborRate"
+              name="laborRate"
+              required
+              value={formData.laborRate}
+              onChange={(e) =>
+                handleInputChange("laborRate", parseFloat(e.target.value))
+              }
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="laborHours" className="block text-sm font-medium text-gray-700">{t('job_cards.labor_hours')}</label>
+            <input
+              type="number"
+              id="laborHours"
+              required
+              value={formData.laborHours}
+              onChange={(e) =>
+                handleInputChange("laborHours", parseFloat(e.target.value))
+              }
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700">{t('vehicles.description')}</label>
+            <textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
           <div className="flex items-center">
             <input
               id="isTemplate"
@@ -272,43 +266,54 @@ export default function ServiceForm({
           <h3 className="text-lg font-medium text-gray-900 mb-4">
             {t('forms.parts_required')}
           </h3>
-          {formData.partsRequired.map((part, index) => (
+          {formData.partsRequired.map((part: { partId: string | number | readonly string[] | undefined; quantity: string | number | readonly string[] | undefined; cost: string | number | readonly string[] | undefined; }, index: Key | null | undefined) => (
             <div
               key={index}
               className="grid grid-cols-4 gap-4 items-center mb-4"
             >
-              <select
-                value={part.partId}
-                onChange={(e) =>
-                  handlePartChange(index, "partId", e.target.value)
-                }
-                className="col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="">{t('job_cards.select_part')}</option>
-                {parts.map((p) => (
-                  <option key={p._id} value={p._id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                placeholder={t('job_cards.qty')}
-                value={part.quantity}
-                onChange={(e) =>
-                  handlePartChange(index, "quantity", parseInt(e.target.value))
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
-              <input
-                type="number"
-                placeholder={t('job_cards.cost')}
-                value={part.cost}
-                onChange={(e) =>
-                  handlePartChange(index, "cost", parseFloat(e.target.value))
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              />
+              <div className="col-span-2">
+                <label htmlFor={`partId-${index}`} className="block text-sm font-medium text-gray-700">{t('job_cards.select_part')}</label>
+                <select
+                  id={`partId-${index}`}
+                  value={part.partId}
+                  onChange={(e) =>
+                    handlePartChange(index, "partId", e.target.value)
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="">{t('job_cards.select_part')}</option>
+                  {parts.map((p) => (
+                    <option key={p._id} value={p._id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label htmlFor={`quantity-${index}`} className="block text-sm font-medium text-gray-700">{t('job_cards.qty')}</label>
+                <input
+                  type="number"
+                  id={`quantity-${index}`}
+                  value={part.quantity}
+                  onChange={(e) =>
+                    handlePartChange(index, "quantity", parseInt(e.target.value))
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label htmlFor={`cost-${index}`} className="block text-sm font-medium text-gray-700">{t('job_cards.cost')}</label>
+                <input
+                  type="number"
+                  id={`cost-${index}`}
+                  name="cost"
+                  value={part.cost}
+                  onChange={(e) =>
+                    handlePartChange(index, "cost", parseFloat(e.target.value))
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
               <button
                 type="button"
                 onClick={() => removePart(index)}

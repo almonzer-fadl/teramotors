@@ -157,6 +157,7 @@
     "parts_placeholder": "قطع الغيار",
     "total_placeholder": "المجموع",
     "item_id_placeholder": "معرف العنصر",
+    "item_id": "معرف العنصر",
     "cost_placeholder": "التكلفة",
     "condition_good": "جيد",
     "condition_fair": "مقبول",
@@ -328,7 +329,19 @@
     "no_parts_found": "لم يتم العثور على قطع غيار",
     "adjust_search": "حاول تعديل شروط البحث الخاصة بك.",
     "get_started_adding": "ابدأ بإضافة أول قطعة غيار لك.",
-    "delete_confirm": "هل أنت متأكد أنك تريد حذف هذه القطعة؟"
+    "delete_confirm": "هل أنت متأكد أنك تريد حذف هذه القطعة؟",
+    "categories": {
+      "engine": "المحرك",
+      "transmission": "ناقل الحركة",
+      "brakes": "الفرامل",
+      "suspension": "نظام التعليق",
+      "electrical": "النظام الكهربائي",
+      "lighting": "الإضاءة",
+      "wheels_tires": "العجلات والإطارات",
+      "body_exterior": "الهيكل الخارجي",
+      "interior": "الداخلية",
+      "exhaust": "العادم"
+    }
   },
   "inventory_alerts": {
     "title": "تنبيهات انخفاض المخزون",
@@ -571,6 +584,18 @@
     "no_services_found": "لم يتم العثور على خدمات",
     "adjust_search": "حاول تعديل شروط البحث الخاصة بك.",
     "get_started": "ابدأ بإضافة خدمتك الأولى.",
-    "delete_confirm": "هل أنت متأكد أنك تريد حذف هذه الخدمة؟"
+    "delete_confirm": "هل أنت متأكد أنك تريد حذف هذه الخدمة؟",
+    "categories": {
+      "general_maintenance": "صيانة عامة",
+      "engine_services": "خدمات المحرك",
+      "transmission_services": "خدمات ناقل الحركة",
+      "brake_services": "خدمات الفرامل",
+      "tire_wheel_services": "خدمات الإطارات والعجلات",
+      "suspension_steering": "نظام التعليق والتوجيه",
+      "electrical_services": "خدمات كهربائية",
+      "ac_heating": "تكييف الهواء والتدفئة",
+      "exhaust_services": "خدمات نظام العادم",
+      "inspection_services": "خدمات الفحص"
+    }
   }
 }

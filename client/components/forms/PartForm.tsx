@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Plus } from "lucide-react";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
+import { Combobox } from "@/components/ui/Combobox";
 
 interface CompatibleVehicle {
   make: string;
@@ -28,6 +29,13 @@ interface PartFormData {
 
 export default function PartForm({ partId }: { partId?: string }) {
   const { t } = useTranslation('common');
+  const partCategories = useMemo(() => {
+    const categories = t('inventory.categories', { returnObjects: true }) as Record<string, string>;
+    return Object.keys(categories).map(key => ({
+      value: key,
+      label: t(`inventory.categories.${key}`)
+    }));
+  }, [t]);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<PartFormData>({
@@ -101,8 +109,6 @@ export default function PartForm({ partId }: { partId?: string }) {
     } catch (error) {
       console.error("Failed to save part:", error);
       alert(t('forms.failed_to_save_part'));
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -160,90 +166,122 @@ export default function PartForm({ partId }: { partId?: string }) {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Form fields for part details */}
         <div className="bg-white shadow rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <input
-            type="text"
-            placeholder={t('inventory.name')}
-            required
-            value={formData.name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <input
-            type="text"
-            placeholder={t('inventory.part_number')}
-            required
-            value={formData.partNumber}
-            onChange={(e) => handleInputChange("partNumber", e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <input
-            type="text"
-            placeholder={t('inventory.category')}
-            required
-            value={formData.category}
-            onChange={(e) => handleInputChange("category", e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <input
-            type="text"
-            placeholder={t('forms.manufacturer')}
-            value={formData.manufacturer}
-            onChange={(e) => handleInputChange("manufacturer", e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <input
-            type="number"
-            placeholder={t('job_cards.cost')}
-            required
-            value={formData.cost}
-            onChange={(e) =>
-              handleInputChange("cost", parseFloat(e.target.value))
-            }
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <input
-            type="number"
-            placeholder={t('inventory.price')}
-            required
-            value={formData.sellingPrice}
-            onChange={(e) =>
-              handleInputChange("sellingPrice", parseFloat(e.target.value))
-            }
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <input
-            type="number"
-            placeholder={t('inventory.stock')}
-            required
-            value={formData.stockQuantity}
-            onChange={(e) =>
-              handleInputChange("stockQuantity", parseInt(e.target.value))
-            }
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <input
-            type="number"
-            placeholder={t('inventory_alerts.min_stock')}
-            required
-            value={formData.minStockLevel}
-            onChange={(e) =>
-              handleInputChange("minStockLevel", parseInt(e.target.value))
-            }
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <input
-            type="text"
-            placeholder={t('forms.location')}
-            value={formData.location}
-            onChange={(e) => handleInputChange("location", e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-          <textarea
-            placeholder={t('vehicles.description')}
-            value={formData.description}
-            onChange={(e) => handleInputChange("description", e.target.value)}
-            className="md:col-span-2 mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">{t('inventory.name')}</label>
+            <input
+              type="text"
+              id="name"
+              required
+              value={formData.name ?? ""}
+              onChange={e => handleInputChange("name", e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="partNumber" className="block text-sm font-medium text-gray-700">{t('inventory.part_number')}</label>
+            <input
+              type="text"
+              id="partNumber"
+              required
+              value={formData.partNumber}
+              onChange={(e) => handleInputChange("partNumber", e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="category" className="block text-sm font-medium text-gray-700">{t('inventory.category')}</label>
+            <Combobox
+              options={partCategories}
+              value={formData.category}
+              onChange={value => handleInputChange("category", value)}
+              placeholder={t('inventory.category')}
+              searchPlaceholder={t('forms.search_category')}
+              emptyPlaceholder={t('forms.no_category_found')}
+            />
+          </div>
+          <div>
+            <label htmlFor="manufacturer" className="block text-sm font-medium text-gray-700">{t('forms.manufacturer')}</label>
+            <input
+              type="text"
+              id="manufacturer"
+              value={formData.manufacturer}
+              onChange={(e) => handleInputChange("manufacturer", e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="cost" className="block text-sm font-medium text-gray-700">{t('job_cards.cost')}</label>
+            <input
+              type="number"
+              id="cost"
+              name="cost"
+              required
+              value={formData.cost}
+              onChange={(e) =>
+                handleInputChange("cost", parseFloat(e.target.value))
+              }
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="sellingPrice" className="block text-sm font-medium text-gray-700">{t('inventory.price')}</label>
+            <input
+              type="number"
+              id="sellingPrice"
+              name="sellingPrice"
+              required
+              value={formData.sellingPrice}
+              onChange={(e) =>
+                handleInputChange("sellingPrice", parseFloat(e.target.value))
+              }
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="stockQuantity" className="block text-sm font-medium text-gray-700">{t('inventory.stock')}</label>
+            <input
+              type="number"
+              id="stockQuantity"
+              required
+              value={formData.stockQuantity}
+              onChange={(e) =>
+                handleInputChange("stockQuantity", parseInt(e.target.value))
+              }
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="minStockLevel" className="block text-sm font-medium text-gray-700">{t('inventory_alerts.min_stock')}</label>
+            <input
+              type="number"
+              id="minStockLevel"
+              required
+              value={formData.minStockLevel}
+              onChange={(e) =>
+                handleInputChange("minStockLevel", parseInt(e.target.value))
+              }
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="location" className="block text-sm font-medium text-gray-700">{t('forms.location')}</label>
+            <input
+              type="text"
+              id="location"
+              value={formData.location}
+              onChange={(e) => handleInputChange("location", e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700">{t('vehicles.description')}</label>
+            <textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
         </div>
 
         <div className="bg-white shadow rounded-lg p-6">
@@ -255,37 +293,46 @@ export default function PartForm({ partId }: { partId?: string }) {
               key={index}
               className="grid grid-cols-4 gap-4 items-center mb-2"
             >
-              <input
-                type="text"
-                placeholder={t('vehicles.make')}
-                value={vehicle.make}
-                onChange={(e) =>
-                  handleCompatibleVehicleChange(index, "make", e.target.value)
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-              />
-              <input
-                type="text"
-                placeholder={t('vehicles.model')}
-                value={vehicle.model}
-                onChange={(e) =>
-                  handleCompatibleVehicleChange(index, "model", e.target.value)
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-              />
-              <input
-                type="number"
-                placeholder={t('vehicles.year')}
-                value={vehicle.year}
-                onChange={(e) =>
-                  handleCompatibleVehicleChange(
-                    index,
-                    "year",
-                    parseInt(e.target.value)
-                  )
-                }
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-              />
+              <div>
+                <label htmlFor={`make-${index}`} className="block text-sm font-medium text-gray-700">{t('vehicles.make')}</label>
+                <input
+                  type="text"
+                  id={`make-${index}`}
+                  value={vehicle.make}
+                  onChange={(e) =>
+                    handleCompatibleVehicleChange(index, "make", e.target.value)
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor={`model-${index}`} className="block text-sm font-medium text-gray-700">{t('vehicles.model')}</label>
+                <input
+                  type="text"
+                  id={`model-${index}`}
+                  value={vehicle.model}
+                  onChange={(e) =>
+                    handleCompatibleVehicleChange(index, "model", e.target.value)
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor={`year-${index}`} className="block text-sm font-medium text-gray-700">{t('vehicles.year')}</label>
+                <input
+                  type="number"
+                  id={`year-${index}`}
+                  value={vehicle.year}
+                  onChange={(e) =>
+                    handleCompatibleVehicleChange(
+                      index,
+                      "year",
+                      parseInt(e.target.value)
+                    )
+                  }
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                />
+              </div>
               <button
                 type="button"
                 onClick={() => removeCompatibleVehicle(index)}

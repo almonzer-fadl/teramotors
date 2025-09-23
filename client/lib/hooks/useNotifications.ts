@@ -44,7 +44,9 @@ export function useNotifications() {
     // Show toast notification
     switch (notification.type) {
       case 'success':
-        toast.success(notification.message, { duration: 4000 });
+        setTimeout(() => {
+          toast.success(notification.message, { duration: 4000 });
+        }, 0);
         break;
       case 'error':
         toast.error(notification.message, { duration: 5000 });
@@ -311,21 +313,27 @@ export function useNotifications() {
 
     // Connection status handler
     const handleConnectionStatus = (connected: boolean) => {
-      setState(prev => ({ ...prev, isConnected: connected }));
-      
-      if (connected) {
-        addNotification({
-          type: 'success',
-          title: 'Connected',
-          message: 'Real-time updates are now active',
-        });
-      } else {
-        addNotification({
-          type: 'error',
-          title: 'Disconnected',
-          message: 'Real-time updates are temporarily unavailable',
-        });
-      }
+      setState(prev => {
+        if (prev.isConnected === connected) {
+          return prev;
+        }
+
+        if (connected) {
+          addNotification({
+            type: 'success',
+            title: 'Connected',
+            message: 'Real-time updates are now active',
+          });
+        } else {
+          addNotification({
+            type: 'error',
+            title: 'Disconnected',
+            message: 'Real-time updates are temporarily unavailable',
+          });
+        }
+
+        return { ...prev, isConnected: connected };
+      });
     };
 
     // Register event listeners
@@ -350,13 +358,15 @@ export function useNotifications() {
     socketService.onSystemMaintenance(handleSystemMaintenance);
     socketService.onSystemAlert(handleSystemAlert);
 
-    // Monitor connection status
-    const checkConnection = () => {
-      handleConnectionStatus(socketService.isConnected());
-    };
-    
-    checkConnection();
-    const connectionInterval = setInterval(checkConnection, 5000);
+    // Connection status listeners
+    const handleConnect = () => handleConnectionStatus(true);
+    const handleDisconnect = () => handleConnectionStatus(false);
+
+    socketService.on('connect', handleConnect);
+    socketService.on('disconnect', handleDisconnect);
+
+    // Set initial state
+    handleConnectionStatus(socketService.isConnected());
 
     return () => {
       // Cleanup event listeners
@@ -381,7 +391,8 @@ export function useNotifications() {
       socketService.off('system_maintenance', handleSystemMaintenance);
       socketService.off('system_alert', handleSystemAlert);
       
-      clearInterval(connectionInterval);
+      socketService.off('connect', handleConnect);
+      socketService.off('disconnect', handleDisconnect);
     };
   }, [addNotification]);
 
