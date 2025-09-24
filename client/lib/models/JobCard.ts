@@ -29,6 +29,16 @@ const JobCardSchema = new Schema({
 });
 
 
+// Add indexes for better query performance
+JobCardSchema.index({ customerId: 1 });
+JobCardSchema.index({ vehicleId: 1 });
+JobCardSchema.index({ status: 1 });
+JobCardSchema.index({ priority: 1 });
+JobCardSchema.index({ appointmentId: 1 });
+JobCardSchema.index({ createdAt: -1 });
+JobCardSchema.index({ estimatedStartTime: 1 });
+JobCardSchema.index({ actualStartTime: 1 });
+
 const JobCard = (mongoose.models && mongoose.models.JobCard) || mongoose.model('JobCard', JobCardSchema);
 
 export default JobCard;
