@@ -196,8 +196,12 @@ export class InvoiceService {
   /**
    * Generate QR code for existing invoice
    */
-  generateQRForInvoice(invoiceData: InvoiceData): string {
-    return this.qrGenerator.generateQRCode(invoiceData);
+  async generateQRForInvoice(invoiceData: InvoiceData): Promise<string> {
+    const result = await this.qrGenerator.generateInvoice(invoiceData);
+    if (!result.success || !result.qrCode) {
+      throw new Error('Failed to generate QR code');
+    }
+    return result.qrCode;
   }
 
   /**

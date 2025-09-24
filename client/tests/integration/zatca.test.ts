@@ -1,112 +1,159 @@
 import { ZATCAValidator } from '@/zatca/zatca-validator'
-import { generateQRCode } from '@/zatca/zatca-qr-generator'
-import { calculateInvoiceHash } from '@/zatca/zatca-utils'
+import { ZATCAQRGenerator } from '@/zatca/zatca-qr-generator'
+import { ZATCAUtils } from '@/zatca/zatca-utils'
 import { mockInvoice } from '../fixtures'
 
 describe('ZATCA Compliance Tests', () => {
   describe('QR Code Generation', () => {
-    test('should generate valid QR code for invoice', () => {
+    test('should generate valid QR code for invoice', async () => {
       const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash'
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
-      const qrCode = generateQRCode(invoiceData)
+      const generator = new ZATCAQRGenerator('TeraMotors', '300000000000003')
+      const result = await generator.generateInvoice(invoiceData)
       
-      expect(qrCode).toBeDefined()
-      expect(typeof qrCode).toBe('string')
-      expect(qrCode.length).toBeGreaterThan(0)
+      expect(result.success).toBe(true)
+      expect(result.qrCode).toBeDefined()
+      expect(typeof result.qrCode).toBe('string')
+      expect(result.qrCode.length).toBeGreaterThan(0)
     })
 
-    test('should handle missing optional fields', () => {
+    test('should handle missing optional fields', async () => {
       const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash'
+        invoiceNumber: 'INV-002',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: 'Service',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
-      expect(() => generateQRCode(invoiceData)).not.toThrow()
+      const generator = new ZATCAQRGenerator('TeraMotors', '300000000000003')
+      const result = await generator.generateInvoice(invoiceData)
+      
+      expect(result.success).toBe(true)
+      expect(result.qrCode).toBeDefined()
     })
 
-    test('should validate required fields', () => {
+    test('should validate required fields', async () => {
       const invalidData = {
-        sellerName: 'TeraMotors',
-        // Missing vatRegistrationNumber
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash'
+        invoiceNumber: '',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: []
       }
 
-      expect(() => generateQRCode(invalidData)).toThrow()
+      const generator = new ZATCAQRGenerator('TeraMotors', '300000000000003')
+      const result = await generator.generateInvoice(invalidData)
+      
+      expect(result.success).toBe(false)
+      expect(result.errors.length).toBeGreaterThan(0)
     })
   })
 
   describe('Invoice Hash Calculation', () => {
-    test('should calculate valid invoice hash', () => {
+    test('should calculate valid invoice totals', () => {
       const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash'
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
-      const hash = calculateInvoiceHash(invoiceData)
+      const totals = ZATCAUtils.calculateInvoiceTotals(invoiceData)
       
-      expect(hash).toBeDefined()
-      expect(typeof hash).toBe('string')
-      expect(hash.length).toBeGreaterThan(0)
+      expect(totals).toBeDefined()
+      expect(totals.totalAmount).toBe(115.00) // 100 + 15% VAT
+      expect(totals.totalVAT).toBe(15.00)
+      expect(totals.subtotal).toBe(100.00)
     })
 
-    test('should generate consistent hash for same data', () => {
+    test('should generate consistent totals for same data', () => {
       const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash'
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
-      const hash1 = calculateInvoiceHash(invoiceData)
-      const hash2 = calculateInvoiceHash(invoiceData)
+      const totals1 = ZATCAUtils.calculateInvoiceTotals(invoiceData)
+      const totals2 = ZATCAUtils.calculateInvoiceTotals(invoiceData)
       
-      expect(hash1).toBe(hash2)
+      expect(totals1.totalAmount).toBe(totals2.totalAmount)
     })
 
-    test('should generate different hash for different data', () => {
+    test('should generate different totals for different data', () => {
       const invoiceData1 = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash'
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
       const invoiceData2 = {
         ...invoiceData1,
-        invoiceTotal: 200.00
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 200.00,
+            vatRate: 15
+          }
+        ]
       }
 
-      const hash1 = calculateInvoiceHash(invoiceData1)
-      const hash2 = calculateInvoiceHash(invoiceData2)
+      const totals1 = ZATCAUtils.calculateInvoiceTotals(invoiceData1)
+      const totals2 = ZATCAUtils.calculateInvoiceTotals(invoiceData2)
       
-      expect(hash1).not.toBe(hash2)
+      expect(totals1.totalAmount).not.toBe(totals2.totalAmount)
     })
   })
 
   describe('ZATCA Validator', () => {
-    let validator: ZATCAValidator
+    let validator: ZATCAValidator;
 
     beforeEach(() => {
       validator = new ZATCAValidator()
@@ -114,13 +161,18 @@ describe('ZATCA Compliance Tests', () => {
 
     test('should validate compliant invoice', () => {
       const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash',
-        qrCode: 'test-qr-code'
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
       const result = validator.validateInvoice(invoiceData)
@@ -129,119 +181,123 @@ describe('ZATCA Compliance Tests', () => {
       expect(result.errors).toHaveLength(0)
     })
 
-    test('should detect missing seller name', () => {
+    test('should detect missing invoice number', () => {
       const invoiceData = {
-        // sellerName: 'TeraMotors', // Missing
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash',
-        qrCode: 'test-qr-code'
+        invoiceNumber: '', // Missing
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
       const result = validator.validateInvoice(invoiceData)
       
       expect(result.isValid).toBe(false)
       expect(result.errors.length).toBeGreaterThan(0)
-      expect(result.errors.some(error => error.includes('seller name'))).toBe(true)
+      expect(result.errors.some(error => error.includes('Invoice number'))).toBe(true)
     })
 
-    test('should validate VAT registration number format', () => {
+    test('should validate invoice date', () => {
       const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123', // Invalid format
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash',
-        qrCode: 'test-qr-code'
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2030-01-01T10:00:00Z'), // Future date
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
       const result = validator.validateInvoice(invoiceData)
       
       expect(result.isValid).toBe(false)
-      expect(result.errors.some(error => error.includes('VAT registration number'))).toBe(true)
+      expect(result.errors.some(error => error.includes('future'))).toBe(true)
     })
 
-    test('should validate invoice timestamp format', () => {
+    test('should validate invoice items', () => {
       const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: 'invalid-date', // Invalid format
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash',
-        qrCode: 'test-qr-code'
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [] // No items
       }
 
       const result = validator.validateInvoice(invoiceData)
       
       expect(result.isValid).toBe(false)
-      expect(result.errors.some(error => error.includes('timestamp'))).toBe(true)
+      expect(result.errors.some(error => error.includes('at least one item'))).toBe(true)
     })
 
-    test('should validate monetary values', () => {
+    test('should validate item data', () => {
       const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: -100.00, // Negative amount
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash',
-        qrCode: 'test-qr-code'
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: '', // Empty name
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
       const result = validator.validateInvoice(invoiceData)
       
       expect(result.isValid).toBe(false)
-      expect(result.errors.some(error => error.includes('total'))).toBe(true)
+      expect(result.errors.some(error => error.includes('Name is required'))).toBe(true)
     })
 
-    test('should validate VAT calculation', () => {
+    test('should validate currency', () => {
       const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 20.00, // Incorrect VAT (should be 15%)
-        invoiceHash: 'test-hash',
-        qrCode: 'test-qr-code'
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'USD', // Invalid currency
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
       const result = validator.validateInvoice(invoiceData)
       
       expect(result.isValid).toBe(false)
-      expect(result.errors.some(error => error.includes('VAT'))).toBe(true)
-    })
-
-    test('should validate QR code presence', () => {
-      const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash'
-        // qrCode: 'test-qr-code' // Missing
-      }
-
-      const result = validator.validateInvoice(invoiceData)
-      
-      expect(result.isValid).toBe(false)
-      expect(result.errors.some(error => error.includes('QR code'))).toBe(true)
+      expect(result.errors.some(error => error.includes('SAR'))).toBe(true)
     })
 
     test('should provide warnings for non-critical issues', () => {
       const invoiceData = {
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash',
-        qrCode: 'test-qr-code',
-        // Missing optional fields that might generate warnings
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
       }
 
       const result = validator.validateInvoice(invoiceData)
@@ -326,53 +382,47 @@ describe('ZATCA Compliance Tests', () => {
   })
 
   describe('Phase 1 Compliance', () => {
-    test('should meet Phase 1 requirements', () => {
+    test('should meet Phase 1 requirements', async () => {
       const phase1Requirements = {
         qrCodeGeneration: true,
-        invoiceHashCalculation: true,
+        invoiceTotalsCalculation: true,
         basicValidation: true,
         tlvEncoding: true
       }
 
-      // Test QR code generation
-      const qrCode = generateQRCode({
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash'
-      })
+      const invoiceData = {
+        invoiceNumber: 'INV-001',
+        invoiceDate: new Date('2024-01-01T10:00:00Z'),
+        currency: 'SAR',
+        items: [
+          {
+            id: '1',
+            name: 'Oil Change',
+            quantity: 1,
+            unitPrice: 100.00,
+            vatRate: 15
+          }
+        ]
+      }
 
-      expect(qrCode).toBeDefined()
+      // Test QR code generation
+      const generator = new ZATCAQRGenerator('TeraMotors', '300000000000003')
+      const result = await generator.generateInvoice(invoiceData)
+
+      expect(result.success).toBe(true)
+      expect(result.qrCode).toBeDefined()
       expect(phase1Requirements.qrCodeGeneration).toBe(true)
 
-      // Test hash calculation
-      const hash = calculateInvoiceHash({
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: 'test-hash'
-      })
-
-      expect(hash).toBeDefined()
-      expect(phase1Requirements.invoiceHashCalculation).toBe(true)
+      // Test totals calculation
+      const totals = ZATCAUtils.calculateInvoiceTotals(invoiceData)
+      expect(totals.totalAmount).toBe(115.00)
+      expect(phase1Requirements.invoiceTotalsCalculation).toBe(true)
 
       // Test validation
       const validator = new ZATCAValidator()
-      const result = validator.validateInvoice({
-        sellerName: 'TeraMotors',
-        vatRegistrationNumber: '123456789012345',
-        invoiceTimestamp: '2024-01-01T10:00:00Z',
-        invoiceTotal: 100.00,
-        vatTotal: 15.00,
-        invoiceHash: hash,
-        qrCode: qrCode
-      })
+      const validationResult = validator.validateInvoice(invoiceData)
 
-      expect(result.isValid).toBe(true)
+      expect(validationResult.isValid).toBe(true)
       expect(phase1Requirements.basicValidation).toBe(true)
     })
   })

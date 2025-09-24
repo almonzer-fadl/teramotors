@@ -363,7 +363,27 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                   </button>
                 </div>
               ))}
-              <FileUpload onUpload={handlePhotoUpload} />
+              <FileUpload onUpload={async (files: File[]) => {
+                for (const file of files) {
+                  // Upload file and get URL, then call handlePhotoUpload
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  
+                  try {
+                    const response = await fetch('/api/upload', {
+                      method: 'POST',
+                      body: formData,
+                    });
+                    
+                    if (response.ok) {
+                      const { secure_url } = await response.json();
+                      handlePhotoUpload(secure_url);
+                    }
+                  } catch (error) {
+                    console.error('Upload failed:', error);
+                  }
+                }
+              }} />
             </div>
           </div>
         </div>

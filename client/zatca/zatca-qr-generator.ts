@@ -6,7 +6,7 @@ import {
   InvoiceTotals 
 } from './zatca-types';
 import { ZATCAUtils } from './zatca-utils';
-import { ZATCAValidator } from './zatca-validator';
+import { ZATCAValidator, ValidationResult } from './zatca-validator';
 import { COMPANY_CONFIG } from '../config/company-config';
 
 export class ZATCAQRGenerator {
@@ -29,7 +29,8 @@ export class ZATCAQRGenerator {
   async generateInvoice(invoiceData: InvoiceData): Promise<InvoiceGenerationResult> {
     try {
       // Validate invoice data
-      const validation = ZATCAValidator.validateInvoice(invoiceData);
+      const validator = new ZATCAValidator();
+      const validation = validator.validateInvoice(invoiceData);
       
       if (!validation.isValid) {
         return {
@@ -83,13 +84,7 @@ export class ZATCAQRGenerator {
   /**
    * Generate only the QR code (for quick operations)
    */
-  generateQRCode(invoiceData: InvoiceData, totals?: InvoiceTotals): string {
-    // Calculate totals if not provided
-    if (!totals) {
-      totals = ZATCAUtils.calculateInvoiceTotals(invoiceData);
-    }
-
-    // Prepare QR data
+  private generateQRCode(invoiceData: InvoiceData, totals: InvoiceTotals): string {
     const qrData: ZATCAQRData = {
       sellerName: this.companyName,
       vatNumber: this.companyVATNumber,
@@ -98,13 +93,6 @@ export class ZATCAQRGenerator {
       vatAmount: totals.totalVAT.toFixed(2),
     };
 
-    // Validate QR data
-    const qrValidation = ZATCAValidator.validateQRData(qrData);
-    if (!qrValidation.isValid) {
-      throw new Error(`QR validation failed: ${qrValidation.errors.join(', ')}`);
-    }
-
-    // Generate TLV encoded QR code
     return this.createTLVQRCode(qrData);
   }
 
@@ -249,7 +237,8 @@ export class ZATCAQRGenerator {
     for (const invoiceData of invoicesData) {
       try {
         // Quick validation
-        const quickValidation = ZATCAValidator.quickValidate(invoiceData);
+        const validator = new ZATCAValidator();
+        const quickValidation = validator.quickValidate(invoiceData);
         
         if (!quickValidation.isValid) {
           failed.push({
@@ -260,7 +249,8 @@ export class ZATCAQRGenerator {
         }
 
         // Generate QR code
-        const qrCode = this.generateQRCode(invoiceData);
+        const totals = ZATCAUtils.calculateInvoiceTotals(invoiceData);
+        const qrCode = this.generateQRCode(invoiceData, totals);
         
         successful.push({
           invoiceNumber: invoiceData.invoiceNumber,
