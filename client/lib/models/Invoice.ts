@@ -43,6 +43,7 @@ InvoiceSchema.index({ paymentStatus: 1 });
 InvoiceSchema.index({ dueDate: 1 });
 InvoiceSchema.index({ createdAt: -1 });
 InvoiceSchema.index({ 'zatca.invoiceNumber': 1 });
+InvoiceSchema.index({ status: 1, createdAt: 1 });
 
 const Invoice = (mongoose.models && mongoose.models.Invoice) || mongoose.model('Invoice', InvoiceSchema);
 

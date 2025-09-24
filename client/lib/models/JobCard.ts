@@ -38,6 +38,7 @@ JobCardSchema.index({ appointmentId: 1 });
 JobCardSchema.index({ createdAt: -1 });
 JobCardSchema.index({ estimatedStartTime: 1 });
 JobCardSchema.index({ actualStartTime: 1 });
+JobCardSchema.index({ status: 1, actualStartTime: 1, actualEndTime: 1 });
 
 const JobCard = (mongoose.models && mongoose.models.JobCard) || mongoose.model('JobCard', JobCardSchema);
 

@@ -27,6 +27,7 @@ AppointmentSchema.index({ startTime: 1 });
 AppointmentSchema.index({ status: 1 });
 AppointmentSchema.index({ priority: 1 });
 AppointmentSchema.index({ createdAt: -1 });
+AppointmentSchema.index({ status: 1, appointmentDate: 1 });
 
 const Appointment = (mongoose.models && mongoose.models.Appointment) || mongoose.model('Appointment', AppointmentSchema);
 
