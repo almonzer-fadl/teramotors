@@ -28,21 +28,24 @@ export const GET = withCache(
       // Get total count for pagination
       const total = await Customer.countDocuments(query)
 
-      // Get paginated results
-      const customers = await Customer.find(query)
-        .populate('vehicles', 'make model year licensePlate')
-        .sort(pagination.sort ? { [pagination.sort]: pagination.direction === 'asc' ? 1 : -1 } : { createdAt: -1 })
-        .skip((pagination.page - 1) * pagination.limit)
-        .limit(pagination.limit)
-        .lean() // Use lean() for better performance
+      // Get paginated results using aggregation
+      const customers = await Customer.aggregate([
+        { $match: query },
+        {
+          $addFields: {
+            vehicles: { $size: "$vehicles" }
+          }
+        },
+        {
+          $sort: pagination.sort
+            ? { [pagination.sort]: pagination.direction === 'asc' ? 1 : -1 }
+            : { createdAt: -1 }
+        },
+        { $skip: (pagination.page - 1) * pagination.limit },
+        { $limit: pagination.limit }
+      ]);
 
-      // Add vehicle count to each customer
-      const customersWithVehicleCount = customers.map(customer => ({
-        ...customer,
-        vehicles: customer.vehicles.length
-      }))
-
-      return NextResponse.json(createPaginatedResponse(customersWithVehicleCount, total, pagination))
+      return NextResponse.json(createPaginatedResponse(customers, total, pagination))
     })
   }),
   {

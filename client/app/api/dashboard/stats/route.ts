@@ -96,9 +96,7 @@ export async function GET() {
           }
         }
       ]),
-      Part.countDocuments({
-        $expr: { $lte: ['$stockQuantity', '$minStockLevel'] }
-      })
+      Part.countDocuments({ isLowStock: true })
     ])
 
     // Calculate revenue growth
