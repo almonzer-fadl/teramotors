@@ -1,11 +1,19 @@
 import { connectToDatabase } from '@/lib/db'
 import User from '@/lib/models/User'
 import { saltAndHashPassword } from '@/lib/utils/password'
+import { authRateLimit } from '@/lib/middleware/rate-limit'
+import { NextRequest } from 'next/server'
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Apply rate limiting
+    const rateLimitResponse = authRateLimit(request);
+    if (rateLimitResponse) {
+      return rateLimitResponse;
+    }
+
     await connectToDatabase()
     
     const body = await request.json()
@@ -22,9 +30,12 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Invalid email format' }, { status: 400 })
     }
     
-    // Validate password length
-    if (password.length < 6) {
-      return Response.json({ error: 'Password must be at least 6 characters' }, { status: 400 })
+    // Strong password validation
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+    if (!passwordRegex.test(password)) {
+      return Response.json({ 
+        error: 'Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character' 
+      }, { status: 400 })
     }
     
     // Check if user already exists

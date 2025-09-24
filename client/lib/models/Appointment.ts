@@ -18,6 +18,16 @@ const AppointmentSchema = new Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Add indexes for better query performance
+AppointmentSchema.index({ customerId: 1 });
+AppointmentSchema.index({ vehicleId: 1 });
+AppointmentSchema.index({ mechanicId: 1 });
+AppointmentSchema.index({ appointmentDate: 1 });
+AppointmentSchema.index({ startTime: 1 });
+AppointmentSchema.index({ status: 1 });
+AppointmentSchema.index({ priority: 1 });
+AppointmentSchema.index({ createdAt: -1 });
+
 const Appointment = (mongoose.models && mongoose.models.Appointment) || mongoose.model('Appointment', AppointmentSchema);
 
 export default Appointment;

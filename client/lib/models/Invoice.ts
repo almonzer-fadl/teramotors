@@ -33,6 +33,17 @@ const InvoiceSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
+// Add indexes for better query performance
+InvoiceSchema.index({ jobCardId: 1 });
+InvoiceSchema.index({ customerId: 1 });
+InvoiceSchema.index({ vehicleId: 1 });
+InvoiceSchema.index({ mechanicId: 1 });
+InvoiceSchema.index({ status: 1 });
+InvoiceSchema.index({ paymentStatus: 1 });
+InvoiceSchema.index({ dueDate: 1 });
+InvoiceSchema.index({ createdAt: -1 });
+InvoiceSchema.index({ 'zatca.invoiceNumber': 1 });
+
 const Invoice = (mongoose.models && mongoose.models.Invoice) || mongoose.model('Invoice', InvoiceSchema);
 
 export default Invoice;

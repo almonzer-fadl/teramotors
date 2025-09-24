@@ -28,6 +28,13 @@ const VehicleSchema = new Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Add indexes for better query performance
+VehicleSchema.index({ customerId: 1 });
+VehicleSchema.index({ make: 1, model: 1 });
+VehicleSchema.index({ year: 1 });
+VehicleSchema.index({ isActive: 1 });
+VehicleSchema.index({ createdAt: -1 });
+
 const Vehicle = (mongoose.models && mongoose.models.Vehicle) || mongoose.model('Vehicle', VehicleSchema);
 
 export default Vehicle;

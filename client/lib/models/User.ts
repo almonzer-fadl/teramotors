@@ -18,6 +18,12 @@ const UserSchema = new Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Add indexes for better query performance
+UserSchema.index({ role: 1 });
+UserSchema.index({ isActive: 1 });
+UserSchema.index({ emailVerified: 1 });
+UserSchema.index({ createdAt: -1 });
+
 const User = (mongoose.models && mongoose.models.User) || mongoose.model('User', UserSchema);
 
 export default User;

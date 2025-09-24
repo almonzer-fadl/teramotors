@@ -34,6 +34,20 @@ export default function ServiceForm({
   }));
 
   const [templates, setTemplates] = useState<ServiceFormData[]>([]);
+  const [parts, setParts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<ServiceFormData>({
+    name: '',
+    description: '',
+    category: '',
+    laborRate: 0,
+    laborHours: 0,
+    partsRequired: [],
+    isActive: true,
+    isTemplate: false,
+  });
+
+  const router = useRouter();
 
   const isEditing = !!serviceId;
 
@@ -266,7 +280,7 @@ export default function ServiceForm({
           <h3 className="text-lg font-medium text-gray-900 mb-4">
             {t('forms.parts_required')}
           </h3>
-          {formData.partsRequired.map((part: { partId: string | number | readonly string[] | undefined; quantity: string | number | readonly string[] | undefined; cost: string | number | readonly string[] | undefined; }, index: Key | null | undefined) => (
+          {formData.partsRequired.map((part: any, index: number) => (
             <div
               key={index}
               className="grid grid-cols-4 gap-4 items-center mb-4"

@@ -25,6 +25,13 @@ const CustomerSchema = new Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
+// Add indexes for better query performance
+CustomerSchema.index({ firstName: 1, lastName: 1 });
+CustomerSchema.index({ phone: 1 });
+CustomerSchema.index({ isActive: 1 });
+CustomerSchema.index({ createdAt: -1 });
+CustomerSchema.index({ 'address.city': 1 });
+
 const Customer = (mongoose.models && mongoose.models.Customer) || mongoose.model('Customer', CustomerSchema);
 
 export default Customer;

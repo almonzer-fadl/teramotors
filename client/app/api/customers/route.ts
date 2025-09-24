@@ -1,64 +1,70 @@
 import { connectToDatabase } from '@/lib/db'
 import Customer from '@/lib/models/Customer'
 import { auth } from '@/lib/auth'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { withPagination, createPaginatedResponse, createSearchQuery } from '@/lib/middleware/pagination'
+import { withCache, generateCacheKey } from '@/lib/middleware/cache'
+import { asyncHandler, createError, measureApiPerformance } from '@/lib/middleware/error-handling'
 
-export async function GET(request: NextRequest) {
-  try {
-    const session = await auth()
-    if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+export const GET = withCache(
+  withPagination(async (request: NextRequest, pagination) => {
+    return measureApiPerformance('customers-list', async () => {
+      const session = await auth()
+      if (!session) {
+        throw createError.authentication()
+      }
+
+      await connectToDatabase()
+
+      const { searchParams } = new URL(request.url)
+      const search = searchParams.get('search') || ''
+
+      // Build query with search
+      const query: any = { isActive: true }
+      if (search) {
+        Object.assign(query, createSearchQuery(search, ['firstName', 'lastName', 'email']))
+      }
+
+      // Get total count for pagination
+      const total = await Customer.countDocuments(query)
+
+      // Get paginated results
+      const customers = await Customer.find(query)
+        .populate('vehicles', 'make model year licensePlate')
+        .sort(pagination.sort ? { [pagination.sort]: pagination.direction === 'asc' ? 1 : -1 } : { createdAt: -1 })
+        .skip((pagination.page - 1) * pagination.limit)
+        .limit(pagination.limit)
+        .lean() // Use lean() for better performance
+
+      // Add vehicle count to each customer
+      const customersWithVehicleCount = customers.map(customer => ({
+        ...customer,
+        vehicles: customer.vehicles.length
+      }))
+
+      return NextResponse.json(createPaginatedResponse(customersWithVehicleCount, total, pagination))
+    })
+  }),
+  {
+    ttl: 300000, // 5 minutes cache
+    keyGenerator: (request) => {
+      const { searchParams } = new URL(request.url)
+      return generateCacheKey('customers', {
+        search: searchParams.get('search') || '',
+        page: searchParams.get('page') || '1',
+        limit: searchParams.get('limit') || '10',
+        sort: searchParams.get('sort') || 'createdAt',
+        direction: searchParams.get('direction') || 'desc'
+      })
     }
-
-    await connectToDatabase()
-
-    const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search') || ''
-    const sort = searchParams.get('sort') || 'createdAt'
-    const direction = searchParams.get('direction') || 'desc'
-
-    const query: any = { isActive: true }
-
-    if (search) {
-      const searchRegex = new RegExp(search, 'i')
-      query.$or = [
-        { firstName: searchRegex },
-        { lastName: searchRegex },
-        { email: searchRegex },
-      ]
-    }
-
-    const sortOptions: { [key: string]: any } = {};
-    if (sort === 'name') {
-      sortOptions.firstName = direction;
-      sortOptions.lastName = direction;
-    } else {
-      sortOptions[sort] = direction;
-    }
-    
-    const customers = await Customer.find(query)
-      .populate('vehicles', 'make model year licensePlate')
-      .sort(sortOptions)
-
-    // Add vehicle count to each customer
-    const customersWithVehicleCount = customers.map(customer => ({
-      ...customer.toObject(),
-      vehicles: customer.vehicles.length
-    }))
-
-    return Response.json(customersWithVehicleCount)
-  } catch (error) {
-    console.error('Error fetching customers:', error)
-    // Return empty array when database is unavailable
-    return Response.json([])
   }
-}
+)
 
-export async function POST(request: Request) {
-  try {
+export const POST = asyncHandler(async (request: NextRequest) => {
+  return measureApiPerformance('customers-create', async () => {
     const session = await auth()
     if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+      throw createError.authentication()
     }
 
     await connectToDatabase()
@@ -68,7 +74,7 @@ export async function POST(request: Request) {
     // Check if customer with email already exists
     const existingCustomer = await Customer.findOne({ email: body.email })
     if (existingCustomer) {
-      return Response.json({ error: 'Customer with this email already exists' }, { status: 400 })
+      throw createError.conflict('Customer with this email already exists')
     }
 
     const customer = new Customer({
@@ -84,15 +90,12 @@ export async function POST(request: Request) {
 
     await customer.save()
 
-    return Response.json({ 
+    return NextResponse.json({ 
       success: true, 
       customer: {
         ...customer.toObject(),
         vehicles: 0
       }
     }, { status: 201 })
-  } catch (error) {
-    console.error('Error creating customer:', error)
-    return Response.json({ error: 'Failed to create customer' }, { status: 500 })
-  }
-}
+  })
+})
