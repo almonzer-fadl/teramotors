@@ -1,4 +1,4 @@
-import { InvoiceData, Customer, InvoiceItem } from './zatca-types';
+import { InvoiceData, Customer, InvoiceItem, ZATCAInvoice } from './zatca-types';
 import { ZATCAUtils } from './zatca-utils';
 
 export interface ValidationResult {
@@ -11,7 +11,7 @@ export class ZATCAValidator {
   /**
    * Validate complete invoice data
    */
-  static validateInvoice(invoiceData: InvoiceData): ValidationResult {
+  public validateInvoice(invoiceData: InvoiceData): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -42,7 +42,7 @@ export class ZATCAValidator {
   /**
    * Validate basic invoice information
    */
-  private static validateBasicInvoiceData(invoiceData: InvoiceData): string[] {
+  private validateBasicInvoiceData(invoiceData: InvoiceData): string[] {
     const errors: string[] = [];
 
     // Invoice number
@@ -99,7 +99,7 @@ export class ZATCAValidator {
   /**
    * Validate invoice items
    */
-  private static validateInvoiceItems(items: InvoiceItem[]): string[] {
+  private validateInvoiceItems(items: InvoiceItem[]): string[] {
     const errors: string[] = [];
 
     // Must have at least one item
@@ -127,7 +127,7 @@ export class ZATCAValidator {
   /**
    * Validate customer information
    */
-  static validateCustomer(customer: Customer): ValidationResult {
+  validateCustomer(customer: Customer): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -177,7 +177,7 @@ export class ZATCAValidator {
   /**
    * Validate business logic rules
    */
-  private static validateBusinessLogic(invoiceData: InvoiceData): string[] {
+  private validateBusinessLogic(invoiceData: InvoiceData): string[] {
     const errors: string[] = [];
 
     // Calculate totals for validation
@@ -221,7 +221,7 @@ export class ZATCAValidator {
   /**
    * Generate business warnings
    */
-  private static generateBusinessWarnings(invoiceData: InvoiceData): string[] {
+  private generateBusinessWarnings(invoiceData: InvoiceData): string[] {
     const warnings: string[] = [];
 
     // Calculate totals for warnings
@@ -262,7 +262,7 @@ export class ZATCAValidator {
   /**
    * Validate QR code data before generation
    */
-  static validateQRData(qrData: {
+  validateQRData(qrData: {
     sellerName: string;
     vatNumber: string;
     timestamp: string;
@@ -316,7 +316,7 @@ export class ZATCAValidator {
   /**
    * Quick validation for common errors
    */
-  static quickValidate(invoiceData: InvoiceData): { isValid: boolean; criticalErrors: string[] } {
+  quickValidate(invoiceData: InvoiceData): { isValid: boolean; criticalErrors: string[] } {
     const criticalErrors: string[] = [];
 
     // Must-have fields only

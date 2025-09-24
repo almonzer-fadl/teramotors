@@ -171,13 +171,13 @@ export default function CustomersPage() {
         <div className="px-4 py-5 sm:p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="w-full md:w-1/2">
-              <Search<Customer>
+              <Search
                 placeholder={t("customers.search_placeholder")}
                 fetchSuggestions={fetchCustomerSuggestions}
-                onSearch={(customer) =>
+                onSearch={(customer: Customer) =>
                   router.push(`/customers/${customer._id}`)
                 }
-                renderSuggestion={(customer) => (
+                renderSuggestion={(customer: Customer) => (
                   <div>
                     <p className="font-medium">
                       {customer.firstName} {customer.lastName}

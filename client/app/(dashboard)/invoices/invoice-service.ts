@@ -308,7 +308,12 @@ import {
           return { success: false, error: 'Invoice not found' };
         }
   
-        const newQRCode = this.qrGenerator.generateQRCode(invoice.invoiceData, invoice.totals);
+        // Generate new QR code using the public method
+        const result = await this.qrGenerator.generateInvoice(invoice.invoiceData);
+        if (!result.success) {
+          return { success: false, error: 'Failed to generate QR code' };
+        }
+        const newQRCode = result.qrCode!;
         
         // Update invoice with new QR code
         invoice.zatca.qrCode = newQRCode;
