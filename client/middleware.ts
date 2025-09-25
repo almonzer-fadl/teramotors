@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { auth } from '@/lib/auth'
+import { getToken } from 'next-auth/jwt'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -29,10 +29,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // For all other routes, check authentication
-  const session = await auth()
+  const token = await getToken({ req: request })
   
-  // If no session and trying to access protected route, redirect to login
-  if (!session) {
+  // If no token and trying to access protected route, redirect to login
+  if (!token) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('callbackUrl', request.url)
     return NextResponse.redirect(loginUrl)
