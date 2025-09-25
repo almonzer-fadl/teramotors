@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // For all other routes, check authentication
+  // For all other routes, check authentication using JWT token
   const token = await getToken({ req: request })
   
   // If no token and trying to access protected route, redirect to login
