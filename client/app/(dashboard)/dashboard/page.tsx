@@ -43,6 +43,14 @@ export default function DashboardPage() {
     lowStockParts: 0,
   });
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      window.location.href = '/login';
+      return;
+    }
+  }, [status]);
+
   const eventNames = [
     "update-jobs",
     "update-inspections",
@@ -176,12 +184,18 @@ export default function DashboardPage() {
     },
   ];
 
-  if (loading) {
+  // Show loading while session is loading or data is loading
+  if (status === 'loading' || loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
+  }
+
+  // Don't render anything if not authenticated (will redirect)
+  if (status === 'unauthenticated') {
+    return null;
   }
 
   return (
