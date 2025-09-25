@@ -1,0 +1,7 @@
+# Koyeb ignore file
+server/
+*.md
+.git/
+node_modules/
+.env*
+!.env.production
