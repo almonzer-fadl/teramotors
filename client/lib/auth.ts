@@ -1,11 +1,10 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import User from "@/lib/models/User"
-import { verifyPassword } from "@/lib/utils/password"
-import { connectToDatabase } from "@/lib/db"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
+  trustHost: true,
+  useSecureCookies: process.env.NODE_ENV === 'production',
   providers: [
     Credentials({
       credentials: {
@@ -13,20 +12,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {},
       },
       authorize: async (credentials) => {
-        await connectToDatabase() // Add this!
-        
-        const user = await User.findOne({ email: credentials.email as string })
-        
-        if (!user || !verifyPassword(credentials.password as string, user.password)) {
-          throw new Error("Invalid credentials.")
+        // Simple auth for development - remove in production
+        if (credentials?.email === "admin@teramotors.com" && credentials?.password === "admin123") {
+          return {
+            id: "1",
+            email: "admin@teramotors.com",
+            name: "Admin User",
+            role: "admin"
+          }
         }
         
-        return {
-          id: user._id.toString(),
-          email: user.email,
-          name: user.fullName,
-          role: user.role
-        }
+        return null
       },
     }),
   ],

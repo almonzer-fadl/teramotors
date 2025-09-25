@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const InvoiceSchema = new Schema({
-  jobCardId: { type: Schema.Types.ObjectId, ref: 'JobCard', required: true },
+  jobCardId: { type: Schema.Types.ObjectId, ref: 'JobCard', required: false },
   customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
   mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: false },

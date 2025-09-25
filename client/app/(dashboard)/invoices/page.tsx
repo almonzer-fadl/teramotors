@@ -402,23 +402,28 @@ export default function InvoicesPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <Link
-                        href={`/invoices/${invoice._id}/pdf`}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                      <Link
                         href={`/invoices/${invoice._id}/edit`}
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         <Edit className="h-4 w-4" />
                       </Link>
-                      <Link href={`/api/invoices/${invoice._id}/pdf?lang=en`} className="text-green-600 hover:text-green-900" prefetch={false}>
-                        <FileText className="h-4 w-4" />
-                      </Link>
-                      <Link href={`/api/invoices/${invoice._id}/pdf?lang=ar`} className="text-emerald-600 hover:text-emerald-900 ms-2" prefetch={false}>
-                        AR
-                      </Link>
+                      <a 
+                        href={`/api/invoices/${invoice._id}/print`} 
+                        className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700" 
+                        target="_blank"
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        عرض
+                      </a>
+                      <a 
+                        href={`/api/invoices/${invoice._id}/pdf`} 
+                        className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-emerald-600 rounded hover:bg-emerald-700" 
+                        target="_blank"
+                        download
+                      >
+                        <FileText className="h-3 w-3 mr-1" />
+                        تحميل PDF
+                      </a>
                     </div>
                   </td>
                 </tr>

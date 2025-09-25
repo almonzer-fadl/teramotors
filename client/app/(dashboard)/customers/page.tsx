@@ -71,7 +71,9 @@ export default function CustomersPage() {
       const response = await fetch(`/api/customers?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        const items = Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : []);
+        const items = Array.isArray(data)
+          ? data
+          : (Array.isArray(data.data) ? data.data : (Array.isArray((data || {}).items) ? data.items : []));
         setCustomers(items);
       } else {
         setCustomers([]);
@@ -95,7 +97,9 @@ export default function CustomersPage() {
       const response = await fetch(`/api/customers?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        const items = Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : []);
+        const items = Array.isArray(data)
+          ? data
+          : (Array.isArray(data.data) ? data.data : (Array.isArray((data || {}).items) ? data.items : []));
         return items as Customer[];
       }
     } catch (error) {

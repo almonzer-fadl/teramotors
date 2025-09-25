@@ -1,6 +1,4 @@
 /* eslint-disable jsx-a11y/alt-text */
-'use client';
-
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
@@ -84,7 +82,6 @@ interface InvoiceDocumentProps {
 }
 
 const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps) => {
-
   const services = jobCard?.services || [];
   const parts = jobCard?.partsUsed || [];
   const servicesTotal = services.reduce((sum: number, s: any) => sum + (s.laborHours * s.laborRate), 0);
@@ -93,7 +90,7 @@ const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps)
   const grandTotal = typeof invoice.totalAmount === 'number' ? invoice.totalAmount : subtotal;
 
   // Generate QR code URL if we have QR data
-  const qrCodeUrl = qrCodeData ? `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(qrCodeData)}` : null;
+  const qrCodeUrl = qrCodeData ? `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(qrCodeData)}` : null;
 
   return (
     <Document>
@@ -107,19 +104,19 @@ const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps)
         )}
 
         <Text style={styles.header}>
-          فاتورة #{String(invoice._id || '').slice(-6)}
+          {t('invoice')} #{String(invoice._id || '').slice(-6)}
         </Text>
-        <Text style={styles.metaRow}>التاريخ: {new Date(invoice.createdAt || Date.now()).toLocaleDateString()}</Text>
-        <Text style={styles.metaRow}>تاريخ الاستحقاق: {new Date(invoice.dueDate || Date.now()).toLocaleDateString()}</Text>
+        <Text style={styles.metaRow}>{t('date')}: {new Date(invoice.createdAt || Date.now()).toLocaleDateString()}</Text>
+        <Text style={styles.metaRow}>{t('dueDate')}: {new Date(invoice.dueDate || Date.now()).toLocaleDateString()}</Text>
 
-        <Text style={styles.sectionTitle}>معلومات العميل</Text>
+        <Text style={styles.sectionTitle}>{t('customerInformation')}</Text>
         <Text style={styles.text}>
           {(invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}
         </Text>
         {invoice.customerId?.email ? <Text style={styles.text}>{invoice.customerId.email}</Text> : null}
         {invoice.customerId?.phone ? <Text style={styles.text}>{invoice.customerId.phone}</Text> : null}
 
-        <Text style={styles.sectionTitle}>معلومات المركبة</Text>
+        <Text style={styles.sectionTitle}>{t('vehicleInformation')}</Text>
         {invoice.vehicleId ? (
           <>
             <Text style={styles.text}>{invoice.vehicleId.year} {invoice.vehicleId.make} {invoice.vehicleId.model}</Text>
@@ -129,13 +126,13 @@ const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps)
 
         {services.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>الخدمات</Text>
+            <Text style={styles.sectionTitle}>{t('services')}</Text>
             <View style={styles.table}>
               <View style={styles.tableRow}>
-                <Text style={styles.tableColHeader}>الخدمة</Text>
-                <Text style={styles.tableColHeader}>الكمية</Text>
-                <Text style={styles.tableColHeader}>تكلفة العمل</Text>
-                <Text style={styles.tableColHeader}>الإجمالي</Text>
+                <Text style={styles.tableColHeader}>{t('service')}</Text>
+                <Text style={styles.tableColHeader}>{t('qty')}</Text>
+                <Text style={styles.tableColHeader}>{t('laborCost')}</Text>
+                <Text style={styles.tableColHeader}>{t('total')}</Text>
               </View>
               {services.map((s: any, idx: number) => (
                 <View style={styles.tableRow} key={idx}>
@@ -151,13 +148,13 @@ const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps)
 
         {parts.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>القطع</Text>
+            <Text style={styles.sectionTitle}>{t('parts')}</Text>
             <View style={styles.table}>
               <View style={styles.tableRow}>
-                <Text style={styles.tableColHeader}>القطعة</Text>
-                <Text style={styles.tableColHeader}>الكمية</Text>
-                <Text style={styles.tableColHeader}>التكلفة</Text>
-                <Text style={styles.tableColHeader}>الإجمالي</Text>
+                <Text style={styles.tableColHeader}>{t('part')}</Text>
+                <Text style={styles.tableColHeader}>{t('qty')}</Text>
+                <Text style={styles.tableColHeader}>{t('cost')}</Text>
+                <Text style={styles.tableColHeader}>{t('total')}</Text>
               </View>
               {parts.map((p: any, idx: number) => (
                 <View style={styles.tableRow} key={idx}>
@@ -172,13 +169,13 @@ const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps)
         )}
 
         <View style={styles.totalsRow}>
-          <Text style={styles.text}>المجموع الفرعي: {formatCurrency(subtotal)}</Text>
-          <Text style={styles.text}>الإجمالي الكلي: {formatCurrency(grandTotal)}</Text>
+          <Text style={styles.text}>{t('subtotal')}: {formatCurrency(subtotal)}</Text>
+          <Text style={styles.text}>{t('grandTotal')}: {formatCurrency(grandTotal)}</Text>
         </View>
 
         {invoice.notes ? (
           <>
-            <Text style={styles.sectionTitle}>ملاحظات</Text>
+            <Text style={styles.sectionTitle}>{t('notes')}</Text>
             <Text style={styles.text}>{invoice.notes}</Text>
           </>
         ) : null}
@@ -188,5 +185,3 @@ const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps)
 };
 
 export default InvoiceDocument;
-
-

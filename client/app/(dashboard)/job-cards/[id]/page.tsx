@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -67,7 +68,7 @@ export default function JobCardDetailsPage() {
       fetchJobCard();
       fetchParts();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [id]);
 
   const fetchJobCard = async () => {
@@ -247,7 +248,7 @@ export default function JobCardDetailsPage() {
           {t("job_cards.parts_used")}
         </h2>
         {jobCard.partsUsed.map((part, index) => (
-          <div key={index} className="grid grid-cols-4 gap-4 items-center mb-4">
+          <div key={index} className="grid grid-cols-4 gap-4 items-start mb-4">
             <select
               value={part.partId}
               onChange={(e) =>
@@ -262,24 +263,28 @@ export default function JobCardDetailsPage() {
                 </option>
               ))}
             </select>
-            <input
+            <div>
+              <label className="label"><span className="label-text">{t("job_cards.qty")}</span></label>
+              <input
               type="number"
-              placeholder={t("job_cards.qty")}
               value={part.quantity}
               onChange={(e) =>
                 handlePartChange(index, "quantity", parseInt(e.target.value))
               }
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="input input-bordered w-full"
             />
-            <input
+            </div>
+            <div>
+              <label className="label"><span className="label-text">{t("job_cards.cost")}</span></label>
+              <input
               type="number"
-              placeholder={t("job_cards.cost")}
               value={part.cost}
               onChange={(e) =>
                 handlePartChange(index, "cost", parseFloat(e.target.value))
               }
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="input input-bordered w-full"
             />
+            </div>
             <button
               type="button"
               onClick={() => removePart(index)}

@@ -34,25 +34,13 @@ export async function GET(
       qrCodeData: invoice.zatca?.qrCode
     });
 
-    // Add print functionality to the HTML
-    const htmlWithPrint = html.replace('</body>', `
-      <script>
-        // Auto-print when page loads
-        window.onload = function() {
-          window.print();
-        };
-      </script>
-    </body>`);
-
-    return new Response(htmlWithPrint, {
+    return new Response(html, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
       },
     });
   } catch (error) {
-    console.error('Error generating Invoice PDF:', error);
-    return new Response(JSON.stringify({ error: 'Failed to generate PDF' }), { status: 500 });
+    console.error('Error generating Invoice HTML:', error);
+    return new Response(JSON.stringify({ error: 'Failed to generate HTML' }), { status: 500 });
   }
 }
-
-
