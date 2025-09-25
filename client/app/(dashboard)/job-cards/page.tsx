@@ -319,17 +319,18 @@ export default function JobCardsPage() {
                 <div className="flex items-center text-sm">
                   <Calendar className="h-4 w-4 text-gray-400 mr-2" />
                   <span className="text-gray-900">
-                    {new Date(
-                      jobCard.appointmentId.appointmentDate
-                    ).toLocaleDateString()}
+                    {jobCard.appointmentId && jobCard.appointmentId.appointmentDate
+                      ? new Date(jobCard.appointmentId.appointmentDate).toLocaleDateString()
+                      : t('job_cards.no_appointment')}
                   </span>
                 </div>
 
                 <div className="flex items-center text-sm">
                   <Clock className="h-4 w-4 text-gray-400 mr-2" />
                   <span className="text-gray-900">
-                    {jobCard.appointmentId.startTime} -{" "}
-                    {jobCard.appointmentId.endTime}
+                    {jobCard.appointmentId && jobCard.appointmentId.startTime && jobCard.appointmentId.endTime
+                      ? `${jobCard.appointmentId.startTime} - ${jobCard.appointmentId.endTime}`
+                      : t('job_cards.no_time')}
                   </span>
                 </div>
 

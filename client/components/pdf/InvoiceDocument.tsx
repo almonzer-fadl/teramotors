@@ -1,64 +1,57 @@
 /* eslint-disable jsx-a11y/alt-text */
 'use client';
 
-import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
-
-// Register a font that supports Arabic shaping (Amiri as an example if available in environment)
-// Consumers can pass custom font family via props if needed
-try {
-  Font.register({ family: 'Amiri', src: 'https://fonts.gstatic.com/s/amiri/v22/J7aRnpd8CGxBHpUrtL8.woff2' });
-} catch {}
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
-  page: { flexDirection: 'column', backgroundColor: '#ffffff', padding: 30 },
-  header: { fontSize: 20, marginBottom: 12, textAlign: 'center', color: '#111827' },
-  metaRow: { fontSize: 10, marginBottom: 2, color: '#374151' },
-  sectionTitle: { fontSize: 12, marginTop: 12, marginBottom: 6, color: '#111827' },
-  text: { fontSize: 10, marginBottom: 2, color: '#374151' },
-  table: { width: 'auto', borderStyle: 'solid', borderWidth: 1, borderColor: '#e5e7eb', marginTop: 6 },
-  tableRow: { margin: 'auto', flexDirection: 'row' },
-  tableColHeader: { width: '25%', borderStyle: 'solid', borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#f9fafb', padding: 6, fontSize: 10, fontWeight: 700 },
-  tableCol: { width: '25%', borderStyle: 'solid', borderWidth: 1, borderColor: '#e5e7eb', padding: 6, fontSize: 10 },
-  totalsRow: { marginTop: 8 },
-  rtl: { direction: 'rtl', fontFamily: 'Amiri' },
+  page: { 
+    flexDirection: 'column', 
+    backgroundColor: '#ffffff', 
+    padding: 30,
+    direction: 'rtl',
+    fontFamily: 'Helvetica'
+  },
+  header: { fontSize: 24, marginBottom: 20, textAlign: 'center', color: '#111827', fontWeight: 'bold' },
+  metaRow: { fontSize: 12, marginBottom: 4, color: '#374151' },
+  sectionTitle: { fontSize: 14, marginTop: 16, marginBottom: 8, color: '#111827', fontWeight: 'bold' },
+  text: { fontSize: 12, marginBottom: 4, color: '#374151' },
+  table: { width: '100%', borderStyle: 'solid', borderWidth: 1, borderColor: '#e5e7eb', marginTop: 8 },
+  tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
+  tableColHeader: { 
+    width: '25%', 
+    borderStyle: 'solid', 
+    borderWidth: 1, 
+    borderColor: '#e5e7eb', 
+    backgroundColor: '#f9fafb', 
+    padding: 8, 
+    fontSize: 12, 
+    fontWeight: 'bold',
+    textAlign: 'center'
+  },
+  tableCol: { 
+    width: '25%', 
+    borderStyle: 'solid', 
+    borderWidth: 1, 
+    borderColor: '#e5e7eb', 
+    padding: 8, 
+    fontSize: 12,
+    textAlign: 'center'
+  },
+  totalsRow: { marginTop: 16, padding: 8, backgroundColor: '#f9fafb' },
   qrContainer: { 
     position: 'absolute', 
     top: 30, 
     right: 30, 
-    width: 100, 
-    height: 100,
+    width: 120, 
+    height: 120,
     alignItems: 'center',
     justifyContent: 'center'
   },
-  qrCode: { width: 80, height: 80 },
-  qrLabel: { fontSize: 8, marginTop: 4, textAlign: 'center' },
+  qrCode: { width: 100, height: 100 },
+  qrLabel: { fontSize: 10, marginTop: 4, textAlign: 'center', fontWeight: 'bold' },
 });
 
-type Language = 'en' | 'ar';
-
-function tEn(key: string) {
-  const dict: Record<string, string> = {
-    invoice: 'Invoice',
-    date: 'Date',
-    dueDate: 'Due Date',
-    customerInformation: 'Customer Information',
-    vehicleInformation: 'Vehicle Information',
-    services: 'Services',
-    service: 'Service',
-    qty: 'Quantity',
-    laborCost: 'Labor Cost',
-    total: 'Total',
-    parts: 'Parts',
-    part: 'Part',
-    cost: 'Cost',
-    notes: 'Notes',
-    subtotal: 'Subtotal',
-    grandTotal: 'Grand Total',
-  };
-  return dict[key] || key;
-}
-
-function tAr(key: string) {
+function t(key: string) {
   const dict: Record<string, string> = {
     invoice: 'فاتورة',
     date: 'التاريخ',
@@ -87,13 +80,10 @@ function formatCurrency(value: number) {
 interface InvoiceDocumentProps {
   invoice: any;
   jobCard?: any;
-  language?: Language;
   qrCodeData?: string;
 }
 
-const InvoiceDocument = ({ invoice, jobCard, language = 'en', qrCodeData }: InvoiceDocumentProps) => {
-  const isArabic = language === 'ar';
-  const tr = isArabic ? tAr : tEn;
+const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps) => {
 
   const services = jobCard?.services || [];
   const parts = jobCard?.partsUsed || [];
@@ -107,7 +97,7 @@ const InvoiceDocument = ({ invoice, jobCard, language = 'en', qrCodeData }: Invo
 
   return (
     <Document>
-      <Page size="A4" style={[styles.page, isArabic ? styles.rtl : {}] as any}>
+      <Page size="A4" style={styles.page}>
         {/* QR Code in top right corner */}
         {qrCodeUrl && (
           <View style={styles.qrContainer}>
@@ -117,19 +107,19 @@ const InvoiceDocument = ({ invoice, jobCard, language = 'en', qrCodeData }: Invo
         )}
 
         <Text style={styles.header}>
-          {tr('invoice')} #{String(invoice._id || '').slice(-6)}
+          فاتورة #{String(invoice._id || '').slice(-6)}
         </Text>
-        <Text style={styles.metaRow}>{tr('date')}: {new Date(invoice.createdAt || Date.now()).toLocaleDateString()}</Text>
-        <Text style={styles.metaRow}>{tr('dueDate')}: {new Date(invoice.dueDate || Date.now()).toLocaleDateString()}</Text>
+        <Text style={styles.metaRow}>التاريخ: {new Date(invoice.createdAt || Date.now()).toLocaleDateString()}</Text>
+        <Text style={styles.metaRow}>تاريخ الاستحقاق: {new Date(invoice.dueDate || Date.now()).toLocaleDateString()}</Text>
 
-        <Text style={styles.sectionTitle}>{tr('customerInformation')}</Text>
+        <Text style={styles.sectionTitle}>معلومات العميل</Text>
         <Text style={styles.text}>
           {(invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}
         </Text>
         {invoice.customerId?.email ? <Text style={styles.text}>{invoice.customerId.email}</Text> : null}
         {invoice.customerId?.phone ? <Text style={styles.text}>{invoice.customerId.phone}</Text> : null}
 
-        <Text style={styles.sectionTitle}>{tr('vehicleInformation')}</Text>
+        <Text style={styles.sectionTitle}>معلومات المركبة</Text>
         {invoice.vehicleId ? (
           <>
             <Text style={styles.text}>{invoice.vehicleId.year} {invoice.vehicleId.make} {invoice.vehicleId.model}</Text>
@@ -139,13 +129,13 @@ const InvoiceDocument = ({ invoice, jobCard, language = 'en', qrCodeData }: Invo
 
         {services.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>{tr('services')}</Text>
+            <Text style={styles.sectionTitle}>الخدمات</Text>
             <View style={styles.table}>
               <View style={styles.tableRow}>
-                <Text style={styles.tableColHeader}>{tr('service')}</Text>
-                <Text style={styles.tableColHeader}>{tr('qty')}</Text>
-                <Text style={styles.tableColHeader}>{tr('laborCost')}</Text>
-                <Text style={styles.tableColHeader}>{tr('total')}</Text>
+                <Text style={styles.tableColHeader}>الخدمة</Text>
+                <Text style={styles.tableColHeader}>الكمية</Text>
+                <Text style={styles.tableColHeader}>تكلفة العمل</Text>
+                <Text style={styles.tableColHeader}>الإجمالي</Text>
               </View>
               {services.map((s: any, idx: number) => (
                 <View style={styles.tableRow} key={idx}>
@@ -161,13 +151,13 @@ const InvoiceDocument = ({ invoice, jobCard, language = 'en', qrCodeData }: Invo
 
         {parts.length > 0 && (
           <>
-            <Text style={styles.sectionTitle}>{tr('parts')}</Text>
+            <Text style={styles.sectionTitle}>القطع</Text>
             <View style={styles.table}>
               <View style={styles.tableRow}>
-                <Text style={styles.tableColHeader}>{tr('part')}</Text>
-                <Text style={styles.tableColHeader}>{tr('qty')}</Text>
-                <Text style={styles.tableColHeader}>{tr('cost')}</Text>
-                <Text style={styles.tableColHeader}>{tr('total')}</Text>
+                <Text style={styles.tableColHeader}>القطعة</Text>
+                <Text style={styles.tableColHeader}>الكمية</Text>
+                <Text style={styles.tableColHeader}>التكلفة</Text>
+                <Text style={styles.tableColHeader}>الإجمالي</Text>
               </View>
               {parts.map((p: any, idx: number) => (
                 <View style={styles.tableRow} key={idx}>
@@ -182,13 +172,13 @@ const InvoiceDocument = ({ invoice, jobCard, language = 'en', qrCodeData }: Invo
         )}
 
         <View style={styles.totalsRow}>
-          <Text style={styles.text}>{tr('subtotal')}: {formatCurrency(subtotal)}</Text>
-          <Text style={styles.text}>{tr('grandTotal')}: {formatCurrency(grandTotal)}</Text>
+          <Text style={styles.text}>المجموع الفرعي: {formatCurrency(subtotal)}</Text>
+          <Text style={styles.text}>الإجمالي الكلي: {formatCurrency(grandTotal)}</Text>
         </View>
 
         {invoice.notes ? (
           <>
-            <Text style={styles.sectionTitle}>{tr('notes')}</Text>
+            <Text style={styles.sectionTitle}>ملاحظات</Text>
             <Text style={styles.text}>{invoice.notes}</Text>
           </>
         ) : null}

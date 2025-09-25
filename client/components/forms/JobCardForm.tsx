@@ -121,7 +121,11 @@ export default function JobCardForm({
         fetch("/api/parts"),
       ]);
       if (appointmentsRes.ok) setAppointments(await appointmentsRes.json());
-      if (customersRes.ok) setCustomers(await customersRes.json());
+      if (customersRes.ok) {
+        const json = await customersRes.json();
+        const items = Array.isArray(json) ? json : (Array.isArray(json.data) ? json.data : []);
+        setCustomers(items);
+      }
       if (vehiclesRes.ok) setVehicles(await vehiclesRes.json());
       if (servicesRes.ok) setServices(await servicesRes.json());
       if (partsRes.ok) setParts(await partsRes.json());
@@ -238,6 +242,17 @@ export default function JobCardForm({
   const handlePartChange = (index: number, field: string, value: any) => {
     const updatedParts = [...formData.partsUsed];
     updatedParts[index] = { ...updatedParts[index], [field]: value };
+
+    // Auto-fill cost when part selected
+    if (field === 'partId') {
+      const selected = parts.find(p => p._id === value) as any;
+      if (selected && typeof selected.cost === 'number') {
+        updatedParts[index].cost = selected.cost;
+      } else if (selected && typeof selected.sellingPrice === 'number') {
+        updatedParts[index].cost = selected.sellingPrice;
+      }
+    }
+
     handleInputChange("partsUsed", updatedParts);
   };
 

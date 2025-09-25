@@ -228,10 +228,12 @@ export default function ServiceForm({
               id="laborRate"
               name="laborRate"
               required
-              value={formData.laborRate}
-              onChange={(e) =>
-                handleInputChange("laborRate", parseFloat(e.target.value))
-              }
+              value={Number.isFinite(formData.laborRate) ? formData.laborRate : ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                const num = val === '' ? 0 : Number(val);
+                handleInputChange("laborRate", Number.isFinite(num) ? num : 0);
+              }}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
             />
           </div>

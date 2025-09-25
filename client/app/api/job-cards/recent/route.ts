@@ -1,36 +1,43 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db'
-import JobCard from '@/lib/models/JobCard'
-import Customer from '@/lib/models/Customer'
-import Vehicle from '@/lib/models/Vehicle'
-import Service from '@/lib/models/Service'
+import { JobCard, Service, Customer, Vehicle } from '@/lib/models'
+import mongoose from 'mongoose'
 
 export async function GET() {
   try {
     await connectToDatabase()
 
-    const recentJobCards = await JobCard.find({
-      status: { $in: ['Created', 'In Progress'] }
+    // Ensure all models are registered
+    console.log('Available models:', Object.keys(mongoose.models));
+
+    const recent = await JobCard.find({
+      status: { $in: ['pending', 'in-progress'] }
     })
       .sort({ createdAt: -1 })
       .limit(9)
-      .populate({
-        path: 'customer',
-        model: Customer,
-        select: 'fullName'
-      })
-      .populate({
-        path: 'vehicle',
-        model: Vehicle,
-        select: 'make model year'
-      })
-      .populate({
-        path: 'services.service',
-        model: Service,
-        select: 'name'
-      });
+      .populate('customerId', 'firstName lastName')
+      .populate('vehicleId', 'make model year')
+      .populate('services.serviceId', 'name')
+      .lean();
 
-    return NextResponse.json(recentJobCards, { status: 200 })
+    const shaped = recent.map((jc: any) => ({
+      _id: jc._id,
+      customer: {
+        fullName: `${jc.customerId?.firstName || ''} ${jc.customerId?.lastName || ''}`.trim(),
+      },
+      vehicle: {
+        make: jc.vehicleId?.make || '',
+        model: jc.vehicleId?.model || '',
+        year: jc.vehicleId?.year || null,
+      },
+      services: (jc.services || []).map((s: any) => ({
+        service: { name: s.serviceId?.name || '' },
+      })),
+      status: jc.status,
+      createdAt: jc.createdAt,
+    }));
+
+    return NextResponse.json(shaped, { status: 200 })
   } catch (error) {
     console.error('Error fetching recent job cards:', error)
     return NextResponse.json({ message: 'Error fetching recent job cards' }, { status: 500 })

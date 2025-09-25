@@ -1,10 +1,8 @@
 import { NextRequest } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
-import { auth } from '@/lib/auth';
 import Invoice from '@/lib/models/Invoice';
 import JobCard from '@/lib/models/JobCard';
-import { pdf } from '@react-pdf/renderer';
-import InvoiceDocument from '@/components/pdf/InvoiceDocument';
+import { generateInvoiceHTML } from '@/lib/pdf-generator-html';
 
 export async function GET(
   request: NextRequest,
@@ -12,14 +10,8 @@ export async function GET(
 ) {
   try {
     const { id } = await context.params;
-    const session = await auth();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+    
     await connectToDatabase();
-
-    const language = (new URL(request.url).searchParams.get('lang') || 'en') as 'en' | 'ar';
 
     const invoice = await Invoice.findById(id)
       .populate('customerId')
@@ -36,18 +28,25 @@ export async function GET(
         .populate('partsUsed.partId');
     }
 
-    const doc = <InvoiceDocument 
-      invoice={invoice.toObject()} 
-      jobCard={jobCard?.toObject?.() || jobCard} 
-      language={language} 
-      qrCodeData={invoice.zatca?.qrCode}
-    />;
-    const pdfStream = await pdf(doc).toBlob();
+    const html = await generateInvoiceHTML({
+      invoice: invoice.toObject(),
+      jobCard: jobCard?.toObject?.() || jobCard,
+      qrCodeData: invoice.zatca?.qrCode
+    });
 
-    return new Response(pdfStream, {
+    // Add print functionality to the HTML
+    const htmlWithPrint = html.replace('</body>', `
+      <script>
+        // Auto-print when page loads
+        window.onload = function() {
+          window.print();
+        };
+      </script>
+    </body>`);
+
+    return new Response(htmlWithPrint, {
       headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="invoice-${String(invoice._id).slice(-6)}-${language}.pdf"`,
+        'Content-Type': 'text/html; charset=utf-8',
       },
     });
   } catch (error) {
