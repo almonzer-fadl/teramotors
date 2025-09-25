@@ -9,8 +9,14 @@ import { asyncHandler, createError, measureApiPerformance } from '@/lib/middlewa
 export const GET = withCache(
   withPagination(async (request: NextRequest, pagination) => {
     return measureApiPerformance('customers-list', async () => {
-      const session = await auth()
-      if (!session) {
+      // Try to authenticate; if AUTH_SECRET is set and no session, reject
+      let session: any = null
+      try {
+        session = await auth()
+      } catch (e) {
+        // auth not configured; allow in dev/non-auth environments
+      }
+      if (process.env.AUTH_SECRET && !session) {
         throw createError.authentication()
       }
 

@@ -2,7 +2,7 @@ import { io, Socket } from 'socket.io-client';
 import { useEffect, useState } from 'react';
 
 // Make sure to use NEXT_PUBLIC_ for client-side environment variables
-const URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
+const URL = process.env.NEXT_PUBLIC_SOCKET_URL; // if not set, sockets are disabled in client
 
 class SocketService {
   emit(event: string, ...args: any[]) {
@@ -19,12 +19,27 @@ class SocketService {
 
   connect() {
     if (this.socket?.connected) return;
+    // If URL is not configured, skip socket initialization (avoid dev console noise)
+    if (!URL) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Socket] NEXT_PUBLIC_SOCKET_URL not set; skipping socket connection');
+      }
+      return;
+    }
 
     this.socket = io(URL, {
       autoConnect: true,
       reconnection: true,
       reconnectionAttempts: this.maxReconnectAttempts,
       reconnectionDelay: this.reconnectDelay,
+      // Avoid long-polling to prevent xhr poll error; use websockets directly
+      transports: ['websocket'],
+      upgrade: false,
+      withCredentials: true,
+      // Allow custom path via env if backend uses non-default path
+      path: process.env.NEXT_PUBLIC_SOCKET_PATH || '/socket.io',
+      timeout: 10000,
+      forceNew: true,
     });
 
     this.setupEventHandlers();
@@ -50,7 +65,9 @@ class SocketService {
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('[Socket] Connection error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[Socket] Connection error:', error?.message || error);
+      }
       this.reconnectAttempts++;
     });
 
@@ -59,11 +76,15 @@ class SocketService {
     });
 
     this.socket.on('reconnect_error', (error) => {
-      console.error('[Socket] Reconnection error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[Socket] Reconnection error:', error?.message || error);
+      }
     });
 
     this.socket.on('reconnect_failed', () => {
-      console.error('[Socket] Failed to reconnect after', this.maxReconnectAttempts, 'attempts');
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[Socket] Failed to reconnect after', this.maxReconnectAttempts, 'attempts');
+      }
     });
   }
 

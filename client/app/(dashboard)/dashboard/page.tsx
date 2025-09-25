@@ -16,6 +16,7 @@ import {
 import JobCardGrid from "@/components/dashboard/JobCardGrid";
 import { socketService } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
+import { useSession } from "next-auth/react";
 
 interface DashboardStats {
   totalCustomers: number;
@@ -30,6 +31,7 @@ interface DashboardStats {
 
 export default function DashboardPage() {
   const { t } = useTranslation("common");
+  const { data: session, status } = useSession();
   const [stats, setStats] = useState<DashboardStats>({
     totalCustomers: 0,
     totalVehicles: 0,
@@ -55,15 +57,27 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch dashboard stats
+    // Fetch stats regardless of authentication status
+    // The API will handle authentication internally
 
     console.log("you entered dashboard");
     const fetchStats = async () => {
       try {
-        const response = await fetch("/api/dashboard/stats");
+        const response = await fetch("/api/dashboard/stats", {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
         if (response.ok) {
           const data = await response.json();
           setStats(data);
+        } else if (response.status === 401) {
+          console.error("Unauthorized access to dashboard stats");
+          // Redirect to login or show error
+        } else {
+          console.error("Failed to fetch dashboard stats:", response.status);
         }
       } catch (error) {
         console.error("Failed to fetch dashboard stats:", error);

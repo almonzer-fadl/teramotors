@@ -71,7 +71,10 @@ export default function CustomersPage() {
       const response = await fetch(`/api/customers?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        setCustomers(data);
+        const items = Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : []);
+        setCustomers(items);
+      } else {
+        setCustomers([]);
       }
     } catch (error) {
       console.error("Failed to fetch customers:", error);
@@ -91,7 +94,9 @@ export default function CustomersPage() {
       });
       const response = await fetch(`/api/customers?${params.toString()}`);
       if (response.ok) {
-        return await response.json();
+        const data = await response.json();
+        const items = Array.isArray(data) ? data : (Array.isArray(data.items) ? data.items : []);
+        return items as Customer[];
       }
     } catch (error) {
       console.error("Failed to fetch customer suggestions:", error);

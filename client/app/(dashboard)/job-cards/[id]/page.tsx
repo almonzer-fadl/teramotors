@@ -331,7 +331,27 @@ export default function JobCardDetailsPage() {
         <h2 className="text-xl font-bold text-gray-900 mb-4">
           {t("job_cards.progress_photos")}
         </h2>
-        <FileUpload onUpload={handlePhotoUpload} />
+        <FileUpload onUpload={async (files: File[]) => {
+          for (const file of files) {
+            try {
+              // Upload file to /api/upload
+              const formData = new FormData();
+              formData.append('file', file);
+              
+              const uploadResponse = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+              });
+              
+              if (uploadResponse.ok) {
+                const uploadData = await uploadResponse.json();
+                await handlePhotoUpload(uploadData.url);
+              }
+            } catch (error) {
+              console.error('Error uploading file:', error);
+            }
+          }
+        }} />
         <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
           {jobCard.photos.map((photo, index) => (
             <div key={index} className="relative">
