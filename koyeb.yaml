@@ -1,0 +1,22 @@
+name: teramotors
+services:
+  - name: teramotors-app
+    source:
+      git:
+        repository: https://github.com/almonzer-fadl/teramotors.git
+        branch: main
+    build:
+      build_command: npm run build
+      run_command: npm run start
+    environment:
+      - name: NODE_ENV
+        value: production
+      - name: MONGODB_URI
+        secret: mongodb-uri
+      - name: AUTH_SECRET
+        secret: auth-secret
+      - name: NEXTAUTH_URL
+        value: https://teramotors-${KOYEB_APP}.koyeb.app
+    ports:
+      - port: 3000
+        http_path: /
