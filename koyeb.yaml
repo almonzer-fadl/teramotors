@@ -6,8 +6,8 @@ services:
         repository: https://github.com/almonzer-fadl/teramotors.git
         branch: main
     build:
-      build_command: npm run build
-      run_command: npm run start
+      build_command: cd client && npm install && npm run build
+      run_command: cd client && npm run start
     environment:
       - name: NODE_ENV
         value: production

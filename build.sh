@@ -3,8 +3,12 @@
 # TeraMotors Koyeb Build Script
 echo "🚗 Building TeraMotors Auto Repair Shop..."
 
-# Install dependencies
-echo "📦 Installing dependencies..."
+# Install root dependencies first
+echo "📦 Installing root dependencies..."
+npm install
+
+# Install client dependencies
+echo "📦 Installing client dependencies..."
 cd client
 npm install
 
