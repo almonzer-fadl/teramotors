@@ -1,0 +1,21 @@
+name: teramotors-server
+services:
+  - name: teramotors-socket-server
+    source:
+      git:
+        repository: https://github.com/almonzer-fadl/teramotors.git
+        branch: main
+        source_directory: server
+    build:
+      build_command: npm install
+      run_command: npm run dev
+    environment:
+      - name: NODE_ENV
+        value: production
+      - name: MONGODB_URI
+        secret: mongodb-uri
+      - name: PORT
+        value: "5000"
+    ports:
+      - port: 5000
+        http_path: /

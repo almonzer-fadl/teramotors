@@ -1,22 +1,6 @@
-name: teramotors
-services:
-  - name: teramotors-app
-    source:
-      git:
-        repository: https://github.com/almonzer-fadl/teramotors.git
-        branch: main
-    build:
-      build_command: ./build.sh
-      run_command: cd client && npm run start
-    environment:
-      - name: NODE_ENV
-        value: production
-      - name: MONGODB_URI
-        secret: mongodb-uri
-      - name: AUTH_SECRET
-        secret: auth-secret
-      - name: NEXTAUTH_URL
-        value: https://teramotors-${KOYEB_APP}.koyeb.app
-    ports:
-      - port: 3000
-        http_path: /
+# This file is now deprecated
+# Use server/koyeb.yaml for Koyeb server deployment
+# Use Vercel for frontend deployment
+
+name: teramotors-deprecated
+services: []
