@@ -1,6 +1,0 @@
-# This file is now deprecated
-# Use server/koyeb.yaml for Koyeb server deployment
-# Use Vercel for frontend deployment
-
-name: teramotors-deprecated
-services: []
