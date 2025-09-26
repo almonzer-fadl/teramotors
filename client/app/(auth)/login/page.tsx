@@ -3,7 +3,7 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,16 +27,12 @@ function LoginForm() {
         redirect: false,
       });
 
-      if (result?.error) {
-        setError("Invalid email or password");
-      } else if (result?.ok) {
-        // Use NextAuth's built-in redirect
-        // window.location.href = callbackUrl;
-
-        // window.location.href = "/";
-        router.replace("/dashboard");
-        console.log("redirected to dashboard");
-      }
+        if (result?.error) {
+          setError("Invalid email or password");
+        } else if (result?.ok) {
+          // Use NextAuth's built-in redirect
+          window.location.href = callbackUrl;
+        }
     } catch (error) {
       setError("An error occurred. Please try again.");
     } finally {
