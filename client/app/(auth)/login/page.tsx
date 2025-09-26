@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 
 function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
