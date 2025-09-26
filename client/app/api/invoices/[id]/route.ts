@@ -3,6 +3,10 @@ import { connectToDatabase } from '@/lib/db';
 import { getServerSession } from "@/lib/auth-server";
 import Invoice from '@/lib/models/Invoice';
 import JobCard from '@/lib/models/JobCard';
+import Customer from '@/lib/models/Customer';
+import Vehicle from '@/lib/models/Vehicle';
+import Service from '@/lib/models/Service';
+import Part from '@/lib/models/Part';
 
 export async function GET(
   request: NextRequest,
