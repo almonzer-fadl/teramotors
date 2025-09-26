@@ -1,50 +1,54 @@
-import { auth } from "@/lib/auth"
 import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-const publicRoutes = [
-  '/login',
-  '/register',
-  '/forgot-password',
-  '/reset-password',
-  '/verify-email',
-];
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
 
-const publicApiRoutes = [
+  // Public routes that don't require authentication
+  const publicRoutes = [
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+    '/verify-email',
+    '/api/auth',
     '/api/health',
     '/api/test-connection',
-    '/api/test-db',
-    '/api/auth' // NextAuth routes are handled by the `auth` wrapper implicitly
-]
+    '/api/test-db'
+  ]
 
-export const middleware = auth((request) => {
-  const { nextUrl } = request;
-  const isLoggedIn = !!request.auth;
+  // Check if the current path is public
+  const isPublicRoute = publicRoutes.some(route => 
+    pathname.startsWith(route)
+  )
 
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-  const isPublicApiRoute = publicApiRoutes.some(route => nextUrl.pathname.startsWith(route));
-
-  if (isPublicApiRoute) {
-    return null;
-  }
-
+  // If it's a public route, allow access
   if (isPublicRoute) {
-    if (isLoggedIn) {
-      return NextResponse.redirect(new URL('/dashboard', nextUrl));
-    }
-    return null;
+    return NextResponse.next()
   }
 
-  if (!isLoggedIn) {
-    let callbackUrl = nextUrl.pathname;
-    if (nextUrl.search) {
-      callbackUrl += nextUrl.search;
+  // For all other routes, check for NextAuth session cookie
+  const sessionToken = request.cookies.get('next-auth.session-token') || 
+                      request.cookies.get('__Secure-next-auth.session-token')
+  
+  // If no session token and trying to access protected route, redirect to login
+  if (!sessionToken) {
+    const loginUrl = new URL('/login', request.url)
+    // Only set callbackUrl if it's not already the login page
+    if (pathname !== '/login') {
+      loginUrl.searchParams.set('callbackUrl', request.url)
     }
-    const encodedCallbackUrl = encodeURIComponent(callbackUrl);
-    return NextResponse.redirect(new URL(`/login?callbackUrl=${encodedCallbackUrl}`, nextUrl));
+    return NextResponse.redirect(loginUrl)
   }
 
-  return null;
-})
+  // If user is authenticated and trying to access root, redirect to dashboard
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // If user is authenticated, allow access
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
