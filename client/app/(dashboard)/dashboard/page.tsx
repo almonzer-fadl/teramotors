@@ -16,7 +16,7 @@ import {
 import JobCardGrid from "@/components/dashboard/JobCardGrid";
 import { socketService } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/hooks/useSession";
 
 interface DashboardStats {
   totalCustomers: number;
@@ -31,7 +31,7 @@ interface DashboardStats {
 
 export default function DashboardPage() {
   const { t } = useTranslation("common");
-  const { data: session, status } = useSession();
+  const { user, isLoading, isAuthenticated } = useSession();
   const [stats, setStats] = useState<DashboardStats>({
     totalCustomers: 0,
     totalVehicles: 0,
@@ -45,11 +45,11 @@ export default function DashboardPage() {
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!isLoading && !isAuthenticated) {
       window.location.href = '/login';
       return;
     }
-  }, [status]);
+  }, [isLoading, isAuthenticated]);
 
   const eventNames = [
     "update-jobs",
@@ -185,7 +185,7 @@ export default function DashboardPage() {
   ];
 
   // Show loading while session is loading or data is loading
-  if (status === 'loading' || loading) {
+  if (isLoading || loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -194,7 +194,7 @@ export default function DashboardPage() {
   }
 
   // Don't render anything if not authenticated (will redirect)
-  if (status === 'unauthenticated') {
+  if (!isAuthenticated) {
     return null;
   }
 

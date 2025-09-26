@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "@/lib/hooks/useSession";
-import { signOut } from "next-auth/react";
+import { signOut } from "@/lib/simple-auth-client";
 import Breadcrumbs from "@/components/dashboard/Breadcrumbs";
 import ToastProvider from "@/components/dashboard/ToastProvider";
 import { getNavigationItems } from "@/lib/roles";
@@ -180,7 +180,7 @@ export default function DashboardLayout({
                   </div>
                 </div>
                 <button
-                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  onClick={() => signOut()}
                   className="flex items-center gap-x-2 text-sm text-gray-500 hover:text-gray-700"
                 >
                   <LogOut className="h-4 w-4" />

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getServerSession } from '@/lib/auth-server';
 import { hasPermission } from '@/lib/roles';
 import { authRateLimit, generalRateLimit, uploadRateLimit, strictRateLimit } from './rate-limit';
 import { validateBody, validateQuery, commonSchemas } from './validation';
@@ -34,7 +34,7 @@ export function createSecureHandler(options: {
 
     // Authentication check
     if (options.requireAuth) {
-      const session = await auth();
+      const session = await getServerSession();
       if (!session) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }

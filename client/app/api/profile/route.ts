@@ -1,9 +1,9 @@
 import { connectToDatabase } from '@/lib/db'
 import User from '@/lib/models/User'
-import { auth } from '@/lib/auth'
+import { getServerSession } from "@/lib/auth-server";
 
 export async function PUT(request: Request) {
-  const session = await auth()
+  const session = await getServerSession()
   if (!session || !session.user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }

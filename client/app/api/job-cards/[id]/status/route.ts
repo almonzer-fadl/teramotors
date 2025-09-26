@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
-import { auth } from '@/lib/auth';
+import { getServerSession } from "@/lib/auth-server";
 import JobCard from '@/lib/models/JobCard';
 import Part from '@/lib/models/Part';
 
 export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params;
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }

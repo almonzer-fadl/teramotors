@@ -4,7 +4,7 @@ import Estimate from '@/lib/models/Estimate';
 import JobCard from '@/lib/models/JobCard';
 import Customer from '@/lib/models/Customer';
 import Vehicle from '@/lib/models/Vehicle';
-import { auth } from '@/lib/auth';
+import { getServerSession } from "@/lib/auth-server";
 import { NextRequest } from 'next/server';
 import { invoiceService } from '@/lib/services/InvoiceService';
 
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }

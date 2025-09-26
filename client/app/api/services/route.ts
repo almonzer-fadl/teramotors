@@ -1,11 +1,11 @@
 import { connectToDatabase } from '@/lib/db';
 import Service from '@/lib/models/Service';
-import { auth } from '@/lib/auth';
+import { getServerSession } from "@/lib/auth-server";
 import { NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }

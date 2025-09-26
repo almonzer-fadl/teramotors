@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn } from "@/lib/simple-auth-client";
 import Link from "next/link";
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -21,18 +21,13 @@ function LoginForm() {
     const password = formData.get("password") as string;
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+      const result = await signIn(email, password);
 
-        if (result?.error) {
-          setError("Invalid email or password");
-        } else if (result?.ok) {
-          // Use Next.js router for navigation
-          router.push(callbackUrl);
-        }
+      if (result.success) {
+        router.push(callbackUrl);
+      } else {
+        setError(result.error || "Invalid email or password");
+      }
     } catch (error) {
       setError("An error occurred. Please try again.");
     } finally {
