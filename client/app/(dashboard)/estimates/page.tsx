@@ -12,6 +12,7 @@ import {
   XCircle,
   Clock,
 } from "lucide-react";
+import Pagination from "@/components/ui/Pagination";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -79,10 +80,13 @@ export default function EstimatesPage() {
       const response = await fetch("/api/estimates");
       if (response.ok) {
         const data = await response.json();
-        setEstimates(data);
+        setEstimates(Array.isArray(data.estimates) ? data.estimates : []);
+      } else {
+        setEstimates([]);
       }
     } catch (error) {
       console.error("Failed to fetch estimates:", error);
+      setEstimates([]);
     } finally {
       setLoading(false);
     }

@@ -38,7 +38,10 @@ export class InvoiceService {
       // Generate ZATCA-compliant invoice
       const result = await this.qrGenerator.generateInvoice(invoiceData);
       
-      if (result.success && result.invoice) {
+      if (result.success && result.invoice && result.qrCode) {
+        // Generate QR code image
+        const qrCodeImage = await this.qrGenerator.generateQRImage(result.qrCode);
+        
         // Store additional metadata for database integration
         (result.invoice as any).metadata = {
           jobCardId: jobCardData.jobCardId,
@@ -47,6 +50,9 @@ export class InvoiceService {
           originalServices: jobCardData.services,
           originalParts: jobCardData.partsUsed,
         };
+        
+        // Add QR code image to the result
+        result.invoice.zatca.qrCodeImage = qrCodeImage;
       }
       
       return result;
@@ -102,6 +108,7 @@ export class InvoiceService {
     const invoiceNumber = ZATCAUtils.generateInvoiceNumber('INV', this.invoiceCounter++);
 
     return {
+      status: 'draft', // Required by InvoiceData
       invoiceNumber,
       invoiceDate: new Date(),
       dueDate: jobCardData.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
@@ -109,7 +116,6 @@ export class InvoiceService {
       customer,
       items,
       paymentMethod: jobCardData.paymentMethod as any || 'cash',
-      paymentStatus: 'pending',
       notes: jobCardData.notes,
     };
   }
@@ -146,15 +152,23 @@ export class InvoiceService {
         invoiceDate: new Date(),
         dueDate: invoiceData.dueDate,
         currency: 'SAR',
+        status: 'draft', // Added required 'status' property with a default value
         customer: invoiceData.customer,
         items,
         globalDiscount: invoiceData.globalDiscount,
         paymentMethod: invoiceData.paymentMethod as any || 'cash',
-        paymentStatus: 'pending',
         notes: invoiceData.notes,
       };
 
-      return await this.qrGenerator.generateInvoice(zatcaInvoiceData);
+      const result = await this.qrGenerator.generateInvoice(zatcaInvoiceData);
+      
+      if (result.success && result.invoice && result.qrCode) {
+        // Generate QR code image
+        const qrCodeImage = await this.qrGenerator.generateQRImage(result.qrCode);
+        result.invoice.zatca.qrCodeImage = qrCodeImage;
+      }
+      
+      return result;
     } catch (error) {
       return {
         success: false,

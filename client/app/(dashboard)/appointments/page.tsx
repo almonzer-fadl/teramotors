@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Edit, Eye, Calendar, Clock } from "lucide-react";
 import StatusBadge from "@/components/dashboard/StatusBadge";
+import Pagination from "@/components/ui/Pagination";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -40,6 +41,15 @@ interface Appointment {
   createdAt: string;
 }
 
+interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 export default function AppointmentsPage() {
   const { t } = useTranslation('common');
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -47,10 +57,20 @@ export default function AppointmentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 0,
+    totalCount: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
 
   useEffect(() => {
     socket.on("update-appointments", () => {
-      fetchAppointments(searchTerm, statusFilter, dateFilter);
+      fetchAppointments(searchTerm, statusFilter, dateFilter, currentPage, itemsPerPage);
     });
 
     return () => {
@@ -59,27 +79,77 @@ export default function AppointmentsPage() {
   });
 
   useEffect(() => {
-    fetchAppointments(searchTerm, statusFilter, dateFilter);
-  }, [searchTerm, statusFilter, dateFilter]);
+    fetchAppointments(searchTerm, statusFilter, dateFilter, currentPage, itemsPerPage);
+  }, [searchTerm, statusFilter, dateFilter, currentPage, itemsPerPage]);
 
   const fetchAppointments = async (
     search: string,
     status: string,
-    date: string
+    date: string,
+    page: number,
+    limit: number
   ) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ search, status, date });
+      const params = new URLSearchParams({ 
+        search, 
+        status, 
+        date,
+        page: page.toString(),
+        limit: limit.toString()
+      });
       const response = await fetch(`/api/appointments?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        setAppointments(data);
+        if (data.appointments && data.pagination) {
+          setAppointments(data.appointments);
+          setPagination(data.pagination);
+        } else {
+          // Fallback for old API format
+          setAppointments(data);
+          setPagination({
+            currentPage: 1,
+            totalPages: 1,
+            totalCount: data.length,
+            limit: data.length,
+            hasNextPage: false,
+            hasPrevPage: false
+          });
+        }
+      } else {
+        setAppointments([]);
+        setPagination({
+          currentPage: 1,
+          totalPages: 0,
+          totalCount: 0,
+          limit: 10,
+          hasNextPage: false,
+          hasPrevPage: false
+        });
       }
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
+      setAppointments([]);
+      setPagination({
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0,
+        limit: 10,
+        hasNextPage: false,
+        hasPrevPage: false
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    setItemsPerPage(itemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
   };
 
   if (loading) {
@@ -149,7 +219,7 @@ export default function AppointmentsPage() {
               </select>
             </div>
             <div className="text-sm text-gray-500">
-              {t(appointments.length === 1 ? 'appointments.appointment_count' : 'appointments.appointment_count_plural', { count: appointments.length })}
+              {t(pagination.totalCount === 1 ? 'appointments.appointment_count' : 'appointments.appointment_count_plural', { count: pagination.totalCount })}
             </div>
           </div>
         </div>
@@ -286,6 +356,22 @@ export default function AppointmentsPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {pagination.totalPages > 1 && (
+        <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalCount}
+            itemsPerPage={pagination.limit}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsPerPageOptions={[10, 30, 50]}
+            showItemsPerPage={true}
+          />
+        </div>
+      )}
 
       {appointments.length === 0 && (
         <div className="text-center py-12">

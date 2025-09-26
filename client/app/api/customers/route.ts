@@ -20,6 +20,10 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search') || ''
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const sortBy = searchParams.get('sortBy') || 'createdAt'
+    const sortOrder = searchParams.get('sortOrder') || 'desc'
 
     // Build query with search
     const query: any = { isActive: true }
@@ -31,11 +35,38 @@ export async function GET(request: NextRequest) {
       ]
     }
 
-    const customers = await Customer.find(query)
-      .sort({ createdAt: -1 })
-      .limit(50)
+    // Calculate pagination
+    const skip = (page - 1) * limit
 
-    return NextResponse.json(customers)
+    // Build sort object
+    const sort: any = {}
+    sort[sortBy] = sortOrder === 'desc' ? -1 : 1
+
+    // Get total count for pagination
+    const totalCount = await Customer.countDocuments(query)
+
+    // Get customers with pagination
+    const customers = await Customer.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+
+    // Calculate pagination info
+    const totalPages = Math.ceil(totalCount / limit)
+    const hasNextPage = page < totalPages
+    const hasPrevPage = page > 1
+
+    return NextResponse.json({
+      customers,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit,
+        hasNextPage,
+        hasPrevPage
+      }
+    })
   } catch (error) {
     console.error('Error fetching customers:', error)
     return NextResponse.json({ error: 'Failed to fetch customers' }, { status: 500 })

@@ -89,8 +89,10 @@ const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps)
   const subtotal = servicesTotal + partsTotal;
   const grandTotal = typeof invoice.totalAmount === 'number' ? invoice.totalAmount : subtotal;
 
-  // Generate QR code URL if we have QR data
-  const qrCodeUrl = qrCodeData ? `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(qrCodeData)}` : null;
+  // Use ZATCA QR code image if available, otherwise generate from data
+  const qrCodeUrl = qrCodeData ? 
+    (qrCodeData.startsWith('data:') ? qrCodeData : `data:image/png;base64,${qrCodeData}`) : 
+    null;
 
   return (
     <Document>

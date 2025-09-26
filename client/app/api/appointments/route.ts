@@ -21,6 +21,10 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status')
     const dateFrom = searchParams.get('dateFrom')
     const dateTo = searchParams.get('dateTo')
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const sortBy = searchParams.get('sortBy') || 'appointmentDate'
+    const sortOrder = searchParams.get('sortOrder') || 'asc'
 
     const query: any = {}
 
@@ -38,6 +42,21 @@ export async function GET(request: NextRequest) {
     } else if (dateTo) {
       query.appointmentDate = { $lte: new Date(dateTo) }
     }
+
+    // Calculate pagination
+    const skip = (page - 1) * limit
+
+    // Build sort object
+    const sort: any = {}
+    if (sortBy === 'appointmentDate') {
+      sort.appointmentDate = sortOrder === 'desc' ? -1 : 1
+      sort.startTime = sortOrder === 'desc' ? -1 : 1
+    } else {
+      sort[sortBy] = sortOrder === 'desc' ? -1 : 1
+    }
+    
+    // Get total count for pagination
+    const totalCount = await Appointment.countDocuments(query)
     
     const appointments = await Appointment.find(query)
       .populate('customerId', 'firstName lastName')
@@ -50,13 +69,40 @@ export async function GET(request: NextRequest) {
         }
       })
       .populate('serviceId', 'name')
-      .sort({ appointmentDate: 1, startTime: 1 })
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
 
-    return Response.json(appointments)
+    // Calculate pagination info
+    const totalPages = Math.ceil(totalCount / limit)
+    const hasNextPage = page < totalPages
+    const hasPrevPage = page > 1
+
+    return Response.json({
+      appointments,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit,
+        hasNextPage,
+        hasPrevPage
+      }
+    })
   } catch (error) {
     console.error('Error fetching appointments:', error)
     // Return empty array when database is unavailable
-    return Response.json([])
+    return Response.json({
+      appointments: [],
+      pagination: {
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0,
+        limit: 10,
+        hasNextPage: false,
+        hasPrevPage: false
+      }
+    })
   }
 }
 

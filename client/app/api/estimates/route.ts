@@ -7,8 +7,9 @@ import Mechanic from '@/lib/models/Mechanic'
 import User from '@/lib/models/User'
 import Service from '@/lib/models/Service'
 import { getServerSession } from "@/lib/auth-server";
+import { NextRequest } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession()
     if (!session) {
@@ -16,6 +17,22 @@ export async function GET() {
     }
 
     await connectToDatabase()
+
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+
+    // Build sort object
+    const sort: any = {};
+    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    
+    // Get total count for pagination
+    const totalCount = await Estimate.countDocuments({});
     
     const estimates = await Estimate.find({})
       .populate('jobCardId', '_id')
@@ -23,13 +40,40 @@ export async function GET() {
       .populate('vehicleId', 'make model year licensePlate')
       .populate({        path: 'mechanicId',        populate: {          path: 'userId',          select: 'firstName lastName'        }      })
       .populate('services.serviceId', 'name')
-      .sort({ createdAt: -1 })
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
 
-    return Response.json(estimates)
+    // Calculate pagination info
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return Response.json({
+      estimates,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit,
+        hasNextPage,
+        hasPrevPage
+      }
+    })
   } catch (error) {
     console.error('Error fetching estimates:', error)
     // Return empty array when database is unavailable
-    return Response.json([])
+    return Response.json({
+      estimates: [],
+      pagination: {
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0,
+        limit: 10,
+        hasNextPage: false,
+        hasPrevPage: false
+      }
+    })
   }
 }
 

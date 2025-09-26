@@ -158,220 +158,262 @@ export default function ServiceForm({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <button
-            onClick={() => router.back()}
-            className="mr-4 p-2 text-gray-400 hover:text-gray-600"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? t('forms.edit_service') : t('forms.new_service')}
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              {isEditing ? t('forms.update_service_details') : t('forms.create_new_service')}
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="py-8">
+            <div className="flex items-center">
+              <button
+                onClick={() => router.back()}
+                className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
+              >
+                <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
+              </button>
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  {isEditing ? t('forms.edit_service') : t('forms.new_service')}
+                </h1>
+                <p className="mt-3 text-xl text-gray-600">
+                  {isEditing ? t('forms.update_service_details') : t('forms.create_new_service')}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {fromTemplate && (
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {t('forms.create_from_template')}
-            </h3>
-            <select
-              onChange={(e) => handleTemplateChange(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="">{t('forms.select_template')}</option>
-              {templates.map((t) => (
-                <option key={(t as any)._id} value={(t as any)._id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-        {/* Form fields for service details */}
-        <div className="bg-white shadow rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">{t('inventory.name')}</label>
-            <input
-              type="text"
-              id="name"
-              required
-              value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">{t('forms.select_category')}</label>
-            <Combobox
-              options={serviceCategories}
-              value={formData.category}
-              onChange={(value) => handleInputChange("category", value)}
-              placeholder={t('forms.select_category')}
-              searchPlaceholder={t('forms.search_or_add_category')}
-              emptyPlaceholder={t('forms.no_categories_found')}
-            />
-          </div>
-          <div>
-            <label htmlFor="laborRate" className="block text-sm font-medium text-gray-700">{t('job_cards.labor_rate')}</label>
-            <input
-              type="number"
-              id="laborRate"
-              name="laborRate"
-              required
-              value={Number.isFinite(formData.laborRate) ? formData.laborRate : ''}
-              onChange={(e) => {
-                const val = e.target.value;
-                const num = val === '' ? 0 : Number(val);
-                handleInputChange("laborRate", Number.isFinite(num) ? num : 0);
-              }}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            />
-          </div>
-          <div>
-            <label htmlFor="laborHours" className="block text-sm font-medium text-gray-700">{t('job_cards.labor_hours')}</label>
-            <input
-              type="number"
-              id="laborHours"
-              required
-              value={formData.laborHours}
-              onChange={(e) =>
-                handleInputChange("laborHours", parseFloat(e.target.value))
-              }
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">{t('vehicles.description')}</label>
-            <textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-            />
-          </div>
-          <div className="flex items-center">
-            <input
-              id="isTemplate"
-              type="checkbox"
-              checked={formData.isTemplate}
-              onChange={(e) =>
-                handleInputChange("isTemplate", e.target.checked)
-              }
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600"
-            />
-            <label
-              htmlFor="isTemplate"
-              className="ml-3 min-w-0 flex-1 text-gray-500"
-            >
-              {t('forms.save_as_template')}
-            </label>
-          </div>
-        </div>
-
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            {t('forms.parts_required')}
-          </h3>
-          {formData.partsRequired.map((part: any, index: number) => (
-            <div
-              key={index}
-              className="grid grid-cols-4 gap-4 items-center mb-4"
-            >
-              <div className="col-span-2">
-                <label htmlFor={`partId-${index}`} className="block text-sm font-medium text-gray-700">{t('job_cards.select_part')}</label>
+      <div className="px-4 sm:px-6 lg:px-8 py-12">
+        <form onSubmit={handleSubmit} className="space-y-10">
+          {/* Template Selection Section */}
+          {fromTemplate && (
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+              <div className="px-8 py-8">
+                <div className="flex items-center mb-8">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                    <FileText className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {t('forms.create_from_template')}
+                  </h3>
+                </div>
                 <select
-                  id={`partId-${index}`}
-                  value={part.partId}
-                  onChange={(e) =>
-                    handlePartChange(index, "partId", e.target.value)
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  onChange={(e) => handleTemplateChange(e.target.value)}
+                  className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                 >
-                  <option value="">{t('job_cards.select_part')}</option>
-                  {parts.map((p) => (
-                    <option key={p._id} value={p._id}>
-                      {p.name}
+                  <option value="">{t('forms.select_template')}</option>
+                  {templates.map((t) => (
+                    <option key={(t as any)._id} value={(t as any)._id}>
+                      {t.name}
                     </option>
                   ))}
                 </select>
               </div>
-              <div>
-                <label htmlFor={`quantity-${index}`} className="block text-sm font-medium text-gray-700">{t('job_cards.qty')}</label>
-                <input
-                  type="number"
-                  id={`quantity-${index}`}
-                  value={part.quantity}
-                  onChange={(e) =>
-                    handlePartChange(index, "quantity", parseInt(e.target.value))
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
+            </div>
+          )}
+
+          {/* Service Details Section */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="px-8 py-8">
+              <div className="flex items-center mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mr-4">
+                  <Wrench className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {t('forms.service_details')}
+                </h3>
               </div>
-              <div>
-                <label htmlFor={`cost-${index}`} className="block text-sm font-medium text-gray-700">{t('job_cards.cost')}</label>
-                <input
-                  type="number"
-                  id={`cost-${index}`}
-                  name="cost"
-                  value={part.cost}
-                  onChange={(e) =>
-                    handlePartChange(index, "cost", parseFloat(e.target.value))
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="block text-sm font-bold text-gray-700">{t('inventory.name')}</label>
+                  <input
+                    type="text"
+                    id="name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter service name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="category" className="block text-sm font-bold text-gray-700">{t('forms.select_category')}</label>
+                  <Combobox
+                    options={serviceCategories}
+                    value={formData.category}
+                    onChange={(value) => handleInputChange("category", value)}
+                    placeholder={t('forms.select_category')}
+                    searchPlaceholder={t('forms.search_or_add_category')}
+                    emptyPlaceholder={t('forms.no_categories_found')}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="laborRate" className="block text-sm font-bold text-gray-700">{t('job_cards.labor_rate')}</label>
+                  <input
+                    type="number"
+                    id="laborRate"
+                    name="laborRate"
+                    required
+                    value={Number.isFinite(formData.laborRate) ? formData.laborRate : ''}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const num = val === '' ? 0 : Number(val);
+                      handleInputChange("laborRate", Number.isFinite(num) ? num : 0);
+                    }}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter labor rate"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="laborHours" className="block text-sm font-bold text-gray-700">{t('job_cards.labor_hours')}</label>
+                  <input
+                    type="number"
+                    id="laborHours"
+                    required
+                    value={formData.laborHours}
+                    onChange={(e) =>
+                      handleInputChange("laborHours", parseFloat(e.target.value))
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter labor hours"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label htmlFor="description" className="block text-sm font-bold text-gray-700">{t('vehicles.description')}</label>
+                  <textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange("description", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
+                    placeholder="Enter service description"
+                    rows={4}
+                  />
+                </div>
+                <div className="flex items-center space-x-3">
+                  <input
+                    id="isTemplate"
+                    type="checkbox"
+                    checked={formData.isTemplate}
+                    onChange={(e) =>
+                      handleInputChange("isTemplate", e.target.checked)
+                    }
+                    className="h-5 w-5 rounded border-2 border-gray-300 text-[#F13F33] focus:ring-[#F13F33] focus:ring-2"
+                  />
+                  <label
+                    htmlFor="isTemplate"
+                    className="text-sm font-bold text-gray-700"
+                  >
+                    {t('forms.save_as_template')}
+                  </label>
+                </div>
               </div>
+            </div>
+          </div>
+
+          {/* Parts Required Section */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="px-8 py-8">
+              <div className="flex items-center mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                  <Settings className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {t('forms.parts_required')}
+                </h3>
+              </div>
+              {formData.partsRequired.map((part: any, index: number) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-4 gap-4 items-center mb-4"
+                >
+                  <div className="col-span-2">
+                    <label htmlFor={`partId-${index}`} className="block text-sm font-medium text-gray-700">{t('job_cards.select_part')}</label>
+                    <select
+                      id={`partId-${index}`}
+                      value={part.partId}
+                      onChange={(e) =>
+                        handlePartChange(index, "partId", e.target.value)
+                      }
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                      <option value="">{t('job_cards.select_part')}</option>
+                      {parts.map((p) => (
+                        <option key={p._id} value={p._id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor={`quantity-${index}`} className="block text-sm font-medium text-gray-700">{t('job_cards.qty')}</label>
+                    <input
+                      type="number"
+                      id={`quantity-${index}`}
+                      value={part.quantity}
+                      onChange={(e) =>
+                        handlePartChange(index, "quantity", parseInt(e.target.value))
+                      }
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor={`cost-${index}`} className="block text-sm font-medium text-gray-700">{t('job_cards.cost')}</label>
+                    <input
+                      type="number"
+                      id={`cost-${index}`}
+                      name="cost"
+                      value={part.cost}
+                      onChange={(e) =>
+                        handlePartChange(index, "cost", parseFloat(e.target.value))
+                      }
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removePart(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+              ))}
               <button
                 type="button"
-                onClick={() => removePart(index)}
-                className="text-red-500 hover:text-red-700"
+                onClick={addPart}
+                className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
-                <Trash2 className="h-5 w-5" />
+                <Plus className="mr-2 h-4 w-4" />
+                {t('forms.add_part')}
               </button>
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={addPart}
-            className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t('forms.add_part')}
-          </button>
-        </div>
+          </div>
 
-        <div className="flex justify-end space-x-3">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            <X className="mr-2 h-4 w-4" />
-            {t('forms.cancel')}
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-          >
-            <Save className="mr-2 h-4 w-4" />
-            {loading
-              ? t('forms.saving')
-              : isEditing
-              ? t('forms.update_service')
-              : t('forms.save_service')}
-          </button>
-        </div>
-      </form>
+          {/* Form Actions */}
+          <div className="flex justify-end space-x-6">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="group inline-flex items-center px-8 py-4 border-2 border-gray-300 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:border-[#F13F33] hover:text-[#F13F33] hover:bg-[#F13F33]/5 transition-all duration-300"
+            >
+              <X className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              {t('forms.cancel')}
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+            >
+              <Save className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              {loading
+                ? t('forms.saving')
+                : isEditing
+                ? t('forms.update_service')
+                : t('forms.save_service')}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

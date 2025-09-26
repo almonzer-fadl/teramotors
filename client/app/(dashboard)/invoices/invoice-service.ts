@@ -96,6 +96,7 @@ import {
           paymentMethod: params.paymentMethod || 'cash',
           paymentStatus: 'pending',
           notes: params.notes,
+          status: ''
         };
   
         // Generate ZATCA compliant invoice
@@ -180,6 +181,7 @@ import {
         paymentMethod: 'cash',
         paymentStatus: 'pending',
         notes: `Return/Refund for invoice ${params.originalInvoiceNumber}. Reason: ${params.reason || 'Not specified'}`,
+        status: ''
       };
   
       const result = await this.qrGenerator.generateInvoice(invoiceData);
@@ -221,7 +223,7 @@ import {
           throw new Error('Invoice not found');
         }
   
-        invoice.invoiceData.paymentStatus = status;
+        invoice.invoiceData.status = status;
         invoice.updatedAt = new Date();
   
         await this.saveInvoice(invoice);
@@ -274,9 +276,14 @@ import {
         report.totalVAT += invoice.totals.totalVAT;
   
         // Payment status count
-        const status = invoice.invoiceData.paymentStatus || 'pending';
-        report.paymentStatus[status]++;
-  
+        const status = invoice.invoiceData.status || 'pending';
+        if (status === 'paid' || status === 'pending' || status === 'overdue') {
+          report.paymentStatus[status]++;
+        } else {
+          // If status is unknown, count as 'pending'
+          report.paymentStatus['pending']++;
+        }
+
         // Customer statistics
         if (invoice.invoiceData.customer?.name) {
           const customerName = invoice.invoiceData.customer.name;

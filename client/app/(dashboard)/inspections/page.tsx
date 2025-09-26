@@ -12,6 +12,7 @@ import {
   Camera,
   FileText,
 } from "lucide-react";
+import Pagination from "@/components/ui/Pagination";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -97,10 +98,13 @@ export default function InspectionsPage() {
 
       if (inspectionsRes.ok) {
         const inspectionsData = await inspectionsRes.json();
-        setInspections(inspectionsData);
+        setInspections(Array.isArray(inspectionsData.inspections) ? inspectionsData.inspections : []);
+      } else {
+        setInspections([]);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
+      setInspections([]);
     } finally {
       setLoading(false);
     }

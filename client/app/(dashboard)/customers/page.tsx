@@ -15,6 +15,7 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 import Search from "@/components/dashboard/Search";
+import Pagination from "@/components/ui/Pagination";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -35,6 +36,15 @@ interface Customer {
   createdAt: string;
 }
 
+interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 type SortKey = "name" | "createdAt";
 type SortDirection = "asc" | "desc";
 
@@ -45,15 +55,25 @@ export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 0,
+    totalCount: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
   const router = useRouter();
 
   useEffect(() => {
-    fetchCustomers(searchTerm, sortKey, sortDirection);
-  }, [searchTerm, sortKey, sortDirection]);
+    fetchCustomers(searchTerm, sortKey, sortDirection, currentPage, itemsPerPage);
+  }, [searchTerm, sortKey, sortDirection, currentPage, itemsPerPage]);
 
   useEffect(() => {
     socket.on("update-customers", () => {
-      fetchCustomers(searchTerm, sortKey, sortDirection);
+      fetchCustomers(searchTerm, sortKey, sortDirection, currentPage, itemsPerPage);
     });
     return () => {
       socket.off("update-customers");
@@ -63,23 +83,62 @@ export default function CustomersPage() {
   const fetchCustomers = async (
     search: string,
     sort: SortKey,
-    direction: SortDirection
+    direction: SortDirection,
+    page: number,
+    limit: number
   ) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ search, sort, direction });
+      const params = new URLSearchParams({ 
+        search, 
+        sortBy: sort === "name" ? "firstName" : sort,
+        sortOrder: direction,
+        page: page.toString(),
+        limit: limit.toString()
+      });
       const response = await fetch(`/api/customers?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        const items = Array.isArray(data)
-          ? data
-          : (Array.isArray(data.data) ? data.data : (Array.isArray((data || {}).items) ? data.items : []));
-        setCustomers(items);
+        if (data.customers && data.pagination) {
+          setCustomers(data.customers);
+          setPagination(data.pagination);
+        } else {
+          // Fallback for old API format
+          const items = Array.isArray(data)
+            ? data
+            : (Array.isArray(data.data) ? data.data : (Array.isArray((data || {}).items) ? data.items : []));
+          setCustomers(items);
+          setPagination({
+            currentPage: 1,
+            totalPages: 1,
+            totalCount: items.length,
+            limit: items.length,
+            hasNextPage: false,
+            hasPrevPage: false
+          });
+        }
       } else {
         setCustomers([]);
+        setPagination({
+          currentPage: 1,
+          totalPages: 0,
+          totalCount: 0,
+          limit: 10,
+          hasNextPage: false,
+          hasPrevPage: false
+        });
       }
     } catch (error) {
       console.error("Failed to fetch customers:", error);
+      setCustomers([]);
+      setPagination({
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0,
+        limit: 10,
+        hasNextPage: false,
+        hasPrevPage: false
+      });
     } finally {
       setLoading(false);
     }
@@ -91,12 +150,18 @@ export default function CustomersPage() {
     try {
       const params = new URLSearchParams({
         search: query,
-        sort: "name",
-        direction: "asc",
+        sortBy: "firstName",
+        sortOrder: "asc",
+        page: "1",
+        limit: "10"
       });
       const response = await fetch(`/api/customers?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
+        if (data.customers) {
+          return data.customers as Customer[];
+        }
+        // Fallback for old API format
         const items = Array.isArray(data)
           ? data
           : (Array.isArray(data.data) ? data.data : (Array.isArray((data || {}).items) ? data.items : []));
@@ -108,17 +173,8 @@ export default function CustomersPage() {
     return [];
   };
 
-  const sortedCustomers = useMemo(() => {
-    return [...customers].sort((a, b) => {
-      const aVal =
-        sortKey === "name" ? `${a.firstName} ${a.lastName}` : a.createdAt;
-      const bVal =
-        sortKey === "name" ? `${b.firstName} ${b.lastName}` : b.createdAt;
-      if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
-      return 0;
-    });
-  }, [customers, sortKey, sortDirection]);
+  // Remove client-side sorting since we're now doing it server-side
+  const sortedCustomers = customers;
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -127,6 +183,16 @@ export default function CustomersPage() {
       setSortKey(key);
       setSortDirection("asc");
     }
+    setCurrentPage(1); // Reset to first page when sorting
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    setItemsPerPage(itemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
   };
 
   const handleDelete = async (id: string) => {
@@ -198,10 +264,10 @@ export default function CustomersPage() {
             </div>
             <div className="text-sm text-gray-500">
               {t(
-                sortedCustomers.length === 1
+                pagination.totalCount === 1
                   ? "customers.customer_count"
                   : "customers.customer_count_plural",
-                { count: sortedCustomers.length }
+                { count: pagination.totalCount }
               )}
             </div>
           </div>
@@ -338,6 +404,22 @@ export default function CustomersPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {pagination.totalPages > 1 && (
+        <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalCount}
+            itemsPerPage={pagination.limit}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsPerPageOptions={[10, 30, 50]}
+            showItemsPerPage={true}
+          />
+        </div>
+      )}
 
       {sortedCustomers.length === 0 && (
         <div className="text-center py-12">

@@ -213,14 +213,20 @@ export class ZATCAQRGenerator {
    */
   async generateQRImage(qrCodeData: string): Promise<string> {
     try {
-      // This would require: npm install qrcode @types/qrcode
-      // import QRCode from 'qrcode';
-      // return await QRCode.toDataURL(qrCodeData);
-      
-      // For now, return a placeholder
-      return `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==`;
+      // Import QRCode dynamically to avoid build issues
+      const QRCode = await import('qrcode');
+      return await QRCode.toDataURL(qrCodeData, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      });
     } catch (error) {
-      throw new Error('Failed to generate QR code image');
+      console.error('Failed to generate QR code image:', error);
+      // Return a placeholder if QR generation fails
+      return `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==`;
     }
   }
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Edit, Trash2, Eye, Car, Wrench } from "lucide-react";
+import Pagination from "@/components/ui/Pagination";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -26,48 +27,106 @@ interface Vehicle {
   createdAt: string;
 }
 
+interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 export default function VehiclesPage() {
   const { t } = useTranslation('common');
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 0,
+    totalCount: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
 
   useEffect(() => {
-    fetchVehicles();
+    fetchVehicles(searchTerm, currentPage, itemsPerPage);
 
     socket.on("update-vehicles", () => {
-      fetchVehicles();
+      fetchVehicles(searchTerm, currentPage, itemsPerPage);
     });
     return () => {
       socket.off("update-vehicles");
     };
-  }, []);
+  }, [searchTerm, currentPage, itemsPerPage]);
 
-  const fetchVehicles = async () => {
+  const fetchVehicles = async (search: string, page: number, limit: number) => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/vehicles");
+      const params = new URLSearchParams({
+        search,
+        page: page.toString(),
+        limit: limit.toString()
+      });
+      const response = await fetch(`/api/vehicles?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        setVehicles(data);
+        if (data.vehicles && data.pagination) {
+          setVehicles(data.vehicles);
+          setPagination(data.pagination);
+        } else {
+          // Fallback for old API format
+          setVehicles(data);
+          setPagination({
+            currentPage: 1,
+            totalPages: 1,
+            totalCount: data.length,
+            limit: data.length,
+            hasNextPage: false,
+            hasPrevPage: false
+          });
+        }
+      } else {
+        setVehicles([]);
+        setPagination({
+          currentPage: 1,
+          totalPages: 0,
+          totalCount: 0,
+          limit: 10,
+          hasNextPage: false,
+          hasPrevPage: false
+        });
       }
     } catch (error) {
       console.error("Failed to fetch vehicles:", error);
+      setVehicles([]);
+      setPagination({
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0,
+        limit: 10,
+        hasNextPage: false,
+        hasPrevPage: false
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredVehicles = vehicles.filter(
-    (vehicle) =>
-      `${vehicle.make} ${vehicle.model}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      vehicle.licensePlate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.vin?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      `${vehicle.customerId.firstName} ${vehicle.customerId.lastName}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-  );
+  // Remove client-side filtering since we're now doing it server-side
+  const filteredVehicles = vehicles;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    setItemsPerPage(itemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
 
   const handleDelete = async (id: string) => {
     if (confirm(t('vehicles.delete_confirm'))) {
@@ -130,7 +189,7 @@ export default function VehiclesPage() {
               </div>
             </div>
             <div className="text-sm text-gray-500">
-              {t(filteredVehicles.length === 1 ? 'vehicles.vehicle_count' : 'vehicles.vehicle_count_plural', { count: filteredVehicles.length })}
+              {t(pagination.totalCount === 1 ? 'vehicles.vehicle_count' : 'vehicles.vehicle_count_plural', { count: pagination.totalCount })}
             </div>
           </div>
         </div>
@@ -248,6 +307,22 @@ export default function VehiclesPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {pagination.totalPages > 1 && (
+        <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalCount}
+            itemsPerPage={pagination.limit}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsPerPageOptions={[10, 30, 50]}
+            showItemsPerPage={true}
+          />
+        </div>
+      )}
 
       {filteredVehicles.length === 0 && (
         <div className="text-center py-12">

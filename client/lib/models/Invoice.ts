@@ -12,12 +12,13 @@ const InvoiceSchema = new Schema({
   paidAmount: { type: Number, required: false, min: 0 }, // Make optional
   dueDate: { type: Date, required: true },
   paymentMethod: { type: String, enum: ['cash', 'card', 'bank_transfer', 'other'], required: false }, // Make optional
-  paymentStatus: { type: String, enum: ['pending', 'paid', 'failed'], default: 'pending' },
   paymentDate: { type: Date, required: false },
+  paidAt: { type: Date, required: false },
   
   // ZATCA compliance fields
   zatca: {
     qrCode: { type: String, required: false },
+    qrCodeImage: { type: String, required: false },
     invoiceNumber: { type: String, required: false },
     invoiceDate: { type: Date, required: false },
     vatAmount: { type: Number, required: false },
@@ -39,7 +40,6 @@ InvoiceSchema.index({ customerId: 1 });
 InvoiceSchema.index({ vehicleId: 1 });
 InvoiceSchema.index({ mechanicId: 1 });
 InvoiceSchema.index({ status: 1 });
-InvoiceSchema.index({ paymentStatus: 1 });
 InvoiceSchema.index({ dueDate: 1 });
 InvoiceSchema.index({ createdAt: -1 });
 InvoiceSchema.index({ 'zatca.invoiceNumber': 1 });

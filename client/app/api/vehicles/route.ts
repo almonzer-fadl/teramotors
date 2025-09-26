@@ -14,7 +14,11 @@ export async function GET(request: NextRequest) {
     await connectToDatabase()
 
     const { searchParams } = new URL(request.url)
-    const search = searchParams.get('search')
+    const search = searchParams.get('search') || ''
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const sortBy = searchParams.get('sortBy') || 'createdAt'
+    const sortOrder = searchParams.get('sortOrder') || 'desc'
 
     const query: any = { isActive: true }
 
@@ -27,16 +31,53 @@ export async function GET(request: NextRequest) {
         { licensePlate: searchRegex },
       ]
     }
+
+    // Calculate pagination
+    const skip = (page - 1) * limit
+
+    // Build sort object
+    const sort: any = {}
+    sort[sortBy] = sortOrder === 'desc' ? -1 : 1
+
+    // Get total count for pagination
+    const totalCount = await Vehicle.countDocuments(query)
     
     const vehicles = await Vehicle.find(query)
       .populate('customerId', 'firstName lastName')
-      .sort({ createdAt: -1 })
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
 
-    return Response.json(vehicles)
+    // Calculate pagination info
+    const totalPages = Math.ceil(totalCount / limit)
+    const hasNextPage = page < totalPages
+    const hasPrevPage = page > 1
+
+    return Response.json({
+      vehicles,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit,
+        hasNextPage,
+        hasPrevPage
+      }
+    })
   } catch (error) {
     console.error('Error fetching vehicles:', error)
     // Return empty array when database is unavailable
-    return Response.json([])
+    return Response.json({
+      vehicles: [],
+      pagination: {
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0,
+        limit: 10,
+        hasNextPage: false,
+        hasPrevPage: false
+      }
+    })
   }
 }
 
