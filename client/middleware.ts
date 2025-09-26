@@ -1,65 +1,51 @@
+import { auth } from "@/lib/auth"
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+const publicRoutes = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+];
 
-  // Public routes that don't require authentication
-  const publicRoutes = [
-    '/login',
-    '/register',
-    '/forgot-password',
-    '/reset-password',
-    '/verify-email',
-    '/api/auth',
+const publicApiRoutes = [
     '/api/health',
     '/api/test-connection',
-    '/api/test-db'
-  ]
+    '/api/test-db',
+    '/api/auth' // NextAuth routes are handled by the `auth` wrapper implicitly
+]
 
-  // Check if the current path is public
-  const isPublicRoute = publicRoutes.some(route => 
-    pathname.startsWith(route)
-  )
+export const middleware = auth((request) => {
+  const { nextUrl } = request;
+  const isLoggedIn = !!request.auth;
 
-  // If it's a public route, allow access
+  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isPublicApiRoute = publicApiRoutes.some(route => nextUrl.pathname.startsWith(route));
+
+  if (isPublicApiRoute) {
+    return null;
+  }
+
   if (isPublicRoute) {
-    return NextResponse.next()
-  }
-
-  // For all other routes, check for NextAuth session cookie
-  const sessionToken = request.cookies.get('next-auth.session-token') || 
-                      request.cookies.get('__Secure-next-auth.session-token')
-  
-  // If no session token and trying to access protected route, redirect to login
-  if (!sessionToken) {
-    const loginUrl = new URL('/login', request.url)
-    // Only set callbackUrl if it's not already the login page
-    if (pathname !== '/login') {
-      loginUrl.searchParams.set('callbackUrl', request.url)
+    if (isLoggedIn) {
+      return NextResponse.redirect(new URL('/dashboard', nextUrl));
     }
-    return NextResponse.redirect(loginUrl)
+    return null;
   }
 
-  // If user is authenticated and trying to access root, redirect to dashboard
-  if (pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  if (!isLoggedIn) {
+    let callbackUrl = nextUrl.pathname;
+    if (nextUrl.search) {
+      callbackUrl += nextUrl.search;
+    }
+    const encodedCallbackUrl = encodeURIComponent(callbackUrl);
+    return NextResponse.redirect(new URL(`/login?callbackUrl=${encodedCallbackUrl}`, nextUrl));
   }
 
-  // If user is authenticated, allow access
-  return NextResponse.next()
-}
+  return null;
+})
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api/auth (NextAuth.js routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 }
