@@ -10,8 +10,9 @@ export default function RootLayout({
   return (
     <html>
       <head>
-        <title>Tera Motors</title>
-        {/* <link rel="icon" href="/favicon.png" type="image/png" /> */}
+        <title>TeraMotors - Auto Repair Management</title>
+        <link rel="icon" href="/icon.png" type="image/png" />
+        <meta name="description" content="Professional auto repair management system for TeraMotors" />
       </head>
       <body>
         <I18nProvider>

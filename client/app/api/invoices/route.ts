@@ -1,11 +1,5 @@
 import { connectToDatabase } from '@/lib/db';
-import Invoice from '@/lib/models/Invoice';
-import Estimate from '@/lib/models/Estimate';
-import JobCard from '@/lib/models/JobCard';
-import Customer from '@/lib/models/Customer';
-import Vehicle from '@/lib/models/Vehicle';
-import Service from '@/lib/models/Service';
-import Part from '@/lib/models/Part';
+import { Invoice, Estimate, JobCard, Customer, Vehicle, Service, Part } from '@/lib/models';
 import { getServerSession } from "@/lib/auth-server";
 import { NextRequest } from 'next/server';
 import { invoiceService } from '@/lib/services/InvoiceService';

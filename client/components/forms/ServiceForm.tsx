@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Key } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, X, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, X, Plus, Trash2, Wrench, Settings, FileText } from "lucide-react";
 import Part from "@/lib/models/Part";
 
 import { Combobox } from "@/components/ui/Combobox";

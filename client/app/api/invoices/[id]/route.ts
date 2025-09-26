@@ -1,12 +1,7 @@
 import { NextRequest } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { getServerSession } from "@/lib/auth-server";
-import Invoice from '@/lib/models/Invoice';
-import JobCard from '@/lib/models/JobCard';
-import Customer from '@/lib/models/Customer';
-import Vehicle from '@/lib/models/Vehicle';
-import Service from '@/lib/models/Service';
-import Part from '@/lib/models/Part';
+import { Invoice, JobCard, Customer, Vehicle, Service, Part } from '@/lib/models';
 
 export async function GET(
   request: NextRequest,

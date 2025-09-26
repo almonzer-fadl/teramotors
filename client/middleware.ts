@@ -6,6 +6,7 @@ export async function middleware(request: NextRequest) {
 
   // Public routes that don't require authentication
   const publicRoutes = [
+    '/',
     '/login',
     '/register',
     '/forgot-password',
@@ -38,11 +39,6 @@ export async function middleware(request: NextRequest) {
       loginUrl.searchParams.set('callbackUrl', request.url)
     }
     return NextResponse.redirect(loginUrl)
-  }
-
-  // If user is authenticated and trying to access root, redirect to dashboard
-  if (pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // If user is authenticated, allow access
