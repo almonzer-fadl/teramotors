@@ -4,7 +4,7 @@ import csv from 'csv-parser';
 import { Readable } from 'stream';
 import Customer from '@/lib/models/Customer';
 import { connectToDatabase } from '@/lib/db';
-import { auth } from '@/lib/auth';
+import { getServerSession } from "@/lib/auth-server";
 import { uploadRateLimit } from '@/lib/middleware/rate-limit';
 import { validateFileUpload, sanitizeInput } from '@/lib/middleware/security';
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check authentication
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

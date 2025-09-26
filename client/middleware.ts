@@ -27,9 +27,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // For all other routes, check for NextAuth session cookie
-  const sessionToken = request.cookies.get('next-auth.session-token') || 
-                      request.cookies.get('__Secure-next-auth.session-token')
+  // For all other routes, check for auth token cookie
+  const sessionToken = request.cookies.get('auth-token')
   
   // If no session token and trying to access protected route, redirect to login
   if (!sessionToken) {

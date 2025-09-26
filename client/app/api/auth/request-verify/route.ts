@@ -1,12 +1,12 @@
 import { connectToDatabase } from '@/lib/db'
 import User from '@/lib/models/User'
-import { auth } from '@/lib/auth'
+import { getServerSession } from "@/lib/auth-server";
 import crypto from 'crypto'
 import { sendEmail } from '@/lib/email'
 
 export async function POST() {
   try {
-    const session = await auth()
+    const session = await getServerSession()
     if (!session || !session.user?.email) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }

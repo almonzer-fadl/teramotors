@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/lib/auth'
+import { getServerSession } from "@/lib/auth-server";
 import { connectToDatabase } from '@/lib/db'
 import Customer from '@/lib/models/Customer'
 import Vehicle from '@/lib/models/Vehicle'
@@ -11,7 +11,7 @@ import Part from '@/lib/models/Part'
 // GET /api/reports - Get report data (Admin only)
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await getServerSession()
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
     }
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
 // POST /api/reports/export - Export report (Admin only)
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await getServerSession()
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
     }

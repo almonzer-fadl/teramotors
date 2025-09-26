@@ -1,12 +1,12 @@
 import { connectToDatabase } from '@/lib/db';
 import Part from '@/lib/models/Part';
-import { auth } from '@/lib/auth';
+import { getServerSession } from "@/lib/auth-server";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }

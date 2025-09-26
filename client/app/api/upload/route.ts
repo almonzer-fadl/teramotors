@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { Readable } from 'stream';
-import { auth } from '@/lib/auth';
+import { getServerSession } from "@/lib/auth-server";
 import { uploadRateLimit } from '@/lib/middleware/rate-limit';
 import { validateFileUpload } from '@/lib/middleware/security';
 
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Check authentication
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

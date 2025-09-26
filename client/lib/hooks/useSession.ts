@@ -1,12 +1,6 @@
 'use client'
-import { useSession as useNextAuthSession } from 'next-auth/react'
+import { useSession as useSimpleAuthSession } from '@/lib/simple-auth-client'
 
 export function useSession() {
-  const { data: session, status } = useNextAuthSession()
-  
-  return {
-    user: session?.user,
-    isLoading: status === 'loading',
-    isAuthenticated: !!session
-  }
+  return useSimpleAuthSession()
 }

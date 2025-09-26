@@ -1,6 +1,6 @@
 import { connectToDatabase } from '@/lib/db'
 import Customer from '@/lib/models/Customer'
-import { auth } from '@/lib/auth'
+import { getServerSession } from "@/lib/auth-server";
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     // Try to authenticate; if AUTH_SECRET is set and no session, reject
     let session: any = null
     try {
-      session = await auth()
+      session = await getServerSession()
     } catch (e) {
       // auth not configured; allow in dev/non-auth environments
     }
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
+    const session = await getServerSession()
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

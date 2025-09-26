@@ -6,14 +6,14 @@ import Appointment from '@/lib/models/Appointment'
 import JobCard from '@/lib/models/JobCard'
 import Part from '@/lib/models/Part'
 import Invoice from '@/lib/models/Invoice'
-import { auth } from '@/lib/auth'
+import { getServerSession } from "@/lib/auth-server";
 
 export async function GET() {
   try {
     // Try to get session, but don't fail if auth is not configured
     let session = null;
     try {
-      session = await auth();
+      session = await getServerSession();
     } catch (error) {
       // Auth not configured or error, continue without authentication
       console.log('Auth not configured, proceeding without authentication');

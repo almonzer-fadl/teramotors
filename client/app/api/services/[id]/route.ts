@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Service from '@/lib/models/Service';
-import { auth } from '@/lib/auth';
+import { getServerSession } from "@/lib/auth-server";
 import { hasPermission } from '@/lib/roles';
 
 export async function GET(
@@ -10,7 +10,7 @@ export async function GET(
 ) {
   try {
     const { id } = await context.params;
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
@@ -36,7 +36,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await context.params;
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
@@ -68,7 +68,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await context.params;
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }

@@ -1,13 +1,13 @@
 
 import { connectToDatabase } from '@/lib/db';
 import Mechanic from '@/lib/models/Mechanic';
-import { auth } from '@/lib/auth';
+import { getServerSession } from "@/lib/auth-server";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const session = await auth();
+    const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }

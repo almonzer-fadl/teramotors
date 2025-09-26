@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db'
 import User from '@/lib/models/User'
-import { auth } from '@/lib/auth'
+import { getServerSession } from "@/lib/auth-server";
 
 export async function GET() {
-  const session = await auth()
+  const session = await getServerSession()
   if (!session || (session.user as any).role !== 'admin') {
     return NextResponse.json({ message: 'Not authenticated' }, { status: 401 })
   }
