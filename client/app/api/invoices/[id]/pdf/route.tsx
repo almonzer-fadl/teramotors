@@ -1,11 +1,6 @@
 import { NextRequest } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
-import Invoice from '@/lib/models/Invoice';
-import JobCard from '@/lib/models/JobCard';
-import Part from '@/lib/models/Part';
-import Service from '@/lib/models/Service';
-import Customer from '@/lib/models/Customer';
-import Vehicle from '@/lib/models/Vehicle';
+import { Invoice, JobCard, Part, Service, Customer, Vehicle } from '@/lib/models';
 import { generateInvoiceHTML } from '@/lib/pdf-generator-html';
 
 export async function GET(

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, X, Plus } from "lucide-react";
+import { ArrowLeft, Save, X, Plus, Package, Settings, FileText } from "lucide-react";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 import { Combobox } from "@/components/ui/Combobox";

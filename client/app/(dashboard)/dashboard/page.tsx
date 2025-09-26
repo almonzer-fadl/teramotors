@@ -12,6 +12,7 @@ import {
   Clock,
   AlertTriangle,
   Search,
+  Zap,
 } from "lucide-react";
 import JobCardGrid from "@/components/dashboard/JobCardGrid";
 import { socketService } from "@/lib/services/socket";
@@ -199,91 +200,159 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          {t("dashboard.title")}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">{t("dashboard.welcome")}</p>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {statCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Link
-              key={card.title}
-              href={card.href}
-              className="relative overflow-hidden rounded-lg bg-white px-4 py-5 shadow hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-center">
-                <div className={`flex-shrink-0 rounded-md p-3 ${card.color}`}>
-                  <Icon className="h-6 w-6 text-white" />
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="py-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {t("dashboard.title")}
+                </h1>
+                <p className="mt-2 text-lg text-gray-600">{t("dashboard.welcome")}</p>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="text-right">
+                  <p className="text-sm text-gray-500">Welcome back</p>
+                  <p className="font-semibold text-gray-900">{user?.name || 'User'}</p>
                 </div>
-                <div className="ms-4 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      {card.title}
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      {card.value}
-                    </dd>
-                  </dl>
+                <div className="w-12 h-12 bg-[#F13F33] rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-white" />
                 </div>
               </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            {t("dashboard.quick_actions")}
-          </h3>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Link
-              href="/customers/new"
-              className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <Users className="me-2 h-4 w-4" />
-              {t("dashboard.add_customer")}
-            </Link>
-            <Link
-              href="/vehicles/new"
-              className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <Car className="me-2 h-4 w-4" />
-              {t("dashboard.add_vehicle")}
-            </Link>
-            <Link
-              href="/inspections/new"
-              className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <Search className="me-2 h-4 w-4" />
-              {t("dashboard.create_inspection")}
-            </Link>
-            <Link
-              href="/job-cards/new"
-              className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <ClipboardList className="me-2 h-4 w-4" />
-              {t("dashboard.create_job_card")}
-            </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Active Job Cards */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            {t("dashboard.active_job_cards")}
-          </h3>
-          <JobCardGrid />
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          {statCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <Link
+                key={card.title}
+                href={card.href}
+                className="group relative overflow-hidden rounded-xl bg-white p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              >
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 rounded-xl p-3 bg-[#F13F33] group-hover:bg-[#d6352a] transition-colors">
+                    <Icon className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <p className="text-sm font-medium text-gray-500 truncate">
+                      {card.title}
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {card.value}
+                    </p>
+                  </div>
+                </div>
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#063479]/10 to-transparent rounded-bl-3xl"></div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="bg-gradient-to-br from-white to-gray-50/80 rounded-3xl shadow-2xl mb-8 border border-gray-100/50">
+          <div className="px-8 py-8">
+            <div className="flex items-center mb-8">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mr-4">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900">
+                {t("dashboard.quick_actions")}
+              </h3>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <Link
+                href="/customers/new"
+                className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 p-6 transition-all duration-500 hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Users className="w-7 h-7 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                    {t("dashboard.add_customer")}
+                  </h4>
+                  <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors">
+                    Add new customer to system
+                  </p>
+                </div>
+              </Link>
+              <Link
+                href="/vehicles/new"
+                className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 p-6 transition-all duration-500 hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Car className="w-7 h-7 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
+                    {t("dashboard.add_vehicle")}
+                  </h4>
+                  <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors">
+                    Register new vehicle
+                  </p>
+                </div>
+              </Link>
+              <Link
+                href="/inspections/new"
+                className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 p-6 transition-all duration-500 hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-[#F13F33]/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Search className="w-7 h-7 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#F13F33] transition-colors">
+                    {t("dashboard.create_inspection")}
+                  </h4>
+                  <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors">
+                    Start vehicle inspection
+                  </p>
+                </div>
+              </Link>
+              <Link
+                href="/job-cards/new"
+                className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-gray-100 p-6 transition-all duration-500 hover:-translate-y-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-[#063479]/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <ClipboardList className="w-7 h-7 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#063479] transition-colors">
+                    {t("dashboard.create_job_card")}
+                  </h4>
+                  <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors">
+                    Create new work order
+                  </p>
+                </div>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Job Cards */}
+        <div className="bg-gradient-to-br from-white to-gray-50/80 rounded-3xl shadow-2xl border border-gray-100/50">
+          <div className="px-8 py-8">
+            <div className="flex items-center mb-8">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mr-4">
+                <ClipboardList className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900">
+                {t("dashboard.active_job_cards")}
+              </h3>
+            </div>
+            <JobCardGrid />
+          </div>
         </div>
       </div>
     </div>

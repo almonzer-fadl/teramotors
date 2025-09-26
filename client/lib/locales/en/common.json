@@ -597,5 +597,92 @@
       "exhaust_services": "Exhaust System Services",
       "inspection_services": "Inspection Services"
     }
+  },
+  "landing": {
+    "hero": {
+      "title": "TeraMotors Auto Repair",
+      "subtitle": "Your Trusted Partner for Professional Auto Repair Services",
+      "description": "With over 15 years of experience, we provide expert automotive repair and maintenance services. From routine oil changes to complex engine repairs, we keep your vehicle running smoothly and safely.",
+      "book_appointment": "Book Appointment",
+      "call_now": "Call Now",
+      "phone": "(555) 123-4567"
+    },
+    "services": {
+      "title": "Our Services",
+      "subtitle": "Comprehensive Auto Repair & Maintenance",
+      "engine_repair": {
+        "title": "Engine Repair",
+        "description": "Complete engine diagnostics, rebuilds, and repairs for all makes and models."
+      },
+      "brake_service": {
+        "title": "Brake Service",
+        "description": "Brake pad replacement, rotor resurfacing, and complete brake system maintenance."
+      },
+      "transmission": {
+        "title": "Transmission Service",
+        "description": "Automatic and manual transmission repair, rebuild, and maintenance services."
+      },
+      "electrical": {
+        "title": "Electrical Systems",
+        "description": "Battery replacement, alternator repair, and complete electrical system diagnostics."
+      },
+      "ac_heating": {
+        "title": "A/C & Heating",
+        "description": "Air conditioning repair, heating system service, and climate control maintenance."
+      },
+      "suspension": {
+        "title": "Suspension & Steering",
+        "description": "Shock absorber replacement, alignment, and steering system repair."
+      },
+      "oil_change": {
+        "title": "Oil Change Service",
+        "description": "Regular oil changes with premium filters to keep your engine running smoothly."
+      },
+      "inspection": {
+        "title": "Vehicle Inspection",
+        "description": "Comprehensive safety inspections and pre-purchase vehicle evaluations."
+      }
+    },
+    "about": {
+      "title": "About TeraMotors",
+      "subtitle": "Your Neighborhood Auto Repair Experts",
+      "description": "Founded in 2008, TeraMotors has been serving the community with honest, reliable auto repair services. Our certified technicians use state-of-the-art equipment and genuine parts to ensure your vehicle receives the best care possible.",
+      "experience": "15+ Years Experience",
+      "certified_techs": "Certified Technicians",
+      "warranty": "12-Month Warranty",
+      "customer_satisfaction": "100% Customer Satisfaction",
+      "mission": "Our mission is to provide honest, transparent, and high-quality auto repair services that keep you and your family safe on the road.",
+      "values": {
+        "honesty": "Honest, transparent pricing with no hidden fees",
+        "quality": "Only genuine parts and premium service",
+        "warranty": "Comprehensive warranty on all repairs",
+        "convenience": "Flexible scheduling and quick turnaround times"
+      }
+    },
+    "testimonials": {
+      "title": "What Our Customers Say",
+      "subtitle": "Real feedback from satisfied customers"
+    },
+    "gallery": {
+      "title": "Our Workshop",
+      "subtitle": "State-of-the-art facility with modern equipment"
+    },
+    "contact": {
+      "title": "Get In Touch",
+      "subtitle": "Ready to schedule your next service?",
+      "address": "123 Auto Repair Street, City, State 12345",
+      "phone": "(555) 123-4567",
+      "email": "info@teramotors.com",
+      "hours": "Mon-Fri: 7AM-6PM, Sat: 8AM-4PM, Sun: Closed",
+      "book_online": "Book Online",
+      "call_us": "Call Us Now"
+    },
+    "login": {
+      "title": "Customer Portal",
+      "subtitle": "Access your service history and manage appointments",
+      "description": "Track your vehicle's service history, schedule appointments, and view repair estimates all in one place.",
+      "sign_in": "Sign In to Portal",
+      "create_account": "Create Account"
+    }
   }
 }
