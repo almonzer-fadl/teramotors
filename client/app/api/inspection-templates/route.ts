@@ -37,7 +37,8 @@ export async function POST(request: Request) {
       name: body.name,
       category: body.category,
       vehicleType: body.vehicleType,
-      items: body.items
+      items: body.items,
+      isActive: body.isActive !== undefined ? body.isActive : true
     })
 
     await template.save()

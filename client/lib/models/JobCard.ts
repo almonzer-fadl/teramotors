@@ -3,8 +3,10 @@ const { Schema } = mongoose;
 
 const JobCardSchema = new Schema({
   appointmentId: { type: Schema.Types.ObjectId, ref: 'Appointment', required: false },
+  inspectionId: { type: Schema.Types.ObjectId, ref: 'VehicleInspection', required: false },
   customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
+  mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: false },
   status: { type: String, enum: ['pending', 'in-progress', 'completed', 'cancelled'], default: 'pending' },
   priority: { type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium' },
   estimatedStartTime: { type: Date, required: false },

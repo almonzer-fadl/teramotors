@@ -27,6 +27,7 @@ export interface InvoiceItem {
   
   // Main invoice data structure
   export interface InvoiceData {
+    status: string;
     invoiceNumber: string;
     invoiceDate: Date;
     dueDate?: Date;

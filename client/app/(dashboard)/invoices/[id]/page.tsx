@@ -26,11 +26,19 @@ export default function InvoiceDetailPage() {
   }, [id]);
 
   const qrSrc = useMemo(() => {
+    // First try to get the QR code image if available
+    const qrImage = data?.invoice?.zatca?.qrCodeImage;
+    if (qrImage) {
+      if (typeof qrImage === 'string' && qrImage.startsWith('data:')) return qrImage;
+      return `data:image/png;base64,${qrImage}`;
+    }
+    
+    // Fallback to generating QR code from base64 data
     const qr = data?.invoice?.zatca?.qrCode;
     if (!qr) return null;
     if (typeof qr === 'string' && qr.startsWith('data:')) return qr;
     return `data:image/png;base64,${qr}`;
-  }, [data]);
+  }, [data?.invoice?.zatca?.qrCodeImage, data?.invoice?.zatca?.qrCode]);
 
   if (loading) {
     return (
@@ -90,7 +98,7 @@ export default function InvoiceDetailPage() {
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Payment</h3>
-                <p className="mt-1 text-gray-900">{invoice?.paymentStatus} {invoice?.paymentMethod ? `(${invoice.paymentMethod})` : ''}</p>
+                <p className="mt-1 text-gray-900">{invoice?.status} {invoice?.paymentMethod ? `(${invoice.paymentMethod})` : ''}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Due Date</h3>

@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || '';
     const sort = searchParams.get('sort') || 'name';
     const direction = searchParams.get('direction') || 'asc';
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
 
     const query: any = { isActive: true };
 
@@ -30,16 +32,50 @@ export async function GET(request: NextRequest) {
       ];
     }
 
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+
     const sortOptions: { [key: string]: any } = {};
     sortOptions[sort] = direction;
 
-    const parts = await Part.find(query).sort(sortOptions);
+    // Get total count for pagination
+    const totalCount = await Part.countDocuments(query);
 
-    return new Response(JSON.stringify(parts));
+    const parts = await Part.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit);
+
+    // Calculate pagination info
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return new Response(JSON.stringify({
+      parts,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit,
+        hasNextPage,
+        hasPrevPage
+      }
+    }));
   } catch (error) {
     console.error('Error fetching parts:', error);
     // Return empty array when database is unavailable
-    return new Response(JSON.stringify([]));
+    return new Response(JSON.stringify({
+      parts: [],
+      pagination: {
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0,
+        limit: 10,
+        hasNextPage: false,
+        hasPrevPage: false
+      }
+    }));
   }
 }
 

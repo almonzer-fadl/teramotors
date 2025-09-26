@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const EstimateSchema = new Schema({
-  jobCardId: { type: Schema.Types.ObjectId, ref: 'JobCard', required: true },
+  jobCardId: { type: Schema.Types.ObjectId, ref: 'JobCard', required: false },
+  inspectionId: { type: Schema.Types.ObjectId, ref: 'VehicleInspection', required: false },
   customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
   mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: true },
@@ -13,6 +14,12 @@ const EstimateSchema = new Schema({
     quantity: { type: Number, required: true, min: 1 },
     laborCost: { type: Number, required: true, min: 0 },
     partsCost: { type: Number, required: true, min: 0 },
+    totalCost: { type: Number, required: true, min: 0 }
+  }],
+  parts: [{
+    partId: { type: Schema.Types.ObjectId, ref: 'Part' },
+    quantity: { type: Number, required: true, min: 1 },
+    unitCost: { type: Number, required: true, min: 0 },
     totalCost: { type: Number, required: true, min: 0 }
   }],
   subtotal: { type: Number, required: true, min: 0 },

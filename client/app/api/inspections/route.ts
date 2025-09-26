@@ -6,8 +6,9 @@ import Customer from '@/lib/models/Customer'
 import Mechanic from '@/lib/models/Mechanic'
 import User from '@/lib/models/User'
 import { getServerSession } from "@/lib/auth-server";
+import { NextRequest } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession()
     if (!session) {
@@ -15,6 +16,22 @@ export async function GET() {
     }
 
     await connectToDatabase()
+
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+
+    // Build sort object
+    const sort: any = {};
+    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    
+    // Get total count for pagination
+    const totalCount = await VehicleInspection.countDocuments({});
     
     const inspections = await VehicleInspection.find({})
       .populate('vehicleId', 'make model year licensePlate')
@@ -26,13 +43,40 @@ export async function GET() {
         }
       })
       .populate('templateId', 'name')
-      .sort({ createdAt: -1 })
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
 
-    return Response.json(inspections)
+    // Calculate pagination info
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return Response.json({
+      inspections,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit,
+        hasNextPage,
+        hasPrevPage
+      }
+    })
   } catch (error) {
     console.error('Error fetching inspections:', error)
     // Return empty array when database is unavailable
-    return Response.json([])
+    return Response.json({
+      inspections: [],
+      pagination: {
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0,
+        limit: 10,
+        hasNextPage: false,
+        hasPrevPage: false
+      }
+    })
   }
 }
 

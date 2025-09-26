@@ -56,10 +56,13 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
       const response = await fetch("/api/customers");
       if (response.ok) {
         const data = await response.json();
-        setCustomers(data);
+        // Ensure data is always an array
+        const customersArray = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+        setCustomers(customersArray);
       }
     } catch (error) {
       console.error("Failed to fetch customers:", error);
+      setCustomers([]); // Set empty array on error
     }
   };
 
@@ -152,47 +155,59 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <button
-            onClick={() => router.back()}
-            className="mr-4 p-2 text-gray-400 hover:text-gray-600"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {isEditing ? t("forms.edit_vehicle") : t("forms.new_vehicle")}
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              {isEditing
-                ? t("forms.update_vehicle_information")
-                : t("forms.enter_vehicle_details")}
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="py-8">
+            <div className="flex items-center">
+              <button
+                onClick={() => router.back()}
+                className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
+              >
+                <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
+              </button>
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  {isEditing ? t("forms.edit_vehicle") : t("forms.new_vehicle")}
+                </h1>
+                <p className="mt-3 text-xl text-gray-600">
+                  {isEditing
+                    ? t("forms.update_vehicle_information")
+                    : t("forms.enter_vehicle_details")}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {t("vehicles.title")}
-            </h3>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("forms.customer")} *
-                </label>
-                <select
-                  required
-                  value={formData.customerId}
-                  onChange={(e) =>
-                    handleInputChange("customerId", e.target.value)
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
+      <div className="px-4 sm:px-6 lg:px-8 py-12">
+
+        <form onSubmit={handleSubmit} className="space-y-10">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="px-8 py-8">
+              <div className="flex items-center mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mr-4">
+                  <Plus className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {t("vehicles.title")}
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("forms.customer")} *
+                  </label>
+                  <select
+                    required
+                    value={formData.customerId}
+                    onChange={(e) =>
+                      handleInputChange("customerId", e.target.value)
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  >
                   <option value="">{t("forms.select_customer")}</option>
                   {customers.map((customer) => (
                     <option
@@ -204,133 +219,141 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("vehicles.vin")}
-                </label>
-                <input
-                  type="text"
-                  value={formData.vin}
-                  onChange={(e) => handleInputChange("vin", e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("vehicles.make")} *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.make}
-                  onChange={(e) => handleInputChange("make", e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("vehicles.model")} *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.model}
-                  onChange={(e) => handleInputChange("model", e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("vehicles.year")} *
-                </label>
-                <input
-                  type="number"
-                  required
-                  value={formData.year}
-                  onChange={(e) =>
-                    handleInputChange("year", parseInt(e.target.value))
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("vehicles.color")}
-                </label>
-                <input
-                  type="text"
-                  value={formData.color}
-                  onChange={(e) => handleInputChange("color", e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("vehicles.license_plate")} *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.licensePlate}
-                  onChange={(e) =>
-                    handleInputChange("licensePlate", e.target.value)
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("vehicles.mileage")}
-                </label>
-                <input
-                  type="number"
-                  value={formData.mileage}
-                  onChange={(e) =>
-                    handleInputChange("mileage", parseInt(e.target.value))
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("vehicles.engine")}
-                </label>
-                <input
-                  type="text"
-                  value={formData.engineType}
-                  onChange={(e) =>
-                    handleInputChange("engineType", e.target.value)
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("vehicles.transmission")}
-                </label>
-                <select
-                  value={formData.transmission}
-                  onChange={(e) =>
-                    handleInputChange("transmission", e.target.value)
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("vehicles.vin")}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.vin}
+                    onChange={(e) => handleInputChange("vin", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter VIN number"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("vehicles.make")} *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.make}
+                    onChange={(e) => handleInputChange("make", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter vehicle make"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("vehicles.model")} *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.model}
+                    onChange={(e) => handleInputChange("model", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter vehicle model"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("vehicles.year")} *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={formData.year}
+                    onChange={(e) =>
+                      handleInputChange("year", parseInt(e.target.value))
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter vehicle year"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("vehicles.color")}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.color}
+                    onChange={(e) => handleInputChange("color", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter vehicle color"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("vehicles.license_plate")} *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.licensePlate}
+                    onChange={(e) =>
+                      handleInputChange("licensePlate", e.target.value)
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter license plate"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("vehicles.mileage")}
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.mileage}
+                    onChange={(e) =>
+                      handleInputChange("mileage", parseInt(e.target.value))
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter mileage"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("vehicles.engine")}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.engineType}
+                    onChange={(e) =>
+                      handleInputChange("engineType", e.target.value)
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter engine type"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("vehicles.transmission")}
+                  </label>
+                  <select
+                    value={formData.transmission}
+                    onChange={(e) =>
+                      handleInputChange("transmission", e.target.value)
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  >
                   <option value="automatic">{t("vehicles.automatic")}</option>
                   <option value="manual">{t("vehicles.manual")}</option>
                   <option value="cvt">{t("vehicles.cvt")}</option>
                 </select>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t("vehicles.fuel_type")}
-                </label>
-                <select
-                  value={formData.fuelType}
-                  onChange={(e) =>
-                    handleInputChange("fuelType", e.target.value)
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("vehicles.fuel_type")}
+                  </label>
+                  <select
+                    value={formData.fuelType}
+                    onChange={(e) =>
+                      handleInputChange("fuelType", e.target.value)
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  >
                   <option value="gasoline">{t("vehicles.gasoline")}</option>
                   <option value="diesel">{t("vehicles.diesel")}</option>
                   <option value="hybrid">{t("vehicles.hybrid")}</option>
@@ -341,11 +364,16 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
           </div>
         </div>
 
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {t("forms.vehicle_photos")}
-            </h3>
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="px-8 py-8">
+              <div className="flex items-center mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                  <Plus className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {t("forms.vehicle_photos")}
+                </h3>
+              </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {formData.photos.map((photo, index) => (
                 <div key={index} className="relative">
@@ -388,29 +416,31 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
           </div>
         </div>
 
-        <div className="flex justify-end space-x-3">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            <X className="mr-2 h-4 w-4" />
-            {t("forms.cancel")}
-          </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-          >
-            <Save className="mr-2 h-4 w-4" />
-            {loading
-              ? t("forms.saving")
-              : isEditing
-              ? t("forms.update_vehicle")
-              : t("forms.save_vehicle")}
-          </button>
-        </div>
-      </form>
+          {/* Form Actions */}
+          <div className="flex justify-end space-x-6">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="group inline-flex items-center px-8 py-4 border-2 border-gray-300 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:border-[#F13F33] hover:text-[#F13F33] hover:bg-[#F13F33]/5 transition-all duration-300"
+            >
+              <X className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              {t("forms.cancel")}
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+            >
+              <Save className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              {loading
+                ? t("forms.saving")
+                : isEditing
+                ? t("forms.update_vehicle")
+                : t("forms.save_vehicle")}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

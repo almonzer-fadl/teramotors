@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Plus, Search, Edit, Trash2, ArrowUpDown } from "lucide-react";
 import StatusBadge from "@/components/dashboard/StatusBadge";
+import Pagination from "@/components/ui/Pagination";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -54,10 +55,13 @@ export default function InventoryPage() {
       const response = await fetch(`/api/parts?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        setParts(data);
+        setParts(Array.isArray(data.parts) ? data.parts : []);
+      } else {
+        setParts([]);
       }
     } catch (error) {
       console.error("Failed to fetch parts:", error);
+      setParts([]);
     } finally {
       setLoading(false);
     }

@@ -14,6 +14,7 @@ import {
   Clock,
   FileText,
 } from "lucide-react";
+import Pagination from "@/components/ui/Pagination";
 import { useTranslation } from "react-i18next";
 
 interface Invoice {
@@ -43,9 +44,31 @@ interface Invoice {
   paidAmount?: number;
   dueDate: string;
   paymentMethod?: "cash" | "card" | "bank_transfer" | "other";
-  paymentStatus: "pending" | "paid" | "failed";
   paymentDate?: string;
   createdAt: string;
+  zatca?: {
+    qrCode?: string;
+    qrCodeImage?: string;
+    invoiceNumber?: string;
+    invoiceDate?: Date;
+    vatAmount?: number;
+    subtotal?: number;
+    compliance?: {
+      phase: number;
+      isCompliant: boolean;
+      errors: string[];
+      warnings: string[];
+    };
+  };
+}
+
+interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
 
 export default function InvoicesPage() {
@@ -54,45 +77,77 @@ export default function InvoicesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [paymentFilter, setPaymentFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 0,
+    totalCount: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
 
   useEffect(() => {
-    fetchInvoices();
-  }, []);
+    fetchInvoices(searchTerm, statusFilter, currentPage, itemsPerPage);
+  }, [searchTerm, statusFilter, currentPage, itemsPerPage]);
 
-  const fetchInvoices = async () => {
+  const fetchInvoices = async (search: string, status: string, page: number, limit: number) => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/invoices");
+      const params = new URLSearchParams({
+        search,
+        status,
+        page: page.toString(),
+        limit: limit.toString()
+      });
+      const response = await fetch(`/api/invoices?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
-        setInvoices(data);
+        if (data.invoices && data.pagination) {
+          setInvoices(data.invoices);
+          setPagination(data.pagination);
+        } else {
+          // Fallback for old API format
+          setInvoices(data);
+          setPagination({
+            currentPage: 1,
+            totalPages: 1,
+            totalCount: data.length,
+            limit: data.length,
+            hasNextPage: false,
+            hasPrevPage: false
+          });
+        }
+      } else {
+        setInvoices([]);
+        setPagination({
+          currentPage: 1,
+          totalPages: 0,
+          totalCount: 0,
+          limit: 10,
+          hasNextPage: false,
+          hasPrevPage: false
+        });
       }
     } catch (error) {
       console.error("Failed to fetch invoices:", error);
+      setInvoices([]);
+      setPagination({
+        currentPage: 1,
+        totalPages: 0,
+        totalCount: 0,
+        limit: 10,
+        hasNextPage: false,
+        hasPrevPage: false
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredInvoices = invoices.filter((invoice) => {
-    const matchesSearch =
-      `${invoice.customerId.firstName} ${invoice.customerId.lastName}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      `${invoice.vehicleId.year} ${invoice.vehicleId.make} ${invoice.vehicleId.model}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      invoice.vehicleId.licensePlate
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all" || invoice.status === statusFilter;
-    const matchesPayment =
-      paymentFilter === "all" || invoice.paymentStatus === paymentFilter;
-
-    return matchesSearch && matchesStatus && matchesPayment;
-  });
+  // Remove client-side filtering since we're now doing it server-side
+  const filteredInvoices = invoices;
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -116,20 +171,19 @@ export default function InvoicesPage() {
     }
   };
 
-  const getPaymentStatusColor = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "bg-green-100 text-green-800";
-      case "failed":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-yellow-100 text-yellow-800";
-    }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    setItemsPerPage(itemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
   };
 
   const isOverdue = (dueDate: string) => {
     const invoice = invoices.find((i) => i.dueDate === dueDate);
-    const isPaid = invoice?.paymentStatus === "paid";
+    const isPaid = invoice?.status === "paid";
     return new Date(dueDate) < new Date() && !isPaid;
   };
 
@@ -260,23 +314,13 @@ export default function InvoicesPage() {
                 <option value="paid">{t("invoices.paid")}</option>
                 <option value="cancelled">{t("appointments.cancelled")}</option>
               </select>
-              <select
-                value={paymentFilter}
-                onChange={(e) => setPaymentFilter(e.target.value)}
-                className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="all">{t("invoices.all_payments")}</option>
-                <option value="pending">{t("invoices.payment_pending")}</option>
-                <option value="paid">{t("invoices.payment_received")}</option>
-                <option value="failed">{t("invoices.payment_failed")}</option>
-              </select>
             </div>
             <div className="text-sm text-gray-500">
               {t(
-                filteredInvoices.length === 1
+                pagination.totalCount === 1
                   ? "invoices.invoice_count"
                   : "invoices.invoice_count_plural",
-                { count: filteredInvoices.length }
+                { count: pagination.totalCount }
               )}
             </div>
           </div>
@@ -303,9 +347,6 @@ export default function InvoicesPage() {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {t("invoices.due_date")}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t("invoices.payment_status")}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {t("customers.status")}
@@ -379,24 +420,20 @@ export default function InvoicesPage() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(
-                        invoice.paymentStatus
-                      )}`}
-                    >
-                      {invoice.paymentStatus}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
+                    <div className="flex items-center space-x-2">
                       {getStatusIcon(invoice.status)}
                       <span
-                        className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
                           invoice.status
                         )}`}
                       >
                         {invoice.status}
                       </span>
+                      {invoice.zatca?.compliance?.isCompliant && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          ZATCA ✓
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -433,6 +470,22 @@ export default function InvoicesPage() {
         </div>
       </div>
 
+      {/* Pagination */}
+      {pagination.totalPages > 1 && (
+        <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalCount}
+            itemsPerPage={pagination.limit}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsPerPageOptions={[10, 30, 50]}
+            showItemsPerPage={true}
+          />
+        </div>
+      )}
+
       {filteredInvoices.length === 0 && (
         <div className="text-center py-12">
           <CreditCard className="mx-auto h-12 w-12 text-gray-400" />
@@ -440,11 +493,11 @@ export default function InvoicesPage() {
             {t("invoices.no_invoices_found")}
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== "all" || paymentFilter !== "all"
+            {searchTerm || statusFilter !== "all"
               ? t("invoices.adjust_search")
               : t("invoices.get_started")}
           </p>
-          {!searchTerm && statusFilter === "all" && paymentFilter === "all" && (
+          {!searchTerm && statusFilter === "all" && (
             <div className="mt-6">
               <Link
                 href="/invoices/new"
