@@ -123,10 +123,26 @@ export default function AppointmentForm({
           fetch("/api/services"),
           fetch("/api/mechanics"),
         ]);
-      if (customersRes.ok) setCustomers(await customersRes.json());
-      if (vehiclesRes.ok) setVehicles(await vehiclesRes.json());
-      if (servicesRes.ok) setServices(await servicesRes.json());
-      if (mechanicsRes.ok) setMechanics(await mechanicsRes.json());
+      if (customersRes.ok) {
+        const data = await customersRes.json();
+        const customersArray = Array.isArray(data.customers) ? data.customers : (Array.isArray(data) ? data : []);
+        setCustomers(customersArray);
+      }
+      if (vehiclesRes.ok) {
+        const data = await vehiclesRes.json();
+        const vehiclesArray = Array.isArray(data.vehicles) ? data.vehicles : (Array.isArray(data) ? data : []);
+        setVehicles(vehiclesArray);
+      }
+      if (servicesRes.ok) {
+        const data = await servicesRes.json();
+        const servicesArray = Array.isArray(data) ? data : [];
+        setServices(servicesArray);
+      }
+      if (mechanicsRes.ok) {
+        const data = await mechanicsRes.json();
+        const mechanicsArray = Array.isArray(data) ? data : [];
+        setMechanics(mechanicsArray);
+      }
     } catch (error) {
       console.error("Failed to fetch initial data:", error);
     }

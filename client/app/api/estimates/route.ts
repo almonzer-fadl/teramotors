@@ -88,10 +88,12 @@ export async function POST(request: Request) {
     
     const body = await request.json()
     
-    // Validate that job card exists
-    const jobCard = await JobCard.findById(body.jobCardId)
-    if (!jobCard) {
-      return Response.json({ error: 'Job card not found' }, { status: 400 })
+    // Validate that job card exists (optional)
+    if (body.jobCardId) {
+      const jobCard = await JobCard.findById(body.jobCardId)
+      if (!jobCard) {
+        return Response.json({ error: 'Job card not found' }, { status: 400 })
+      }
     }
 
     // Validate that customer exists
@@ -106,51 +108,75 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Vehicle not found' }, { status: 400 })
     }
 
-    // Validate that mechanic exists
-    const mechanic = await Mechanic.findById(body.mechanicId)
-    if (!mechanic) {
-      return Response.json({ error: 'Mechanic not found' }, { status: 400 })
-    }
-
-    // Validate services
-    for (const service of body.services) {
-      const serviceExists = await Service.findById(service.serviceId)
-      if (!serviceExists) {
-        return Response.json({ error: `Service ${service.serviceId} not found` }, { status: 400 })
+    // Validate that mechanic exists (optional)
+    if (body.mechanicId) {
+      const mechanic = await User.findById(body.mechanicId)
+      if (!mechanic) {
+        return Response.json({ error: 'Mechanic not found' }, { status: 400 })
       }
     }
 
+    // Clean and validate services
+    const cleanedServices = body.services.map((service: any) => ({
+      ...service,
+      serviceId: service.serviceId && service.serviceId !== '' && !service.serviceId.startsWith('auto-') ? service.serviceId : null
+    }));
+
+    // Validate services (only if serviceId is provided)
+    for (const service of cleanedServices) {
+      if (service.serviceId) {
+        const serviceExists = await Service.findById(service.serviceId)
+        if (!serviceExists) {
+          return Response.json({ error: `Service ${service.serviceId} not found` }, { status: 400 })
+        }
+      }
+    }
+
+    // Clean parts
+    const cleanedParts = body.parts ? body.parts.map((part: any) => ({
+      ...part,
+      partId: part.partId && part.partId !== '' ? part.partId : null
+    })) : [];
+
+
     // Calculate totals
-    const subtotal = body.services.reduce((sum: number, service: any) => sum + service.totalCost, 0)
-    const tax = subtotal * 0.08 // 8% tax rate
+    const servicesTotal = cleanedServices.reduce((sum: number, service: any) => sum + service.totalCost, 0)
+    const partsTotal = cleanedParts.reduce((sum: number, part: any) => sum + part.totalCost, 0)
+    const subtotal = servicesTotal + partsTotal
+    const tax = subtotal * 0.15 // 15% tax rate
     const total = subtotal + tax
 
     // Set valid until date (30 days from now)
     const validUntil = new Date()
     validUntil.setDate(validUntil.getDate() + 30)
 
+
     const estimate = new Estimate({
-      jobCardId: body.jobCardId,
+      jobCardId: body.jobCardId || null,
+      inspectionId: body.inspectionId || null,
       customerId: body.customerId,
       vehicleId: body.vehicleId,
-      mechanicId: body.mechanicId,
+      mechanicId: body.mechanicId || null,
       status: body.status || 'pending',
-      services: body.services,
+      services: cleanedServices || [],
+      parts: cleanedParts || [],
       subtotal,
       tax,
       total,
-      validUntil,
-      notes: body.notes
+      validUntil: body.validUntil ? new Date(body.validUntil) : validUntil,
+      notes: body.notes || ''
     })
 
     await estimate.save()
 
     const populatedEstimate = await Estimate.findById(estimate._id)
       .populate('jobCardId', '_id')
+      .populate('inspectionId', 'inspectionDate overallCondition')
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate({        path: 'mechanicId',        populate: {          path: 'userId',          select: 'firstName lastName'        }      })
+      .populate('mechanicId', 'firstName lastName displayName')
       .populate('services.serviceId', 'name')
+      .populate('parts.partId', 'name partNumber')
 
     return Response.json({ 
       success: true, 
@@ -158,6 +184,10 @@ export async function POST(request: Request) {
     }, { status: 201 })
   } catch (error) {
     console.error('Error creating estimate:', error)
-    return Response.json({ error: 'Failed to create estimate' }, { status: 500 })
+    return Response.json({ 
+      error: 'Failed to create estimate',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    }, { status: 500 })
   }
 }

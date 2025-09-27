@@ -50,6 +50,7 @@ export async function GET(request: NextRequest) {
       .sort(sort)
       .skip(skip)
       .limit(limit)
+      .lean() // Use lean() for better performance
 
     // Calculate pagination info
     const totalPages = Math.ceil(totalCount / limit)

@@ -144,12 +144,18 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
                       <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">
                         {t('vehicles.owner')}
                       </p>
-                      <Link 
-                        href={`/customers/${vehicle.customerId._id}`} 
-                        className="text-lg font-bold text-[#F13F33] hover:text-[#d6352a] transition-colors duration-300"
-                      >
-                        {vehicle.customerId.firstName} {vehicle.customerId.lastName}
-                      </Link>
+                      {vehicle.customerId ? (
+                        <Link 
+                          href={`/customers/${vehicle.customerId._id}`} 
+                          className="text-lg font-bold text-[#F13F33] hover:text-[#d6352a] transition-colors duration-300"
+                        >
+                          {vehicle.customerId.firstName} {vehicle.customerId.lastName}
+                        </Link>
+                      ) : (
+                        <span className="text-lg font-bold text-gray-500">
+                          No Customer Assigned
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center p-4 bg-gray-50/80 rounded-2xl">

@@ -14,7 +14,6 @@ import {
   LayoutDashboard,
   Users,
   Car,
-  Calendar,
   ClipboardList,
   FileText,
   Package,
@@ -26,7 +25,6 @@ import {
   Menu,
   X,
   Bell,
-  User,
   Wrench,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -38,7 +36,6 @@ const iconMap = {
   LayoutDashboard,
   Users,
   Car,
-  Calendar,
   ClipboardList,
   FileText,
   Package,
@@ -209,7 +206,7 @@ export default function DashboardLayout({
               <div className="flex items-center gap-x-4">
                 <div className="flex items-center gap-x-3">
                   <div className="w-10 h-10 bg-[#F13F33] rounded-xl flex items-center justify-center">
-                    <User className="h-5 w-5 text-white" />
+                    <Users className="h-5 w-5 text-white" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold text-gray-900">

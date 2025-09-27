@@ -56,9 +56,13 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
       const response = await fetch("/api/customers");
       if (response.ok) {
         const data = await response.json();
-        // Ensure data is always an array
-        const customersArray = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
+        // The customers API returns { customers: [...], pagination: {...} }
+        const customersArray = Array.isArray(data.customers) ? data.customers : (Array.isArray(data) ? data : []);
+        console.log('Fetched customers for vehicle form:', customersArray);
         setCustomers(customersArray);
+      } else {
+        console.error("Failed to fetch customers:", response.status, response.statusText);
+        setCustomers([]);
       }
     } catch (error) {
       console.error("Failed to fetch customers:", error);

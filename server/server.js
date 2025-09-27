@@ -28,8 +28,16 @@ app.get('/health', (req, res) => {
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/teramotors', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
+  dbName: "teramotors",
+  serverSelectionTimeoutMS: 30000,
+  socketTimeoutMS: 60000,
+  connectTimeoutMS: 30000,
+  maxPoolSize: 5,
+  minPoolSize: 1,
+  maxIdleTimeMS: 60000,
+  retryWrites: true,
+  retryReads: true,
+  bufferCommands: false,
 })
 .then(() => console.log('MongoDB connected successfully'))
 .catch(err => console.error('MongoDB connection error:', err));

@@ -43,15 +43,26 @@ export async function GET(request: NextRequest) {
     const totalCount = await Vehicle.countDocuments(query)
     
     const vehicles = await Vehicle.find(query)
-      .populate('customerId', 'firstName lastName')
+      .populate('customerId', 'firstName lastName isActive')
       .sort(sort)
       .skip(skip)
       .limit(limit)
+      .lean() // Use lean() for better performance
 
     // Calculate pagination info
     const totalPages = Math.ceil(totalCount / limit)
     const hasNextPage = page < totalPages
     const hasPrevPage = page > 1
+
+    // Log for debugging
+    console.log(`Fetched ${vehicles.length} vehicles, ${vehicles.filter(v => v.customerId).length} with customers`)
+    console.log('Sample vehicle data:', vehicles.slice(0, 2).map(v => ({
+      id: v._id,
+      make: v.make,
+      model: v.model,
+      customerId: v.customerId,
+      customerName: v.customerId ? `${v.customerId.firstName} ${v.customerId.lastName}` : 'No Customer'
+    })))
 
     return Response.json({
       vehicles,

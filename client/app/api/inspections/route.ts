@@ -3,7 +3,6 @@ import VehicleInspection from '@/lib/models/VehicleInspection'
 import InspectionTemplate from '@/lib/models/InspectionTemplate'
 import Vehicle from '@/lib/models/Vehicle'
 import Customer from '@/lib/models/Customer'
-import Mechanic from '@/lib/models/Mechanic'
 import User from '@/lib/models/User'
 import { getServerSession } from "@/lib/auth-server";
 import { NextRequest } from 'next/server';
@@ -36,12 +35,7 @@ export async function GET(request: NextRequest) {
     const inspections = await VehicleInspection.find({})
       .populate('vehicleId', 'make model year licensePlate')
       .populate('customerId', 'firstName lastName')
-      .populate({        path: 'mechanicId',
-        populate: {
-          path: 'userId',
-          select: 'firstName lastName'
-        }
-      })
+      .populate('mechanicId', 'firstName lastName displayName')
       .populate('templateId', 'name')
       .sort(sort)
       .skip(skip)
@@ -103,42 +97,54 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Customer not found' }, { status: 400 })
     }
 
-    // Validate that mechanic exists
-    const mechanic = await Mechanic.findById(body.mechanicId)
-    if (!mechanic) {
-      return Response.json({ error: 'Mechanic not found' }, { status: 400 })
+    // Validate that user exists
+    const user = await User.findById(body.mechanicId)
+    if (!user) {
+      return Response.json({ error: 'User not found' }, { status: 400 })
     }
 
-    // Validate that template exists
-    const template = await InspectionTemplate.findById(body.templateId)
-    if (!template) {
-      return Response.json({ error: 'Inspection template not found' }, { status: 400 })
+    // Validate that template exists (only if provided and not empty)
+    if (body.templateId && body.templateId !== "") {
+      const template = await InspectionTemplate.findById(body.templateId)
+      if (!template) {
+        return Response.json({ error: 'Inspection template not found' }, { status: 400 })
+      }
     }
 
     // Calculate total estimated cost
     const totalEstimatedCost = body.items.reduce((sum: number, item: any) => sum + (item.estimatedCost || 0), 0)
 
-    const inspection = new VehicleInspection({
+    const inspectionData: any = {
       vehicleId: body.vehicleId,
       customerId: body.customerId,
       mechanicId: body.mechanicId,
-      templateId: body.templateId,
       inspectionDate: body.inspectionDate,
       mileage: body.mileage,
       overallCondition: body.overallCondition,
       items: body.items,
       totalEstimatedCost,
       recommendations: body.recommendations,
-      nextInspectionDate: body.nextInspectionDate,
       status: body.status || 'in-progress'
-    })
+    }
+
+    // Only add templateId if it's provided and not empty
+    if (body.templateId && body.templateId !== "") {
+      inspectionData.templateId = body.templateId
+    }
+
+    // Only add nextInspectionDate if it's provided and not empty
+    if (body.nextInspectionDate && body.nextInspectionDate !== "") {
+      inspectionData.nextInspectionDate = body.nextInspectionDate
+    }
+
+    const inspection = new VehicleInspection(inspectionData)
 
     await inspection.save()
 
     const populatedInspection = await VehicleInspection.findById(inspection._id)
       .populate('vehicleId', 'make model year licensePlate')
       .populate('customerId', 'firstName lastName')
-      .populate({        path: 'mechanicId',        populate: {          path: 'userId',          select: 'firstName lastName'        }      })
+      .populate('mechanicId', 'firstName lastName displayName')
       .populate('templateId', 'name')
 
     return Response.json({ 

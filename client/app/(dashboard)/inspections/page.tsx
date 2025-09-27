@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   Camera,
   FileText,
+  Download,
 } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
 import { socket } from "@/lib/services/socket";
@@ -80,6 +81,7 @@ export default function InspectionsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [generatingPDF, setGeneratingPDF] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -110,6 +112,19 @@ export default function InspectionsPage() {
     }
   };
 
+  const generatePDF = async (inspectionId: string) => {
+    setGeneratingPDF(inspectionId);
+    try {
+      // Open PDF in new tab for viewing
+      window.open(`/api/inspections/${inspectionId}/pdf`, '_blank');
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+      alert(t("inspections.failed_to_generate_pdf"));
+    } finally {
+      setGeneratingPDF(null);
+    }
+  };
+
   const filteredInspections = inspections.filter((inspection) => {
     const matchesSearch =
       `${inspection.customerId.firstName} ${inspection.customerId.lastName}`
@@ -121,7 +136,7 @@ export default function InspectionsPage() {
       inspection.vehicleId.licensePlate
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      inspection.templateId.name
+      (inspection.templateId?.name || 'No Template')
         .toLowerCase()
         .includes(searchTerm.toLowerCase());
 
@@ -191,14 +206,14 @@ export default function InspectionsPage() {
         <div className="mt-4 sm:mt-0 flex space-x-3">
           <Link
             href="/inspections/templates"
-            className="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500"
+            className="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 transition-colors duration-200"
           >
             <FileText className="mr-2 h-4 w-4" />
             {t('inspections.templates')}
           </Link>
           <Link
             href="/inspections/new"
-            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
+            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-200"
           >
             <Plus className="mr-2 h-4 w-4" />
             {t('inspections.new_inspection')}
@@ -206,7 +221,7 @@ export default function InspectionsPage() {
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search and Stats */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-4 py-5 sm:p-6">
           <div className="flex items-center justify-between mb-4">
@@ -218,13 +233,13 @@ export default function InspectionsPage() {
                   placeholder={t('inspections.search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                 />
               </div>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
               >
                 <option value="all">{t('inspections.all_status')}</option>
                 <option value="in-progress">{t('inspections.in_progress')}</option>
@@ -259,9 +274,6 @@ export default function InspectionsPage() {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {t('inspections.overall_condition')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inspections.estimated_cost')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {t('inspections.status')}
@@ -310,7 +322,7 @@ export default function InspectionsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {inspection.templateId.name}
+                      {inspection.templateId?.name || 'No Template'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -323,9 +335,6 @@ export default function InspectionsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      ${inspection.totalEstimatedCost.toFixed(2)}
-                    </div>
                     <div className="text-sm text-gray-500">
                       {inspection.items.length} items
                     </div>
@@ -356,12 +365,18 @@ export default function InspectionsPage() {
                       >
                         <Edit className="h-4 w-4" />
                       </Link>
-                      <Link
-                        href={`/inspections/${inspection._id}/report`}
-                        className="text-green-600 hover:text-green-900"
+                      <button
+                        onClick={() => generatePDF(inspection._id)}
+                        disabled={generatingPDF === inspection._id}
+                        className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                        title={t("inspections.generate_pdf")}
                       >
-                        <FileText className="h-4 w-4" />
-                      </Link>
+                        {generatingPDF === inspection._id ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                        ) : (
+                          <Download className="h-4 w-4" />
+                        )}
+                      </button>
                     </div>
                   </td>
                 </tr>

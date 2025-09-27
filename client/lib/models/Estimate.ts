@@ -6,18 +6,20 @@ const EstimateSchema = new Schema({
   inspectionId: { type: Schema.Types.ObjectId, ref: 'VehicleInspection', required: false },
   customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
-  mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: true },
+  mechanicId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   notes: { type: String, required: false },
   services: [{
-    serviceId: { type: Schema.Types.ObjectId, ref: 'Service' },
+    serviceId: { type: Schema.Types.ObjectId, ref: 'Service', required: false },
+    name: { type: String, required: false, default: '' },
     quantity: { type: Number, required: true, min: 1 },
     laborCost: { type: Number, required: true, min: 0 },
     partsCost: { type: Number, required: true, min: 0 },
     totalCost: { type: Number, required: true, min: 0 }
   }],
   parts: [{
-    partId: { type: Schema.Types.ObjectId, ref: 'Part' },
+    partId: { type: Schema.Types.ObjectId, ref: 'Part', required: false },
+    name: { type: String, required: false, default: '' },
     quantity: { type: Number, required: true, min: 1 },
     unitCost: { type: Number, required: true, min: 0 },
     totalCost: { type: Number, required: true, min: 0 }

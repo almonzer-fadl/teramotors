@@ -9,11 +9,11 @@ import { useTranslation } from "react-i18next";
 
 interface Vehicle {
   _id: string;
-  customerId: {
+  customerId?: {
     _id: string;
     firstName: string;
     lastName: string;
-  };
+  } | null;
   vin: string;
   make: string;
   model: string;
@@ -74,6 +74,7 @@ export default function VehiclesPage() {
       const response = await fetch(`/api/vehicles?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
+        
         if (data.vehicles && data.pagination) {
           setVehicles(data.vehicles);
           setPagination(data.pagination);
@@ -118,6 +119,7 @@ export default function VehiclesPage() {
 
   // Remove client-side filtering since we're now doing it server-side
   const filteredVehicles = vehicles;
+  
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -225,7 +227,12 @@ export default function VehiclesPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredVehicles.map((vehicle) => (
+              {filteredVehicles.map((vehicle) => {
+                const customerName = vehicle.customerId ? 
+                  `${vehicle.customerId.firstName} ${vehicle.customerId.lastName}` : 
+                  'No Customer';
+                
+                return (
                 <tr key={vehicle._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -246,8 +253,7 @@ export default function VehiclesPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {vehicle.customerId.firstName}{" "}
-                      {vehicle.customerId.lastName}
+                      {customerName}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -302,7 +308,8 @@ export default function VehiclesPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

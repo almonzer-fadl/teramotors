@@ -17,7 +17,7 @@ export async function GET(
     await connectToDatabase();
     
     const vehicle = await Vehicle.findById(id)
-      .populate('customerId', 'firstName lastName')
+      .populate('customerId', 'firstName lastName isActive')
       .populate('serviceHistory.serviceId', 'name');
     
     if (!vehicle) {
