@@ -11,16 +11,21 @@ import {
   AlertTriangle,
   DollarSign,
   Wrench,
+  Download,
+  Trash2,
+  Calendar,
+  User,
+  Car,
+  Settings,
+  Clock,
+  MapPin,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface InspectionItem {
   itemId: string;
+  category: string;
   condition: string;
-  notes: string;
-  priority: string;
-  estimatedCost: number;
-  recommendations: string;
 }
 
 interface VehicleInspection {
@@ -39,10 +44,9 @@ interface VehicleInspection {
   };
   mechanicId: {
     _id: string;
-    userId: {
-      firstName: string;
-      lastName: string;
-    };
+    firstName: string;
+    lastName: string;
+    displayName: string;
   };
   templateId: {
     _id: string;
@@ -52,27 +56,28 @@ interface VehicleInspection {
   mileage: number;
   overallCondition: string;
   items: InspectionItem[];
-  totalEstimatedCost: number;
   recommendations: string;
   nextInspectionDate: string;
-  status: string;
+  status: "in-progress" | "completed" | "cancelled";
   createdAt: string;
+  updatedAt: string;
 }
 
 export default function InspectionDetailsPage() {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation();
   const params = useParams();
   const router = useRouter();
-  const { id } = params;
+  const id = params.id as string;
+
   const [inspection, setInspection] = useState<VehicleInspection | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [creatingEstimate, setCreatingEstimate] = useState(false);
+  const [generatingPDF, setGeneratingPDF] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      fetchInspection();
-    }
+    fetchInspection();
   }, [id]);
 
   const fetchInspection = async () => {
@@ -81,268 +86,451 @@ export default function InspectionDetailsPage() {
       if (response.ok) {
         const data = await response.json();
         setInspection(data);
-        // Pre-select items that need repair
-        const itemsNeedingRepair = data.items
-          .filter((item: InspectionItem) => 
-            item.condition === 'poor' || item.condition === 'critical'
-          )
-          .map((item: InspectionItem) => item.itemId);
-        setSelectedItems(itemsNeedingRepair);
+      } else {
+        console.error("Failed to fetch inspection");
+        router.push("/inspections");
       }
     } catch (error) {
-      console.error("Failed to fetch inspection:", error);
+      console.error("Error fetching inspection:", error);
+      router.push("/inspections");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleItemSelection = (itemId: string) => {
-    setSelectedItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    );
+  const generatePDF = async () => {
+    if (!inspection) return;
+
+    setGeneratingPDF(true);
+    try {
+      window.open(`/api/inspections/${id}/pdf`, '_blank');
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+      alert(t("inspections.failed_to_generate_pdf"));
+    } finally {
+      setGeneratingPDF(false);
+    }
   };
 
-  const createEstimate = async () => {
-    if (selectedItems.length === 0) {
-      alert(t("inspections.select_items_for_estimate"));
-      return;
-    }
+  const deleteInspection = async () => {
+    if (!inspection) return;
 
-    setCreatingEstimate(true);
+    setDeleting(true);
     try {
-      const response = await fetch("/api/estimates/from-inspection", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await fetch(`/api/inspections/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        router.push("/inspections");
+      } else {
+        console.error("Failed to delete inspection");
+        alert(t("inspections.failed_to_delete"));
+      }
+    } catch (error) {
+      console.error("Error deleting inspection:", error);
+      alert(t("inspections.failed_to_delete"));
+    } finally {
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const updateStatus = async (newStatus: string) => {
+    if (!inspection) return;
+
+    setUpdatingStatus(true);
+    try {
+      const response = await fetch(`/api/inspections/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          inspectionId: id,
-          selectedItems: inspection?.items.filter(item => 
-            selectedItems.includes(item.itemId)
-          )
+          ...inspection,
+          status: newStatus,
         }),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        router.push(`/estimates/${data.estimate._id}`);
+        setInspection(prev => prev ? { ...prev, status: newStatus as any } : null);
       } else {
-        const error = await response.json();
-        alert(error.message || t("estimates.failed_to_create"));
+        console.error("Failed to update status");
+        alert("Failed to update status");
       }
     } catch (error) {
-      console.error("Failed to create estimate:", error);
-      alert(t("estimates.failed_to_create"));
+      console.error("Error updating status:", error);
+      alert("Failed to update status");
     } finally {
-      setCreatingEstimate(false);
+      setUpdatingStatus(false);
     }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "in-progress":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "cancelled":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getConditionColor = (condition: string) => {
+    switch (condition) {
+      case "good":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "fair":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "poor":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "critical":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F13F33] mx-auto"></div>
+          <p className="mt-4 text-gray-600 text-center">Loading inspection...</p>
+        </div>
       </div>
     );
   }
 
   if (!inspection) {
-    return <div>{t("inspections.not_found")}</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl p-8 text-center">
+          <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Inspection Not Found</h2>
+          <p className="text-gray-600 mb-6">The inspection you're looking for doesn't exist.</p>
+          <Link
+            href="/inspections"
+            className="inline-flex items-center px-6 py-3 bg-[#F13F33] text-white font-bold rounded-xl hover:bg-[#E03A2F] transition-all duration-300"
+          >
+            <ArrowLeft className="mr-2 h-5 w-5" />
+            Back to Inspections
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <Link
-            href="/inspections"
-            className="mr-4 p-2 text-gray-400 hover:text-gray-600"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {t("inspections.inspection_details")}
-            </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              {inspection.vehicleId.make} {inspection.vehicleId.model} - {inspection.vehicleId.licensePlate}
-            </p>
-          </div>
-        </div>
-        <div className="flex space-x-2">
-          <Link
-            href={`/inspections/${id}/edit`}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          >
-            <Edit className="h-4 w-4 mr-2" />
-            {t("forms.edit")}
-          </Link>
-          <button
-            onClick={createEstimate}
-            disabled={creatingEstimate || selectedItems.length === 0}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-          >
-            <DollarSign className="h-4 w-4 mr-2" />
-            {creatingEstimate ? t("estimates.creating") : t("estimates.create_from_inspection")}
-          </button>
-        </div>
-      </div>
-
-      {/* Inspection Overview */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">
-              {t("inspections.customer")}
-            </h3>
-            <p className="text-sm text-gray-900">
-              {inspection.customerId.firstName} {inspection.customerId.lastName}
-            </p>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">
-              {t("inspections.mechanic")}
-            </h3>
-            <p className="text-sm text-gray-900">
-              {inspection.mechanicId.userId.firstName} {inspection.mechanicId.userId.lastName}
-            </p>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">
-              {t("inspections.inspection_date")}
-            </h3>
-            <p className="text-sm text-gray-900">
-              {new Date(inspection.inspectionDate).toLocaleDateString()}
-            </p>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">
-              {t("inspections.mileage")}
-            </h3>
-            <p className="text-sm text-gray-900">
-              {inspection.mileage.toLocaleString()} km
-            </p>
-          </div>
-        </div>
-        
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">
-              {t("inspections.overall_condition")}
-            </h3>
-            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-              inspection.overallCondition === 'excellent' ? 'bg-green-100 text-green-800' :
-              inspection.overallCondition === 'good' ? 'bg-blue-100 text-blue-800' :
-              inspection.overallCondition === 'fair' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-red-100 text-red-800'
-            }`}>
-              {t(`forms.condition_${inspection.overallCondition}`)}
-            </span>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">
-              {t("inspections.total_estimated_cost")}
-            </h3>
-            <p className="text-sm text-gray-900 font-semibold">
-              ${inspection.totalEstimatedCost.toFixed(2)}
-            </p>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">
-              {t("inspections.status")}
-            </h3>
-            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-              inspection.status === 'completed' ? 'bg-green-100 text-green-800' :
-              inspection.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
-              'bg-red-100 text-red-800'
-            }`}>
-              {t(`inspections.status_${inspection.status}`)}
-            </span>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/inspections"
+                className="p-2 text-gray-400 hover:text-[#F13F33] hover:bg-[#F13F33]/10 rounded-xl transition-all duration-300"
+              >
+                <ArrowLeft className="h-6 w-6" />
+              </Link>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Inspection Details
+                </h1>
+                <p className="text-sm text-gray-500">
+                  {inspection.vehicleId.make} {inspection.vehicleId.model} - {formatDate(inspection.inspectionDate)}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={generatePDF}
+                disabled={generatingPDF}
+                className="inline-flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-300 font-medium"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                {generatingPDF ? t("inspections.generating_pdf") : t("inspections.generate_pdf")}
+              </button>
+              <Link
+                href={`/inspections/${id}/edit`}
+                className="inline-flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-300 font-medium"
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                {t("forms.edit")}
+              </Link>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="inline-flex items-center px-4 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-xl transition-all duration-300 font-medium"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                {t("forms.delete")}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Inspection Items */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900">
-            {t("inspections.inspection_items")}
-          </h2>
-          <p className="text-sm text-gray-500">
-            {t("inspections.select_items_for_estimate")}
-          </p>
-        </div>
-        
-        <div className="space-y-3">
-          {inspection.items.map((item, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.includes(item.itemId)}
-                    onChange={() => handleItemSelection(item.itemId)}
-                    className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h4 className="font-medium text-gray-900 capitalize">
-                        {item.itemId}
-                      </h4>
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        item.condition === 'good' ? 'bg-green-100 text-green-800' :
-                        item.condition === 'fair' ? 'bg-yellow-100 text-yellow-800' :
-                        item.condition === 'poor' ? 'bg-orange-100 text-orange-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {t(`forms.condition_${item.condition}`)}
-                      </span>
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        item.priority === 'critical' ? 'bg-red-100 text-red-800' :
-                        item.priority === 'safety' ? 'bg-orange-100 text-orange-800' :
-                        item.priority === 'recommended' ? 'bg-blue-100 text-blue-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {t(`forms.priority_${item.priority}`)}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Status Card */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
+              <div className="px-6 py-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-[#F13F33]/10 rounded-xl mr-4">
+                      <Settings className="h-6 w-6 text-[#F13F33]" />
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900">Inspection Status</h2>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <span className={`inline-flex items-center px-4 py-2 rounded-xl text-sm font-bold border ${getStatusColor(inspection.status)}`}>
+                      {inspection.status.replace("-", " ").toUpperCase()}
+                    </span>
+                    <select
+                      value={inspection.status}
+                      onChange={(e) => updateStatus(e.target.value)}
+                      disabled={updatingStatus}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300"
+                    >
+                      <option value="in-progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex items-center space-x-3">
+                    <Calendar className="h-5 w-5 text-gray-400" />
+                    <div>
+                      <p className="text-sm text-gray-500">Inspection Date</p>
+                      <p className="font-semibold text-gray-900">{formatDate(inspection.inspectionDate)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Clock className="h-5 w-5 text-gray-400" />
+                    <div>
+                      <p className="text-sm text-gray-500">Overall Condition</p>
+                      <span className={`inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold border ${getConditionColor(inspection.overallCondition)}`}>
+                        {inspection.overallCondition.toUpperCase()}
                       </span>
                     </div>
-                    
-                    {item.notes && (
-                      <p className="text-sm text-gray-600 mb-2">
-                        <strong>{t("forms.notes")}:</strong> {item.notes}
-                      </p>
-                    )}
-                    
-                    {item.recommendations && (
-                      <p className="text-sm text-gray-600 mb-2">
-                        <strong>{t("forms.recommendations")}:</strong> {item.recommendations}
-                      </p>
-                    )}
-                    
-                    {item.estimatedCost > 0 && (
-                      <p className="text-sm font-medium text-gray-900">
-                        <strong>{t("forms.estimated_cost")}:</strong> ${item.estimatedCost.toFixed(2)}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
             </div>
-          ))}
+
+            {/* Vehicle Information */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
+              <div className="px-6 py-8">
+                <div className="flex items-center mb-6">
+                  <div className="p-3 bg-blue-100 rounded-xl mr-4">
+                    <Car className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900">Vehicle Information</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Make & Model</p>
+                    <p className="text-lg font-semibold text-gray-900">
+                      {inspection.vehicleId.make} {inspection.vehicleId.model}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Year</p>
+                    <p className="text-lg font-semibold text-gray-900">{inspection.vehicleId.year}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">License Plate</p>
+                    <p className="text-lg font-semibold text-gray-900">{inspection.vehicleId.licensePlate}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Mileage</p>
+                    <p className="text-lg font-semibold text-gray-900">{inspection.mileage?.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Inspection Items */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
+              <div className="px-6 py-8">
+                <div className="flex items-center mb-6">
+                  <div className="p-3 bg-green-100 rounded-xl mr-4">
+                    <CheckCircle className="h-6 w-6 text-green-600" />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900">Inspection Items</h2>
+                </div>
+                {inspection.items && inspection.items.length > 0 ? (
+                  <div className="space-y-4">
+                    {inspection.items.map((item, index) => (
+                      <div key={index} className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200 hover:border-[#F13F33]/30 transition-all duration-300">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h3 className="text-lg font-bold text-gray-900">{item.itemId}</h3>
+                              <span className={`inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold border ${getConditionColor(item.condition)}`}>
+                                {item.condition.toUpperCase()}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600">{item.category}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <CheckCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">No inspection items found</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Recommendations */}
+            {inspection.recommendations && (
+              <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
+                <div className="px-6 py-8">
+                  <div className="flex items-center mb-6">
+                    <div className="p-3 bg-yellow-100 rounded-xl mr-4">
+                      <AlertTriangle className="h-6 w-6 text-yellow-600" />
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900">Recommendations</h2>
+                  </div>
+                  <p className="text-gray-700 leading-relaxed">{inspection.recommendations}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-8">
+            {/* Customer Information */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
+              <div className="px-6 py-8">
+                <div className="flex items-center mb-6">
+                  <div className="p-3 bg-purple-100 rounded-xl mr-4">
+                    <User className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900">Customer</h2>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500">Name</p>
+                    <p className="font-semibold text-gray-900">
+                      {inspection.customerId.firstName} {inspection.customerId.lastName}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mechanic Information */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
+              <div className="px-6 py-8">
+                <div className="flex items-center mb-6">
+                  <div className="p-3 bg-orange-100 rounded-xl mr-4">
+                    <Wrench className="h-6 w-6 text-orange-600" />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900">Mechanic</h2>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-500">Name</p>
+                    <p className="font-semibold text-gray-900">
+                      {inspection.mechanicId.displayName || `${inspection.mechanicId.firstName} ${inspection.mechanicId.lastName}`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Template Information */}
+            {inspection.templateId && (
+              <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
+                <div className="px-6 py-8">
+                  <div className="flex items-center mb-6">
+                    <div className="p-3 bg-indigo-100 rounded-xl mr-4">
+                      <FileText className="h-6 w-6 text-indigo-600" />
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900">Template</h2>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm text-gray-500">Template Name</p>
+                      <p className="font-semibold text-gray-900">{inspection.templateId.name}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Next Inspection */}
+            {inspection.nextInspectionDate && (
+              <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
+                <div className="px-6 py-8">
+                  <div className="flex items-center mb-6">
+                    <div className="p-3 bg-teal-100 rounded-xl mr-4">
+                      <Calendar className="h-6 w-6 text-teal-600" />
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900">Next Inspection</h2>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm text-gray-500">Due Date</p>
+                      <p className="font-semibold text-gray-900">{formatDate(inspection.nextInspectionDate)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Recommendations */}
-      {inspection.recommendations && (
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            {t("inspections.recommendations")}
-          </h2>
-          <p className="text-sm text-gray-600">
-            {inspection.recommendations}
-          </p>
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl p-8 max-w-md mx-4">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <Trash2 className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                {t("inspections.delete_inspection")}
+              </h3>
+              <p className="text-sm text-gray-500 mb-6">
+                {t("inspections.delete_warning")}
+              </p>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-300 font-medium"
+                >
+                  {t("forms.cancel")}
+                </button>
+                <button
+                  onClick={deleteInspection}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 rounded-xl transition-all duration-300 font-medium"
+                >
+                  {deleting ? t("inspections.deleting") : t("forms.delete")}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

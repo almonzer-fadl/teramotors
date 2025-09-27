@@ -46,22 +46,26 @@ export const connectToDatabase = async (): Promise<void> => {
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
       dbName: "teramotors",
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      connectTimeoutMS: 10000,
-      maxPoolSize: 10,
-      minPoolSize: 5,
-      maxIdleTimeMS: 30000,
+      serverSelectionTimeoutMS: 30000, // Increased to 30 seconds
+      socketTimeoutMS: 60000, // Increased to 60 seconds
+      connectTimeoutMS: 30000, // Increased to 30 seconds
+      maxPoolSize: 5, // Reduced pool size
+      minPoolSize: 1, // Reduced min pool size
+      maxIdleTimeMS: 60000, // Increased idle time
       retryWrites: true,
       retryReads: true,
+      bufferCommands: false, // Disable mongoose buffering
     });
     
     isConnected = true;
     connectionAttempts = 0;
     console.log("MongoDB connected successfully");
     
-    // Handle connection events
+    // Handle connection events (only add once)
     if (!listenersAdded) {
+      // Remove any existing listeners first
+      mongoose.connection.removeAllListeners();
+      
       mongoose.connection.on('error', (err) => {
         console.error('MongoDB connection error:', err);
         isConnected = false;
@@ -244,5 +248,26 @@ const handleConnectionError = (error: any) => {
 export const resetConnection = () => {
   isConnected = false;
   connectionAttempts = 0;
+  listenersAdded = false;
+  // Remove all listeners to prevent memory leaks
+  if (mongoose.connection) {
+    mongoose.connection.removeAllListeners();
+  }
   console.log("Connection status reset");
+};
+
+// Helper function to check if we need to reconnect
+export const shouldReconnect = (): boolean => {
+  return !isConnected || mongoose.connection.readyState !== 1;
+};
+
+// Helper function to get connection info
+export const getConnectionInfo = () => {
+  return {
+    isConnected,
+    readyState: mongoose.connection.readyState,
+    listenersAdded,
+    connectionAttempts,
+    maxRetries
+  };
 };

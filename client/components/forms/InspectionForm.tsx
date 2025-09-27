@@ -11,19 +11,19 @@ interface VehicleMinimal {
   make: string;
   model: string;
   year: number;
+  customerId: string | { _id: string };
 }
 interface CustomerMinimal {
   _id: string;
   firstName: string;
   lastName: string;
 }
-interface MechanicMinimal {
+interface UserMinimal {
   _id: string;
-  userId: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-  };
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  role: string;
 }
 interface TemplateMinimal {
   _id: string;
@@ -40,11 +40,8 @@ interface InspectionFormData {
   overallCondition: string;
   items: {
     itemId: string;
+    category: string;
     condition: "good" | "fair" | "poor" | "critical";
-    notes: string;
-    priority: "critical" | "safety" | "recommended" | "optional";
-    estimatedCost: number;
-    recommendations: string;
   }[];
   recommendations: string;
   nextInspectionDate: string;
@@ -61,7 +58,7 @@ export default function InspectionForm({
   const [loading, setLoading] = useState(false);
   const [vehicles, setVehicles] = useState<VehicleMinimal[]>([]);
   const [customers, setCustomers] = useState<CustomerMinimal[]>([]);
-  const [mechanics, setMechanics] = useState<MechanicMinimal[]>([]);
+  const [users, setUsers] = useState<UserMinimal[]>([]);
   const [templates, setTemplates] = useState<TemplateMinimal[]>([]);
   const [formData, setFormData] = useState<InspectionFormData>({
     vehicleId: "",
@@ -88,11 +85,11 @@ export default function InspectionForm({
 
   const fetchInitialData = async () => {
     try {
-      const [vehiclesRes, customersRes, mechanicsRes, templatesRes] =
+      const [vehiclesRes, customersRes, usersRes, templatesRes] =
         await Promise.all([
           fetch("/api/vehicles"),
           fetch("/api/customers"),
-          fetch("/api/mechanics"),
+          fetch("/api/users"),
           fetch("/api/inspection-templates"),
         ]);
       
@@ -110,11 +107,11 @@ export default function InspectionForm({
         setCustomers(customersArray);
       }
       
-      if (mechanicsRes.ok) {
-        const data = await mechanicsRes.json();
-        // The mechanics API returns { mechanics: [...], pagination: {...} }
-        const mechanicsArray = Array.isArray(data.mechanics) ? data.mechanics : (Array.isArray(data) ? data : []);
-        setMechanics(mechanicsArray);
+      if (usersRes.ok) {
+        const data = await usersRes.json();
+        // The users API returns an array directly
+        const usersArray = Array.isArray(data) ? data : [];
+        setUsers(usersArray);
       }
       
       if (templatesRes.ok) {
@@ -128,7 +125,7 @@ export default function InspectionForm({
       // Set empty arrays on error to prevent runtime errors
       setVehicles([]);
       setCustomers([]);
-      setMechanics([]);
+      setUsers([]);
       setTemplates([]);
     }
   };
@@ -184,7 +181,33 @@ export default function InspectionForm({
   };
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const newData = { ...prev, [field]: value };
+      
+      // Auto-populate customer when vehicle is selected
+      if (field === 'vehicleId' && value) {
+        const selectedVehicle = vehicles.find(v => v._id === value);
+        if (selectedVehicle && selectedVehicle.customerId) {
+          const customerId = typeof selectedVehicle.customerId === 'object' ? 
+            selectedVehicle.customerId._id : selectedVehicle.customerId;
+          newData.customerId = customerId;
+        }
+      }
+      
+      // Auto-populate vehicle when customer is selected (if no vehicle is already selected)
+      if (field === 'customerId' && value && !newData.vehicleId) {
+        const customerVehicles = vehicles.filter(v => {
+          const vehicleCustomerId = typeof v.customerId === 'object' ? 
+            v.customerId._id : v.customerId;
+          return vehicleCustomerId === value;
+        });
+        if (customerVehicles.length === 1) {
+          newData.vehicleId = customerVehicles[0]._id;
+        }
+      }
+      
+      return newData;
+    });
   };
 
   const handleItemChange = (index: number, field: string, value: any) => {
@@ -193,26 +216,35 @@ export default function InspectionForm({
     handleInputChange("items", updatedItems);
   };
 
-  const loadTemplateItems = (templateId: string) => {
-    const template = templates.find(t => t._id === templateId);
-    if (template) {
-      // For now, we'll create basic items based on template
-      // In a real implementation, you'd load the template's items
-      const templateItems = [
-        { itemId: "engine", condition: "good" as const, notes: "", priority: "critical" as const, estimatedCost: 0, recommendations: "" },
-        { itemId: "brakes", condition: "good" as const, notes: "", priority: "safety" as const, estimatedCost: 0, recommendations: "" },
-        { itemId: "tires", condition: "good" as const, notes: "", priority: "safety" as const, estimatedCost: 0, recommendations: "" },
-        { itemId: "lights", condition: "good" as const, notes: "", priority: "safety" as const, estimatedCost: 0, recommendations: "" },
-        { itemId: "battery", condition: "good" as const, notes: "", priority: "recommended" as const, estimatedCost: 0, recommendations: "" },
-      ];
-      handleInputChange("items", templateItems);
+  const loadTemplateItems = async (templateId: string) => {
+    if (!templateId) {
+      handleInputChange("items", []);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/inspection-templates/${templateId}`);
+      if (response.ok) {
+        const template = await response.json();
+        if (template && template.items) {
+          // Convert template items to inspection items format
+          const templateItems = template.items.map((item: any) => ({
+            itemId: item.itemId,
+            category: item.category,
+            condition: "good" as const, // Default condition
+          }));
+          handleInputChange("items", templateItems);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load template items:", error);
     }
   };
 
   const addItem = () => {
     handleInputChange("items", [
       ...formData.items,
-      { itemId: "", condition: "good", notes: "", priority: "optional", estimatedCost: 0, recommendations: "" },
+      { itemId: "", category: "general", condition: "good" },
     ]);
   };
 
@@ -316,9 +348,9 @@ export default function InspectionForm({
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                   >
                     <option value="">{t('forms.assign_mechanic')}</option>
-                    {mechanics.map((m) => (
-                      <option key={m._id} value={m._id}>
-                        {m.userId.firstName} {m.userId.lastName}
+                    {users.map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.displayName || `${user.firstName} ${user.lastName}`}
                       </option>
                     ))}
                   </select>
@@ -328,11 +360,10 @@ export default function InspectionForm({
                     {t('forms.inspection_template')}
                   </label>
                   <select
-                    required
                     value={formData.templateId}
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       handleInputChange("templateId", e.target.value);
-                      loadTemplateItems(e.target.value);
+                      await loadTemplateItems(e.target.value);
                     }}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                   >
@@ -365,9 +396,9 @@ export default function InspectionForm({
                   <input
                     type="number"
                     required
-                    value={formData.mileage}
+                    value={formData.mileage || ""}
                     onChange={(e) =>
-                      handleInputChange("mileage", parseInt(e.target.value))
+                      handleInputChange("mileage", parseInt(e.target.value) || 0)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     placeholder="Enter mileage"
@@ -394,7 +425,7 @@ export default function InspectionForm({
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
-                    {t('forms.next_inspection_date')}
+                    {t('forms.next_inspection_date')} <span className="text-gray-400">(Optional)</span>
                   </label>
                   <input
                     type="date"
@@ -439,7 +470,7 @@ export default function InspectionForm({
                   key={index}
                   className="bg-gray-50/80 rounded-2xl p-6 mb-6 border border-gray-200/50"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
                     <div className="space-y-2">
                       <label htmlFor={`itemId-${index}`} className="block text-sm font-bold text-gray-700">{t('forms.item_id')}</label>
                       <input
@@ -452,6 +483,22 @@ export default function InspectionForm({
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                         placeholder="e.g., engine, brakes, tires"
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor={`category-${index}`} className="block text-sm font-bold text-gray-700">{t('forms.category')}</label>
+                      <select
+                        id={`category-${index}`}
+                        value={item.category}
+                        onChange={(e) =>
+                          handleItemChange(index, "category", e.target.value)
+                        }
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      >
+                        <option value="general">General</option>
+                        <option value="safety">Safety</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="performance">Performance</option>
+                      </select>
                     </div>
                     <div className="space-y-2">
                       <label htmlFor={`condition-${index}`} className="block text-sm font-bold text-gray-700">{t('forms.condition')}</label>
@@ -468,63 +515,6 @@ export default function InspectionForm({
                         <option value="poor">{t('forms.condition_poor')}</option>
                         <option value="critical">{t('forms.condition_critical')}</option>
                       </select>
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor={`priority-${index}`} className="block text-sm font-bold text-gray-700">{t('forms.priority')}</label>
-                      <select
-                        id={`priority-${index}`}
-                        value={item.priority}
-                        onChange={(e) =>
-                          handleItemChange(index, "priority", e.target.value)
-                        }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      >
-                        <option value="critical">{t('forms.priority_critical')}</option>
-                        <option value="safety">{t('forms.priority_safety')}</option>
-                        <option value="recommended">{t('forms.priority_recommended')}</option>
-                        <option value="optional">{t('forms.priority_optional')}</option>
-                      </select>
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor={`estimatedCost-${index}`} className="block text-sm font-bold text-gray-700">{t('forms.estimated_cost')}</label>
-                      <input
-                        type="number"
-                        id={`estimatedCost-${index}`}
-                        value={item.estimatedCost}
-                        onChange={(e) =>
-                          handleItemChange(index, "estimatedCost", parseFloat(e.target.value) || 0)
-                        }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div className="md:col-span-2 space-y-2">
-                      <label htmlFor={`notes-${index}`} className="block text-sm font-bold text-gray-700">{t('forms.notes')}</label>
-                      <input
-                        type="text"
-                        id={`notes-${index}`}
-                        value={item.notes}
-                        onChange={(e) =>
-                          handleItemChange(index, "notes", e.target.value)
-                        }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                        placeholder="Additional notes about this item"
-                      />
-                    </div>
-                    <div className="md:col-span-2 space-y-2">
-                      <label htmlFor={`recommendations-${index}`} className="block text-sm font-bold text-gray-700">{t('forms.recommendations')}</label>
-                      <input
-                        type="text"
-                        id={`recommendations-${index}`}
-                        value={item.recommendations}
-                        onChange={(e) =>
-                          handleItemChange(index, "recommendations", e.target.value)
-                        }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                        placeholder="Recommendations for this item"
-                      />
                     </div>
                     <div className="flex justify-end">
                       <button

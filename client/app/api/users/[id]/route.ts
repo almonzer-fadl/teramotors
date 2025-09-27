@@ -13,7 +13,7 @@ export async function PUT(
   }
 
   const { id } = await context.params;
-  const { role, isActive } = await request.json();
+  const { role, isActive, displayName, firstName, lastName } = await request.json();
 
   if (!id) {
     return NextResponse.json({ message: 'User ID not provided' }, { status: 400 });
@@ -34,6 +34,18 @@ export async function PUT(
 
     if (isActive !== undefined) {
       user.isActive = isActive;
+    }
+
+    if (displayName) {
+      user.displayName = displayName;
+    }
+
+    if (firstName) {
+      user.firstName = firstName;
+    }
+
+    if (lastName) {
+      user.lastName = lastName;
     }
 
     await user.save();

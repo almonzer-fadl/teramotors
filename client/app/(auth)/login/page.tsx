@@ -125,13 +125,7 @@ function LoginForm() {
             </button>
           </form>
           
-          <div className="mt-8 flex flex-col space-y-3 text-center">
-            <Link 
-              href="/register" 
-              className="text-[#063479] hover:text-[#F13F33] font-semibold text-sm transition-colors duration-300"
-            >
-              Create staff account
-            </Link>
+          <div className="mt-8 text-center">
             <Link
               href="/forgot-password"
               className="text-[#063479] hover:text-[#F13F33] font-semibold text-sm transition-colors duration-300"

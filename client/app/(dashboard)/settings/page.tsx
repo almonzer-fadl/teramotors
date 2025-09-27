@@ -7,6 +7,7 @@ import { hasPermission, roleDisplayNames, roleDescriptions } from '@/lib/roles'
 import { useTranslation } from 'react-i18next'
 import { 
   Users, 
+  User,
   UserPlus, 
   Edit, 
   Trash2, 
@@ -17,12 +18,16 @@ import {
   Phone,
   Calendar,
   CheckCircle,
-  XCircle
+  XCircle,
+  Key
 } from 'lucide-react'
 
 interface User {
   _id: string
   email: string
+  firstName: string
+  lastName: string
+  displayName: string
   fullName: string
   role: 'admin' | 'mechanic' | 'inspector'
   phone?: string
@@ -38,7 +43,23 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [showAddUser, setShowAddUser] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [editingNames, setEditingNames] = useState<User | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [migrating, setMigrating] = useState(false)
+  const [resetting, setResetting] = useState(false)
+  const [editForm, setEditForm] = useState({
+    firstName: '',
+    lastName: '',
+    displayName: ''
+  })
+  const [newUserForm, setNewUserForm] = useState({
+    email: '',
+    firstName: '',
+    lastName: '',
+    role: 'mechanic',
+    phone: ''
+  })
+  const [creatingUser, setCreatingUser] = useState(false)
   const { t } = useTranslation()
   // Check if user has admin permissions
   const userRole = (user as any)?.role || 'mechanic'
@@ -61,6 +82,86 @@ export default function SettingsPage() {
       console.error('Error fetching users:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const migrateUsers = async () => {
+    setMigrating(true)
+    try {
+      const response = await fetch('/api/migrate-users', {
+        method: 'POST',
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        alert(`Migration completed! ${result.migrated} users migrated successfully.`)
+        await fetchUsers() // Refresh the list
+      } else {
+        const error = await response.json()
+        alert(`Migration failed: ${error.message}`)
+      }
+    } catch (error) {
+      console.error('Error migrating users:', error)
+      alert('Migration failed')
+    } finally {
+      setMigrating(false)
+    }
+  }
+
+  const resetDatabaseConnection = async () => {
+    setResetting(true)
+    try {
+      const response = await fetch('/api/reset-db', {
+        method: 'POST',
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        alert('Database connection reset successfully!')
+        await fetchUsers() // Refresh the list
+      } else {
+        const error = await response.json()
+        alert(`Reset failed: ${error.message}`)
+      }
+    } catch (error) {
+      console.error('Error resetting database:', error)
+      alert('Reset failed')
+    } finally {
+      setResetting(false)
+    }
+  }
+
+  const handleEditNames = (user: User) => {
+    setEditingNames(user)
+    setEditForm({
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      displayName: user.displayName || user.fullName || ''
+    })
+  }
+
+  const handleSaveNames = async (userId: string) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editForm),
+      })
+
+      if (response.ok) {
+        await fetchUsers() // Refresh the list
+        setEditingNames(null)
+        setEditForm({ firstName: '', lastName: '', displayName: '' })
+        alert('User names updated successfully')
+      } else {
+        const error = await response.json()
+        alert(`Failed to update names: ${error.message}`)
+      }
+    } catch (error) {
+      console.error('Error updating names:', error)
+      alert('Failed to update names')
     }
   }
 
@@ -133,6 +234,75 @@ export default function SettingsPage() {
       alert('Error updating user role');
     }
   };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newUserForm.email || !newUserForm.firstName || !newUserForm.lastName) {
+      alert('Please fill in all required fields')
+      return
+    }
+
+    setCreatingUser(true)
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newUserForm),
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        alert(`User created successfully! Temporary password: TempPass123!`)
+        setNewUserForm({
+          email: '',
+          firstName: '',
+          lastName: '',
+          role: 'mechanic',
+          phone: ''
+        })
+        setShowAddUser(false)
+        await fetchUsers() // Refresh the list
+      } else {
+        const error = await response.json()
+        alert(`Failed to create user: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('Error creating user:', error)
+      alert('Failed to create user')
+    } finally {
+      setCreatingUser(false)
+    }
+  }
+
+  const handleResetPassword = async (userId: string) => {
+    const newPassword = prompt('Enter new password for this user (min 8 characters):')
+    if (!newPassword || newPassword.length < 8) {
+      alert('Password must be at least 8 characters')
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/users/${userId}/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ newPassword }),
+      })
+
+      if (response.ok) {
+        alert('Password reset successfully!')
+      } else {
+        const error = await response.json()
+        alert(`Failed to reset password: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error)
+      alert('Failed to reset password')
+    }
+  }
 
   const filteredUsers = users.filter(user =>
     (user.fullName && user.fullName.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -219,6 +389,20 @@ export default function SettingsPage() {
                 <h2 className="text-2xl font-bold text-gray-900">{t('settings.user_management')}</h2>
               </div>
               <div className="flex items-center gap-4">
+                <button
+                  onClick={migrateUsers}
+                  disabled={migrating}
+                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {migrating ? 'Migrating...' : 'Migrate Users'}
+                </button>
+                <button
+                  onClick={resetDatabaseConnection}
+                  disabled={resetting}
+                  className="px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {resetting ? 'Resetting...' : 'Reset DB Connection'}
+                </button>
                 <div className="relative">
                   <Search className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
                   <input
@@ -271,7 +455,10 @@ export default function SettingsPage() {
                             </div>
                             <div className="ml-4">
                               <div className="text-sm font-medium text-gray-900">
-                                {user.fullName}
+                                {user.displayName || user.fullName || `${user.firstName || 'Unknown'} ${user.lastName || 'User'}`}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Names not set'}
                               </div>
                               <div className="text-sm text-gray-500 flex items-center gap-1">
                                 <Mail className="h-3 w-3" />
@@ -322,8 +509,23 @@ export default function SettingsPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center gap-2">
                             <button
+                              onClick={() => handleEditNames(user)}
+                              className="text-green-600 hover:text-green-900"
+                              title="Edit Names"
+                            >
+                              <User className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleResetPassword(user._id)}
+                              className="text-orange-600 hover:text-orange-900"
+                              title="Reset Password"
+                            >
+                              <Key className="h-4 w-4" />
+                            </button>
+                            <button
                               onClick={() => setEditingUser(user)}
                               className="text-blue-600 hover:text-blue-900"
+                              title="Edit Role"
                             >
                               <Edit className="h-4 w-4" />
                             </button>
@@ -332,12 +534,14 @@ export default function SettingsPage() {
                               className={`${
                                 user.isActive ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'
                               }`}
+                              title={user.isActive ? 'Deactivate' : 'Activate'}
                             >
                               {user.isActive ? t('settings.deactivate') : t('settings.activate')}
                             </button>
                             <button
                               onClick={() => handleDeleteUser(user._id)}
                               className="text-red-600 hover:text-red-900"
+                              title="Delete User"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -362,46 +566,76 @@ export default function SettingsPage() {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900">{t('settings.add_user_title')}</h3>
               </div>
-              <form className="space-y-6">
+              <form onSubmit={handleCreateUser} className="space-y-6">
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
-                    {t('settings.full_name')}
+                    First Name *
                   </label>
                   <input
                     type="text"
+                    required
+                    value={newUserForm.firstName}
+                    onChange={(e) => setNewUserForm(prev => ({ ...prev, firstName: e.target.value }))}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder={t('settings.full_name_placeholder')}
+                    placeholder="Enter first name"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
-                    {t('settings.email')}
+                    Last Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newUserForm.lastName}
+                    onChange={(e) => setNewUserForm(prev => ({ ...prev, lastName: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter last name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    Email *
                   </label>
                   <input
                     type="email"
+                    required
+                    value={newUserForm.email}
+                    onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder={t('settings.email_placeholder')}
+                    placeholder="Enter email address"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
-                    {t('settings.role')}
+                    Role *
                   </label>
-                  <select className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300">
-                    <option value="mechanic">{t('settings.mechanic')}</option>
-                    <option value="inspector">{t('settings.inspector')}</option>
-                    <option value="admin">{t('settings.administrator')}</option>
+                  <select 
+                    value={newUserForm.role}
+                    onChange={(e) => setNewUserForm(prev => ({ ...prev, role: e.target.value }))}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  >
+                    <option value="mechanic">Mechanic</option>
+                    <option value="inspector">Inspector</option>
+                    <option value="admin">Administrator</option>
                   </select>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
-                    {t('settings.phone_optional')}
+                    Phone (Optional)
                   </label>
                   <input
                     type="tel"
+                    value={newUserForm.phone}
+                    onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder={t('settings.phone_placeholder')}
+                    placeholder="Enter phone number"
                   />
+                </div>
+                <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Note:</strong> The user will receive a temporary password (TempPass123!) and will be required to change it on first login.
+                  </p>
                 </div>
                 <div className="flex justify-end gap-4 pt-4">
                   <button
@@ -409,13 +643,14 @@ export default function SettingsPage() {
                     onClick={() => setShowAddUser(false)}
                     className="px-6 py-3 text-gray-600 border-2 border-gray-300 rounded-2xl hover:border-[#F13F33] hover:text-[#F13F33] hover:bg-[#F13F33]/5 transition-all duration-300 font-bold"
                   >
-                    {t('settings.cancel')}
+                    Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl hover:shadow-xl hover:shadow-blue-600/25 transition-all duration-300 hover:-translate-y-0.5 font-bold"
+                    disabled={creatingUser}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-2xl hover:shadow-xl hover:shadow-blue-600/25 transition-all duration-300 hover:-translate-y-0.5 font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {t('settings.add_user_button')}
+                    {creatingUser ? 'Creating...' : 'Create User'}
                   </button>
                 </div>
               </form>
@@ -423,7 +658,85 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* Edit User Modal */}
+        {/* Edit User Names Modal */}
+        {editingNames && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 w-full max-w-md">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mr-4">
+                  <User className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">Edit User Names</h3>
+              </div>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                handleSaveNames(editingNames._id);
+              }}>
+                <div className="space-y-2 mb-6">
+                  <label className="block text-sm font-bold text-gray-700">
+                    User
+                  </label>
+                  <p className="text-lg font-bold text-gray-900">{editingNames.email}</p>
+                </div>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-bold text-gray-700">
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.firstName}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, firstName: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      placeholder="Enter first name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-bold text-gray-700">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.lastName}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, lastName: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      placeholder="Enter last name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-sm font-bold text-gray-700">
+                      Display Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.displayName}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, displayName: e.target.value }))}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      placeholder="Enter display name"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-4 pt-6">
+                  <button
+                    type="button"
+                    onClick={() => setEditingNames(null)}
+                    className="px-6 py-3 text-gray-600 border-2 border-gray-300 rounded-2xl hover:border-[#F13F33] hover:text-[#F13F33] hover:bg-[#F13F33]/5 transition-all duration-300 font-bold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl hover:shadow-xl hover:shadow-green-600/25 transition-all duration-300 hover:-translate-y-0.5 font-bold"
+                  >
+                    Save Names
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Edit User Role Modal */}
         {editingUser && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 w-full max-w-md">
@@ -443,7 +756,7 @@ export default function SettingsPage() {
                   <label className="block text-sm font-bold text-gray-700">
                     {t('settings.user')}
                   </label>
-                  <p className="text-lg font-bold text-gray-900">{editingUser.fullName} ({editingUser.email})</p>
+                  <p className="text-lg font-bold text-gray-900">{editingUser.displayName || editingUser.fullName} ({editingUser.email})</p>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">

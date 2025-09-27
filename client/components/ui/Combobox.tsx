@@ -46,9 +46,11 @@ export function Combobox({
           aria-expanded={open}
           className="w-full justify-between"
         >
-          {value
-            ? options.find((option) => option.value === value)?.label
-            : placeholder}
+          {(() => {
+            const selectedOption = options.find((option) => option.value === value);
+            console.log('Combobox display:', { value, selectedOption, allOptions: options });
+            return value ? selectedOption?.label : placeholder;
+          })()}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -60,8 +62,13 @@ export function Combobox({
             {options.map((option) => (
               <CommandItem
                 key={option.value}
+                value={option.value}
                 onSelect={(currentValue) => {
-                  onChange(currentValue === value ? '' : currentValue)
+                  console.log('Combobox selection:', { currentValue, optionValue: option.value, currentFormValue: value });
+                  // Use option.value instead of currentValue since CommandItem might not pass the value correctly
+                  const selectedValue = option.value;
+                  console.log('Selected value:', selectedValue);
+                  onChange(selectedValue === value ? '' : selectedValue)
                   setOpen(false)
                 }}
               >

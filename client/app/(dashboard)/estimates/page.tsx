@@ -39,6 +39,7 @@ interface Estimate {
   };
   status: "pending" | "approved" | "rejected";
   services: Array<{
+    name: string;
     serviceId: {
       _id: string;
       name: string;
@@ -177,13 +178,13 @@ export default function EstimatesPage() {
                   placeholder={t('estimates.search_placeholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
                 />
               </div>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
               >
                 <option value="all">{t('estimates.all_status')}</option>
                 <option value="pending">{t('estimates.pending')}</option>
@@ -272,7 +273,7 @@ export default function EstimatesPage() {
                     </div>
                     <div className="text-sm text-gray-500">
                       {estimate.services
-                        .map((s) => s.serviceId.name)
+                        .map((s) => s.name || (s.serviceId?.name || 'Unknown Service'))
                         .join(", ")}
                     </div>
                   </td>
@@ -324,12 +325,14 @@ export default function EstimatesPage() {
                       >
                         <Edit className="h-4 w-4" />
                       </Link>
-                      <Link
-                        href={`/estimates/${estimate._id}/pdf`}
+                      <a
+                        href={`/api/estimates/${estimate._id}/pdf`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-green-600 hover:text-green-900"
                       >
                         <FileText className="h-4 w-4" />
-                      </Link>
+                      </a>
                     </div>
                   </td>
                 </tr>

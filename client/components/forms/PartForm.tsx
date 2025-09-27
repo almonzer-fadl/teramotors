@@ -36,6 +36,7 @@ export default function PartForm({ partId }: { partId?: string }) {
       label: t(`inventory.categories.${key}`)
     }));
   }, [t]);
+  
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<PartFormData>({
@@ -51,6 +52,15 @@ export default function PartForm({ partId }: { partId?: string }) {
     partNumber: "",
     compatibleVehicles: [],
   });
+
+  // Debug logging
+  console.log('Part categories:', partCategories);
+  console.log('Current category value:', formData.category);
+
+  // Track formData changes
+  useEffect(() => {
+    console.log('PartForm formData changed:', formData);
+  }, [formData]);
 
   const isEditing = !!partId;
 
@@ -113,7 +123,12 @@ export default function PartForm({ partId }: { partId?: string }) {
   };
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    console.log('PartForm handleInputChange:', { field, value, currentFormData: formData });
+    setFormData((prev) => {
+      const newData = { ...prev, [field]: value };
+      console.log('PartForm new form data:', newData);
+      return newData;
+    });
   };
 
   const handleCompatibleVehicleChange = (

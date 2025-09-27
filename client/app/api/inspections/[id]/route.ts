@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import VehicleInspection from '@/lib/models/VehicleInspection';
 import { getServerSession } from "@/lib/auth-server";
+import mongoose from 'mongoose';
 
 export async function GET(
   request: NextRequest,
@@ -14,18 +15,17 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: 'Invalid inspection ID' }, { status: 400 });
+    }
+
     await connectToDatabase();
 
     const inspection = await VehicleInspection.findById(id)
       .populate('vehicleId', 'make model year licensePlate')
       .populate('customerId', 'firstName lastName')
-      .populate({
-        path: 'mechanicId',
-        populate: {
-          path: 'userId',
-          select: 'firstName lastName'
-        }
-      })
+      .populate('mechanicId', 'firstName lastName displayName')
       .populate('templateId', 'name');
 
     if (!inspection) {
@@ -50,6 +50,11 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: 'Invalid inspection ID' }, { status: 400 });
+    }
+
     await connectToDatabase();
 
     const body = await request.json();
@@ -68,13 +73,7 @@ export async function PUT(
     )
       .populate('vehicleId', 'make model year licensePlate')
       .populate('customerId', 'firstName lastName')
-      .populate({
-        path: 'mechanicId',
-        populate: {
-          path: 'userId',
-          select: 'firstName lastName'
-        }
-      })
+      .populate('mechanicId', 'firstName lastName displayName')
       .populate('templateId', 'name');
 
     if (!inspection) {
@@ -97,6 +96,11 @@ export async function DELETE(
     const session = await getServerSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: 'Invalid inspection ID' }, { status: 400 });
     }
 
     await connectToDatabase();

@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();
 
-    const vehicles = await Vehicle.find({}).populate('customerId', 'firstName lastName');
+    const vehicles = await Vehicle.find({}).populate('customerId', 'firstName lastName isActive');
 
     const fields = [
       { label: 'VIN', value: 'vin' },
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       { label: 'Engine Type', value: 'engineType' },
       { label: 'Transmission', value: 'transmission' },
       { label: 'Fuel Type', value: 'fuelType' },
-      { label: 'Customer', value: 'customerId.firstName' },
+      { label: 'Customer', value: (row: { customerId: { firstName: any; lastName: any; }; }) => row.customerId ? `${row.customerId.firstName} ${row.customerId.lastName}` : 'No Customer' },
     ];
 
     const json2csvParser = new Parser({ fields });

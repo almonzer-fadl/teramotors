@@ -47,6 +47,15 @@ export default function ServiceForm({
     isTemplate: false,
   });
 
+  // Debug logging
+  console.log('Service categories:', serviceCategories);
+  console.log('Current category value:', formData.category);
+
+  // Track formData changes
+  useEffect(() => {
+    console.log('ServiceForm formData changed:', formData);
+  }, [formData]);
+
   const router = useRouter();
 
   const isEditing = !!serviceId;
@@ -136,7 +145,12 @@ export default function ServiceForm({
   };
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    console.log('ServiceForm handleInputChange:', { field, value, currentFormData: formData });
+    setFormData((prev) => {
+      const newData = { ...prev, [field]: value };
+      console.log('ServiceForm new form data:', newData);
+      return newData;
+    });
   };
 
   const handlePartChange = (index: number, field: string, value: any) => {

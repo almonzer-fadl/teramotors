@@ -8,7 +8,6 @@ export const getNavigationItems = (userRole: string) => {
     { tKey: 'sidebar.dashboard', href: '/dashboard', icon: 'LayoutDashboard', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.customers', href: '/customers', icon: 'Users', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.vehicles', href: '/vehicles', icon: 'Car', roles: ['admin', 'mechanic', 'inspector'] },
-    { tKey: 'sidebar.appointments', href: '/appointments', icon: 'Calendar', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.job_cards', href: '/job-cards', icon: 'ClipboardList', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.estimates', href: '/estimates', icon: 'FileText', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.invoices', href: '/invoices', icon: 'CreditCard', roles: ['admin', 'mechanic', 'inspector'] },
