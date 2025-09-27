@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PaginationProps {
   currentPage: number;
@@ -26,6 +27,7 @@ export default function Pagination({
   showItemsPerPage = true,
   className = ''
 }: PaginationProps) {
+  const { t } = useTranslation('common');
   const startItem = (currentPage - 1) * itemsPerPage + 1;
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
@@ -92,7 +94,7 @@ export default function Pagination({
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
           className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          aria-label="First page"
+          aria-label={t('ui.first_page')}
         >
           <ChevronsLeft className="h-4 w-4" />
         </button>
@@ -102,7 +104,7 @@ export default function Pagination({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          aria-label="Previous page"
+          aria-label={t('ui.previous_page')}
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -136,7 +138,7 @@ export default function Pagination({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          aria-label="Next page"
+          aria-label={t('ui.next_page')}
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -146,7 +148,7 @@ export default function Pagination({
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage === totalPages}
           className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          aria-label="Last page"
+          aria-label={t('ui.last_page')}
         >
           <ChevronsRight className="h-4 w-4" />
         </button>

@@ -63,6 +63,10 @@ export default function InvoiceDetailPage() {
 
   const { invoice, jobCard } = data;
 
+  function t(arg0: string): string | undefined {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <div className="space-y-6">
       <div className="sm:flex sm:items-center sm:justify-between">
@@ -128,7 +132,7 @@ export default function InvoiceDetailPage() {
             {qrSrc ? (
               <div className="flex items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={qrSrc} alt="ZATCA QR" className="h-48 w-48 object-contain" />
+                <img src={qrSrc} alt={t('ui.zatca_qr')} className="h-48 w-48 object-contain" />
               </div>
             ) : (
               <div className="text-sm text-gray-500">QR not available</div>

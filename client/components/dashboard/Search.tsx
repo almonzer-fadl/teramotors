@@ -204,6 +204,10 @@ export default function Search({
     }
   };
 
+  function t(arg0: string): string | undefined {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <div ref={searchRef} className={`relative ${className}`}>
       {/* Search Input */}
@@ -358,7 +362,7 @@ export default function Search({
                             handleExport(result.type, 'csv');
                           }}
                           className="p-1 text-gray-400 hover:text-gray-600"
-                          title="Export as CSV"
+                          title={t('ui.export_as_csv')}
                         >
                           <Download className="h-4 w-4" />
                         </button>

@@ -10,6 +10,15 @@ export default function I18nProvider({
   children: React.ReactNode
 }) {
   useEffect(() => {
+    // Only change language after hydration to prevent mismatch
+    const storedLang = localStorage.getItem('i18nextLng');
+    if (storedLang && storedLang !== i18n.language) {
+      // Use setTimeout to ensure this happens after hydration
+      setTimeout(() => {
+        i18n.changeLanguage(storedLang);
+      }, 0);
+    }
+
     const setLangAndDir = () => {
       if (typeof window !== 'undefined') {
         document.documentElement.lang = i18n.language;
@@ -28,6 +37,20 @@ export default function I18nProvider({
     return () => {
       i18n.off('initialized', setLangAndDir);
       i18n.off('languageChanged', setLangAndDir);
+    };
+  }, []);
+
+  // Handle language changes by updating localStorage
+  const handleLanguageChange = (lng: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('i18nextLng', lng);
+    }
+  };
+
+  useEffect(() => {
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
     };
   }, []);
 

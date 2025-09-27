@@ -94,15 +94,15 @@ export default function SettingsPage() {
       
       if (response.ok) {
         const result = await response.json()
-        alert(`Migration completed! ${result.migrated} users migrated successfully.`)
+        alert(t('alerts.migration_completed', { count: result.migrated }))
         await fetchUsers() // Refresh the list
       } else {
         const error = await response.json()
-        alert(`Migration failed: ${error.message}`)
+        alert(t('alerts.migration_failed', { message: error.message }))
       }
     } catch (error) {
       console.error('Error migrating users:', error)
-      alert('Migration failed')
+      alert(t('alerts.migration_failed_generic'))
     } finally {
       setMigrating(false)
     }
@@ -117,15 +117,15 @@ export default function SettingsPage() {
       
       if (response.ok) {
         const result = await response.json()
-        alert('Database connection reset successfully!')
+        alert(t('alerts.database_reset_success'))
         await fetchUsers() // Refresh the list
       } else {
         const error = await response.json()
-        alert(`Reset failed: ${error.message}`)
+        alert(t('alerts.reset_failed', { message: error.message }))
       }
     } catch (error) {
       console.error('Error resetting database:', error)
-      alert('Reset failed')
+      alert(t('alerts.reset_failed_generic'))
     } finally {
       setResetting(false)
     }
@@ -154,14 +154,14 @@ export default function SettingsPage() {
         await fetchUsers() // Refresh the list
         setEditingNames(null)
         setEditForm({ firstName: '', lastName: '', displayName: '' })
-        alert('User names updated successfully')
+        alert(t('alerts.user_names_updated'))
       } else {
         const error = await response.json()
-        alert(`Failed to update names: ${error.message}`)
+        alert(t('alerts.failed_to_update_names', { message: error.message }))
       }
     } catch (error) {
       console.error('Error updating names:', error)
-      alert('Failed to update names')
+      alert(t('alerts.failed_to_update_names_generic'))
     }
   }
 
@@ -177,13 +177,13 @@ export default function SettingsPage() {
 
       if (response.ok) {
         setUsers(users.filter(u => u._id !== userId))
-        alert('User deleted successfully')
+        alert(t('alerts.user_deleted_success'))
       } else {
-        alert('Failed to delete user')
+        alert(t('alerts.failed_to_delete_user'))
       }
     } catch (error) {
       console.error('Error deleting user:', error)
-      alert('Error deleting user')
+      alert(t('alerts.error_deleting_user'))
     }
   }
 
@@ -202,11 +202,11 @@ export default function SettingsPage() {
           u._id === userId ? { ...u, isActive: !isActive } : u
         ))
       } else {
-        alert('Failed to update user status')
+        alert(t('alerts.failed_to_update_user_status'))
       }
     } catch (error) {
       console.error('Error updating user:', error)
-      alert('Error updating user')
+      alert(t('alerts.error_updating_user'))
     }
   }
 
@@ -225,20 +225,20 @@ export default function SettingsPage() {
           u._id === userId ? { ...u, role: role as any } : u
         ));
         setEditingUser(null);
-        alert('User role updated successfully');
+        alert(t('alerts.user_role_updated'));
       } else {
-        alert('Failed to update user role');
+        alert(t('alerts.failed_to_update_user_role'));
       }
     } catch (error) {
       console.error('Error updating user role:', error);
-      alert('Error updating user role');
+      alert(t('alerts.error_updating_user_role'));
     }
   };
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newUserForm.email || !newUserForm.firstName || !newUserForm.lastName) {
-      alert('Please fill in all required fields')
+      alert(t('alerts.fill_required_fields'))
       return
     }
 
@@ -254,7 +254,7 @@ export default function SettingsPage() {
 
       if (response.ok) {
         const result = await response.json()
-        alert(`User created successfully! Temporary password: TempPass123!`)
+        alert(t('alerts.user_created_success'))
         setNewUserForm({
           email: '',
           firstName: '',
@@ -266,11 +266,11 @@ export default function SettingsPage() {
         await fetchUsers() // Refresh the list
       } else {
         const error = await response.json()
-        alert(`Failed to create user: ${error.error}`)
+        alert(t('alerts.failed_to_create_user', { error: error.error }))
       }
     } catch (error) {
       console.error('Error creating user:', error)
-      alert('Failed to create user')
+      alert(t('alerts.failed_to_create_user_generic'))
     } finally {
       setCreatingUser(false)
     }
@@ -279,7 +279,7 @@ export default function SettingsPage() {
   const handleResetPassword = async (userId: string) => {
     const newPassword = prompt('Enter new password for this user (min 8 characters):')
     if (!newPassword || newPassword.length < 8) {
-      alert('Password must be at least 8 characters')
+      alert(t('alerts.password_min_length'))
       return
     }
 
@@ -293,14 +293,14 @@ export default function SettingsPage() {
       })
 
       if (response.ok) {
-        alert('Password reset successfully!')
+        alert(t('alerts.password_reset_success'))
       } else {
         const error = await response.json()
-        alert(`Failed to reset password: ${error.error}`)
+        alert(t('alerts.failed_to_reset_password', { error: error.error }))
       }
     } catch (error) {
       console.error('Error resetting password:', error)
-      alert('Failed to reset password')
+      alert(t('alerts.failed_to_reset_password_generic'))
     }
   }
 
@@ -511,21 +511,21 @@ export default function SettingsPage() {
                             <button
                               onClick={() => handleEditNames(user)}
                               className="text-green-600 hover:text-green-900"
-                              title="Edit Names"
+                              title={t('ui.edit_names')}
                             >
                               <User className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleResetPassword(user._id)}
                               className="text-orange-600 hover:text-orange-900"
-                              title="Reset Password"
+                              title={t('ui.reset_password')}
                             >
                               <Key className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => setEditingUser(user)}
                               className="text-blue-600 hover:text-blue-900"
-                              title="Edit Role"
+                              title={t('ui.edit_role')}
                             >
                               <Edit className="h-4 w-4" />
                             </button>
@@ -541,7 +541,7 @@ export default function SettingsPage() {
                             <button
                               onClick={() => handleDeleteUser(user._id)}
                               className="text-red-600 hover:text-red-900"
-                              title="Delete User"
+                              title={t('ui.delete_user')}
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -577,7 +577,7 @@ export default function SettingsPage() {
                     value={newUserForm.firstName}
                     onChange={(e) => setNewUserForm(prev => ({ ...prev, firstName: e.target.value }))}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter first name"
+                    placeholder={t('ui.enter_first_name')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -590,7 +590,7 @@ export default function SettingsPage() {
                     value={newUserForm.lastName}
                     onChange={(e) => setNewUserForm(prev => ({ ...prev, lastName: e.target.value }))}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter last name"
+                    placeholder={t('ui.enter_last_name')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -603,7 +603,7 @@ export default function SettingsPage() {
                     value={newUserForm.email}
                     onChange={(e) => setNewUserForm(prev => ({ ...prev, email: e.target.value }))}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter email address"
+                    placeholder={t('ui.enter_email_address')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -629,7 +629,7 @@ export default function SettingsPage() {
                     value={newUserForm.phone}
                     onChange={(e) => setNewUserForm(prev => ({ ...prev, phone: e.target.value }))}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter phone number"
+                    placeholder={t('ui.enter_phone_number')}
                   />
                 </div>
                 <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
@@ -688,7 +688,7 @@ export default function SettingsPage() {
                       value={editForm.firstName}
                       onChange={(e) => setEditForm(prev => ({ ...prev, firstName: e.target.value }))}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="Enter first name"
+                      placeholder={t('ui.enter_first_name')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -700,7 +700,7 @@ export default function SettingsPage() {
                       value={editForm.lastName}
                       onChange={(e) => setEditForm(prev => ({ ...prev, lastName: e.target.value }))}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="Enter last name"
+                      placeholder={t('ui.enter_last_name')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -712,7 +712,7 @@ export default function SettingsPage() {
                       value={editForm.displayName}
                       onChange={(e) => setEditForm(prev => ({ ...prev, displayName: e.target.value }))}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="Enter display name"
+                      placeholder={t('ui.enter_display_name')}
                     />
                   </div>
                 </div>

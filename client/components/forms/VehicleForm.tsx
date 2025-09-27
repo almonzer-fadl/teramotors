@@ -232,7 +232,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                     value={formData.vin}
                     onChange={(e) => handleInputChange("vin", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter VIN number"
+                    placeholder={t('ui.enter_vin_number')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -245,7 +245,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                     value={formData.make}
                     onChange={(e) => handleInputChange("make", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter vehicle make"
+                    placeholder={t('ui.enter_vehicle_make')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -258,7 +258,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                     value={formData.model}
                     onChange={(e) => handleInputChange("model", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter vehicle model"
+                    placeholder={t('ui.enter_vehicle_model')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -273,7 +273,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                       handleInputChange("year", parseInt(e.target.value))
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter vehicle year"
+                    placeholder={t('ui.enter_vehicle_year')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -285,7 +285,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                     value={formData.color}
                     onChange={(e) => handleInputChange("color", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter vehicle color"
+                    placeholder={t('ui.enter_vehicle_color')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -300,7 +300,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                       handleInputChange("licensePlate", e.target.value)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter license plate"
+                    placeholder={t('ui.enter_license_plate')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -314,7 +314,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                       handleInputChange("mileage", parseInt(e.target.value))
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter mileage"
+                    placeholder={t('ui.enter_mileage')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -328,7 +328,7 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                       handleInputChange("engineType", e.target.value)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter engine type"
+                    placeholder={t('ui.enter_engine_type')}
                   />
                 </div>
                 <div className="space-y-2">

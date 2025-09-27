@@ -567,7 +567,7 @@ export default function PaymentsPage() {
                         value={paymentForm.reference}
                         onChange={(e) => setPaymentForm(prev => ({ ...prev, reference: e.target.value }))}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                        placeholder="Transaction reference"
+                        placeholder={t('ui.enter_transaction_reference')}
                       />
                     </div>
                   </div>
@@ -600,7 +600,7 @@ export default function PaymentsPage() {
                       disabled={creating}
                       className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {creating ? "Creating..." : "Create Payment"}
+                      {creating ? t('ui.creating') : t('ui.create_payment')}
                     </button>
                   </div>
                 </form>

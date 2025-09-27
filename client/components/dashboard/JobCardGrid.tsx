@@ -87,11 +87,11 @@ export default function JobCardGrid() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Created":
+      case t('status.created'):
         return "bg-gradient-to-r from-blue-500 to-blue-600 text-white";
-      case "In Progress":
+      case t('status.in_progress'):
         return "bg-gradient-to-r from-[#F13F33] to-[#d6352a] text-white";
-      case "Completed":
+      case t('status.completed'):
         return "bg-gradient-to-r from-green-500 to-green-600 text-white";
       default:
         return "bg-gradient-to-r from-gray-500 to-gray-600 text-white";

@@ -247,7 +247,7 @@ export default function ServiceForm({
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter service name"
+                    placeholder={t('ui.enter_service_name')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -275,7 +275,7 @@ export default function ServiceForm({
                       handleInputChange("laborRate", Number.isFinite(num) ? num : 0);
                     }}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter labor rate"
+                    placeholder={t('ui.enter_labor_rate')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -289,7 +289,7 @@ export default function ServiceForm({
                       handleInputChange("laborHours", parseFloat(e.target.value))
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter labor hours"
+                    placeholder={t('ui.enter_labor_hours')}
                   />
                 </div>
                 <div className="md:col-span-2 space-y-2">
@@ -299,7 +299,7 @@ export default function ServiceForm({
                     value={formData.description}
                     onChange={(e) => handleInputChange("description", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
-                    placeholder="Enter service description"
+                    placeholder={t('ui.enter_service_description')}
                     rows={4}
                   />
                 </div>

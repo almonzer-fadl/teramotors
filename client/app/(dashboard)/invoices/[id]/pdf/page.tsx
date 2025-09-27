@@ -38,6 +38,10 @@ export default function InvoicePdfPage() {
     return <div className="p-6">Invoice not found</div>;
   }
 
+  function t(arg0: string): string | undefined {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -61,7 +65,7 @@ export default function InvoicePdfPage() {
           width="100%" 
           height="100%"
           className="border-0"
-          title="Invoice PDF"
+          title={t('ui.invoice_pdf')}
         />
       </div>
     </div>
