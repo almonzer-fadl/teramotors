@@ -87,7 +87,7 @@ export default function DashboardLayout({
             <div className="flex items-center">
               <img 
                 src="/icon.png" 
-                alt="TeraMotors Logo" 
+                alt={t('ui.teramotors_logo')} 
                 className="w-12 h-12 rounded-xl mr-3 object-contain bg-white p-1"
               />
               <div className="flex flex-col">
@@ -143,7 +143,7 @@ export default function DashboardLayout({
             <div className="flex items-center">
               <img 
                 src="/icon.png" 
-                alt="TeraMotors Logo" 
+                alt={t('ui.teramotors_logo')} 
                 className="w-12 h-12 rounded-xl mr-3 object-contain bg-white p-1"
               />
                 <div className="flex flex-col">

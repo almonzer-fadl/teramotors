@@ -338,7 +338,7 @@ export default function AppointmentsPage() {
                       <Link
                         href={`/appointments/edit/${appointment._id}`}
                         className="text-indigo-600 hover:text-indigo-900"
-                        title="Reschedule"
+                        title={t('ui.reschedule')}
                       >
                         <Clock className="h-4 w-4" />
                       </Link>

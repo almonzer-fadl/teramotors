@@ -401,7 +401,7 @@ export default function InspectionForm({
                       handleInputChange("mileage", parseInt(e.target.value) || 0)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter mileage"
+                    placeholder={t('ui.enter_mileage')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -448,7 +448,7 @@ export default function InspectionForm({
                   }
                   rows={3}
                   className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
-                  placeholder="Enter inspection recommendations"
+                  placeholder={t('ui.enter_recommendations')}
                 />
               </div>
             </div>

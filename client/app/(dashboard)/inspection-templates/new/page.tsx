@@ -237,7 +237,7 @@ export default function NewTemplatePage() {
                     value={item.description}
                     onChange={(e) => handleItemChange(index, "description", e.target.value)}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="Description of this inspection item"
+                    placeholder={t('ui.description_of_inspection_item')}
                   />
                 </div>
                 <div>

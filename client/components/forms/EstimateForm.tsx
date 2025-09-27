@@ -263,7 +263,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
   const addService = () => {
     const newService = {
       serviceId: null,
-      name: "Custom Service",
+      name: t('ui.custom_service'),
       quantity: 1,
       laborCost: 0,
       partsCost: 0,
@@ -298,7 +298,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
   const addPart = () => {
     const newPart = {
       partId: null,
-      name: "Custom Part",
+      name: t('ui.custom_part'),
       quantity: 1,
       unitCost: 0,
       totalCost: 0,
@@ -368,9 +368,9 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
         try {
           const errorData = await response.json();
           const errorMessage = errorData.details || errorData.error || 'Unknown error';
-          alert(`Failed to save estimate: ${errorMessage}`);
+          alert(t('alerts.failed_to_save_estimate', { error: errorMessage }));
         } catch (parseError) {
-          alert(`Failed to save estimate: HTTP ${response.status}`);
+          alert(t('alerts.failed_to_save_estimate_http', { status: response.status }));
         }
       }
     } catch (error) {
@@ -382,7 +382,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
 
   const generatePDF = async () => {
     if (!formData.inspectionId) {
-      alert('Please select an inspection first');
+      alert(t('alerts.select_inspection_first'));
       return;
     }
 

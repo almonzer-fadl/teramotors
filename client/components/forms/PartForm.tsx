@@ -206,7 +206,7 @@ export default function PartForm({ partId }: { partId?: string }) {
                     value={formData.name ?? ""}
                     onChange={e => handleInputChange("name", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter part name"
+                    placeholder={t('ui.enter_part_name')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -218,7 +218,7 @@ export default function PartForm({ partId }: { partId?: string }) {
                     value={formData.partNumber}
                     onChange={(e) => handleInputChange("partNumber", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter part number"
+                    placeholder={t('ui.enter_part_number')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -240,7 +240,7 @@ export default function PartForm({ partId }: { partId?: string }) {
                     value={formData.manufacturer}
                     onChange={(e) => handleInputChange("manufacturer", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter manufacturer"
+                    placeholder={t('ui.enter_manufacturer')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -311,7 +311,7 @@ export default function PartForm({ partId }: { partId?: string }) {
                     value={formData.location}
                     onChange={(e) => handleInputChange("location", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter storage location"
+                    placeholder={t('ui.enter_storage_location')}
                   />
                 </div>
                 <div className="md:col-span-2 space-y-2">
@@ -321,7 +321,7 @@ export default function PartForm({ partId }: { partId?: string }) {
                     value={formData.description}
                     onChange={(e) => handleInputChange("description", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
-                    placeholder="Enter part description"
+                    placeholder={t('ui.enter_part_description')}
                     rows={4}
                   />
                 </div>
@@ -355,7 +355,7 @@ export default function PartForm({ partId }: { partId?: string }) {
                         handleCompatibleVehicleChange(index, "make", e.target.value)
                       }
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="Make"
+                      placeholder={t('vehicles.make')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -368,7 +368,7 @@ export default function PartForm({ partId }: { partId?: string }) {
                         handleCompatibleVehicleChange(index, "model", e.target.value)
                       }
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="Model"
+                      placeholder={t('vehicles.model')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -385,7 +385,7 @@ export default function PartForm({ partId }: { partId?: string }) {
                         )
                       }
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="Year"
+                      placeholder={t('vehicles.year')}
                     />
                   </div>
                   <button

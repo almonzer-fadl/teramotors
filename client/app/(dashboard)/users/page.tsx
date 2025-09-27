@@ -175,7 +175,7 @@ export default function UsersPage() {
                               value={editForm.displayName}
                               onChange={(e) => setEditForm(prev => ({ ...prev, displayName: e.target.value }))}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F13F33] focus:border-[#F13F33]"
-                              placeholder="Display Name"
+                              placeholder={t('ui.enter_display_name')}
                             />
                             <div className="flex space-x-2">
                               <input
@@ -183,14 +183,14 @@ export default function UsersPage() {
                                 value={editForm.firstName}
                                 onChange={(e) => setEditForm(prev => ({ ...prev, firstName: e.target.value }))}
                                 className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F13F33] focus:border-[#F13F33]"
-                                placeholder="First Name"
+                                placeholder={t('ui.enter_first_name')}
                               />
                               <input
                                 type="text"
                                 value={editForm.lastName}
                                 onChange={(e) => setEditForm(prev => ({ ...prev, lastName: e.target.value }))}
                                 className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F13F33] focus:border-[#F13F33]"
-                                placeholder="Last Name"
+                                placeholder={t('ui.enter_last_name')}
                               />
                             </div>
                           </div>

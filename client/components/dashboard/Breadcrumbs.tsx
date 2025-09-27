@@ -16,7 +16,7 @@ const Breadcrumbs = () => {
   }
 
   return (
-    <nav aria-label="Breadcrumb" className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
+    <nav aria-label={t('ui.breadcrumb')} className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
       <ol className="flex items-center space-x-2 text-sm">
         <li>
           <Link 

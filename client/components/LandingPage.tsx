@@ -92,7 +92,7 @@ function LoginForm() {
               type="email"
               required
               className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm"
-              placeholder="Enter your email"
+              placeholder={t('ui.enter_your_email')}
             />
           </div>
         </div>
@@ -106,7 +106,7 @@ function LoginForm() {
               type="password"
               required
               className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm"
-              placeholder="Enter your password"
+              placeholder={t('ui.enter_your_password')}
             />
           </div>
         </div>
@@ -260,18 +260,18 @@ export default function LandingPage() {
 
   const testimonials = [
     {
-      name: "Sarah Johnson",
-      role: "Local Business Owner",
+      name: t('testimonials.sarah_johnson.name'),
+      role: t('testimonials.sarah_johnson.role'),
       content: "TeraMotors has been servicing my fleet for 5 years. Their attention to detail and honest pricing keeps me coming back."
     },
     {
-      name: "Mike Chen",
-      role: "Family Man",
+      name: t('testimonials.mike_chen.name'),
+      role: t('testimonials.mike_chen.role'),
       content: "When my car broke down unexpectedly, TeraMotors got me back on the road quickly and affordably. Highly recommended!"
     },
     {
-      name: "Lisa Rodriguez",
-      role: "Car Enthusiast",
+      name: t('testimonials.lisa_rodriguez.name'),
+      role: t('testimonials.lisa_rodriguez.role'),
       content: "The team at TeraMotors understands cars like no one else. They've kept my classic car running perfectly for years."
     }
   ];
@@ -334,7 +334,7 @@ export default function LandingPage() {
               <div className="space-y-6">
                 <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#F13F33]/20 border border-[#F13F33]/30 text-[#F13F33] text-sm font-medium">
                   <Wrench className="w-4 h-4 mr-2" />
-                  Professional Auto Repair
+                  {t('landing_missing.professional_auto_repair')}
                 </div>
                 <h1 className="text-6xl font-bold leading-tight bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent">
                   {t("landing.hero.title")}
@@ -368,7 +368,7 @@ export default function LandingPage() {
               <div className="grid grid-cols-3 gap-8 pt-8">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-white">15+</div>
-                  <div className="text-sm text-blue-200">Years Experience</div>
+                  <div className="text-sm text-blue-200">{t('landing_missing.years_experience')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-white">100%</div>
@@ -394,7 +394,7 @@ export default function LandingPage() {
                   <div className="grid grid-cols-2 gap-6">
                     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
                       <div className="text-3xl font-bold text-white">15+</div>
-                      <div className="text-sm text-blue-200">Years Experience</div>
+                      <div className="text-sm text-blue-200">{t('landing_missing.years_experience')}</div>
                     </div>
                     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
                       <div className="text-3xl font-bold text-white">100%</div>

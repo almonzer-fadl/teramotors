@@ -441,7 +441,7 @@ export default function AppointmentForm({
                       handleInputChange("estimatedCost", parseFloat(e.target.value))
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter estimated cost"
+                    placeholder={t('ui.enter_estimated_cost')}
                   />
                 </div>
                 <div className="md:col-span-2 space-y-2">
@@ -453,7 +453,7 @@ export default function AppointmentForm({
                     onChange={(e) => handleInputChange("notes", e.target.value)}
                     rows={4}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
-                    placeholder="Enter appointment notes"
+                    placeholder={t('ui.enter_appointment_notes')}
                   ></textarea>
                 </div>
           </div>

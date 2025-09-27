@@ -83,7 +83,7 @@ export default function DashboardPage() {
           const data = await response.json();
           setStats(data);
         } else if (response.status === 401) {
-          console.error("Unauthorized access to dashboard stats");
+          console.error(t('alerts.unauthorized_dashboard'));
           // Redirect to login or show error
         } else {
           console.error("Failed to fetch dashboard stats:", response.status);

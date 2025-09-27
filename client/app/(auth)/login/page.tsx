@@ -5,8 +5,10 @@ import Link from "next/link";
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Wrench, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 function LoginForm() {
+  const { t } = useTranslation('common');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +30,7 @@ function LoginForm() {
       if (result.success) {
         router.push(callbackUrl);
       } else {
-        setError(result.error || "Invalid email or password");
+        setError(result.error || t('ui.invalid_email_or_password'));
       }
     } catch (error) {
       setError("An error occurred. Please try again.");
@@ -82,7 +84,7 @@ function LoginForm() {
                   type="email"
                   required
                   className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm"
-                  placeholder="Enter your email"
+                  placeholder={t('ui.enter_your_email')}
                 />
               </div>
             </div>
@@ -97,7 +99,7 @@ function LoginForm() {
                   type={showPassword ? "text" : "password"}
                   required
                   className="w-full px-4 py-4 pr-12 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm"
-                  placeholder="Enter your password"
+                  placeholder={t('ui.enter_your_password')}
                 />
                 <button
                   type="button"
@@ -120,11 +122,10 @@ function LoginForm() {
                   Signing in...
                 </div>
               ) : (
-                "Access Workshop Portal"
+                t('ui.access_workshop_portal')
               )}
             </button>
           </form>
-          
           <div className="mt-8 text-center">
             <Link
               href="/forgot-password"

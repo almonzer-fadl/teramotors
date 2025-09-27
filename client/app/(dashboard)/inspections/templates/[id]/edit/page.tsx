@@ -277,7 +277,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                       value={newItem.itemId}
                       onChange={(e) => handleItemChange("itemId", e.target.value)}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="e.g., BRAKE_001"
+                      placeholder={t('templates.item_id_placeholder')}
                     />
                   </div>
                   

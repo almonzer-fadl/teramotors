@@ -207,7 +207,7 @@ export default function NewTemplatePage() {
                     value={newItem.itemId}
                     onChange={(e) => handleItemChange("itemId", e.target.value)}
                     className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g., BRAKE_001"
+                    placeholder={t('templates.item_id_placeholder')}
                   />
                 </div>
                 

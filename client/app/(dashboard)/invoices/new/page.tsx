@@ -263,6 +263,10 @@ function NewInvoiceContent() {
     setParts(updated);
   };
 
+    function t(arg0: string): import("react").ReactNode | Iterable<import("react").ReactNode> {
+        throw new Error("Function not implemented.");
+    }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
@@ -742,7 +746,7 @@ function NewInvoiceContent() {
               className="group inline-flex items-center px-8 py-4 border border-transparent text-lg font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="mr-3 h-6 w-6 group-hover:scale-110 transition-transform" />
-              {submitting ? "Creating Invoice..." : "Create Invoice"}
+              {submitting ? t('ui.creating_invoice') : t('ui.create_invoice')}
             </button>
           </div>
         </form>

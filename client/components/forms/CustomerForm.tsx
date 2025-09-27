@@ -192,7 +192,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                       handleInputChange("firstName", e.target.value)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter first name"
+                    placeholder={t('ui.enter_first_name')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -207,7 +207,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                       handleInputChange("lastName", e.target.value)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter last name"
+                    placeholder={t('ui.enter_last_name')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -220,7 +220,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     value={formData.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter email address"
+                    placeholder={t('ui.enter_email_address')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -233,7 +233,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     value={formData.phone}
                     onChange={(e) => handleInputChange("phone", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter phone number"
+                    placeholder={t('ui.enter_phone_number')}
                   />
                 </div>
               </div>
@@ -262,7 +262,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                       handleInputChange("address.street", e.target.value)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="Enter street address"
+                    placeholder={t('forms.street_address')}
                   />
                 </div>
                 <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
@@ -277,7 +277,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                         handleInputChange("address.city", e.target.value)
                       }
                       className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="Enter city"
+                      placeholder={t('forms.city')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -291,7 +291,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                         handleInputChange("address.state", e.target.value)
                       }
                       className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="Enter state"
+                      placeholder={t('forms.state')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -305,7 +305,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                         handleInputChange("address.zipCode", e.target.value)
                       }
                       className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="Enter ZIP code"
+                      placeholder={t('forms.zip_code')}
                     />
                   </div>
                 </div>
