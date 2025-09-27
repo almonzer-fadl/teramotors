@@ -75,8 +75,17 @@ interface JobCard {
   laborHours: number;
   notes?: string;
   photos: string[];
-  services: { serviceId: string; quantity: number; laborHours: number; laborRate: number }[];
-  partsUsed: { partId: string; quantity: number; cost: number }[];
+  services: { 
+    serviceId: { _id: string; name: string; description: string; laborHours: number; laborRate: number } | string; 
+    quantity: number; 
+    laborHours: number; 
+    laborRate: number 
+  }[];
+  partsUsed: { 
+    partId: { _id: string; name: string; partNumber: string; cost: number } | string; 
+    quantity: number; 
+    cost: number 
+  }[];
 }
 
 export default function JobCardDetailsPage() {
@@ -518,27 +527,36 @@ export default function JobCardDetailsPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t("job_cards.services")}
             </h2>
-            {jobCard.services.map((service, index) => (
-              <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-start mb-6 p-4 bg-gray-50/80 rounded-2xl">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    {t("job_cards.select_service")}
-                  </label>
-                  <select
-                    value={service.serviceId}
-                    onChange={(e) =>
-                      handleServiceChange(index, "serviceId", e.target.value)
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                  >
-                    <option value="">{t("job_cards.select_service")}</option>
-                    {services.map((s) => (
-                      <option key={s._id} value={s._id}>
-                        {s.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            {jobCard.services.map((service, index) => {
+              const serviceId = typeof service.serviceId === 'string' ? service.serviceId : service.serviceId?._id || '';
+              const serviceName = typeof service.serviceId === 'object' && service.serviceId ? service.serviceId.name : '';
+              
+              return (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-start mb-6 p-4 bg-gray-50/80 rounded-2xl">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      {t("job_cards.select_service")}
+                    </label>
+                    <select
+                      value={serviceId}
+                      onChange={(e) =>
+                        handleServiceChange(index, "serviceId", e.target.value)
+                      }
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    >
+                      <option value="">{t("job_cards.select_service")}</option>
+                      {services.map((s) => (
+                        <option key={s._id} value={s._id}>
+                          {s.name}
+                        </option>
+                      ))}
+                    </select>
+                    {serviceName && (
+                      <p className="mt-2 text-sm text-gray-600">
+                        <strong>Selected:</strong> {serviceName}
+                      </p>
+                    )}
+                  </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     {t("job_cards.qty")}
@@ -578,7 +596,8 @@ export default function JobCardDetailsPage() {
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
             <div className="flex justify-between items-center mt-6">
               <button
                 type="button"
@@ -604,27 +623,36 @@ export default function JobCardDetailsPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t("job_cards.parts_used")}
             </h2>
-            {jobCard.partsUsed.map((part, index) => (
-              <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start mb-6 p-4 bg-gray-50/80 rounded-2xl">
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    {t("job_cards.select_part")}
-                  </label>
-                  <select
-                    value={part.partId}
-                    onChange={(e) =>
-                      handlePartChange(index, "partId", e.target.value)
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                  >
-                    <option value="">{t("job_cards.select_part")}</option>
-                    {parts.map((p) => (
-                      <option key={p._id} value={p._id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+            {jobCard.partsUsed.map((part, index) => {
+              const partId = typeof part.partId === 'string' ? part.partId : part.partId?._id || '';
+              const partName = typeof part.partId === 'object' && part.partId ? part.partId.name : '';
+              
+              return (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start mb-6 p-4 bg-gray-50/80 rounded-2xl">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      {t("job_cards.select_part")}
+                    </label>
+                    <select
+                      value={partId}
+                      onChange={(e) =>
+                        handlePartChange(index, "partId", e.target.value)
+                      }
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    >
+                      <option value="">{t("job_cards.select_part")}</option>
+                      {parts.map((p) => (
+                        <option key={p._id} value={p._id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                    {partName && (
+                      <p className="mt-2 text-sm text-gray-600">
+                        <strong>Selected:</strong> {partName}
+                      </p>
+                    )}
+                  </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     {t("job_cards.qty")}
@@ -664,7 +692,8 @@ export default function JobCardDetailsPage() {
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
             <div className="flex justify-between items-center mt-6">
               <button
                 type="button"

@@ -81,14 +81,37 @@ export default function JobCardForm({
       const response = await fetch(`/api/job-cards/${jobCardId}`);
       if (response.ok) {
         const jobCard = await response.json();
+        
+        // Transform services to match form data structure
+        const transformedServices = jobCard.services?.map((service: any) => ({
+          serviceId: typeof service.serviceId === 'object' ? service.serviceId._id : service.serviceId,
+          quantity: service.quantity || 1,
+          laborHours: service.laborHours || 0,
+          laborRate: service.laborRate || 0,
+        })) || [];
+        
+        // Transform parts to match form data structure
+        const transformedParts = jobCard.partsUsed?.map((part: any) => ({
+          partId: typeof part.partId === 'object' ? part.partId._id : part.partId,
+          quantity: part.quantity || 1,
+          cost: part.cost || 0,
+        })) || [];
+        
         setFormData({
-          ...jobCard,
+          appointmentId: jobCard.appointmentId?._id || "",
+          customerId: jobCard.customerId?._id || "",
+          vehicleId: jobCard.vehicleId?._id || "",
+          status: jobCard.status || "pending",
+          priority: jobCard.priority || "medium",
           estimatedStartTime: jobCard.estimatedStartTime
             ? new Date(jobCard.estimatedStartTime).toISOString().slice(0, 16)
             : "",
           estimatedEndTime: jobCard.estimatedEndTime
             ? new Date(jobCard.estimatedEndTime).toISOString().slice(0, 16)
             : "",
+          services: transformedServices,
+          partsUsed: transformedParts,
+          notes: jobCard.notes || "",
         });
       }
     } catch (error) {

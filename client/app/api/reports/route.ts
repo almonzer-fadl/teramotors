@@ -7,6 +7,7 @@ import Appointment from '@/lib/models/Appointment'
 import JobCard from '@/lib/models/JobCard'
 import Invoice from '@/lib/models/Invoice'
 import Part from '@/lib/models/Part'
+import Service from '@/lib/models/Service'
 
 // GET /api/reports - Get report data (Admin only)
 export async function GET(request: NextRequest) {
@@ -71,14 +72,40 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Get top services (mock data for now)
-    const topServices = [
-      { name: 'Oil Change', count: 45, revenue: 2250 },
-      { name: 'Brake Service', count: 23, revenue: 3450 },
-      { name: 'Engine Repair', count: 12, revenue: 4800 },
-      { name: 'Transmission Service', count: 8, revenue: 3200 },
-      { name: 'Tire Replacement', count: 15, revenue: 1800 }
-    ]
+    // Get top services from job cards
+    const jobCards = await JobCard.find({
+      createdAt: { $gte: startDate, $lte: endDate }
+    }).populate('services.serviceId', 'name description laborHours laborRate')
+
+    const serviceStats = new Map()
+    
+    jobCards.forEach(jobCard => {
+      jobCard.services.forEach((service: { serviceId: { name: any; }; quantity: number; laborHours: number; laborRate: number; }) => {
+        if (service.serviceId && typeof service.serviceId === 'object') {
+          const serviceName = service.serviceId.name
+          const quantity = service.quantity || 1
+          const laborHours = service.laborHours || 0
+          const laborRate = service.laborRate || 0
+          const revenue = quantity * laborHours * laborRate
+          
+          if (serviceStats.has(serviceName)) {
+            const existing = serviceStats.get(serviceName)
+            existing.count += quantity
+            existing.revenue += revenue
+          } else {
+            serviceStats.set(serviceName, {
+              name: serviceName,
+              count: quantity,
+              revenue: revenue
+            })
+          }
+        }
+      })
+    })
+
+    const topServices = Array.from(serviceStats.values())
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 10)
 
     // Generate customer growth data (last 12 months)
     const customerGrowth = []
@@ -97,6 +124,65 @@ export async function GET(request: NextRequest) {
       })
     }
 
+    // Get mechanic productivity data
+    const mechanicStats = new Map()
+    jobCards.forEach(jobCard => {
+      if (jobCard.mechanicId && typeof jobCard.mechanicId === 'object') {
+        const mechanicName = jobCard.mechanicId.fullName || 'Unknown'
+        const jobDuration = jobCard.actualStartTime && jobCard.actualEndTime 
+          ? (new Date(jobCard.actualEndTime).getTime() - new Date(jobCard.actualStartTime).getTime()) / (1000 * 60 * 60) // hours
+          : 0
+        
+        if (mechanicStats.has(mechanicName)) {
+          const existing = mechanicStats.get(mechanicName)
+          existing.jobsCompleted += 1
+          existing.totalHours += jobDuration
+        } else {
+          mechanicStats.set(mechanicName, {
+            name: mechanicName,
+            jobsCompleted: 1,
+            totalHours: jobDuration
+          })
+        }
+      }
+    })
+
+    const topMechanics = Array.from(mechanicStats.values())
+      .sort((a, b) => b.jobsCompleted - a.jobsCompleted)
+      .slice(0, 5)
+
+    // Get job status distribution
+    const jobStatusStats = await JobCard.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 }
+        }
+      }
+    ])
+
+    const jobStatusDistribution = jobStatusStats.map(stat => ({
+      status: stat._id,
+      count: stat.count
+    }))
+
+    // Get average job completion time
+    const completedJobs = await JobCard.find({
+      actualStartTime: { $exists: true },
+      actualEndTime: { $exists: true },
+      createdAt: { $gte: startDate, $lte: endDate }
+    })
+
+    const totalCompletionTime = completedJobs.reduce((sum, job) => {
+      const start = new Date(job.actualStartTime).getTime()
+      const end = new Date(job.actualEndTime).getTime()
+      return sum + (end - start) / (1000 * 60 * 60) // hours
+    }, 0)
+
+    const averageJobCompletionTime = completedJobs.length > 0 
+      ? totalCompletionTime / completedJobs.length 
+      : 0
+
     const reportData = {
       totalCustomers,
       totalVehicles,
@@ -106,44 +192,16 @@ export async function GET(request: NextRequest) {
       totalParts,
       monthlyRevenue,
       topServices,
-      customerGrowth
+      customerGrowth,
+      topMechanics,
+      jobStatusDistribution,
+      averageJobCompletionTime: Math.round(averageJobCompletionTime * 100) / 100,
+      completedJobs: completedJobs.length
     }
 
     return new Response(JSON.stringify(reportData))
   } catch (error) {
     console.error('Error fetching report data:', error)
     return new Response(JSON.stringify({ error: 'Failed to fetch report data' }), { status: 500 })
-  }
-}
-
-// POST /api/reports/export - Export report (Admin only)
-export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerSession()
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
-    }
-
-    // Check if user is admin
-    if ((session.user as any).role !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), { status: 403 })
-    }
-
-    const body = await request.json()
-    const { format, range } = body
-
-    // For now, return a simple response
-    // In a real implementation, you would generate PDF or Excel files
-    const exportData = {
-      message: `Report exported in ${format} format for ${range} days`,
-      timestamp: new Date().toISOString(),
-      format,
-      range
-    }
-
-    return new Response(JSON.stringify(exportData))
-  } catch (error) {
-    console.error('Error exporting report:', error)
-    return new Response(JSON.stringify({ error: 'Failed to export report' }), { status: 500 })
   }
 }

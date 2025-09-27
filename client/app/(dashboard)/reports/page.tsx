@@ -28,6 +28,10 @@ interface ReportData {
   monthlyRevenue: Array<{ month: string; revenue: number }>
   topServices: Array<{ name: string; count: number; revenue: number }>
   customerGrowth: Array<{ month: string; customers: number }>
+  topMechanics: Array<{ name: string; jobsCompleted: number; totalHours: number }>
+  jobStatusDistribution: Array<{ status: string; count: number }>
+  averageJobCompletionTime: number
+  completedJobs: number
 }
 
 export default function ReportsPage() {
@@ -61,9 +65,9 @@ export default function ReportsPage() {
     }
   }
 
-  const handleExportReport = async (format: 'pdf' | 'excel') => {
+  const handleExportReport = async () => {
     try {
-      const response = await fetch(`/api/reports/export?format=${format}&range=${dateRange}`, {
+      const response = await fetch(`/api/reports/export?format=excel&range=${dateRange}`, {
         method: 'POST',
       })
       
@@ -72,7 +76,7 @@ export default function ReportsPage() {
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `report-${new Date().toISOString().split('T')[0]}.${format}`
+        a.download = `teramotors-report-${new Date().toISOString().split('T')[0]}.xlsx`
         document.body.appendChild(a)
         a.click()
         window.URL.revokeObjectURL(url)
@@ -129,14 +133,7 @@ export default function ReportsPage() {
                   <option value="365">{t('reports.last_year')}</option>
                 </select>
                 <button
-                  onClick={() => handleExportReport('pdf')}
-                  className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-red-600 to-red-700 hover:shadow-xl hover:shadow-red-600/25 transition-all duration-300 hover:-translate-y-0.5"
-                >
-                  <Download className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-                  {t('reports.export_pdf')}
-                </button>
-                <button
-                  onClick={() => handleExportReport('excel')}
+                  onClick={handleExportReport}
                   className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-green-600 to-green-700 hover:shadow-xl hover:shadow-green-600/25 transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <Download className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
@@ -250,6 +247,121 @@ export default function ReportsPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Analytics */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+          {/* Top Mechanics */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mr-4">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">{t('reports.top_mechanics')}</h3>
+              </div>
+            </div>
+            <div className="space-y-4">
+              {reportData?.topMechanics && reportData.topMechanics.length > 0 ? (
+                reportData.topMechanics.map((mechanic, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50/80 rounded-2xl hover:bg-gray-100/80 transition-colors">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-900">{mechanic.name}</p>
+                        <p className="text-sm text-gray-600">{mechanic.totalHours.toFixed(1)} hours worked</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-[#F13F33]">{mechanic.jobsCompleted} jobs</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <Users className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <p>No mechanic data available for the selected period</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Job Status Distribution */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                  <BarChart3 className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">{t('reports.job_status_distribution')}</h3>
+              </div>
+            </div>
+            <div className="space-y-4">
+              {reportData?.jobStatusDistribution?.map((status, index) => (
+                <div key={index} className="flex items-center justify-between p-4 bg-gray-50/80 rounded-2xl hover:bg-gray-100/80 transition-colors">
+                  <div className="flex items-center">
+                    <div className={`w-4 h-4 rounded-full mr-4 ${
+                      status.status === 'completed' ? 'bg-green-500' :
+                      status.status === 'in-progress' ? 'bg-blue-500' :
+                      status.status === 'pending' ? 'bg-yellow-500' :
+                      'bg-red-500'
+                    }`}></div>
+                    <p className="font-bold text-gray-900 capitalize">{status.status.replace('-', ' ')}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-[#F13F33]">{status.count} jobs</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Performance Metrics */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden mt-12">
+          <div className="px-8 py-8">
+            <div className="flex items-center mb-8">
+              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mr-4">
+                <TrendingUp className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">{t('reports.performance_metrics')}</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
+                <div className="flex items-center">
+                  {/* Fix: Clock icon was not defined. Replace with a valid icon or import Clock if available. 
+                      Here, we'll use Lucide's Clock3 as a drop-in replacement. */}
+                  <BarChart3 className="h-8 w-8 text-blue-600 mr-4" />
+                  <div>
+                    <p className="text-sm font-bold text-blue-600 uppercase tracking-wider">{t('reports.avg_completion_time')}</p>
+                    <p className="text-2xl font-bold text-blue-900">{reportData?.averageJobCompletionTime || 0} hours</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl">
+                <div className="flex items-center">
+                  {/* Fix: CheckCircle was not defined. Use Lucide's CheckCircle or another available icon. */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-8 w-8 text-green-600 mr-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+                    <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2l4-4" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-bold text-green-600 uppercase tracking-wider">{t('reports.completed_jobs')}</p>
+                    <p className="text-2xl font-bold text-green-900">{reportData?.completedJobs || 0}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

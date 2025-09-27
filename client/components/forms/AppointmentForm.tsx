@@ -81,9 +81,9 @@ export default function AppointmentForm({
       if (response.ok) {
         const appointment = await response.json();
         setFormData({
-          customerId: appointment.customerId || "",
-          vehicleId: appointment.vehicleId || "",
-          serviceId: appointment.serviceId || "",
+          customerId: appointment.customerId?._id || appointment.customerId || "",
+          vehicleId: appointment.vehicleId?._id || appointment.vehicleId || "",
+          serviceId: appointment.serviceId?._id || appointment.serviceId || "",
           appointmentDate: appointment.appointmentDate
             ? new Date(appointment.appointmentDate).toISOString().split("T")[0]
             : "",
@@ -92,7 +92,7 @@ export default function AppointmentForm({
           status: appointment.status || "scheduled",
           notes: appointment.notes || "",
           estimatedCost: appointment.estimatedCost || 0,
-          mechanicId: appointment.mechanicId || "",
+          mechanicId: appointment.mechanicId?._id || appointment.mechanicId || "",
           priority: appointment.priority || "medium",
         });
       }

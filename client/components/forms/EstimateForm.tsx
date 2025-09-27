@@ -186,14 +186,30 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
       const response = await fetch(`/api/estimates/${estimateId}`);
       if (response.ok) {
         const estimate = await response.json();
+        
+        // Transform services to match form data structure
+        const transformedServices = estimate.services?.map((service: any) => ({
+          serviceId: typeof service.serviceId === 'object' ? service.serviceId._id : service.serviceId,
+          quantity: service.quantity || 1,
+          laborHours: service.laborHours || 0,
+          laborRate: service.laborRate || 0,
+        })) || [];
+        
+        // Transform parts to match form data structure
+        const transformedParts = estimate.parts?.map((part: any) => ({
+          partId: typeof part.partId === 'object' ? part.partId._id : part.partId,
+          quantity: part.quantity || 1,
+          cost: part.cost || 0,
+        })) || [];
+        
         setFormData({
-          inspectionId: estimate.inspectionId || "",
-          customerId: estimate.customerId || "",
-          vehicleId: estimate.vehicleId || "",
+          inspectionId: estimate.inspectionId?._id || estimate.inspectionId || "",
+          customerId: estimate.customerId?._id || estimate.customerId || "",
+          vehicleId: estimate.vehicleId?._id || estimate.vehicleId || "",
           status: estimate.status || "pending",
           notes: estimate.notes || "",
-          services: estimate.services || [],
-          parts: estimate.parts || [],
+          services: transformedServices,
+          parts: transformedParts,
           subtotal: estimate.subtotal || 0,
           tax: estimate.tax || 0,
           total: estimate.total || 0,
