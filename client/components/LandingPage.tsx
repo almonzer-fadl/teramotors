@@ -127,12 +127,6 @@ function LoginForm() {
       </form>
       
       <div className="mt-8 text-center space-y-3">
-        <Link 
-          href="/register" 
-          className="text-[#063479] hover:text-[#F13F33] font-semibold text-sm block transition-colors duration-300"
-        >
-          {t("landing.login.create_account")}
-        </Link>
         <Link
           href="/forgot-password"
           className="text-[#063479] hover:text-[#F13F33] font-semibold text-sm block transition-colors duration-300"

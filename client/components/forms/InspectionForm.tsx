@@ -136,10 +136,19 @@ export default function InspectionForm({
       if (response.ok) {
         const inspection = await response.json();
         setFormData({
-          ...inspection,
+          vehicleId: inspection.vehicleId?._id || inspection.vehicleId || "",
+          customerId: inspection.customerId?._id || inspection.customerId || "",
+          mechanicId: inspection.mechanicId?._id || inspection.mechanicId || "",
+          templateId: inspection.templateId?._id || inspection.templateId || "",
           inspectionDate: inspection.inspectionDate
             ? new Date(inspection.inspectionDate).toISOString().split("T")[0]
             : "",
+          mileage: inspection.mileage || 0,
+          overallCondition: inspection.overallCondition || "",
+          items: inspection.items || [],
+          recommendations: inspection.recommendations || "",
+          nextInspectionDate: inspection.nextInspectionDate || "",
+          status: inspection.status || "in-progress",
         });
       }
     } catch (error) {

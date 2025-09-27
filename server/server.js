@@ -27,7 +27,7 @@ app.get('/health', (req, res) => {
 });
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/teramotors', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://admin:password@localhost:27017/teramotors?authSource=admin', {
   dbName: "teramotors",
   serverSelectionTimeoutMS: 30000,
   socketTimeoutMS: 60000,

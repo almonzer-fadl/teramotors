@@ -108,28 +108,6 @@ export default function SettingsPage() {
     }
   }
 
-  const resetDatabaseConnection = async () => {
-    setResetting(true)
-    try {
-      const response = await fetch('/api/reset-db', {
-        method: 'POST',
-      })
-      
-      if (response.ok) {
-        const result = await response.json()
-        alert(t('alerts.database_reset_success'))
-        await fetchUsers() // Refresh the list
-      } else {
-        const error = await response.json()
-        alert(t('alerts.reset_failed', { message: error.message }))
-      }
-    } catch (error) {
-      console.error('Error resetting database:', error)
-      alert(t('alerts.reset_failed_generic'))
-    } finally {
-      setResetting(false)
-    }
-  }
 
   const handleEditNames = (user: User) => {
     setEditingNames(user)
@@ -389,20 +367,7 @@ export default function SettingsPage() {
                 <h2 className="text-2xl font-bold text-gray-900">{t('settings.user_management')}</h2>
               </div>
               <div className="flex items-center gap-4">
-                <button
-                  onClick={migrateUsers}
-                  disabled={migrating}
-                  className="px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {migrating ? 'Migrating...' : 'Migrate Users'}
-                </button>
-                <button
-                  onClick={resetDatabaseConnection}
-                  disabled={resetting}
-                  className="px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {resetting ? 'Resetting...' : 'Reset DB Connection'}
-                </button>
+                
                 <div className="relative">
                   <Search className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
                   <input
