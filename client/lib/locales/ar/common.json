@@ -907,7 +907,14 @@
     "working_hours": "ساعات العمل",
     "hours": "ساعات",
     "call_us": "اتصل بنا",
-    "visit_our_shop": "زر متجرنا"
+    "visit_our_shop": "زر متجرنا",
+    "engine_repair": "إصلاح المحرك",
+    "brake_service": "خدمة الفرامل",
+    "transmission": "ناقل الحركة",
+    "electrical": "كهربائي",
+    "contact_info": "معلومات الاتصال",
+    "services": "الخدمات",
+    "all_rights_reserved": "جميع الحقوق محفوظة"
   },
   "dashboard_missing": {
     "welcome_back": "مرحباً بعودتك {{role}}",
