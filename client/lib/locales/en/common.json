@@ -948,7 +948,14 @@
     "working_hours": "Working Hours",
     "hours": "Hours",
     "call_us": "Call Us",
-    "visit_our_shop": "Visit Our Shop"
+    "visit_our_shop": "Visit Our Shop",
+    "engine_repair": "Engine Repair",
+    "brake_service": "Brake Service",
+    "transmission": "Transmission",
+    "electrical": "Electrical",
+    "contact_info": "Contact Info",
+    "services": "Services",
+    "all_rights_reserved": "All rights reserved"
   },
   "dashboard_missing": {
     "welcome_back": "Welcome back {{role}} user",

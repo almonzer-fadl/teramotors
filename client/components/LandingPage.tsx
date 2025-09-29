@@ -366,11 +366,11 @@ export default function LandingPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-white">100%</div>
-                  <div className="text-sm text-blue-200">Satisfaction</div>
+                  <div className="text-sm text-blue-200">{t('landing_missing.satisfaction')}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-white">24/7</div>
-                  <div className="text-sm text-blue-200">Support</div>
+                  <div className="text-sm text-blue-200">{t('landing_missing.support_24_7')}</div>
                 </div>
               </div>
             </div>
@@ -382,8 +382,8 @@ export default function LandingPage() {
                   <div className="w-20 h-20 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                     <Car className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-3xl font-bold text-white mb-4">Professional Service</h3>
-                  <p className="text-blue-100 mb-8 text-lg">Trusted by thousands of customers across the region</p>
+                  <h3 className="text-3xl font-bold text-white mb-4">{t('landing_missing.professional_service')}</h3>
+                  <p className="text-blue-100 mb-8 text-lg">{t('landing_missing.trusted_by_thousands')}</p>
                   
                   <div className="grid grid-cols-2 gap-6">
                     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
@@ -392,15 +392,15 @@ export default function LandingPage() {
                     </div>
                     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
                       <div className="text-3xl font-bold text-white">100%</div>
-                      <div className="text-sm text-blue-200">Satisfaction</div>
+                      <div className="text-sm text-blue-200">{t('landing_missing.satisfaction')}</div>
                     </div>
                     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
                       <div className="text-3xl font-bold text-white">24/7</div>
-                      <div className="text-sm text-blue-200">Support</div>
+                      <div className="text-sm text-blue-200">{t('landing_missing.support_24_7')}</div>
                     </div>
                     <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6">
                       <div className="text-3xl font-bold text-white">5K+</div>
-                      <div className="text-sm text-blue-200">Happy Customers</div>
+                      <div className="text-sm text-blue-200">{t('landing_missing.happy_customers')}</div>
                     </div>
                   </div>
                 </div>
@@ -418,7 +418,7 @@ export default function LandingPage() {
           <div className="text-center mb-20">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#F13F33]/10 border border-[#F13F33]/20 text-[#F13F33] text-sm font-medium mb-6">
               <Wrench className="w-4 h-4 mr-2" />
-              Our Services
+              {t('landing_missing.our_services')}
             </div>
             <h2 className="text-5xl font-bold text-gray-900 mb-6">
               {t("landing.services.title")}
@@ -480,7 +480,7 @@ export default function LandingPage() {
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <h3 className="text-2xl font-semibold text-gray-900 mb-6">
-                Why Choose Us
+                {t('landing_missing.why_choose_us')}
               </h3>
               <div className="space-y-4">
                 {values.map((value, index) => (
@@ -530,7 +530,7 @@ export default function LandingPage() {
             <div>
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#F13F33]/20 border border-[#F13F33]/30 text-[#F13F33] text-sm font-medium mb-8">
                 <Phone className="w-4 h-4 mr-2" />
-                Get In Touch
+                {t('landing_missing.get_in_touch')}
               </div>
               <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent">
                 {t("landing.contact.title")}
@@ -545,7 +545,7 @@ export default function LandingPage() {
                     <MapPin className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">Visit Our Shop</h4>
+                    <h4 className="font-semibold text-white mb-1">{t('landing_missing.visit_our_shop')}</h4>
                     <p className="text-blue-200">{t("landing.contact.address")}</p>
                   </div>
                 </div>
@@ -555,7 +555,7 @@ export default function LandingPage() {
                     <Phone className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">Call Us</h4>
+                    <h4 className="font-semibold text-white mb-1">{t('landing_missing.call_us')}</h4>
                     <p className="text-blue-200">{t("landing.contact.phone")}</p>
                   </div>
                 </div>
@@ -565,7 +565,7 @@ export default function LandingPage() {
                     <Clock className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">Working Hours</h4>
+                    <h4 className="font-semibold text-white mb-1">{t('landing_missing.working_hours')}</h4>
                     <p className="text-blue-200">{t("landing.contact.hours")}</p>
                   </div>
                 </div>
@@ -593,8 +593,8 @@ export default function LandingPage() {
               <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-2 border border-white/20 shadow-2xl w-full max-w-md">
                 <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
                   <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">Workshop Portal</h3>
-                    <p className="text-gray-300 text-sm">Staff & Management Access</p>
+                    <h3 className="text-2xl font-bold text-white mb-2">{t('landing_missing.workshop_portal')}</h3>
+                    <p className="text-gray-300 text-sm">{t('landing_missing.staff_management_access')}</p>
                   </div>
                   <Suspense fallback={<div className="animate-pulse bg-white/20 rounded-2xl w-full h-96"></div>}>
                     <LoginForm />
@@ -635,16 +635,16 @@ export default function LandingPage() {
               </div>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4">Services</h4>
+              <h4 className="text-lg font-semibold mb-4">{t('landing_missing.services')}</h4>
               <div className="space-y-2">
-                <a href="#services" className="block text-gray-400 hover:text-white transition-colors">Engine Repair</a>
-                <a href="#services" className="block text-gray-400 hover:text-white transition-colors">Brake Service</a>
-                <a href="#services" className="block text-gray-400 hover:text-white transition-colors">Transmission</a>
-                <a href="#services" className="block text-gray-400 hover:text-white transition-colors">Electrical</a>
+                <a href="#services" className="block text-gray-400 hover:text-white transition-colors">{t('landing_missing.engine_repair')}</a>
+                <a href="#services" className="block text-gray-400 hover:text-white transition-colors">{t('landing_missing.brake_service')}</a>
+                <a href="#services" className="block text-gray-400 hover:text-white transition-colors">{t('landing_missing.transmission')}</a>
+                <a href="#services" className="block text-gray-400 hover:text-white transition-colors">{t('landing_missing.electrical')}</a>
               </div>
             </div>
             <div>
-              <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
+              <h4 className="text-lg font-semibold mb-4">{t('landing_missing.contact_info')}</h4>
               <div className="space-y-2 text-gray-400">
                 <p>{t("landing.contact.address")}</p>
                 <p>{t("landing.contact.phone")}</p>
@@ -653,7 +653,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 TeraMotors Auto Repair. All rights reserved.</p>
+            <p>&copy; 2024 TeraMotors Auto Repair. {t('landing_missing.all_rights_reserved')}</p>
           </div>
         </div>
       </footer>
