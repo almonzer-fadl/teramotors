@@ -415,6 +415,8 @@
     "failed_to_save_notes": "Failed to save notes",
     "no_active_job_cards": "No Active Job Cards",
     "no_active_job_cards_description": "There are no job cards with status 'Created' or 'In Progress'.",
+    "customer": "Customer",
+    "view": "View",
     "status_created": "Created",
     "status_in_progress": "In Progress",
     "services_label": "Services:",
@@ -485,7 +487,7 @@
     "estimates": "Estimates",
     "invoices": "Invoices",
     "payments": "Payments",
-    "inventory": "Parts Inventory",
+    "inventory": "Inventory",
     "inspections": "Inspections",
     "services": "Services",
     "users": "User Management",
@@ -955,7 +957,17 @@
     "electrical": "Electrical",
     "contact_info": "Contact Info",
     "services": "Services",
-    "all_rights_reserved": "All rights reserved"
+    "all_rights_reserved": "All rights reserved",
+    "back_to_home": "Back to Home",
+    "back_to_login": "Back to Login",
+    "sign_in_to_manage": "Sign in to manage your auto repair business",
+    "email_address": "Email Address",
+    "password": "Password",
+    "signing_in": "Signing in...",
+    "forgot_your_password": "Forgot your password?",
+    "testimonial_1": "TeraMotors has been servicing my fleet for 5 years. Their attention to detail and honest pricing keeps me coming back.",
+    "testimonial_2": "When my car broke down unexpectedly, TeraMotors got me back on the road quickly and affordably. Highly recommended!",
+    "testimonial_3": "The team at TeraMotors understands cars like no one else. They've kept my classic car running perfectly for years."
   },
   "dashboard_missing": {
     "welcome_back": "Welcome back {{role}} user",
@@ -967,12 +979,43 @@
       "create_job_card": "Create a new work order"
     },
     "in_progress": "In Progress",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "modern_widget": {
+      "clients": "Clients",
+      "vehicles": "Vehicles", 
+      "inventory": "Inventory",
+      "vendors": "Vendors",
+      "accounting": "Accounting",
+      "job_cards": "Job Cards",
+      "invoices_estimates": "Inv & Est",
+      "payments": "Payments",
+      "inspections": "Inspections",
+      "appointments": "Appointments",
+      "time_tracking": "Time Tracking",
+      "service_reminders": "Services",
+      "reports": "Reports",
+      "navigation": "Navigation",
+      "statistics_overview": "Statistics Overview",
+      "draft": "Draft",
+      "due_amount": "Due Amount",
+      "active_job_cards": "Active Job Cards",
+      "customer": "Customer",
+      "vehicle": "Vehicle",
+      "invoice_number": "Invoice #",
+      "total": "Total",
+      "paid": "Paid",
+      "due": "Due",
+      "status": "Status"
+    }
   },
   "pagination_missing": {
     "show": "Show",
     "per_page": "per page",
-    "showing_results": "Showing {{start}} to {{end}} of {{total}} results"
+    "showing_results": "Showing {{start}} to {{end}} of {{total}} results",
+    "first_page": "First page",
+    "previous_page": "Previous page",
+    "next_page": "Next page",
+    "last_page": "Last page"
   },
   "job_cards_missing": {
     "no_appointment": "No Appointment",

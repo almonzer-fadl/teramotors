@@ -53,7 +53,7 @@ function LoginForm() {
           className="absolute -top-16 left-0 flex items-center text-white/80 hover:text-white transition-colors group"
         >
           <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-          Back to Home
+          {t('landing_missing.back_to_home')}
         </Link>
 
         <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20">
@@ -62,9 +62,9 @@ function LoginForm() {
               <Wrench className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-3">
-              Workshop Portal
+              {t('landing_missing.workshop_portal')}
             </h1>
-            <p className="text-gray-600 text-base">Sign in to manage your auto repair business</p>
+            <p className="text-gray-600 text-base">{t('landing_missing.sign_in_to_manage')}</p>
           </div>
 
           {error && (
@@ -76,7 +76,7 @@ function LoginForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700">
-                Email Address
+                {t('landing_missing.email_address')}
               </label>
               <div className="relative">
                 <input
@@ -91,7 +91,7 @@ function LoginForm() {
             
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700">
-                Password
+                {t('landing_missing.password')}
               </label>
               <div className="relative">
                 <input
@@ -119,7 +119,7 @@ function LoginForm() {
               {isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Signing in...
+                  {t('landing_missing.signing_in')}
                 </div>
               ) : (
                 t('ui.access_workshop_portal')
@@ -131,7 +131,7 @@ function LoginForm() {
               href="/forgot-password"
               className="text-[#063479] hover:text-[#F13F33] font-semibold text-sm transition-colors duration-300"
             >
-              Forgot your password?
+              {t('landing_missing.forgot_your_password')}
             </Link>
           </div>
         </div>

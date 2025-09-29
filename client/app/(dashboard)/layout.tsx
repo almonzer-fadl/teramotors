@@ -53,12 +53,18 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(pathname === '/dashboard');
   const { user } = useSession();
   const { t } = useTranslation("common");
 
   // Get role-based navigation items
   const userRole = (user as any)?.role || "mechanic";
   const navigation = getNavigationItems(userRole);
+
+  // Auto-collapse sidebar on dashboard
+  useEffect(() => {
+    setSidebarCollapsed(pathname === '/dashboard');
+  }, [pathname]);
 
   useEffect(() => {
     socket.connect();
@@ -133,11 +139,40 @@ export default function DashboardLayout({
               })}
             </ul>
           </nav>
+          
+          {/* User profile and sign out at bottom */}
+          <div className="border-t border-gray-200 p-6">
+            <div className="flex items-center gap-x-3 mb-4">
+              <div className="w-10 h-10 bg-[#F13F33] rounded-xl flex items-center justify-center">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-gray-900">
+                  {user?.name}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {t(`roles.${userRole}.name`)}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                signOut();
+                setSidebarOpen(false);
+              }}
+              className="flex items-center gap-x-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium w-full"
+            >
+              <LogOut className="h-4 w-4" />
+              {t("header.sign_out")}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
+      <div className={`hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-all duration-300 ${
+        sidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:pointer-events-none' : 'lg:w-72'
+      }`}>
         <div className="flex flex-grow flex-col overflow-y-auto bg-white shadow-2xl">
           <div className="flex h-20 items-center px-6 bg-gradient-to-r from-[#063479] to-[#052a5f]">
             <div className="flex items-center">
@@ -146,6 +181,7 @@ export default function DashboardLayout({
                 alt={t('ui.teramotors_logo')} 
                 className="w-12 h-12 rounded-xl mr-3 object-contain bg-white p-1"
               />
+              {!sidebarCollapsed && (
                 <div className="flex flex-col">
                   <span className="flex items-center space-x-2">
                     <span className="text-2xl font-extrabold tracking-tight text-white drop-shadow-sm font-logo" style={{ letterSpacing: '0.04em' }}>
@@ -157,6 +193,7 @@ export default function DashboardLayout({
                     Auto Repair
                   </span>
                 </div>
+              )}
             </div>
           </div>
           <nav className="flex-1 px-6 py-6">
@@ -171,21 +208,48 @@ export default function DashboardLayout({
                         pathname === item.href
                           ? "bg-[#F13F33] text-white shadow-lg"
                           : "text-gray-700 hover:bg-gray-100 hover:text-[#F13F33]"
-                      }`}
+                      } ${sidebarCollapsed ? 'justify-center' : ''}`}
+                      title={sidebarCollapsed ? t(item.tKey) : undefined}
                     >
-                      <Icon className="mr-3 h-5 w-5" />
-                      {t(item.tKey)}
+                      <Icon className={`h-5 w-5 ${sidebarCollapsed ? '' : 'me-3'}`} />
+                      {!sidebarCollapsed && t(item.tKey)}
                     </Link>
                   </li>
                 );
               })}
             </ul>
           </nav>
+
+          {/* Desktop user profile at bottom of sidebar - only show when sidebar is expanded */}
+          {!sidebarCollapsed && (
+            <div className="hidden lg:block mt-auto p-4 border-t border-gray-200">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-[#F13F33] rounded-xl flex items-center justify-center">
+                  <Users className="h-5 w-5 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-gray-900">
+                    {user?.name}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {t(`roles.${userRole}.name`)}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => signOut()}
+                className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium w-full"
+              >
+                <LogOut className="h-4 w-4" />
+                {t("header.sign_out")}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Main content */}
-      <div className="lg:ps-72">
+      <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ps-0' : 'lg:ps-72'}`}>
         <ToastProvider />
         {/* Top bar */}
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
@@ -197,34 +261,46 @@ export default function DashboardLayout({
             <Menu className="h-6 w-6" />
           </button>
 
+          {/* Desktop sidebar toggle */}
+          <button
+            type="button"
+            className="hidden lg:block -m-2.5 p-2.5 text-gray-700 hover:text-[#F13F33] transition-colors"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1"></div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <LanguageSwitcher />
               <NotificationBell />
 
-              <div className="flex items-center gap-x-4">
-                <div className="flex items-center gap-x-3">
-                  <div className="w-10 h-10 bg-[#F13F33] rounded-xl flex items-center justify-center">
-                    <Users className="h-5 w-5 text-white" />
+              {/* Desktop user profile - only show when sidebar is collapsed */}
+              {sidebarCollapsed && (
+                <div className="hidden lg:flex items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#F13F33] rounded-xl flex items-center justify-center">
+                      <Users className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-gray-900">
+                        {user?.name}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {t(`roles.${userRole}.name`)}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-gray-900">
-                      {user?.name}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {t(`roles.${userRole}.name`)}
-                    </span>
-                  </div>
+                  <button
+                    onClick={() => signOut()}
+                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    {t("header.sign_out")}
+                  </button>
                 </div>
-                <button
-                  onClick={() => signOut()}
-                  className="flex items-center gap-x-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium"
-                >
-                  <LogOut className="h-4 w-4" />
-                  {t("header.sign_out")}
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>

@@ -64,7 +64,7 @@ export default function Pagination({
       {/* Items per page selector */}
       {showItemsPerPage && (
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-700">Show</span>
+          <span className="text-sm text-gray-700">{t('pagination_missing.show')}</span>
           <select
             value={itemsPerPage}
             onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
@@ -76,15 +76,17 @@ export default function Pagination({
               </option>
             ))}
           </select>
-          <span className="text-sm text-gray-700">per page</span>
+          <span className="text-sm text-gray-700">{t('pagination_missing.per_page')}</span>
         </div>
       )}
 
       {/* Items info */}
       <div className="text-sm text-gray-700">
-        Showing <span className="font-medium">{startItem}</span> to{' '}
-        <span className="font-medium">{endItem}</span> of{' '}
-        <span className="font-medium">{totalItems}</span> results
+        {t('pagination_missing.showing_results', { 
+          start: startItem, 
+          end: endItem, 
+          total: totalItems 
+        })}
       </div>
 
       {/* Pagination controls */}
