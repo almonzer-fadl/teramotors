@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Plus, Search, Edit, Trash2, Eye, ArrowUpDown } from "lucide-react";
-import StatusBadge from "@/components/dashboard/StatusBadge";
+import { Plus, Search } from "lucide-react";
+import ResponsiveServicesTable from "@/components/ui/ResponsiveServicesTable";
 import { socket } from "@/lib/services/socket";
 import { useSession } from "@/lib/hooks/useSession";
 import { hasPermission } from "@/lib/roles";
+import { useTranslation } from "react-i18next";
 
 interface Service {
   _id: string;
@@ -23,6 +24,7 @@ type SortKey = "name" | "category" | "laborRate" | "laborHours" | "createdAt";
 type SortDirection = "asc" | "desc";
 
 export default function ServicesPage() {
+  const { t } = useTranslation('common');
   const { user } = useSession();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -116,7 +118,7 @@ export default function ServicesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this service?")) {
+    if (confirm(t('services.delete_confirmation'))) {
       try {
         const response = await fetch(`/api/services/${id}`, {
           method: "DELETE",
@@ -138,56 +140,125 @@ export default function ServicesPage() {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="sm:flex sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Services</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Manage your service catalog.
-          </p>
-        </div>
-        <div className="mt-4 sm:mt-0">
-          <Link
-            href="/services/new"
-            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Service
-          </Link>
-          <Link
-            href="/services/new?fromTemplate=true"
-            className="ml-2 inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            New from Template
-          </Link>
-        </div>
-      </div>
+  const totalServices = sortedServices.length;
+  const activeServices = sortedServices.filter(s => s.isActive).length;
+  const inactiveServices = sortedServices.filter(s => !s.isActive).length;
 
-      {/* Search and Stats */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search services..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                />
+  return (
+    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              {t('services.title')}
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              {t('services.description')}
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              href="/services/new"
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+            >
+              <Plus className="me-2 h-4 w-4" />
+              {t('services.add_service')}
+            </Link>
+            <Link
+              href="/services/new?fromTemplate=true"
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 transition-colors"
+            >
+              <Plus className="me-2 h-4 w-4" />
+              {t('services.new_from_template')}
+            </Link>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Plus className="h-6 w-6 text-blue-400" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t('services.total_services')}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {totalServices}
+                    </dd>
+                  </dl>
+                </div>
               </div>
-              <div className="relative">
+            </div>
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Plus className="h-6 w-6 text-green-400" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t('services.active')}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {activeServices}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Plus className="h-6 w-6 text-red-400" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t('services.inactive')}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {inactiveServices}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="relative flex-1 sm:flex-none">
+                  <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder={t('services.search_placeholder')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="pl-3 pr-8 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="">All Categories</option>
+                  <option value="">{t('services.all_categories')}</option>
                   {categories.map((category) => (
                     <option key={category} value={category}>
                       {category}
@@ -195,132 +266,49 @@ export default function ServicesPage() {
                   ))}
                 </select>
               </div>
-            </div>
-            <div className="text-sm text-gray-500">
-              {sortedServices.length} service
-              {sortedServices.length !== 1 ? "s" : ""}
+              <div className="text-sm text-gray-500 text-center sm:text-end">
+                {t(sortedServices.length === 1 ? 'services.service_count' : 'services.service_count_plural', { count: sortedServices.length })}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Services Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("name")}
-                >
-                  Name <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("category")}
-                >
-                  Category <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("laborRate")}
-                >
-                  Labor Rate{" "}
-                  <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("laborHours")}
-                >
-                  Labor Hours{" "}
-                  <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                  onClick={() => handleSort("createdAt")}
-                >
-                  Created <ArrowUpDown className="inline-block ml-1 h-4 w-4" />
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {sortedServices.map((service) => (
-                <tr key={service._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {service.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {service.category}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${service.laborRate.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {service.laborHours} hrs
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <StatusBadge
-                      status={service.isActive ? "active" : "inactive"}
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(service.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <Link
-                        href={`/services/${service._id}/edit`}
-                        className="text-indigo-600 hover:text-indigo-900"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                      {canDeleteServices && (
-                        <button
-                          onClick={() => handleDelete(service._id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        {/* Services Table */}
+        <ResponsiveServicesTable
+          services={sortedServices}
+          sortKey={sortKey}
+          sortDirection={sortDirection}
+          onSort={handleSort}
+          onDelete={handleDelete}
+          canDelete={canDeleteServices}
+        />
 
-      {sortedServices.length === 0 && (
-        <div className="text-center py-12">
-          <h3 className="mt-2 text-sm font-medium text-gray-900">
-            No services found
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {searchTerm
-              ? "Try adjusting your search terms."
-              : "Get started by adding your first service."}
-          </p>
-          {!searchTerm && (
-            <div className="mt-6">
-              <Link
-                href="/services/new"
-                className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Service
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
+        {/* Empty State */}
+        {sortedServices.length === 0 && (
+          <div className="bg-white rounded-lg shadow p-8 text-center">
+            <Plus className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-4 text-lg font-medium text-gray-900">
+              {t('services.no_services_found')}
+            </h3>
+            <p className="mt-2 text-sm text-gray-500">
+              {searchTerm
+                ? t('services.adjust_search_terms')
+                : t('services.get_started_adding')}
+            </p>
+            {!searchTerm && (
+              <div className="mt-6">
+                <Link
+                  href="/services/new"
+                  className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+                >
+                  <Plus className="me-2 h-4 w-4" />
+                  {t('services.add_service')}
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

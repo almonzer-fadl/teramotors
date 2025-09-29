@@ -1,8 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  Plus,
+  Search,
+  CreditCard,
+  DollarSign,
+  Calendar,
+  User,
+  CheckCircle,
+  XCircle,
+  Clock,
+  X,
+} from "lucide-react";
+import Pagination from "@/components/ui/Pagination";
+import ResponsivePaymentsTable from "@/components/ui/ResponsivePaymentsTable";
 import { useTranslation } from "react-i18next";
-import { CreditCard, DollarSign, Calendar, User, CheckCircle, XCircle, Clock, Search, Filter, Plus, X } from "lucide-react";
 
 interface Payment {
   _id: string;
@@ -33,6 +47,15 @@ interface Payment {
   updatedAt: string;
 }
 
+interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 export default function PaymentsPage() {
   const { t } = useTranslation("common");
   const [payments, setPayments] = useState<Payment[]>([]);
@@ -40,6 +63,16 @@ export default function PaymentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [methodFilter, setMethodFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 0,
+    totalCount: 0,
+    limit: 10,
+    hasNextPage: false,
+    hasPrevPage: false
+  });
   
   // Payment creation form state
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -60,12 +93,21 @@ export default function PaymentsPage() {
   }, []);
 
   const fetchPayments = async () => {
+    setLoading(true);
     try {
       const response = await fetch("/api/payments");
       if (response.ok) {
         const data = await response.json();
         const paymentsArray = Array.isArray(data.payments) ? data.payments : (Array.isArray(data) ? data : []);
         setPayments(paymentsArray);
+        setPagination({
+          currentPage: 1,
+          totalPages: 1,
+          totalCount: paymentsArray.length,
+          limit: paymentsArray.length,
+          hasNextPage: false,
+          hasPrevPage: false
+        });
       }
     } catch (error) {
       console.error("Failed to fetch payments:", error);
@@ -143,7 +185,7 @@ export default function PaymentsPage() {
       }
     } catch (error) {
       console.error("Error creating payment:", error);
-      alert("Failed to create payment");
+      alert(t('alerts.payment_creation_failed'));
     } finally {
       setCreating(false);
     }
@@ -175,293 +217,211 @@ export default function PaymentsPage() {
     return matchesSearch && matchesStatus && matchesMethod;
   });
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case "failed":
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      case "pending":
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      case "refunded":
-        return <XCircle className="h-5 w-5 text-gray-500" />;
-      default:
-        return <Clock className="h-5 w-5 text-gray-500" />;
-    }
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "failed":
-        return "bg-red-100 text-red-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "refunded":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    setItemsPerPage(itemsPerPage);
+    setCurrentPage(1);
   };
 
-  const getMethodIcon = (method: string) => {
-    switch (method) {
-      case "card":
-        return <CreditCard className="h-4 w-4" />;
-      case "cash":
-        return <DollarSign className="h-4 w-4" />;
-      case "bank_transfer":
-        return <CreditCard className="h-4 w-4" />;
-      case "check":
-        return <CreditCard className="h-4 w-4" />;
-      default:
-        return <DollarSign className="h-4 w-4" />;
-    }
-  };
+  const totalPayments = payments.reduce((sum, payment) => sum + payment.amount, 0);
+  const completedPayments = payments.filter(p => p.status === 'completed').reduce((sum, payment) => sum + payment.amount, 0);
+  const pendingPayments = payments.filter(p => p.status === 'pending').reduce((sum, payment) => sum + payment.amount, 0);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F13F33] mx-auto"></div>
-          <p className="mt-4 text-lg text-gray-600">Loading payments...</p>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="py-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  Payment Management
-                </h1>
-                <p className="mt-3 text-xl text-gray-600">
-                  Track and manage customer payments
-                </p>
-              </div>
-              <div className="flex items-center space-x-6">
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-[#F13F33]">
-                    ${payments.reduce((sum, payment) => sum + payment.amount, 0).toFixed(2)}
-                  </div>
-                  <div className="text-sm text-gray-600">Total Payments</div>
+    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              {t("payments.title")}
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              {t("payments.description")}
+            </p>
+          </div>
+          <div className="flex-shrink-0">
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+            >
+              <Plus className="me-2 h-4 w-4" />
+              {t("payments.add_payment")}
+            </button>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <DollarSign className="h-6 w-6 text-green-400" />
                 </div>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 transition-all duration-300 hover:-translate-y-0.5"
-                >
-                  <Plus className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-                  Add Payment
-                </button>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t("payments.total_payments")}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      ${totalPayments.toFixed(2)}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <CheckCircle className="h-6 w-6 text-green-400" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t("invoices.paid")}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      ${completedPayments.toFixed(2)}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Clock className="h-6 w-6 text-yellow-400" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t("payments.status.pending")}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      ${pendingPayments.toFixed(2)}
+                    </dd>
+                  </dl>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-12">
-        {/* Filters */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden mb-8">
-          <div className="px-8 py-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Search Payments
-                </label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+        {/* Search and Filters */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="relative flex-1 sm:flex-none">
+                  <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
+                    placeholder={t("payments.search_placeholder")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search by invoice number, customer, or vehicle..."
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Status
-                </label>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="all">All Statuses</option>
-                  <option value="pending">Pending</option>
-                  <option value="completed">Completed</option>
-                  <option value="failed">Failed</option>
-                  <option value="refunded">Refunded</option>
+                  <option value="all">{t("payments.all_statuses")}</option>
+                  <option value="pending">{t("payments.status.pending")}</option>
+                  <option value="completed">{t("payments.status.completed")}</option>
+                  <option value="failed">{t("payments.status.failed")}</option>
+                  <option value="refunded">{t("payments.status.refunded")}</option>
                 </select>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Payment Method
-                </label>
                 <select
                   value={methodFilter}
                   onChange={(e) => setMethodFilter(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                 >
-                  <option value="all">All Methods</option>
-                  <option value="cash">Cash</option>
-                  <option value="card">Card</option>
-                  <option value="bank_transfer">Bank Transfer</option>
-                  <option value="check">Check</option>
+                  <option value="all">{t("payments.all_methods")}</option>
+                  <option value="cash">{t("payments.method.cash")}</option>
+                  <option value="card">{t("payments.method.card")}</option>
+                  <option value="bank_transfer">{t("payments.method.bank_transfer")}</option>
+                  <option value="check">{t("payments.method.check")}</option>
                 </select>
+              </div>
+              <div className="text-sm text-gray-500 text-center sm:text-end">
+                {t(
+                  pagination.totalCount === 1
+                    ? "payments.payment_count"
+                    : "payments.payment_count_plural",
+                  { count: pagination.totalCount }
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Payments List */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-          <div className="px-8 py-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              <CreditCard className="mr-3 h-7 w-7 text-[#F13F33]" />
-              Payments ({filteredPayments.length})
-            </h2>
-            
-            {filteredPayments.length === 0 ? (
-              <div className="text-center py-12">
-                <CreditCard className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-bold text-gray-900 mb-2">No Payments Found</h3>
-                <p className="text-gray-600">No payments match your current filters.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {filteredPayments.map((payment) => (
-                  <div key={payment._id} className="bg-gray-50/80 rounded-2xl p-6 border border-gray-200/50 hover:shadow-lg transition-all duration-300">
-                    <div className="grid grid-cols-1 lg:grid-cols-6 gap-6 items-center">
-                      {/* Payment Info */}
-                      <div className="lg:col-span-2">
-                        <div>
-                          <h3 className="text-lg font-bold text-gray-900">
-                            Payment #{payment._id.slice(-8).toUpperCase()}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            Invoice: {payment.invoiceId?.invoiceNumber || 'N/A'}
-                          </p>
-                        </div>
-                      </div>
+        {/* Payments Table */}
+        <ResponsivePaymentsTable
+          payments={filteredPayments}
+          onStatusUpdate={handlePaymentStatusUpdate}
+        />
 
-                      {/* Customer Info */}
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <User className="h-4 w-4 text-gray-400" />
-                          <div>
-                            <p className="font-bold text-gray-900">
-                              {payment.invoiceId?.customerId?.firstName || 'N/A'} {payment.invoiceId?.customerId?.lastName || 'N/A'}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {payment.invoiceId?.vehicleId?.make || 'N/A'} {payment.invoiceId?.vehicleId?.model || 'N/A'} ({payment.invoiceId?.vehicleId?.year || 'N/A'})
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 rounded-lg shadow">
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalItems={pagination.totalCount}
+              itemsPerPage={pagination.limit}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              itemsPerPageOptions={[10, 30, 50]}
+              showItemsPerPage={true}
+            />
+          </div>
+        )}
 
-                      {/* Amount */}
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <DollarSign className="h-4 w-4 text-gray-400" />
-                          <div>
-                            <p className="text-xl font-bold text-[#F13F33]">
-                              ${payment.amount.toFixed(2)}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              of ${payment.invoiceId?.total?.toFixed(2) || '0.00'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Payment Method */}
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          {getMethodIcon(payment.paymentMethod)}
-                          <div>
-                            <p className="font-bold text-gray-900 capitalize">
-                              {payment.paymentMethod.replace('_', ' ')}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {payment.reference}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Date */}
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <Calendar className="h-4 w-4 text-gray-400" />
-                          <div>
-                            <p className="font-bold text-gray-900">
-                              {new Date(payment.paymentDate).toLocaleDateString()}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {new Date(payment.paymentDate).toLocaleTimeString()}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Payment Status */}
-                      <div className="flex flex-col space-y-2">
-                        <div className="flex items-center space-x-2">
-                          {getStatusIcon(payment.status)}
-                          <span className={`inline-flex px-3 py-1 text-sm font-bold rounded-full ${getStatusColor(payment.status)}`}>
-                            {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
-                          </span>
-                        </div>
-                        {payment.status === "pending" && (
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handlePaymentStatusUpdate(payment._id, "completed")}
-                              className="text-green-600 hover:text-green-800 text-sm font-bold px-3 py-1 rounded-lg hover:bg-green-50 transition-all duration-300"
-                            >
-                              Mark Paid
-                            </button>
-                            <button
-                              onClick={() => handlePaymentStatusUpdate(payment._id, "failed")}
-                              className="text-red-600 hover:text-red-800 text-sm font-bold px-3 py-1 rounded-lg hover:bg-red-50 transition-all duration-300"
-                            >
-                              Mark Failed
-                            </button>
-                          </div>
-                        )}
-                        {payment.status === "completed" && (
-                          <button
-                            onClick={() => handlePaymentStatusUpdate(payment._id, "refunded")}
-                            className="text-gray-600 hover:text-gray-800 text-sm font-bold px-3 py-1 rounded-lg hover:bg-gray-50 transition-all duration-300"
-                          >
-                            Refund
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Notes */}
-                    {payment.notes && (
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <p className="text-sm text-gray-600">
-                          <strong>Notes:</strong> {payment.notes}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))}
+        {/* Empty State */}
+        {filteredPayments.length === 0 && (
+          <div className="bg-white rounded-lg shadow p-8 text-center">
+            <CreditCard className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-4 text-lg font-medium text-gray-900">
+              {t("payments.no_payments_found")}
+            </h3>
+            <p className="mt-2 text-sm text-gray-500">
+              {searchTerm || statusFilter !== "all" || methodFilter !== "all"
+                ? t("payments.no_payments_match")
+                : t("payments.get_started")}
+            </p>
+            {!searchTerm && statusFilter === "all" && methodFilter === "all" && (
+              <div className="mt-6">
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+                >
+                  <Plus className="me-2 h-4 w-4" />
+                  {t("payments.add_payment")}
+                </button>
               </div>
             )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Payment Creation Modal */}
@@ -469,16 +429,16 @@ export default function PaymentsPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4">
             <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setShowCreateModal(false)}></div>
-            <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 w-full max-w-2xl">
-              <div className="px-8 py-6">
+            <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl">
+              <div className="px-6 py-4">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                    <Plus className="mr-3 h-7 w-7 text-[#F13F33]" />
-                    Create New Payment
+                  <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                    <Plus className="me-3 h-6 w-6 text-blue-600" />
+                    {t("payments.create_payment")}
                   </h2>
                   <button
                     onClick={() => setShowCreateModal(false)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors duration-300"
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     <X className="h-6 w-6" />
                   </button>
@@ -487,16 +447,16 @@ export default function PaymentsPage() {
                 <form onSubmit={handleCreatePayment} className="space-y-6">
                   {/* Invoice Selection */}
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Select Invoice *
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t("payments.select_invoice")} *
                     </label>
                     <select
                       value={selectedInvoiceId}
                       onChange={(e) => handleInvoiceChange(e.target.value)}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                       required
                     >
-                      <option value="">Select an invoice</option>
+                      <option value="">{t("payments.select_invoice_placeholder")}</option>
                       {invoices.map((invoice) => (
                         <option key={invoice._id} value={invoice._id}>
                           {invoice.invoiceNumber} - {invoice.customerId?.firstName} {invoice.customerId?.lastName} - ${invoice.totalAmount}
@@ -508,14 +468,14 @@ export default function PaymentsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Amount */}
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Payment Amount *
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t("payments.payment_amount")} *
                       </label>
                       <input
                         type="number"
                         value={paymentForm.amount}
                         onChange={(e) => setPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         placeholder="0.00"
                         step="0.01"
                         min="0"
@@ -525,19 +485,19 @@ export default function PaymentsPage() {
 
                     {/* Payment Method */}
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Payment Method *
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t("payments.payment_method")} *
                       </label>
                       <select
                         value={paymentForm.paymentMethod}
                         onChange={(e) => setPaymentForm(prev => ({ ...prev, paymentMethod: e.target.value }))}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         required
                       >
-                        <option value="cash">Cash</option>
-                        <option value="card">Card</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-                        <option value="check">Check</option>
+                        <option value="cash">{t("payments.method.cash")}</option>
+                        <option value="card">{t("payments.method.card")}</option>
+                        <option value="bank_transfer">{t("payments.method.bank_transfer")}</option>
+                        <option value="check">{t("payments.method.check")}</option>
                       </select>
                     </div>
                   </div>
@@ -545,44 +505,44 @@ export default function PaymentsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Payment Date */}
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Payment Date *
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t("payments.payment_date")} *
                       </label>
                       <input
                         type="date"
                         value={paymentForm.paymentDate}
                         onChange={(e) => setPaymentForm(prev => ({ ...prev, paymentDate: e.target.value }))}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                         required
                       />
                     </div>
 
                     {/* Reference */}
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Reference Number
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t("payments.reference_number")}
                       </label>
                       <input
                         type="text"
                         value={paymentForm.reference}
                         onChange={(e) => setPaymentForm(prev => ({ ...prev, reference: e.target.value }))}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                        placeholder={t('ui.enter_transaction_reference')}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        placeholder={t("ui.enter_transaction_reference")}
                       />
                     </div>
                   </div>
 
                   {/* Notes */}
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Notes
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t("payments.notes")}
                     </label>
                     <textarea
                       value={paymentForm.notes}
                       onChange={(e) => setPaymentForm(prev => ({ ...prev, notes: e.target.value }))}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-none"
                       rows={3}
-                      placeholder="Additional payment notes..."
+                      placeholder={t("payments.additional_notes")}
                     />
                   </div>
 
@@ -591,16 +551,16 @@ export default function PaymentsPage() {
                     <button
                       type="button"
                       onClick={() => setShowCreateModal(false)}
-                      className="px-6 py-3 border-2 border-gray-200 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:bg-gray-50 transition-all duration-300"
+                      className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                     >
-                      Cancel
+                      {t("forms.cancel")}
                     </button>
                     <button
                       type="submit"
                       disabled={creating}
-                      className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {creating ? t('ui.creating') : t('ui.create_payment')}
+                      {creating ? t('ui.creating') : t('payments.create_payment')}
                     </button>
                   </div>
                 </form>
