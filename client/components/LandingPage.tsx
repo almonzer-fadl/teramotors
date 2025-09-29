@@ -157,7 +157,7 @@ function ServiceCard({ icon: Icon, title, description }: {
 function StatCard({ number, label }: { number: string, label: string }) {
   return (
     <div className="text-center">
-      <div className="text-4xl font-bold text-[#F13F33] mb-2">{number}</div>
+      <div className="text-4xl font-bold mb-2">{number}</div>
       <div className="text-gray-600 font-medium">{label}</div>
     </div>
   );
@@ -256,17 +256,17 @@ export default function LandingPage() {
     {
       name: t('testimonials.sarah_johnson.name'),
       role: t('testimonials.sarah_johnson.role'),
-      content: "TeraMotors has been servicing my fleet for 5 years. Their attention to detail and honest pricing keeps me coming back."
+      content: t('landing_missing.testimonial_1')
     },
     {
       name: t('testimonials.mike_chen.name'),
       role: t('testimonials.mike_chen.role'),
-      content: "When my car broke down unexpectedly, TeraMotors got me back on the road quickly and affordably. Highly recommended!"
+      content: t('landing_missing.testimonial_2')
     },
     {
       name: t('testimonials.lisa_rodriguez.name'),
       role: t('testimonials.lisa_rodriguez.role'),
-      content: "The team at TeraMotors understands cars like no one else. They've kept my classic car running perfectly for years."
+      content: t('landing_missing.testimonial_3')
     }
   ];
 
@@ -358,21 +358,7 @@ export default function LandingPage() {
                 </a>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-8 pt-8">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">15+</div>
-                  <div className="text-sm text-blue-200">{t('landing_missing.years_experience')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">100%</div>
-                  <div className="text-sm text-blue-200">{t('landing_missing.satisfaction')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">24/7</div>
-                  <div className="text-sm text-blue-200">{t('landing_missing.support_24_7')}</div>
-                </div>
-              </div>
+             
             </div>
             
             <div className="relative">
