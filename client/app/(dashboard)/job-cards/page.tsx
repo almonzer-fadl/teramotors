@@ -2,19 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  Plus,
-  Search,
-  Edit,
-  Eye,
-  Clock,
-  User,
-  Car,
-  Calendar,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-} from "lucide-react";
+import ResponsiveJobCardsGrid from "@/components/ui/ResponsiveJobCardsGrid";
 import { socketService } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -145,44 +133,6 @@ export default function JobCardsPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "in-progress":
-        return <Clock className="h-4 w-4 text-blue-500" />;
-      case "cancelled":
-        return <XCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "in-progress":
-        return "bg-blue-100 text-blue-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-yellow-100 text-yellow-800";
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "urgent":
-        return "bg-red-100 text-red-800";
-      case "high":
-        return "bg-orange-100 text-orange-800";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   const handleStatusChange = async (id: string, status: string) => {
     try {
@@ -218,194 +168,13 @@ export default function JobCardsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="sm:flex sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('job_cards.title')}</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {t('job_cards.description')}
-          </p>
-        </div>
-        <div className="mt-4 sm:mt-0">
-          <Link
-            href="/job-cards/new"
-            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t('job_cards.create')}
-          </Link>
-        </div>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder={t('job_cards.search_placeholder')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              >
-                <option value="all">{t('appointments.all_status')}</option>
-                <option value="pending">{t('estimates.pending')}</option>
-                <option value="in-progress">{t('appointments.in_progress')}</option>
-                <option value="completed">{t('appointments.completed')}</option>
-                <option value="cancelled">{t('appointments.cancelled')}</option>
-              </select>
-            </div>
-            <div className="text-sm text-gray-500">
-              {t(filteredJobCards.length === 1 ? 'job_cards.job_card_count' : 'job_cards.job_card_count_plural', { count: filteredJobCards.length })}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Job Cards Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredJobCards.map((jobCard) => (
-          <div
-            key={jobCard._id}
-            className="bg-white shadow rounded-lg overflow-hidden"
-          >
-            <div className="px-4 py-5 sm:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center">
-                  {getStatusIcon(jobCard.status)}
-                  <span
-                    className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                      jobCard.status
-                    )}`}
-                  >
-                    {jobCard.status.replace("-", " ")}
-                  </span>
-                </div>
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(
-                    jobCard.priority
-                  )}`}
-                >
-                  {jobCard.priority}
-                </span>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center text-sm">
-                  <User className="h-4 w-4 text-gray-400 mr-2" />
-                  <span className="text-gray-900">
-                    {jobCard.customerId.firstName} {jobCard.customerId.lastName}
-                  </span>
-                </div>
-
-                <div className="flex items-center text-sm">
-                  <Car className="h-4 w-4 text-gray-400 mr-2" />
-                  <span className="text-gray-900">
-                    {jobCard.vehicleId.year} {jobCard.vehicleId.make}{" "}
-                    {jobCard.vehicleId.model}
-                  </span>
-                </div>
-
-                <div className="flex items-center text-sm">
-                  <Calendar className="h-4 w-4 text-gray-400 mr-2" />
-                  <span className="text-gray-900">
-                    {jobCard.appointmentId && jobCard.appointmentId.appointmentDate
-                      ? new Date(jobCard.appointmentId.appointmentDate).toLocaleDateString()
-                      : t('job_cards.no_appointment')}
-                  </span>
-                </div>
-
-                <div className="flex items-center text-sm">
-                  <Clock className="h-4 w-4 text-gray-400 mr-2" />
-                  <span className="text-gray-900">
-                    {jobCard.appointmentId && jobCard.appointmentId.startTime && jobCard.appointmentId.endTime
-                      ? `${jobCard.appointmentId.startTime} - ${jobCard.appointmentId.endTime}`
-                      : t('job_cards.no_time')}
-                  </span>
-                </div>
-
-                <div className="text-sm text-gray-500">
-                  <strong>{t('job_cards.services_label')}</strong> {jobCard.services.map(s => s.serviceId.name).join(', ')}
-                </div>
-
-                <div className="text-sm text-gray-500">
-                  <strong>{t('job_cards.labor_hours')}</strong> {jobCard.services.reduce((sum, s) => sum + s.laborHours, 0)}h
-                </div>
-
-                {jobCard.notes && (
-                  <div className="text-sm text-gray-500">
-                    <strong>{t('forms.notes')}:</strong> {jobCard.notes}
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-4 flex justify-end space-x-2">
-                <Link
-                  href={`/job-cards/${jobCard._id}`}
-                  className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  <Eye className="h-3 w-3 mr-1" />
-                  {t('common.view')}
-                </Link>
-                <Link
-                  href={`/job-cards/${jobCard._id}/edit`}
-                  className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <Edit className="h-3 w-3 mr-1" />
-                  {t('common.edit')}
-                </Link>
-                <select
-                  value={jobCard.status}
-                  onChange={(e) =>
-                    handleStatusChange(jobCard._id, e.target.value)
-                  }
-                  className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  <option value="pending">{t('estimates.pending')}</option>
-                  <option value="in-progress">{t('appointments.in_progress')}</option>
-                  <option value="completed">{t('appointments.completed')}</option>
-                  <option value="cancelled">{t('appointments.cancelled')}</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredJobCards.length === 0 && (
-        <div className="text-center py-12">
-          <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">
-            {t('job_cards.no_job_cards_found')}
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== "all"
-              ? t('job_cards.adjust_search')
-              : t('job_cards.get_started')}
-          </p>
-          {!searchTerm && statusFilter === "all" && (
-            <div className="mt-6">
-              <Link
-                href="/job-cards/new"
-                className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                {t('job_cards.create')}
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+    <ResponsiveJobCardsGrid
+      jobCards={filteredJobCards}
+      onStatusChange={handleStatusChange}
+      searchTerm={searchTerm}
+      statusFilter={statusFilter}
+      onSearchChange={setSearchTerm}
+      onStatusFilterChange={setStatusFilter}
+    />
   );
 }

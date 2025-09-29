@@ -5,15 +5,12 @@ import Link from "next/link";
 import {
   Plus,
   Search,
-  Edit,
-  Eye,
   CheckCircle,
   AlertTriangle,
-  Camera,
   FileText,
   Download,
 } from "lucide-react";
-import Pagination from "@/components/ui/Pagination";
+import ResponsiveInspectionsTable from "@/components/ui/ResponsiveInspectionsTable";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -191,225 +188,171 @@ export default function InspectionsPage() {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="sm:flex sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {t('inspections.title')}
-          </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {t('inspections.description')}
-          </p>
-        </div>
-        <div className="mt-4 sm:mt-0 flex space-x-3">
-          <Link
-            href="/inspections/templates"
-            className="inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 transition-colors duration-200"
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            {t('inspections.templates')}
-          </Link>
-          <Link
-            href="/inspections/new"
-            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-200"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t('inspections.new_inspection')}
-          </Link>
-        </div>
-      </div>
+  const totalInspections = filteredInspections.length;
+  const completedInspections = filteredInspections.filter(i => i.status === 'completed').length;
+  const inProgressInspections = filteredInspections.filter(i => i.status === 'in-progress').length;
 
-      {/* Search and Stats */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder={t('inspections.search_placeholder')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                />
+  return (
+    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              {t('inspections.title')}
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              {t('inspections.description')}
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              href="/inspections/templates"
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-gray-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-500 transition-colors"
+            >
+              <FileText className="me-2 h-4 w-4" />
+              {t('inspections.templates')}
+            </Link>
+            <Link
+              href="/inspections/new"
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+            >
+              <Plus className="me-2 h-4 w-4" />
+              {t('inspections.new_inspection')}
+            </Link>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <CheckCircle className="h-6 w-6 text-blue-400" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t('inspections.total_inspections')}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {totalInspections}
+                    </dd>
+                  </dl>
+                </div>
               </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors duration-200"
-              >
-                <option value="all">{t('inspections.all_status')}</option>
-                <option value="in-progress">{t('inspections.in_progress')}</option>
-                <option value="completed">{t('inspections.completed')}</option>
-                <option value="cancelled">{t('inspections.cancelled')}</option>
-              </select>
             </div>
-            <div className="text-sm text-gray-500">
-              {t(filteredInspections.length === 1 ? 'inspections.inspection_count' : 'inspections.inspection_count_plural', { count: filteredInspections.length })}
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <CheckCircle className="h-6 w-6 text-green-400" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t('inspections.completed')}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {completedInspections}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <AlertTriangle className="h-6 w-6 text-yellow-400" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t('inspections.in_progress')}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {inProgressInspections}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Search and Filters */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="relative flex-1 sm:flex-none">
+                  <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder={t('inspections.search_placeholder')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="all">{t('inspections.all_status')}</option>
+                  <option value="in-progress">{t('inspections.in_progress')}</option>
+                  <option value="completed">{t('inspections.completed')}</option>
+                  <option value="cancelled">{t('inspections.cancelled')}</option>
+                </select>
+              </div>
+              <div className="text-sm text-gray-500 text-center sm:text-end">
+                {t(filteredInspections.length === 1 ? 'inspections.inspection_count' : 'inspections.inspection_count_plural', { count: filteredInspections.length })}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Inspections Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inspections.inspection')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inspections.customer')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inspections.vehicle')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inspections.template')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inspections.overall_condition')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inspections.status')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('inspections.actions')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredInspections.map((inspection) => (
-                <tr key={inspection._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
-                          <CheckCircle className="h-5 w-5 text-white" />
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          INS-{inspection._id.slice(-6)}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {new Date(
-                            inspection.inspectionDate
-                          ).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {inspection.customerId.firstName}{" "}
-                      {inspection.customerId.lastName}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {inspection.vehicleId.year} {inspection.vehicleId.make}{" "}
-                      {inspection.vehicleId.model}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {inspection.vehicleId.licensePlate}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {inspection.templateId?.name || 'No Template'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getConditionColor(
-                        inspection.overallCondition
-                      )}`}
-                    >
-                      {inspection.overallCondition}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">
-                      {inspection.items.length} items
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      {getStatusIcon(inspection.status)}
-                      <span
-                        className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                          inspection.status
-                        )}`}
-                      >
-                        {inspection.status.replace("-", " ")}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <Link
-                        href={`/inspections/${inspection._id}`}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                      <Link
-                        href={`/inspections/${inspection._id}/edit`}
-                        className="text-indigo-600 hover:text-indigo-900"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                      <button
-                        onClick={() => generatePDF(inspection._id)}
-                        disabled={generatingPDF === inspection._id}
-                        className="text-green-600 hover:text-green-900 disabled:opacity-50"
-                        title={t("inspections.generate_pdf")}
-                      >
-                        {generatingPDF === inspection._id ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
-                        ) : (
-                          <Download className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        {/* Inspections Table */}
+        <ResponsiveInspectionsTable
+          inspections={filteredInspections}
+          onGeneratePDF={generatePDF}
+          generatingPDF={generatingPDF}
+        />
 
-      {filteredInspections.length === 0 && (
-        <div className="text-center py-12">
-          <CheckCircle className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">
-            {t('inspections.no_inspections_found')}
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {searchTerm || statusFilter !== "all"
-              ? t('inspections.adjust_search_filters')
-              : t('inspections.get_started_creating')}
-          </p>
-          {!searchTerm && statusFilter === "all" && (
-            <div className="mt-6">
-              <Link
-                href="/inspections/new"
-                className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                {t('inspections.new_inspection')}
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
+        {/* Empty State */}
+        {filteredInspections.length === 0 && (
+          <div className="bg-white rounded-lg shadow p-8 text-center">
+            <CheckCircle className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-4 text-lg font-medium text-gray-900">
+              {t('inspections.no_inspections_found')}
+            </h3>
+            <p className="mt-2 text-sm text-gray-500">
+              {searchTerm || statusFilter !== "all"
+                ? t('inspections.adjust_search_filters')
+                : t('inspections.get_started_creating')}
+            </p>
+            {!searchTerm && statusFilter === "all" && (
+              <div className="mt-6">
+                <Link
+                  href="/inspections/new"
+                  className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+                >
+                  <Plus className="me-2 h-4 w-4" />
+                  {t('inspections.new_inspection')}
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

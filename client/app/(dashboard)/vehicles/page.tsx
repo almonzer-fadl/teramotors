@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Edit, Trash2, Eye, Car, Wrench } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
+import ResponsiveVehicleTable from "@/components/ui/ResponsiveVehicleTable";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -154,207 +155,98 @@ export default function VehiclesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="sm:flex sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('vehicles.title')}</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {t('vehicles.description')}
-          </p>
+    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('vehicles.title')}</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              {t('vehicles.description')}
+            </p>
+          </div>
+          <div className="flex-shrink-0">
+            <Link
+              href="/vehicles/new"
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+            >
+              <Plus className="me-2 h-4 w-4" />
+              {t('vehicles.add_vehicle')}
+            </Link>
+          </div>
         </div>
-        <div className="mt-4 sm:mt-0">
-          <Link
-            href="/vehicles/new"
-            className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            {t('vehicles.add_vehicle')}
-          </Link>
-        </div>
-      </div>
 
-      {/* Search and Stats */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder={t('vehicles.search_placeholder')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                />
+        {/* Search and Stats */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center space-x-4">
+                <div className="relative flex-1 sm:flex-none">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder={t('vehicles.search_placeholder')}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="text-sm text-gray-500">
-              {t(pagination.totalCount === 1 ? 'vehicles.vehicle_count' : 'vehicles.vehicle_count_plural', { count: pagination.totalCount })}
+              <div className="text-sm text-gray-500 text-center sm:text-end">
+                {t(pagination.totalCount === 1 ? 'vehicles.vehicle_count' : 'vehicles.vehicle_count_plural', { count: pagination.totalCount })}
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Vehicles Table */}
+        <ResponsiveVehicleTable
+          vehicles={filteredVehicles}
+          onDelete={handleDelete}
+        />
+
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 rounded-lg shadow">
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalItems={pagination.totalCount}
+              itemsPerPage={pagination.limit}
+              onPageChange={handlePageChange}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              itemsPerPageOptions={[10, 30, 50]}
+              showItemsPerPage={true}
+            />
+          </div>
+        )}
+
+        {/* Empty State */}
+        {filteredVehicles.length === 0 && (
+          <div className="bg-white rounded-lg shadow p-8 text-center">
+            <Car className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-4 text-lg font-medium text-gray-900">
+              {t('vehicles.no_vehicles_found')}
+            </h3>
+            <p className="mt-2 text-sm text-gray-500">
+              {searchTerm
+                ? t('vehicles.adjust_search')
+                : t('vehicles.get_started')}
+            </p>
+            {!searchTerm && (
+              <div className="mt-6">
+                <Link
+                  href="/vehicles/new"
+                  className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+                >
+                  <Plus className="me-2 h-4 w-4" />
+                  {t('vehicles.add_vehicle')}
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-
-      {/* Vehicles Table */}
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('vehicles.vehicle')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('vehicles.owner')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('vehicles.license_plate')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('vehicles.mileage')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('vehicles.transmission')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('customers.status')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('customers.actions')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredVehicles.map((vehicle) => {
-                const customerName = vehicle.customerId ? 
-                  `${vehicle.customerId.firstName} ${vehicle.customerId.lastName}` : 
-                  'No Customer';
-                
-                return (
-                <tr key={vehicle._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-green-500 flex items-center justify-center">
-                          <Car className="h-5 w-5 text-white" />
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {vehicle.year} {vehicle.make} {vehicle.model}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {t('vehicles.vin')} {vehicle.vin?.slice(-8) || "N/A"}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {customerName}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {vehicle.licensePlate}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {t('vehicles.miles', { count: vehicle.mileage }).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {vehicle.transmission}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        vehicle.isActive
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {vehicle.isActive ? t('vehicles.active') : t('vehicles.inactive')}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <Link
-                        href={`/vehicles/${vehicle._id}`}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                      <Link
-                        href={`/vehicles/${vehicle._id}/edit`}
-                        className="text-indigo-600 hover:text-indigo-900"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                      <Link
-                        href={`/vehicles/${vehicle._id}/service-history`}
-                        className="text-green-600 hover:text-green-900"
-                        title={t('vehicles.service_history')}
-                      >
-                        <Wrench className="h-4 w-4" />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(vehicle._id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Pagination */}
-      {pagination.totalPages > 1 && (
-        <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            totalItems={pagination.totalCount}
-            itemsPerPage={pagination.limit}
-            onPageChange={handlePageChange}
-            onItemsPerPageChange={handleItemsPerPageChange}
-            itemsPerPageOptions={[10, 30, 50]}
-            showItemsPerPage={true}
-          />
-        </div>
-      )}
-
-      {filteredVehicles.length === 0 && (
-        <div className="text-center py-12">
-          <Car className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">
-            {t('vehicles.no_vehicles_found')}
-          </h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {searchTerm
-              ? t('vehicles.adjust_search')
-              : t('vehicles.get_started')}
-          </p>
-          {!searchTerm && (
-            <div className="mt-6">
-              <Link
-                href="/vehicles/new"
-                className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                {t('vehicles.add_vehicle')}
-              </Link>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

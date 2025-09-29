@@ -4,34 +4,61 @@ import { useState, useEffect } from 'react'
 import { useSession } from '@/lib/hooks/useSession'
 import { hasPermission } from '@/lib/roles'
 import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  Car, 
-  Calendar, 
-  Package,
   DollarSign,
+  TrendingUp,
+  TrendingDown,
+  CreditCard,
+  Receipt,
   FileText,
   Download,
-  Filter,
-  Calendar as CalendarIcon
+  Calendar,
+  ArrowUpRight,
+  ArrowDownRight,
+  PieChart,
+  BarChart3,
+  Calculator,
+  Banknote
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 interface ReportData {
-  totalCustomers: number
-  totalVehicles: number
-  totalAppointments: number
-  totalJobs: number
+  // Financial Summary
   totalRevenue: number
-  totalParts: number
-  monthlyRevenue: Array<{ month: string; revenue: number }>
-  topServices: Array<{ name: string; count: number; revenue: number }>
-  customerGrowth: Array<{ month: string; customers: number }>
-  topMechanics: Array<{ name: string; jobsCompleted: number; totalHours: number }>
-  jobStatusDistribution: Array<{ status: string; count: number }>
-  averageJobCompletionTime: number
-  completedJobs: number
+  totalExpenses: number
+  netProfit: number
+  grossProfit: number
+  profitMargin: number
+  
+  // Revenue Breakdown
+  serviceRevenue: number
+  partsRevenue: number
+  laborRevenue: number
+  otherRevenue: number
+  
+  // Payment Methods
+  cashPayments: number
+  cardPayments: number
+  bankTransferPayments: number
+  checkPayments: number
+  
+  // Monthly Data
+  monthlyRevenue: Array<{ month: string; revenue: number; expenses: number; profit: number }>
+  monthlyProfit: Array<{ month: string; profit: number; margin: number }>
+  
+  // Top Revenue Sources
+  topServices: Array<{ name: string; revenue: number; count: number; avgPrice: number }>
+  topCustomers: Array<{ name: string; revenue: number; jobs: number }>
+  
+  // Financial Health
+  outstandingInvoices: number
+  overdueInvoices: number
+  averageInvoiceValue: number
+  collectionRate: number
+  
+  // Growth Metrics
+  revenueGrowth: number
+  profitGrowth: number
+  customerGrowth: number
 }
 
 export default function ReportsPage() {
@@ -109,305 +136,334 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="py-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  {t('reports.title')}
-                </h1>
-                <p className="mt-3 text-xl text-gray-600">{t('reports.description')}</p>
+    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              {t('reports.title')}
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              {t('reports.description')}
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select
+              value={dateRange}
+              onChange={(e) => setDateRange(e.target.value)}
+              className="rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option value="7">{t('reports.last_7_days')}</option>
+              <option value="30">{t('reports.last_30_days')}</option>
+              <option value="90">{t('reports.last_90_days')}</option>
+              <option value="365">{t('reports.last_year')}</option>
+            </select>
+            <button
+              onClick={handleExportReport}
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 transition-colors"
+            >
+              <Download className="me-2 h-4 w-4" />
+              {t('reports.export_excel')}
+            </button>
+          </div>
+        </div>
+
+        {/* Financial Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <DollarSign className="h-6 w-6 text-green-500" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t('reports.total_revenue')}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      ${(reportData?.totalRevenue || 0).toLocaleString()}
+                    </dd>
+                    <dd className="text-sm text-green-600 flex items-center">
+                      <ArrowUpRight className="h-3 w-3 me-1" />
+                      +{reportData?.revenueGrowth || 0}%
+                    </dd>
+                  </dl>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <select
-                  value={dateRange}
-                  onChange={(e) => setDateRange(e.target.value)}
-                  className="px-6 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                >
-                  <option value="7">{t('reports.last_7_days')}</option>
-                  <option value="30">{t('reports.last_30_days')}</option>
-                  <option value="90">{t('reports.last_90_days')}</option>
-                  <option value="365">{t('reports.last_year')}</option>
-                </select>
-                <button
-                  onClick={handleExportReport}
-                  className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-green-600 to-green-700 hover:shadow-xl hover:shadow-green-600/25 transition-all duration-300 hover:-translate-y-0.5"
-                >
-                  <Download className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-                  {t('reports.export_excel')}
-                </button>
+            </div>
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <TrendingUp className="h-6 w-6 text-blue-500" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t('reports.net_profit')}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      ${(reportData?.netProfit || 0).toLocaleString()}
+                    </dd>
+                    <dd className="text-sm text-blue-600 flex items-center">
+                      <ArrowUpRight className="h-3 w-3 me-1" />
+                      +{reportData?.profitGrowth || 0}%
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Calculator className="h-6 w-6 text-purple-500" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t('reports.profit_margin')}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      {(reportData?.profitMargin || 0).toFixed(1)}%
+                    </dd>
+                    <dd className="text-sm text-gray-500">
+                      {t('reports.margin')}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Receipt className="h-6 w-6 text-orange-500" />
+                </div>
+                <div className="ms-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      {t('reports.outstanding_invoices')}
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900">
+                      ${(reportData?.outstandingInvoices || 0).toLocaleString()}
+                    </dd>
+                    <dd className="text-sm text-red-600">
+                      {reportData?.overdueInvoices || 0} {t('reports.overdue')}
+                    </dd>
+                  </dl>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-12">
-
-        {/* Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 hover:shadow-3xl transition-all duration-300">
-            <div className="flex items-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
-                <Users className="h-8 w-8 text-white" />
-              </div>
-              <div className="ml-6">
-                <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('reports.total_customers')}</p>
-                <p className="text-3xl font-bold text-gray-900">{reportData?.totalCustomers || 0}</p>
-              </div>
+        {/* Revenue Breakdown */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Revenue Sources */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">{t('reports.revenue_breakdown')}</h3>
             </div>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 hover:shadow-3xl transition-all duration-300">
-            <div className="flex items-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center">
-                <Car className="h-8 w-8 text-white" />
-              </div>
-              <div className="ml-6">
-                <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('reports.total_vehicles')}</p>
-                <p className="text-3xl font-bold text-gray-900">{reportData?.totalVehicles || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 hover:shadow-3xl transition-all duration-300">
-            <div className="flex items-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center">
-                <Calendar className="h-8 w-8 text-white" />
-              </div>
-              <div className="ml-6">
-                <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('reports.total_appointments')}</p>
-                <p className="text-3xl font-bold text-gray-900">{reportData?.totalAppointments || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8 hover:shadow-3xl transition-all duration-300">
-            <div className="flex items-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center">
-                <DollarSign className="h-8 w-8 text-white" />
-              </div>
-              <div className="ml-6">
-                <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('reports.total_revenue')}</p>
-                <p className="text-3xl font-bold text-gray-900">${reportData?.totalRevenue?.toLocaleString() || 0}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
-          {/* Revenue Chart */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mr-4">
-                  <TrendingUp className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">{t('reports.monthly_revenue')}</h3>
-              </div>
-            </div>
-            <div className="h-64 flex items-end justify-between gap-2">
-              {reportData?.monthlyRevenue?.map((item, index) => (
-                <div key={index} className="flex flex-col items-center">
-                  <div
-                    className="bg-gradient-to-t from-[#F13F33] to-[#d6352a] rounded-t-2xl w-8 mb-2 shadow-lg"
-                    style={{ height: `${(item.revenue / Math.max(...(reportData?.monthlyRevenue?.map(r => r.revenue) || [1])) * 200)}px` }}
-                  ></div>
-                  <span className="text-xs font-bold text-gray-500">{item.month}</span>
-                  <span className="text-xs font-bold text-gray-900">${item.revenue.toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Top Services */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
-                  <FileText className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">{t('reports.top_services')}</h3>
-              </div>
-            </div>
-            <div className="space-y-4">
-              {reportData?.topServices?.slice(0, 5).map((service, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-50/80 rounded-2xl hover:bg-gray-100/80 transition-colors">
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className="w-3 h-3 bg-gradient-to-r from-[#F13F33] to-[#d6352a] rounded-full mr-4"></div>
-                    <span className="text-sm font-bold text-gray-900">{service.name}</span>
+                    <div className="w-3 h-3 bg-blue-500 rounded-full me-3"></div>
+                    <span className="text-sm font-medium text-gray-900">{t('reports.service_revenue')}</span>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold text-gray-900">${service.revenue.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500">{t('reports.jobs')}: {service.count}</div>
-                  </div>
+                  <span className="text-sm font-bold text-gray-900">${(reportData?.serviceRevenue || 0).toLocaleString()}</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Additional Analytics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
-          {/* Top Mechanics */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mr-4">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">{t('reports.top_mechanics')}</h3>
-              </div>
-            </div>
-            <div className="space-y-4">
-              {reportData?.topMechanics && reportData.topMechanics.length > 0 ? (
-                reportData.topMechanics.map((mechanic, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50/80 rounded-2xl hover:bg-gray-100/80 transition-colors">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-4">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <p className="font-bold text-gray-900">{mechanic.name}</p>
-                        <p className="text-sm text-gray-600">{mechanic.totalHours.toFixed(1)} hours worked</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-[#F13F33]">{mechanic.jobsCompleted} jobs</p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <Users className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <p>No mechanic data available for the selected period</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Job Status Distribution */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
-                  <BarChart3 className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">{t('reports.job_status_distribution')}</h3>
-              </div>
-            </div>
-            <div className="space-y-4">
-              {reportData?.jobStatusDistribution?.map((status, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-50/80 rounded-2xl hover:bg-gray-100/80 transition-colors">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <div className={`w-4 h-4 rounded-full mr-4 ${
-                      status.status === 'completed' ? 'bg-green-500' :
-                      status.status === 'in-progress' ? 'bg-blue-500' :
-                      status.status === 'pending' ? 'bg-yellow-500' :
-                      'bg-red-500'
-                    }`}></div>
-                    <p className="font-bold text-gray-900 capitalize">{status.status.replace('-', ' ')}</p>
+                    <div className="w-3 h-3 bg-green-500 rounded-full me-3"></div>
+                    <span className="text-sm font-medium text-gray-900">{t('reports.parts_revenue')}</span>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold text-[#F13F33]">{status.count} jobs</p>
-                  </div>
+                  <span className="text-sm font-bold text-gray-900">${(reportData?.partsRevenue || 0).toLocaleString()}</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Performance Metrics */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden mt-12">
-          <div className="px-8 py-8">
-            <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mr-4">
-                <TrendingUp className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900">{t('reports.performance_metrics')}</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
-                <div className="flex items-center">
-                  {/* Fix: Clock icon was not defined. Replace with a valid icon or import Clock if available. 
-                      Here, we'll use Lucide's Clock3 as a drop-in replacement. */}
-                  <BarChart3 className="h-8 w-8 text-blue-600 mr-4" />
-                  <div>
-                    <p className="text-sm font-bold text-blue-600 uppercase tracking-wider">{t('reports.avg_completion_time')}</p>
-                    <p className="text-2xl font-bold text-blue-900">{reportData?.averageJobCompletionTime || 0} hours</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 bg-purple-500 rounded-full me-3"></div>
+                    <span className="text-sm font-medium text-gray-900">{t('reports.labor_revenue')}</span>
                   </div>
+                  <span className="text-sm font-bold text-gray-900">${(reportData?.laborRevenue || 0).toLocaleString()}</span>
                 </div>
-              </div>
-              <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl">
-                <div className="flex items-center">
-                  {/* Fix: CheckCircle was not defined. Use Lucide's CheckCircle or another available icon. */}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-8 w-8 text-green-600 mr-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
-                    <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2l4-4" />
-                  </svg>
-                  <div>
-                    <p className="text-sm font-bold text-green-600 uppercase tracking-wider">{t('reports.completed_jobs')}</p>
-                    <p className="text-2xl font-bold text-green-900">{reportData?.completedJobs || 0}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 bg-orange-500 rounded-full me-3"></div>
+                    <span className="text-sm font-medium text-gray-900">{t('reports.other_revenue')}</span>
                   </div>
+                  <span className="text-sm font-bold text-gray-900">${(reportData?.otherRevenue || 0).toLocaleString()}</span>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Payment Methods */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">{t('reports.payment_methods')}</h3>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Banknote className="h-4 w-4 text-green-600 me-3" />
+                    <span className="text-sm font-medium text-gray-900">{t('reports.cash_payments')}</span>
+                  </div>
+                  <span className="text-sm font-bold text-gray-900">${(reportData?.cashPayments || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <CreditCard className="h-4 w-4 text-blue-600 me-3" />
+                    <span className="text-sm font-medium text-gray-900">{t('reports.card_payments')}</span>
+                  </div>
+                  <span className="text-sm font-bold text-gray-900">${(reportData?.cardPayments || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Receipt className="h-4 w-4 text-purple-600 me-3" />
+                    <span className="text-sm font-medium text-gray-900">{t('reports.bank_transfer')}</span>
+                  </div>
+                  <span className="text-sm font-bold text-gray-900">${(reportData?.bankTransferPayments || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <FileText className="h-4 w-4 text-orange-600 me-3" />
+                    <span className="text-sm font-medium text-gray-900">{t('reports.check_payments')}</span>
+                  </div>
+                  <span className="text-sm font-bold text-gray-900">${(reportData?.checkPayments || 0).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Detailed Reports */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden mt-12">
-          <div className="px-8 py-8">
-            <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mr-4">
-                <BarChart3 className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900">{t('reports.detailed_reports')}</h3>
+        {/* Top Revenue Sources */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Top Services by Revenue */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">{t('reports.top_services')}</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-gray-50/80 rounded-2xl p-6 hover:bg-gray-100/80 cursor-pointer transition-all duration-300 hover:shadow-lg group">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Users className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900">{t('reports.customer_report')}</h4>
-                    <p className="text-sm text-gray-600">{t('reports.customer_report_desc')}</p>
-                  </div>
+            <div className="overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('reports.service')}
+                    </th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('reports.revenue')}
+                    </th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('reports.count')}
+                    </th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('reports.avg_price')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {reportData?.topServices?.slice(0, 5).map((service, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {service.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${service.revenue.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {service.count}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${(service.avgPrice || 0).toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Top Customers by Revenue */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">{t('reports.top_customers')}</h3>
+            </div>
+            <div className="overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('reports.customer')}
+                    </th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('reports.revenue')}
+                    </th>
+                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('reports.jobs')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {reportData?.topCustomers?.slice(0, 5).map((customer, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {customer.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${customer.revenue.toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {customer.jobs}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Financial Health Summary */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">{t('reports.financial_health')}</h3>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">
+                  ${(reportData?.averageInvoiceValue || 0).toLocaleString()}
                 </div>
+                <div className="text-sm text-gray-500">{t('reports.avg_invoice_value')}</div>
               </div>
-              <div className="bg-gray-50/80 rounded-2xl p-6 hover:bg-gray-100/80 cursor-pointer transition-all duration-300 hover:shadow-lg group">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Car className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900">{t('reports.vehicle_report')}</h4>
-                    <p className="text-sm text-gray-600">{t('reports.vehicle_report_desc')}</p>
-                  </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">
+                  {(reportData?.collectionRate || 0).toFixed(1)}%
                 </div>
+                <div className="text-sm text-gray-500">{t('reports.collection_rate')}</div>
               </div>
-              <div className="bg-gray-50/80 rounded-2xl p-6 hover:bg-gray-100/80 cursor-pointer transition-all duration-300 hover:shadow-lg group">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Package className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900">{t('reports.inventory_report')}</h4>
-                    <p className="text-sm text-gray-600">{t('reports.inventory_report_desc')}</p>
-                  </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">
+                  {typeof reportData?.customerGrowth === 'number' ? `${reportData.customerGrowth}%` : '0%'}
                 </div>
+                <div className="text-sm text-gray-500">{t('reports.customer_growth')}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">
+                  ${(reportData?.grossProfit || 0).toLocaleString()}
+                </div>
+                <div className="text-sm text-gray-500">{t('reports.gross_profit')}</div>
               </div>
             </div>
           </div>
