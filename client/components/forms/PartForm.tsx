@@ -2,16 +2,10 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, X, Plus, Package, Settings, FileText } from "lucide-react";
+import { ArrowLeft, Save, X, Package } from "lucide-react";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 import { Combobox } from "@/components/ui/Combobox";
-
-interface CompatibleVehicle {
-  make: string;
-  model: string;
-  year: number;
-}
 
 interface PartFormData {
   name: string;
@@ -23,8 +17,7 @@ interface PartFormData {
   stockQuantity: number;
   minStockLevel: number;
   location: string;
-  partNumber: string;
-  compatibleVehicles: CompatibleVehicle[];
+  partNumber: string | undefined;
 }
 
 export default function PartForm({ partId }: { partId?: string }) {
@@ -50,7 +43,6 @@ export default function PartForm({ partId }: { partId?: string }) {
     minStockLevel: 0,
     location: "",
     partNumber: "",
-    compatibleVehicles: [],
   });
 
   // Debug logging
@@ -76,13 +68,12 @@ export default function PartForm({ partId }: { partId?: string }) {
               description: part.description || "",
               category: part.category || "",
               manufacturer: part.manufacturer || "",
-              cost: part.cost || 0,
-              sellingPrice: part.sellingPrice || 0,
-              stockQuantity: part.stockQuantity || 0,
-              minStockLevel: part.minStockLevel || 0,
+              cost: Number(part.cost) || 0,
+              sellingPrice: Number(part.sellingPrice) || 0,
+              stockQuantity: Number(part.stockQuantity) || 0,
+              minStockLevel: Number(part.minStockLevel) || 0,
               location: part.location || "",
               partNumber: part.partNumber || "",
-              compatibleVehicles: part.compatibleVehicles || [],
             });
           }
         } catch (error) {
@@ -101,12 +92,18 @@ export default function PartForm({ partId }: { partId?: string }) {
       const url = isEditing ? `/api/parts/${partId}` : "/api/parts";
       const method = isEditing ? "PUT" : "POST";
 
+      // Prepare data for submission - handle empty partNumber
+      const submitData = { ...formData };
+      if (submitData.partNumber === '') {
+        submitData.partNumber = undefined;
+      }
+
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       if (response.ok) {
@@ -125,35 +122,17 @@ export default function PartForm({ partId }: { partId?: string }) {
   const handleInputChange = (field: string, value: any) => {
     console.log('PartForm handleInputChange:', { field, value, currentFormData: formData });
     setFormData((prev) => {
+      // Ensure number fields are properly handled
+      const numberFields = ['cost', 'sellingPrice', 'stockQuantity', 'minStockLevel'];
+      if (numberFields.includes(field)) {
+        value = Number(value) || 0;
+      }
       const newData = { ...prev, [field]: value };
       console.log('PartForm new form data:', newData);
       return newData;
     });
   };
 
-  const handleCompatibleVehicleChange = (
-    index: number,
-    field: keyof CompatibleVehicle,
-    value: string | number
-  ) => {
-    const updatedVehicles = [...formData.compatibleVehicles];
-    updatedVehicles[index] = { ...updatedVehicles[index], [field]: value };
-    handleInputChange("compatibleVehicles", updatedVehicles);
-  };
-
-  const addCompatibleVehicle = () => {
-    handleInputChange("compatibleVehicles", [
-      ...formData.compatibleVehicles,
-      { make: "", model: "", year: new Date().getFullYear() },
-    ]);
-  };
-
-  const removeCompatibleVehicle = (index: number) => {
-    const updatedVehicles = formData.compatibleVehicles.filter(
-      (_, i) => i !== index
-    );
-    handleInputChange("compatibleVehicles", updatedVehicles);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -214,7 +193,6 @@ export default function PartForm({ partId }: { partId?: string }) {
                   <input
                     type="text"
                     id="partNumber"
-                    required
                     value={formData.partNumber}
                     onChange={(e) => handleInputChange("partNumber", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
@@ -244,15 +222,15 @@ export default function PartForm({ partId }: { partId?: string }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="cost" className="block text-sm font-bold text-gray-700">{t('job_cards.cost')}</label>
+                  <label htmlFor="cost" className="block text-sm font-bold text-gray-700">{t('inventory.cost')}</label>
                   <input
                     type="number"
                     id="cost"
                     name="cost"
                     required
-                    value={formData.cost}
+                    value={formData.cost || 0}
                     onChange={(e) =>
-                      handleInputChange("cost", parseFloat(e.target.value))
+                      handleInputChange("cost", parseFloat(e.target.value) || 0)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     placeholder="0.00"
@@ -266,9 +244,9 @@ export default function PartForm({ partId }: { partId?: string }) {
                     id="sellingPrice"
                     name="sellingPrice"
                     required
-                    value={formData.sellingPrice}
+                    value={formData.sellingPrice || 0}
                     onChange={(e) =>
-                      handleInputChange("sellingPrice", parseFloat(e.target.value))
+                      handleInputChange("sellingPrice", parseFloat(e.target.value) || 0)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     placeholder="0.00"
@@ -281,9 +259,9 @@ export default function PartForm({ partId }: { partId?: string }) {
                     type="number"
                     id="stockQuantity"
                     required
-                    value={formData.stockQuantity}
+                    value={formData.stockQuantity || 0}
                     onChange={(e) =>
-                      handleInputChange("stockQuantity", parseInt(e.target.value))
+                      handleInputChange("stockQuantity", parseInt(e.target.value) || 0)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     placeholder="0"
@@ -295,9 +273,9 @@ export default function PartForm({ partId }: { partId?: string }) {
                     type="number"
                     id="minStockLevel"
                     required
-                    value={formData.minStockLevel}
+                    value={formData.minStockLevel || 0}
                     onChange={(e) =>
-                      handleInputChange("minStockLevel", parseInt(e.target.value))
+                      handleInputChange("minStockLevel", parseInt(e.target.value) || 0)
                     }
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     placeholder="0"
@@ -329,84 +307,6 @@ export default function PartForm({ partId }: { partId?: string }) {
             </div>
           </div>
 
-          {/* Compatible Vehicles Section */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-            <div className="px-8 py-8">
-              <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mr-4">
-                  <Settings className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">
-                  {t('forms.compatible_vehicles')}
-                </h3>
-              </div>
-              {formData.compatibleVehicles.map((vehicle, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-4 gap-4 items-center mb-2"
-                >
-                  <div className="space-y-2">
-                    <label htmlFor={`make-${index}`} className="block text-sm font-bold text-gray-700">{t('vehicles.make')}</label>
-                    <input
-                      type="text"
-                      id={`make-${index}`}
-                      value={vehicle.make}
-                      onChange={(e) =>
-                        handleCompatibleVehicleChange(index, "make", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder={t('vehicles.make')}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor={`model-${index}`} className="block text-sm font-bold text-gray-700">{t('vehicles.model')}</label>
-                    <input
-                      type="text"
-                      id={`model-${index}`}
-                      value={vehicle.model}
-                      onChange={(e) =>
-                        handleCompatibleVehicleChange(index, "model", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder={t('vehicles.model')}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor={`year-${index}`} className="block text-sm font-bold text-gray-700">{t('vehicles.year')}</label>
-                    <input
-                      type="number"
-                      id={`year-${index}`}
-                      value={vehicle.year}
-                      onChange={(e) =>
-                        handleCompatibleVehicleChange(
-                          index,
-                          "year",
-                          parseInt(e.target.value)
-                        )
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder={t('vehicles.year')}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeCompatibleVehicle(index)}
-                    className="text-red-500 hover:text-red-700 p-3 rounded-xl hover:bg-red-50 transition-all duration-300"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addCompatibleVehicle}
-                className="mt-6 inline-flex items-center px-6 py-3 border-2 border-dashed border-gray-300 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-[#F13F33] hover:text-[#F13F33] transition-all duration-300"
-              >
-                <Plus className="mr-3 h-5 w-5" />
-                {t('forms.add_vehicle')}
-              </button>
-            </div>
-          </div>
 
           {/* Form Actions */}
           <div className="flex justify-end space-x-6">

@@ -32,7 +32,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F13F33] mx-auto"></div>
-          <p className="mt-4 text-lg text-gray-600">Loading vehicle details...</p>
+          <p className="mt-4 text-lg text-gray-600">{t('vehicles.loading_vehicle_details')}</p>
         </div>
       </div>
     );
@@ -43,14 +43,14 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-500 text-6xl mb-4">🚗</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Vehicle Not Found</h2>
-          <p className="text-gray-600">The requested vehicle could not be found.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('vehicles.vehicle_not_found')}</h2>
+          <p className="text-gray-600">{t('vehicles.vehicle_not_found_description')}</p>
           <Link
             href="/vehicles"
             className="mt-4 inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 transition-all duration-300 hover:-translate-y-0.5"
           >
             <ArrowLeft className="mr-2 h-5 w-5" />
-            Back to Vehicles
+            {t('vehicles.back_to_vehicles')}
           </Link>
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center">
                   <Car className="mr-3 h-7 w-7 text-[#F13F33]" />
-                  Vehicle Information
+                  {t('vehicles.vehicle_information')}
                 </h2>
                 <div className="space-y-4">
                   <div className="flex items-center p-4 bg-gray-50/80 rounded-2xl">
@@ -102,7 +102,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
                         {t('vehicles.mileage')}
                       </p>
                       <p className="text-lg font-bold text-gray-900">
-                        {vehicle.mileage?.toLocaleString() || 'N/A'} miles
+                        {vehicle.mileage?.toLocaleString() || 'N/A'} {t('vehicles.miles')}
                       </p>
                     </div>
                   </div>
@@ -135,7 +135,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center">
                   <User className="mr-3 h-7 w-7 text-[#F13F33]" />
-                  Owner Information
+                  {t('vehicles.owner_information')}
                 </h2>
                 <div className="space-y-4">
                   <div className="flex items-center p-4 bg-gray-50/80 rounded-2xl">
@@ -153,7 +153,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
                         </Link>
                       ) : (
                         <span className="text-lg font-bold text-gray-500">
-                          No Customer Assigned
+                          {t('vehicles.no_customer_assigned')}
                         </span>
                       )}
                     </div>
@@ -162,7 +162,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
                     <Calendar className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">
-                        Year
+                        {t('vehicles.year')}
                       </p>
                       <p className="text-lg font-bold text-gray-900">
                         {vehicle.year}
@@ -173,7 +173,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
                     <Car className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">
-                        Color
+                        {t('vehicles.color')}
                       </p>
                       <p className="text-lg font-bold text-gray-900 capitalize">
                         {vehicle.color || 'N/A'}
@@ -242,8 +242,8 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
             ) : (
               <div className="text-center py-12">
                 <Wrench className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-bold text-gray-900 mb-2">No Service History</h3>
-                <p className="text-gray-600">This vehicle doesn't have any service records yet.</p>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('vehicles.no_service_history')}</h3>
+                <p className="text-gray-600">{t('vehicles.no_service_records')}</p>
               </div>
             )}
           </div>
@@ -255,7 +255,7 @@ export default function VehicleDetail({ vehicleId }: { vehicleId: string }) {
             <div className="px-8 py-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <Car className="mr-3 h-7 w-7 text-[#F13F33]" />
-                Vehicle Photos
+                {t('vehicles.vehicle_photos')}
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {vehicle.photos.map((photo: string, index: number) => (

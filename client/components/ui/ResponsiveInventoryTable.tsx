@@ -168,7 +168,7 @@ export default function ResponsiveInventoryTable({
                     <div>
                       <div className="font-medium">${part.sellingPrice.toFixed(2)}</div>
                       <div className="text-xs text-gray-400">
-                        {t('inventory.cost', { cost: part.cost.toFixed(2) })}
+                        {t('inventory.cost_label', { cost: part.cost.toFixed(2) })}
                       </div>
                     </div>
                   </td>
@@ -286,7 +286,7 @@ export default function ResponsiveInventoryTable({
                         ${part.sellingPrice.toFixed(2)}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {t('inventory.cost', { cost: part.cost.toFixed(2) })}
+                        {t('inventory.cost_label', { cost: part.cost.toFixed(2) })}
                       </div>
                     </div>
                   </div>
