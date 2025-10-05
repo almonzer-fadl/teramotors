@@ -90,6 +90,11 @@ export async function POST(request: Request) {
     
     const body = await request.json();
     
+    // Handle empty partNumber - set to undefined if empty string
+    if (body.partNumber === '') {
+      body.partNumber = undefined;
+    }
+    
     const part = new Part(body);
 
     await part.save();

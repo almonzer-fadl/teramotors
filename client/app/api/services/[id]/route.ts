@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Service from '@/lib/models/Service';
 import { getServerSession } from "@/lib/auth-server";
-import { hasPermission } from '@/lib/roles';
 
 export async function GET(
   request: NextRequest,
@@ -73,18 +72,14 @@ export async function DELETE(
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
-    // Check if user has admin permissions for hard deletion
-    const userRole = (session.user as any)?.role || 'inspector';
-    const canDeleteServices = hasPermission(userRole, 'canDelete');
-    
-    if (!canDeleteServices) {
-      return new Response(JSON.stringify({ error: 'Insufficient permissions' }), { status: 403 });
-    }
-
     await connectToDatabase();
     
-    // For admin users, perform hard deletion
-    const service = await Service.findByIdAndDelete(id);
+    // Perform soft deletion by setting isActive to false
+    const service = await Service.findByIdAndUpdate(
+      id,
+      { isActive: false },
+      { new: true }
+    );
 
     if (!service) {
       return new Response(JSON.stringify({ error: 'Service not found' }), { status: 404 });

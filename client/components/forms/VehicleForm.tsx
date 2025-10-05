@@ -7,6 +7,7 @@ import { ArrowLeft, Save, X, Plus } from "lucide-react";
 import FileUpload from "@/components/dashboard/FileUpload";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
+import { CAR_MAKES_MODELS, CAR_MAKES, getModelsForMake } from "@/lib/data/carMakesModels";
 
 interface CustomerMinimal {
   _id: string;
@@ -34,6 +35,9 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [customers, setCustomers] = useState<CustomerMinimal[]>([]);
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [customMake, setCustomMake] = useState(false);
+  const [customModel, setCustomModel] = useState(false);
   const [formData, setFormData] = useState<VehicleFormData>({
     customerId: "",
     vin: "",
@@ -142,6 +146,19 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
       ...prev,
       [field]: value,
     }));
+
+    // Update available models when make changes
+    if (field === 'make') {
+      const models = getModelsForMake(value as string);
+      setAvailableModels(models);
+      setCustomMake(!CAR_MAKES.includes(value as string));
+      
+      // Reset model if it's not available for the new make
+      if (models.length > 0 && !models.includes(formData.model)) {
+        setFormData(prev => ({ ...prev, model: '' }));
+        setCustomModel(false);
+      }
+    }
   };
 
   const handlePhotoUpload = (url: string) => {
@@ -239,27 +256,80 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                   <label className="block text-sm font-bold text-gray-700">
                     {t("vehicles.make")} *
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.make}
-                    onChange={(e) => handleInputChange("make", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder={t('ui.enter_vehicle_make')}
-                  />
+                  <div className="flex gap-2">
+                    <select
+                      required
+                      value={customMake ? 'custom' : formData.make}
+                      onChange={(e) => {
+                        if (e.target.value === 'custom') {
+                          setCustomMake(true);
+                          setFormData(prev => ({ ...prev, make: '' }));
+                        } else {
+                          setCustomMake(false);
+                          handleInputChange("make", e.target.value);
+                        }
+                      }}
+                      className="flex-1 px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    >
+                      <option value="">{t('forms.select_make')}</option>
+                      {CAR_MAKES.map((make) => (
+                        <option key={make} value={make}>
+                          {make}
+                        </option>
+                      ))}
+                      <option value="custom">{t('forms.custom_make')}</option>
+                    </select>
+                    {customMake && (
+                      <input
+                        type="text"
+                        required
+                        value={formData.make}
+                        onChange={(e) => handleInputChange("make", e.target.value)}
+                        className="flex-1 px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                        placeholder={t('ui.enter_vehicle_make')}
+                      />
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
                     {t("vehicles.model")} *
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.model}
-                    onChange={(e) => handleInputChange("model", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder={t('ui.enter_vehicle_model')}
-                  />
+                  <div className="flex gap-2">
+                    <select
+                      required
+                      value={customModel ? 'custom' : formData.model}
+                      onChange={(e) => {
+                        if (e.target.value === 'custom') {
+                          setCustomModel(true);
+                          setFormData(prev => ({ ...prev, model: '' }));
+                        } else {
+                          setCustomModel(false);
+                          handleInputChange("model", e.target.value);
+                        }
+                      }}
+                      className="flex-1 px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      disabled={!formData.make}
+                    >
+                      <option value="">{t('forms.select_model')}</option>
+                      {availableModels.map((model) => (
+                        <option key={model} value={model}>
+                          {model}
+                        </option>
+                      ))}
+                      <option value="custom">{t('forms.custom_model')}</option>
+                    </select>
+                    {customModel && (
+                      <input
+                        type="text"
+                        required
+                        value={formData.model}
+                        onChange={(e) => handleInputChange("model", e.target.value)}
+                        className="flex-1 px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                        placeholder={t('ui.enter_vehicle_model')}
+                      />
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">

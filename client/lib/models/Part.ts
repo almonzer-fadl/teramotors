@@ -15,12 +15,7 @@ const PartSchema = new Schema({
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  partNumber: { type: String, required: true, unique: true },
-  compatibleVehicles: [{
-    make: { type: String },
-    model: { type: String },
-    year: { type: Number },
-  }]
+  partNumber: { type: String, required: false, unique: true, sparse: true }
 });
 
 // Add indexes for better query performance

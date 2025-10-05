@@ -44,6 +44,11 @@ export async function PUT(
     
     const body = await request.json();
     
+    // Handle empty partNumber - set to undefined if empty string
+    if (body.partNumber === '') {
+      body.partNumber = undefined;
+    }
+    
     const part = await Part.findByIdAndUpdate(
       id,
       body,

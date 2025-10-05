@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 interface Vehicle {
   _id: string;
@@ -31,6 +32,7 @@ interface Customer {
 }
 
 export default function CustomerDetailPage() {
+  const { t } = useTranslation('common');
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
   const params = useParams();
@@ -59,7 +61,7 @@ export default function CustomerDetailPage() {
   }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{t('common.loading')}</div>;
   }
 
   if (!customer) {
@@ -86,7 +88,7 @@ export default function CustomerDetailPage() {
                   {customer.firstName} {customer.lastName}
                 </h1>
                 <p className="mt-3 text-xl text-gray-600">
-                  Customer Details
+                  {t('customers.customer_details')}
                 </p>
               </div>
             </div>
@@ -104,23 +106,23 @@ export default function CustomerDetailPage() {
                 </svg>
               </div>
               <h2 className="text-2xl font-bold text-gray-900">
-                Personal Information
+                {t('customers.personal_information')}
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
                 <div className="p-4 bg-gray-50/80 rounded-2xl">
-                  <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Email</p>
+                  <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('customers.email')}</p>
                   <p className="text-lg font-semibold text-gray-900">{customer.email}</p>
                 </div>
                 <div className="p-4 bg-gray-50/80 rounded-2xl">
-                  <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Phone</p>
+                  <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('customers.phone')}</p>
                   <p className="text-lg font-semibold text-gray-900">{customer.phone}</p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="p-4 bg-gray-50/80 rounded-2xl">
-                  <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">Address</p>
+                  <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('customers.address')}</p>
                   <p className="text-lg font-semibold text-gray-900">{customer.address?.street}</p>
                   <p className="text-sm text-gray-600">{customer.address?.city}, {customer.address?.state} {customer.address?.zipCode}</p>
                 </div>
@@ -128,7 +130,7 @@ export default function CustomerDetailPage() {
             </div>
             {customer.notes && (
               <div className="mt-8 p-4 bg-gray-50/80 rounded-2xl">
-                <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">Notes</p>
+                <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">{t('customers.notes')}</p>
                 <p className="text-lg text-gray-900">{customer.notes}</p>
               </div>
             )}
@@ -144,16 +146,16 @@ export default function CustomerDetailPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1m-1-1V8a1 1 0 00-1-1H9m4 8V8a1 1 0 00-1-1H9" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Vehicles</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{t('customers.vehicles')}</h2>
             </div>
             <div className="overflow-hidden">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50/80">
                   <tr>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Make</th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Model</th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Year</th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">License Plate</th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{t('vehicles.make')}</th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{t('vehicles.model')}</th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{t('vehicles.year')}</th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{t('vehicles.license_plate')}</th>
                     <th scope="col" className="relative px-6 py-4">
                       <span className="sr-only">View</span>
                     </th>
@@ -171,7 +173,7 @@ export default function CustomerDetailPage() {
                           href={`/vehicles/${vehicle._id}`} 
                           className="inline-flex items-center px-4 py-2 text-sm font-bold text-[#F13F33] hover:text-[#d6352a] hover:bg-[#F13F33]/5 rounded-xl transition-all duration-300"
                         >
-                          View Details
+                          {t('customers.view_details')}
                         </Link>
                       </td>
                     </tr>
