@@ -18,6 +18,8 @@ import {
   FileText,
   CreditCard,
   Bell,
+  Wrench,
+  Settings,
 } from "lucide-react";
 import JobCardGrid from "@/components/dashboard/JobCardGrid";
 import ModernDashboardWidget from "@/components/dashboard/ModernDashboardWidget";
@@ -59,6 +61,7 @@ interface ModernWidgetData {
 export default function DashboardPage() {
   const { t } = useTranslation("common");
   const { user, isLoading, isAuthenticated } = useSession();
+  const isAdmin = user?.role === 'admin';
   const [stats, setStats] = useState<DashboardStats>({
     totalCustomers: 0,
     totalVehicles: 0,
@@ -102,6 +105,9 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
+    // Only fetch stats and generate tiles when user session is loaded
+    if (isLoading) return;
+
     // Fetch stats regardless of authentication status
     // The API will handle authentication internally
 
@@ -120,7 +126,7 @@ export default function DashboardPage() {
           setStats(data);
           
           // Generate navigation tiles
-          const tiles = [
+          const baseTiles = [
             {
               title: t('dashboard_missing.modern_widget.clients'),
               titleEn: 'Clients',
@@ -146,20 +152,40 @@ export default function DashboardPage() {
               route: '/inventory'
             },
             {
-              title: t('dashboard_missing.modern_widget.accounting'),
-              titleEn: 'Invoices',
-              icon: BarChart3,
-              color: 'bg-orange-500',
-              count: '',
-              route: '/invoices'
-            },
-            {
               title: t('dashboard_missing.modern_widget.job_cards'),
               titleEn: 'Job Cards',
               icon: ClipboardList,
               color: 'bg-purple-600',
               count: '',
               route: '/job-cards'
+            },
+            {
+              title: t('dashboard_missing.modern_widget.inspections'),
+              titleEn: 'Inspections',
+              icon: Search,
+              color: 'bg-indigo-600',
+              count: '',
+              route: '/inspections'
+            },
+
+            {
+              title: t('dashboard_missing.modern_widget.service_reminders'),
+              titleEn: 'Services',
+              icon: Wrench,
+              color: 'bg-blue-700',
+              count: '',
+              route: '/services'
+            }
+          ];
+
+          const adminOnlyTiles = [
+            {
+              title: t('dashboard_missing.modern_widget.accounting'),
+              titleEn: 'Invoices',
+              icon: BarChart3,
+              color: 'bg-orange-500',
+              count: '',
+              route: '/invoices'
             },
             {
               title: t('dashboard_missing.modern_widget.invoices_estimates'),
@@ -178,46 +204,24 @@ export default function DashboardPage() {
               route: '/payments'
             },
             {
-              title: t('dashboard_missing.modern_widget.inspections'),
-              titleEn: 'Inspections',
-              icon: Search,
-              color: 'bg-indigo-600',
-              count: '',
-              route: '/inspections'
-            },
-            {
-              title: t('dashboard_missing.modern_widget.appointments'),
-              titleEn: 'Appointments',
-              icon: Calendar,
-              color: 'bg-cyan-600',
-              count: '',
-              route: '/appointments'
-            },
-            {
-              title: t('dashboard_missing.modern_widget.time_tracking'),
-              titleEn: 'Time Tracking',
-              icon: Clock,
-              color: 'bg-red-600',
-              count: '',
-              route: '/job-cards'
-            },
-            {
-              title: t('dashboard_missing.modern_widget.service_reminders'),
-              titleEn: 'Services',
-              icon: Bell,
-              color: 'bg-blue-700',
-              count: '',
-              route: '/services'
-            },
-            {
               title: t('dashboard_missing.modern_widget.reports'),
               titleEn: 'Reports',
               icon: TrendingUp,
               color: 'bg-blue-800',
               count: '',
               route: '/reports'
+            },
+            {
+              title: t('dashboard_missing.modern_widget.settings'),
+              titleEn: 'Settings',
+              icon: Settings,
+              color: 'bg-gray-600',
+              count: '',
+              route: '/settings'
             }
           ];
+
+          const tiles = isAdmin ? [...baseTiles, ...adminOnlyTiles] : baseTiles;
           
           setModernWidgetData({
             tiles,
@@ -271,7 +275,7 @@ export default function DashboardPage() {
         socketService.off(event, handler);
       });
     };
-  }, []);
+  }, [isLoading, isAdmin]);
 
   const statCards = [
     {

@@ -26,8 +26,13 @@ export async function GET(
       return NextResponse.json({ error: 'Inspection not found' }, { status: 404 });
     }
 
+    // Get language from query parameter or default to English
+    const url = new URL(request.url);
+    const language = url.searchParams.get('lang') || 'en';
+    const isRTL = language === 'ar';
+
     // Generate HTML content for PDF
-    const htmlContent = generateInspectionHTML(inspection);
+    const htmlContent = generateInspectionHTML(inspection, language, isRTL);
 
     return new NextResponse(htmlContent, {
       headers: {
@@ -41,16 +46,70 @@ export async function GET(
   }
 }
 
-function generateInspectionHTML(inspection: any): string {
+function generateInspectionHTML(inspection: any, language: string = 'en', isRTL: boolean = false): string {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString();
+  
+  // Translation object
+  const translations = {
+    en: {
+      title: "Vehicle Inspection Report",
+      company: "TeraMotors Auto Repair",
+      printButton: "🖨️ Print PDF",
+      vehicleInfo: "Vehicle Information",
+      makeModel: "Make & Model",
+      year: "Year",
+      licensePlate: "License Plate",
+      inspectionDate: "Inspection Date",
+      mileage: "Mileage",
+      overallCondition: "Overall Condition",
+      inspectionItems: "Inspection Items",
+      itemId: "Item ID",
+      category: "Category",
+      condition: "Condition",
+      recommendations: "Recommendations",
+      nextInspectionDue: "Next Inspection Due",
+      generatedOn: "Generated on",
+      systemName: "TeraMotors Auto Repair Management System",
+      noItems: "No items found",
+      customer: "Customer",
+      mechanic: "Mechanic",
+      inspectionDetails: "Inspection Details"
+    },
+    ar: {
+      title: "تقرير فحص المركبة",
+      company: "تيرا موتورز لصيانة السيارات",
+      printButton: "🖨️ طباعة PDF",
+      vehicleInfo: "معلومات المركبة",
+      makeModel: "الماركة والنوع",
+      year: "السنة",
+      licensePlate: "رقم اللوحة",
+      inspectionDate: "تاريخ الفحص",
+      mileage: "المسافة المقطوعة",
+      overallCondition: "الحالة العامة",
+      inspectionItems: "عناصر الفحص",
+      itemId: "معرف العنصر",
+      category: "الفئة",
+      condition: "الحالة",
+      recommendations: "التوصيات",
+      nextInspectionDue: "موعد الفحص التالي",
+      generatedOn: "تم الإنشاء في",
+      systemName: "نظام إدارة تيرا موتورز لصيانة السيارات",
+      noItems: "لم يتم العثور على عناصر",
+      customer: "العميل",
+      mechanic: "الميكانيكي",
+      inspectionDetails: "تفاصيل الفحص"
+    }
+  };
+
+  const t = translations[language as keyof typeof translations] || translations.en;
   
   return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${language}" dir="${isRTL ? 'rtl' : 'ltr'}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inspection Report</title>
+    <title>${t.title}</title>
     <style>
         @media print {
             body { margin: 0; }
@@ -59,19 +118,21 @@ function generateInspectionHTML(inspection: any): string {
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: ${isRTL ? "'Segoe UI', 'Tahoma', 'Arial', sans-serif" : "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"};
             line-height: 1.6;
             color: #333;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             background: #fff;
+            direction: ${isRTL ? 'rtl' : 'ltr'};
+            text-align: ${isRTL ? 'right' : 'left'};
         }
         
         .print-button {
             position: fixed;
             top: 20px;
-            right: 20px;
+            ${isRTL ? 'left: 20px;' : 'right: 20px;'}
             background: #2563eb;
             color: white;
             border: none;
@@ -203,65 +264,65 @@ function generateInspectionHTML(inspection: any): string {
     </style>
 </head>
 <body>
-    <button class="print-button no-print" onclick="window.print()">🖨️ Print PDF</button>
+    <button class="print-button no-print" onclick="window.print()">${t.printButton}</button>
     
     <div class="header">
-        <h1>Vehicle Inspection Report</h1>
-        <p>TeraMotors Auto Repair</p>
+        <h1>${t.title}</h1>
+        <p>${t.company}</p>
     </div>
 
     <div class="section">
-        <h2>Vehicle Information</h2>
+        <h2>${t.vehicleInfo}</h2>
         <div class="info-grid">
             <div class="info-item">
-                <h3>Make & Model</h3>
+                <h3>${t.makeModel}</h3>
                 <p>${inspection.vehicleId?.make || 'N/A'} ${inspection.vehicleId?.model || 'N/A'}</p>
             </div>
             <div class="info-item">
-                <h3>Year</h3>
+                <h3>${t.year}</h3>
                 <p>${inspection.vehicleId?.year || 'N/A'}</p>
             </div>
             <div class="info-item">
-                <h3>License Plate</h3>
+                <h3>${t.licensePlate}</h3>
                 <p>${inspection.vehicleId?.licensePlate || 'N/A'}</p>
             </div>
             <div class="info-item">
-                <h3>Mileage</h3>
+                <h3>${t.mileage}</h3>
                 <p>${inspection.mileage?.toLocaleString() || 'N/A'}</p>
             </div>
         </div>
     </div>
 
     <div class="section">
-        <h2>Inspection Details</h2>
+        <h2>${t.inspectionDetails}</h2>
         <div class="info-grid">
             <div class="info-item">
-                <h3>Customer</h3>
+                <h3>${t.customer}</h3>
                 <p>${inspection.customerId?.firstName || 'N/A'} ${inspection.customerId?.lastName || 'N/A'}</p>
             </div>
             <div class="info-item">
-                <h3>Mechanic</h3>
+                <h3>${t.mechanic}</h3>
                 <p>${inspection.mechanicId?.displayName || `${inspection.mechanicId?.firstName || ''} ${inspection.mechanicId?.lastName || ''}`.trim() || 'N/A'}</p>
             </div>
             <div class="info-item">
-                <h3>Inspection Date</h3>
+                <h3>${t.inspectionDate}</h3>
                 <p>${formatDate(inspection.inspectionDate)}</p>
             </div>
             <div class="info-item">
-                <h3>Overall Condition</h3>
+                <h3>${t.overallCondition}</h3>
                 <p>${inspection.overallCondition || 'N/A'}</p>
             </div>
         </div>
     </div>
 
     <div class="section">
-        <h2>Inspection Items</h2>
+        <h2>${t.inspectionItems}</h2>
         <table class="items-table">
             <thead>
                 <tr>
-                    <th>Item ID</th>
-                    <th>Category</th>
-                    <th>Condition</th>
+                    <th>${t.itemId}</th>
+                    <th>${t.category}</th>
+                    <th>${t.condition}</th>
                 </tr>
             </thead>
             <tbody>
@@ -271,7 +332,7 @@ function generateInspectionHTML(inspection: any): string {
                     <td>${item.category || 'N/A'}</td>
                     <td><span class="condition-badge condition-${item.condition || 'unknown'}">${item.condition || 'N/A'}</span></td>
                 </tr>
-                `).join('') || '<tr><td colspan="3" style="text-align: center; color: #6b7280;">No items found</td></tr>'}
+                `).join('') || `<tr><td colspan="3" style="text-align: center; color: #6b7280;">${t.noItems}</td></tr>`}
             </tbody>
         </table>
     </div>
@@ -279,7 +340,7 @@ function generateInspectionHTML(inspection: any): string {
     ${inspection.recommendations ? `
     <div class="section">
         <div class="recommendations">
-            <h3>Recommendations</h3>
+            <h3>${t.recommendations}</h3>
             <p>${inspection.recommendations}</p>
         </div>
     </div>
@@ -288,15 +349,15 @@ function generateInspectionHTML(inspection: any): string {
     ${inspection.nextInspectionDate ? `
     <div class="section">
         <div class="info-item">
-            <h3>Next Inspection Due</h3>
+            <h3>${t.nextInspectionDue}</h3>
             <p>${formatDate(inspection.nextInspectionDate)}</p>
         </div>
     </div>
     ` : ''}
 
     <div class="footer">
-        <p>Generated on ${new Date().toLocaleString()}</p>
-        <p>TeraMotors Auto Repair Management System</p>
+        <p>${t.generatedOn} ${new Date().toLocaleString()}</p>
+        <p>${t.systemName}</p>
     </div>
 </body>
 </html>

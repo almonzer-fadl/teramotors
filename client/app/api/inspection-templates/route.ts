@@ -35,6 +35,7 @@ export async function POST(request: Request) {
     
     const template = new InspectionTemplate({
       name: body.name,
+      description: body.description || '',
       category: body.category,
       vehicleType: body.vehicleType,
       items: body.items,

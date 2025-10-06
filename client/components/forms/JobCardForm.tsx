@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Plus, Trash2 } from "lucide-react";
 import { socketService } from "../../lib/services/socket";
 import { useTranslation } from "react-i18next";
+import { useSession } from "../../lib/hooks/useSession";
 
 interface AppointmentMinimal {
   _id: string;
@@ -55,7 +56,10 @@ export default function JobCardForm({
 }) {
   const { t } = useTranslation("common");
   const router = useRouter();
+  const { user } = useSession();
   const [loading, setLoading] = useState(false);
+  
+  const isAdmin = user?.role === 'admin';
   const [appointments, setAppointments] = useState<AppointmentMinimal[]>([]);
   const [customers, setCustomers] = useState<CustomerMinimal[]>([]);
   const [vehicles, setVehicles] = useState<VehicleMinimal[]>([]);
@@ -443,7 +447,7 @@ export default function JobCardForm({
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
-                    {t("job_cards.estimated_start_time")}
+                    {t("forms.start_time")}
                   </label>
                   <input
                     type="datetime-local"
@@ -456,7 +460,7 @@ export default function JobCardForm({
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
-                    {t("job_cards.estimated_end_time")}
+                    {t("forms.end_time")}
                   </label>
                   <input
                     type="datetime-local"
@@ -538,17 +542,26 @@ export default function JobCardForm({
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">{t('job_cards.labor_rate')}</label>
-                    <input
-                      type="number"
-                      value={service.laborRate}
-                      onChange={(e) =>
-                        handleServiceChange(index, "laborRate", parseFloat(e.target.value))
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    />
-                  </div>
+                  {isAdmin ? (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-gray-700">{t('forms.labor_placeholder')}</label>
+                      <input
+                        type="number"
+                        value={service.laborRate}
+                        onChange={(e) =>
+                          handleServiceChange(index, "laborRate", parseFloat(e.target.value))
+                        }
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-gray-700">{t('forms.labor_placeholder')}</label>
+                      <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
+                        {t("job_cards.admin_only")}
+                      </div>
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => removeService(index)}
@@ -594,7 +607,7 @@ export default function JobCardForm({
                       }
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     >
-                      <option value="">{t("job_cards.select_part")}</option>
+                      <option value="">{t("forms.select_part")}</option>
                       {parts.map((p) => (
                         <option key={p._id} value={p._id}>
                           {p.name}
@@ -603,7 +616,7 @@ export default function JobCardForm({
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">{t('job_cards.qty')}</label>
+                    <label className="block text-sm font-bold text-gray-700">{t('forms.qty')}</label>
                     <input
                       type="number"
                       value={part.quantity}
@@ -613,18 +626,27 @@ export default function JobCardForm({
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">{t('job_cards.cost')}</label>
-                    <input
-                      type="number"
-                      name="cost"
-                      value={part.cost}
-                      onChange={(e) =>
-                        handlePartChange(index, "cost", parseFloat(e.target.value))
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    />
-                  </div>
+                  {isAdmin ? (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-gray-700">{t('forms.cost_placeholder')}</label>
+                      <input
+                        type="number"
+                        name="cost"
+                        value={part.cost}
+                        onChange={(e) =>
+                          handlePartChange(index, "cost", parseFloat(e.target.value))
+                        }
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-gray-700">{t('forms.cost_placeholder')}</label>
+                      <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
+                        {t("job_cards.admin_only")}
+                      </div>
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => removePart(index)}

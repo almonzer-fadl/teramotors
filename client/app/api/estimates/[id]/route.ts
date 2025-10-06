@@ -14,6 +14,12 @@ export async function GET(
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), { status: 403 });
+    }
+
     await connectToDatabase();
     
     const estimate = await Estimate.findById(id)
@@ -41,6 +47,12 @@ export async function PUT(
     const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    }
+
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), { status: 403 });
     }
 
     await connectToDatabase();
@@ -73,6 +85,12 @@ export async function DELETE(
     const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    }
+
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), { status: 403 });
     }
 
     await connectToDatabase();

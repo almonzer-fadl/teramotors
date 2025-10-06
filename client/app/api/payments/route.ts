@@ -10,6 +10,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
+    }
+
     await connectToDatabase();
 
     const { searchParams } = new URL(request.url);
@@ -95,6 +101,12 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     await connectToDatabase();

@@ -14,6 +14,12 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
+    }
+
     await connectToDatabase();
 
     const { id } = await params;
@@ -51,6 +57,12 @@ export async function PUT(
     const session = await getServerSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     await connectToDatabase();
@@ -118,6 +130,12 @@ export async function DELETE(
     const session = await getServerSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     await connectToDatabase();

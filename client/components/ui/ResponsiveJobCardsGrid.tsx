@@ -18,8 +18,10 @@ import {
   Zap,
   AlertTriangle,
   ChevronRight,
+  Trash2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSession } from '@/lib/hooks/useSession';
 
 interface JobCard {
   _id: string;
@@ -65,6 +67,7 @@ interface JobCard {
 interface ResponsiveJobCardsGridProps {
   jobCards: JobCard[];
   onStatusChange: (id: string, status: string) => void;
+  onDeleteJobCard?: (id: string) => void;
   searchTerm: string;
   statusFilter: string;
   onSearchChange: (term: string) => void;
@@ -74,12 +77,16 @@ interface ResponsiveJobCardsGridProps {
 export default function ResponsiveJobCardsGrid({
   jobCards,
   onStatusChange,
+  onDeleteJobCard,
   searchTerm,
   statusFilter,
   onSearchChange,
   onStatusFilterChange,
 }: ResponsiveJobCardsGridProps) {
   const { t } = useTranslation('common');
+  const { user } = useSession();
+  
+  const isAdmin = user?.role === 'admin';
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -308,19 +315,21 @@ export default function ResponsiveJobCardsGrid({
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-100">
+                <div className={`grid gap-3 pt-2 border-t border-gray-100 ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'}`}>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-gray-900">
                       {totalLaborHours(jobCard.services)}h
                     </div>
                     <div className="text-xs text-gray-500">{t('job_cards.labor_hours')}</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-gray-900">
-                      ${totalCost(jobCard.services).toFixed(0)}
+                  {isAdmin && (
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-gray-900">
+                        ${totalCost(jobCard.services).toFixed(0)}
+                      </div>
+                      <div className="text-xs text-gray-500">{t('job_cards.estimated_cost')}</div>
                     </div>
-                    <div className="text-xs text-gray-500">{t('job_cards.estimated_cost')}</div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Notes */}
@@ -350,6 +359,15 @@ export default function ResponsiveJobCardsGrid({
                       <Edit className="h-3 w-3 me-1" />
                       {t('common.edit')}
                     </Link>
+                    {isAdmin && onDeleteJobCard && (
+                      <button
+                        onClick={() => onDeleteJobCard(jobCard._id)}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors"
+                      >
+                        <Trash2 className="h-3 w-3 me-1" />
+                        {t('common.delete')}
+                      </button>
+                    )}
                   </div>
                   <select
                     value={jobCard.status}

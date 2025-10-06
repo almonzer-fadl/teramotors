@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { Invoice, JobCard, Part, Service, Customer, Vehicle } from '@/lib/models';
 import { generateInvoiceHTML } from '@/lib/pdf-generator-html';
+import { getServerSession } from "@/lib/auth-server";
 
 export async function GET(
   request: NextRequest,
@@ -9,6 +10,17 @@ export async function GET(
 ) {
   try {
     const { id } = await context.params;
+    
+    const session = await getServerSession();
+    if (!session) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    }
+
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), { status: 403 });
+    }
     
     await connectToDatabase();
 

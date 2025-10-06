@@ -10,6 +10,11 @@ export async function GET(
   try {
     const { id } = await context.params;
     
+    // Get language from query parameter or default to English
+    const url = new URL(request.url);
+    const language = url.searchParams.get('lang') || 'en';
+    const isRTL = language === 'ar';
+    
     await connectToDatabase();
 
     const invoice = await Invoice.findById(id)
@@ -30,7 +35,9 @@ export async function GET(
     const html = await generateInvoiceHTML({
       invoice: invoice.toObject(),
       jobCard: jobCard?.toObject?.() || jobCard,
-      qrCodeData: invoice.zatca?.qrCode
+      qrCodeData: invoice.zatca?.qrCode,
+      language,
+      isRTL
     });
 
     // Add print functionality to the HTML

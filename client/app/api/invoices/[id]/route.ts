@@ -14,6 +14,12 @@ export async function GET(
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
     }
 
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), { status: 403 });
+    }
+
     await connectToDatabase();
 
     const invoice = await Invoice.findById(id)

@@ -112,8 +112,10 @@ export default function InspectionsPage() {
   const generatePDF = async (inspectionId: string) => {
     setGeneratingPDF(inspectionId);
     try {
-      // Open PDF in new tab for viewing
-      window.open(`/api/inspections/${inspectionId}/pdf`, '_blank');
+      // Get current language from i18n
+      const currentLanguage = localStorage.getItem('i18nextLng') || 'en';
+      // Open PDF in new tab for viewing with language parameter
+      window.open(`/api/inspections/${inspectionId}/pdf?lang=${currentLanguage}`, '_blank');
     } catch (error) {
       console.error("Failed to generate PDF:", error);
       alert(t("inspections.failed_to_generate_pdf"));

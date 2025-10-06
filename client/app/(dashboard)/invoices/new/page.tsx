@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { ArrowLeft, FileText, Wrench, Plus, Trash2, Save, Calculator, QrCode } from "lucide-react";
 
 type Mode = "jobCard" | "manual";
@@ -29,6 +30,7 @@ interface PartLine {
 }
 
 function NewInvoiceContent() {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const params = useSearchParams();
 
@@ -262,10 +264,6 @@ function NewInvoiceContent() {
     updated[index] = { ...updated[index], [field]: value };
     setParts(updated);
   };
-
-    function t(arg0: string): import("react").ReactNode | Iterable<import("react").ReactNode> {
-        throw new Error("Function not implemented.");
-    }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">

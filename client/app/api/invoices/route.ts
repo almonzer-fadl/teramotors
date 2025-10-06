@@ -6,6 +6,17 @@ import { invoiceService } from '@/lib/services/InvoiceService';
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    }
+
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), { status: 403 });
+    }
+
     await connectToDatabase();
 
     const { searchParams } = new URL(request.url);
@@ -58,6 +69,12 @@ export async function POST(request: Request) {
     const session = await getServerSession();
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+    }
+
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), { status: 403 });
     }
 
     await connectToDatabase();

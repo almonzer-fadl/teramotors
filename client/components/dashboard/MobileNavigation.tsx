@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
+import { useSession } from '@/lib/hooks/useSession';
 import { 
   Menu, 
   X, 
@@ -18,7 +19,8 @@ import {
   Settings,
   Bell,
   Search,
-  Plus
+  Plus,
+  CreditCard
 } from 'lucide-react';
 
 interface MobileNavigationProps {
@@ -29,18 +31,26 @@ export default function MobileNavigation({ className = "" }: MobileNavigationPro
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const { t } = useTranslation();
+  const { user } = useSession();
+  const isAdmin = user?.role === 'admin';
 
-  const navigationItems = [
+  const baseNavigationItems = [
     { href: '/dashboard', icon: Home, label: t('nav.dashboard') },
     { href: '/customers', icon: Users, label: t('nav.customers') },
     { href: '/vehicles', icon: Car, label: t('nav.vehicles') },
     { href: '/appointments', icon: Calendar, label: t('nav.appointments') },
     { href: '/job-cards', icon: Wrench, label: t('nav.job_cards') },
+    { href: '/inventory', icon: Package, label: t('nav.inventory') },
+  ];
+
+  const adminOnlyItems = [
     { href: '/estimates', icon: FileText, label: t('nav.estimates') },
     { href: '/invoices', icon: Receipt, label: t('nav.invoices') },
-    { href: '/inventory', icon: Package, label: t('nav.inventory') },
+    { href: '/payments', icon: CreditCard, label: t('nav.payments') },
     { href: '/settings', icon: Settings, label: t('nav.settings') },
   ];
+
+  const navigationItems = isAdmin ? [...baseNavigationItems, ...adminOnlyItems] : baseNavigationItems;
 
   const quickActions = [
     { href: '/customers/new', icon: Plus, label: t('nav.new_customer') },

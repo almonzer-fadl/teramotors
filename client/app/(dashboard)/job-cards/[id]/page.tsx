@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -20,6 +20,7 @@ import {
 import FileUpload from "@/components/dashboard/FileUpload";
 import { useTranslation } from "react-i18next";
 import { socket } from "@/lib/services/socket";
+import { useSession } from "@/lib/hooks/useSession";
 
 interface PartMinimal {
   _id: string;
@@ -91,11 +92,16 @@ interface JobCard {
 export default function JobCardDetailsPage() {
   const { t } = useTranslation("common");
   const params = useParams();
+  const router = useRouter();
+  const { user } = useSession();
   const { id } = params;
   const [jobCard, setJobCard] = useState<JobCard | null>(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
   const [parts, setParts] = useState<PartMinimal[]>([]);
   const [services, setServices] = useState<ServiceMinimal[]>([]);
+  
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     if (id) {
@@ -186,6 +192,15 @@ export default function JobCardDetailsPage() {
     if (jobCard) {
       const updatedParts = [...jobCard.partsUsed];
       updatedParts[index] = { ...updatedParts[index], [field]: value };
+      
+      // If partId is being changed, update the part cost
+      if (field === 'partId') {
+        const part = parts.find(p => p._id === value);
+        if (part) {
+          updatedParts[index].cost = part.cost || 0;
+        }
+      }
+      
       setJobCard({ ...jobCard, partsUsed: updatedParts });
     }
   };
@@ -247,6 +262,16 @@ export default function JobCardDetailsPage() {
     if (jobCard) {
       const updatedServices = [...jobCard.services];
       updatedServices[index] = { ...updatedServices[index], [field]: value };
+      
+      // If serviceId is being changed, update the service details
+      if (field === 'serviceId') {
+        const service = services.find(s => s._id === value);
+        if (service) {
+          updatedServices[index].laborHours = service.laborHours;
+          updatedServices[index].laborRate = service.laborRate;
+        }
+      }
+      
       setJobCard({ ...jobCard, services: updatedServices });
     }
   };
@@ -286,12 +311,40 @@ export default function JobCardDetailsPage() {
     }
   };
 
+  const handleDeleteJobCard = async () => {
+    if (!isAdmin) return;
+    
+    if (!confirm(t("job_cards.delete_confirmation"))) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/job-cards/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        alert(t("job_cards.delete_success"));
+        router.push("/job-cards");
+      } else {
+        const error = await response.json();
+        alert(error.error || t("job_cards.failed_to_delete"));
+      }
+    } catch (error) {
+      console.error("Failed to delete job card:", error);
+      alert(t("job_cards.failed_to_delete"));
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F13F33] mx-auto"></div>
-          <p className="mt-4 text-lg text-gray-600">Loading...</p>
+          <p className="mt-4 text-lg text-gray-600">{t("job_cards.loading")}</p>
         </div>
       </div>
     );
@@ -303,7 +356,7 @@ export default function JobCardDetailsPage() {
         <div className="text-center">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("job_cards.not_found")}</h2>
-          <p className="text-gray-600">The requested job card could not be found.</p>
+          <p className="text-gray-600">{t("job_cards.not_found")}</p>
         </div>
       </div>
     );
@@ -347,6 +400,16 @@ export default function JobCardDetailsPage() {
                   >
                     <CheckCircle className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
                     {t("job_cards.end_job")}
+                  </button>
+                )}
+                {isAdmin && (
+                  <button
+                    onClick={handleDeleteJobCard}
+                    disabled={deleting}
+                    className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-red-600 to-red-700 hover:shadow-xl hover:shadow-red-600/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                    {deleting ? t("job_cards.deleting") : t("job_cards.delete_job_card")}
                   </button>
                 )}
               </div>
@@ -530,12 +593,13 @@ export default function JobCardDetailsPage() {
             {jobCard.services.map((service, index) => {
               const serviceId = typeof service.serviceId === 'string' ? service.serviceId : service.serviceId?._id || '';
               const serviceName = typeof service.serviceId === 'object' && service.serviceId ? service.serviceId.name : '';
+              const selectedService = services.find(s => s._id === serviceId) || { name: serviceName };
               
               return (
                 <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-start mb-6 p-4 bg-gray-50/80 rounded-2xl">
                   <div className="md:col-span-2">
                     <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t("job_cards.select_service")}
+                      {t("forms.select_service")}
                     </label>
                     <select
                       value={serviceId}
@@ -544,22 +608,22 @@ export default function JobCardDetailsPage() {
                       }
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     >
-                      <option value="">{t("job_cards.select_service")}</option>
+                      <option value="">{t("forms.select_service")}</option>
                       {services.map((s) => (
                         <option key={s._id} value={s._id}>
                           {s.name}
                         </option>
                       ))}
                     </select>
-                    {serviceName && (
+                    {selectedService && selectedService.name && (
                       <p className="mt-2 text-sm text-gray-600">
-                        <strong>Selected:</strong> {serviceName}
+                        <strong>{t("job_cards.selected")}</strong> {selectedService.name}
                       </p>
                     )}
                   </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    {t("job_cards.qty")}
+                    {t("forms.qty")}
                   </label>
                   <input
                     type="number"
@@ -586,6 +650,32 @@ export default function JobCardDetailsPage() {
                     step="0.1"
                   />
                 </div>
+                {isAdmin ? (
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      {t("forms.labor_placeholder")}
+                    </label>
+                    <input
+                      type="number"
+                      value={service.laborRate}
+                      onChange={(e) =>
+                        handleServiceChange(index, "laborRate", parseFloat(e.target.value))
+                      }
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      {t("forms.labor_placeholder")}
+                    </label>
+                    <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
+                      {t("job_cards.admin_only")}
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-end">
                   <button
                     type="button"
@@ -626,12 +716,13 @@ export default function JobCardDetailsPage() {
             {jobCard.partsUsed.map((part, index) => {
               const partId = typeof part.partId === 'string' ? part.partId : part.partId?._id || '';
               const partName = typeof part.partId === 'object' && part.partId ? part.partId.name : '';
+              const selectedPart = parts.find(p => p._id === partId) || { name: partName };
               
               return (
                 <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-start mb-6 p-4 bg-gray-50/80 rounded-2xl">
                   <div className="md:col-span-2">
                     <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t("job_cards.select_part")}
+                      {t("forms.select_part")}
                     </label>
                     <select
                       value={partId}
@@ -640,22 +731,22 @@ export default function JobCardDetailsPage() {
                       }
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     >
-                      <option value="">{t("job_cards.select_part")}</option>
+                      <option value="">{t("forms.select_part")}</option>
                       {parts.map((p) => (
                         <option key={p._id} value={p._id}>
                           {p.name}
                         </option>
                       ))}
                     </select>
-                    {partName && (
+                    {selectedPart && selectedPart.name && (
                       <p className="mt-2 text-sm text-gray-600">
-                        <strong>Selected:</strong> {partName}
+                        <strong>{t("job_cards.selected")}</strong> {selectedPart.name}
                       </p>
                     )}
                   </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    {t("job_cards.qty")}
+                    {t("forms.qty")}
                   </label>
                   <input
                     type="number"
@@ -667,21 +758,32 @@ export default function JobCardDetailsPage() {
                     min="1"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    {t("job_cards.cost")}
-                  </label>
-                  <input
-                    type="number"
-                    value={part.cost}
-                    onChange={(e) =>
-                      handlePartChange(index, "cost", parseFloat(e.target.value))
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
+                {isAdmin ? (
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      {t("forms.cost_placeholder")}
+                    </label>
+                    <input
+                      type="number"
+                      value={part.cost}
+                      onChange={(e) =>
+                        handlePartChange(index, "cost", parseFloat(e.target.value))
+                      }
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      {t("forms.cost_placeholder")}
+                    </label>
+                    <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
+                      {t("job_cards.admin_only")}
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-end">
                   <button
                     type="button"
@@ -724,7 +826,7 @@ export default function JobCardDetailsPage() {
               onChange={(e) => setJobCard({ ...jobCard, notes: e.target.value })}
               className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
               rows={4}
-              placeholder="Enter job card notes..."
+              placeholder={t("ui.enter_job_card_notes")}
             />
             <div className="flex justify-end mt-6">
               <button

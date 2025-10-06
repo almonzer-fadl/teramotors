@@ -189,17 +189,21 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
         
         // Transform services to match form data structure
         const transformedServices = estimate.services?.map((service: any) => ({
-          serviceId: typeof service.serviceId === 'object' ? service.serviceId._id : service.serviceId,
+          serviceId: service.serviceId && typeof service.serviceId === 'object' ? service.serviceId._id : service.serviceId,
+          name: service.name || (service.serviceId && typeof service.serviceId === 'object' ? service.serviceId.name : ''),
           quantity: service.quantity || 1,
-          laborHours: service.laborHours || 0,
-          laborRate: service.laborRate || 0,
+          laborCost: service.laborCost || 0,
+          partsCost: service.partsCost || 0,
+          totalCost: service.totalCost || 0,
         })) || [];
         
         // Transform parts to match form data structure
         const transformedParts = estimate.parts?.map((part: any) => ({
-          partId: typeof part.partId === 'object' ? part.partId._id : part.partId,
+          partId: part.partId && typeof part.partId === 'object' ? part.partId._id : part.partId,
+          name: part.name || (part.partId && typeof part.partId === 'object' ? part.partId.name : ''),
           quantity: part.quantity || 1,
-          cost: part.cost || 0,
+          unitCost: part.unitCost || 0,
+          totalCost: part.totalCost || 0,
         })) || [];
         
         setFormData({
@@ -403,7 +407,10 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
     }
 
     try {
-      window.open(`/api/estimates/${estimateId || 'new'}/pdf?inspectionId=${formData.inspectionId}`, '_blank');
+      // Get current language from i18n
+      const currentLanguage = localStorage.getItem('i18nextLng') || 'en';
+      // Open PDF in new tab for viewing with language parameter
+      window.open(`/api/estimates/${estimateId || 'new'}/pdf?lang=${currentLanguage}`, '_blank');
     } catch (error) {
       console.error('Error generating PDF:', error);
     }
@@ -462,7 +469,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                 <div className="p-3 bg-blue-100 rounded-xl mr-4">
                   <AlertTriangle className="h-6 w-6 text-blue-600" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">Inspection Details</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t('forms.inspection_details')}</h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -508,7 +515,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                   <div className="p-3 bg-green-100 rounded-xl mr-4">
                     <Wrench className="h-6 w-6 text-green-600" />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900">Services</h2>
+                  <h2 className="text-xl font-bold text-gray-900">{t('forms.services')}</h2>
                 </div>
                 <button
                   type="button"
@@ -549,6 +556,11 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                             </option>
                           ))}
                         </select>
+                        {service.name && (
+                          <p className="mt-2 text-sm text-gray-600">
+                            <strong>{t('forms.selected')}:</strong> {service.name}
+                          </p>
+                        )}
                       </div>
                       
                       <div>
@@ -622,7 +634,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                   <div className="p-3 bg-orange-100 rounded-xl mr-4">
                     <Settings className="h-6 w-6 text-orange-600" />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900">Parts</h2>
+                  <h2 className="text-xl font-bold text-gray-900">{t('forms.parts')}</h2>
                 </div>
                 <button
                   type="button"
@@ -663,6 +675,11 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                         </option>
                       ))}
                     </select>
+                    {part.name && (
+                      <p className="mt-2 text-sm text-gray-600">
+                        <strong>{t('forms.selected')}:</strong> {part.name}
+                      </p>
+                    )}
                   </div>
                       
                       <div>
@@ -722,7 +739,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                 <div className="p-3 bg-purple-100 rounded-xl mr-4">
                   <FileText className="h-6 w-6 text-purple-600" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">Additional Notes</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t('forms.additional_notes')}</h2>
               </div>
               
               <textarea
@@ -742,7 +759,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                 <div className="p-3 bg-[#F13F33]/10 rounded-xl mr-4">
                   <Calculator className="h-6 w-6 text-[#F13F33]" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">Estimate Summary</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t('forms.estimate_summary')}</h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
