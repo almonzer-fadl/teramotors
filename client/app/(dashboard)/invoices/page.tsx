@@ -150,6 +150,10 @@ export default function InvoicesPage() {
     setCurrentPage(page);
   };
 
+  const handleDeleteInvoice = (invoiceId: string) => {
+    setInvoices(prev => prev.filter(invoice => invoice._id !== invoiceId));
+  };
+
   const handleItemsPerPageChange = (itemsPerPage: number) => {
     setItemsPerPage(itemsPerPage);
     setCurrentPage(1); // Reset to first page when changing items per page
@@ -306,6 +310,7 @@ export default function InvoicesPage() {
         <ResponsiveInvoicesTable
           invoices={filteredInvoices}
           isOverdue={isOverdue}
+          onDeleteInvoice={handleDeleteInvoice}
         />
 
         {/* Pagination */}

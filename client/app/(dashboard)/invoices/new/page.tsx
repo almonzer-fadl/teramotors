@@ -280,10 +280,10 @@ function NewInvoiceContent() {
               </Link>
               <div className="flex-1">
                 <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  Create New Invoice
+                  {t('invoices.create_new_invoice')}
                 </h1>
                 <p className="mt-3 text-xl text-gray-600">
-                  Generate a professional invoice for your services
+                  {t('invoices.generate_professional_invoice')}
                 </p>
               </div>
             </div>
@@ -298,7 +298,7 @@ function NewInvoiceContent() {
             <div className="px-8 py-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <FileText className="mr-3 h-7 w-7 text-[#F13F33]" />
-                Invoice Type
+                {t('invoices.invoice_type')}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button
@@ -312,8 +312,8 @@ function NewInvoiceContent() {
                 >
                   <div className="text-center">
                     <Wrench className="h-8 w-8 mx-auto mb-3 text-[#F13F33]" />
-                    <h3 className="text-lg font-bold text-gray-900">From Job Card</h3>
-                    <p className="text-sm text-gray-600">Create invoice from completed job card</p>
+                    <h3 className="text-lg font-bold text-gray-900">{t('invoices.from_job_card')}</h3>
+                    <p className="text-sm text-gray-600">{t('invoices.create_invoice_from_job_card')}</p>
                   </div>
                 </button>
                 <button
@@ -327,8 +327,8 @@ function NewInvoiceContent() {
                 >
                   <div className="text-center">
                     <FileText className="h-8 w-8 mx-auto mb-3 text-[#F13F33]" />
-                    <h3 className="text-lg font-bold text-gray-900">Manual Entry</h3>
-                    <p className="text-sm text-gray-600">Create invoice manually</p>
+                    <h3 className="text-lg font-bold text-gray-900">{t('invoices.manual_entry')}</h3>
+                    <p className="text-sm text-gray-600">{t('invoices.create_invoice_manually')}</p>
                   </div>
                 </button>
               </div>
@@ -340,12 +340,12 @@ function NewInvoiceContent() {
             <div className="px-8 py-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <FileText className="mr-3 h-7 w-7 text-[#F13F33]" />
-                Invoice Details
+                {t('invoices.invoice_details')}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Invoice Number
+                    {t('invoices.invoice_number')}
                   </label>
                   <input
                     type="text"
@@ -357,7 +357,7 @@ function NewInvoiceContent() {
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Invoice Date
+                    {t('invoices.invoice_date')}
                   </label>
                   <input
                     type="date"
@@ -368,7 +368,7 @@ function NewInvoiceContent() {
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Due Date
+                    {t('invoices.due_date')}
                   </label>
                   <input
                     type="date"
@@ -387,18 +387,18 @@ function NewInvoiceContent() {
               <div className="px-8 py-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                   <Wrench className="mr-3 h-7 w-7 text-[#F13F33]" />
-                  Select Job Card
+                  {t('invoices.select_job_card')}
                 </h2>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Job Card
+                    {t('invoices.job_card')}
                   </label>
                   <select
                     value={selectedJobCardId}
                     onChange={(e) => handleJobCardChange(e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                   >
-                    <option value="">Select a job card</option>
+                    <option value="">{t('invoices.choose_job_card')}</option>
                     {jobCards.map((jobCard) => (
                       <option key={jobCard.value} value={jobCard.value}>
                         {jobCard.label}
@@ -418,19 +418,19 @@ function NewInvoiceContent() {
                 <div className="px-8 py-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                     <FileText className="mr-3 h-7 w-7 text-[#F13F33]" />
-                    Customer & Vehicle
+                    {t('invoices.customer_vehicle')}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Customer
+                        {t('invoices.customer')}
                       </label>
                       <select
                         value={selectedCustomerId}
                         onChange={(e) => setSelectedCustomerId(e.target.value)}
                         className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                       >
-                        <option value="">Select customer</option>
+                        <option value="">{t('invoices.select_customer')}</option>
                         {customers.map((customer) => (
                           <option key={customer.value} value={customer.value}>
                             {customer.label}
@@ -440,14 +440,14 @@ function NewInvoiceContent() {
                     </div>
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-2">
-                        Vehicle
+                        {t('invoices.vehicle')}
                       </label>
                       <select
                         value={selectedVehicleId}
                         onChange={(e) => setSelectedVehicleId(e.target.value)}
                         className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                       >
-                        <option value="">Select vehicle</option>
+                        <option value="">{t('invoices.select_vehicle')}</option>
                         {vehicles.map((vehicle) => (
                           <option key={vehicle.value} value={vehicle.value}>
                             {vehicle.label}
@@ -465,7 +465,7 @@ function NewInvoiceContent() {
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-bold text-gray-900 flex items-center">
                       <Wrench className="mr-3 h-7 w-7 text-[#F13F33]" />
-                      Services
+                      {t('invoices.services')}
                     </h2>
                     <button
                       type="button"
@@ -473,7 +473,7 @@ function NewInvoiceContent() {
                       className="group inline-flex items-center px-4 py-2 border-2 border-dashed border-gray-300 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-[#F13F33] hover:text-[#F13F33] transition-all duration-300"
                     >
                       <Plus className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform" />
-                      Add Service
+                      {t('invoices.add_service')}
                     </button>
                   </div>
                   <div className="space-y-4">
@@ -481,7 +481,7 @@ function NewInvoiceContent() {
                       <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-start p-4 bg-gray-50/80 rounded-2xl">
                         <div className="md:col-span-2">
                           <label className="block text-sm font-bold text-gray-700 mb-2">
-                            Service
+                            {t('invoices.service')}
                           </label>
                           <select
                             value={service.name}
@@ -495,7 +495,7 @@ function NewInvoiceContent() {
                             }}
                             className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                           >
-                            <option value="">Select a service</option>
+                            <option value="">{t('invoices.select_service')}</option>
                             {availableServices.map((service) => (
                               <option key={service._id} value={service.name}>
                                 {service.name} - ${service.laborRate}/hr
@@ -505,7 +505,7 @@ function NewInvoiceContent() {
                         </div>
                         <div>
                           <label className="block text-sm font-bold text-gray-700 mb-2">
-                            Quantity
+                            {t('invoices.quantity')}
                           </label>
                           <input
                             type="number"
@@ -517,7 +517,7 @@ function NewInvoiceContent() {
                         </div>
                         <div>
                           <label className="block text-sm font-bold text-gray-700 mb-2">
-                            Labor Hours
+                            {t('invoices.labor_hours')}
                           </label>
                           <input
                             type="number"
@@ -530,7 +530,7 @@ function NewInvoiceContent() {
                         </div>
                         <div>
                           <label className="block text-sm font-bold text-gray-700 mb-2">
-                            Labor Rate
+                            {t('invoices.labor_rate')}
                           </label>
                           <input
                             type="number"
@@ -601,7 +601,7 @@ function NewInvoiceContent() {
                         </div>
                         <div>
                           <label className="block text-sm font-bold text-gray-700 mb-2">
-                            Quantity
+                            {t('invoices.quantity')}
                           </label>
                           <input
                             type="number"
@@ -683,27 +683,27 @@ function NewInvoiceContent() {
             <div className="px-8 py-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
                 <Calculator className="mr-3 h-7 w-7 text-[#F13F33]" />
-                Invoice Totals
+                {t('invoices.invoice_totals')}
               </h2>
               <div className="space-y-4">
                 <div className="flex justify-between items-center p-4 bg-gray-50/80 rounded-2xl">
-                  <span className="text-lg font-bold text-gray-700">Services Total:</span>
+                  <span className="text-lg font-bold text-gray-700">{t('invoices.services_total')}:</span>
                   <span className="text-lg font-bold text-gray-900">${totals.servicesTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center p-4 bg-gray-50/80 rounded-2xl">
-                  <span className="text-lg font-bold text-gray-700">Parts Total:</span>
+                  <span className="text-lg font-bold text-gray-700">{t('invoices.parts_total')}:</span>
                   <span className="text-lg font-bold text-gray-900">${totals.partsTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center p-4 bg-gray-50/80 rounded-2xl">
-                  <span className="text-lg font-bold text-gray-700">Subtotal:</span>
+                  <span className="text-lg font-bold text-gray-700">{t('invoices.subtotal')}:</span>
                   <span className="text-lg font-bold text-gray-900">${totals.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center p-4 bg-gray-50/80 rounded-2xl">
-                  <span className="text-lg font-bold text-gray-700">Tax ({taxRate}%):</span>
+                  <span className="text-lg font-bold text-gray-700">{t('invoices.tax')} ({taxRate}%):</span>
                   <span className="text-lg font-bold text-gray-900">${totals.tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center p-6 bg-[#F13F33]/10 rounded-2xl border-2 border-[#F13F33]/20">
-                  <span className="text-2xl font-bold text-gray-900">Total:</span>
+                  <span className="text-2xl font-bold text-gray-900">{t('invoices.total')}:</span>
                   <span className="text-2xl font-bold text-[#F13F33]">${totals.total.toFixed(2)}</span>
                 </div>
               </div>
@@ -715,11 +715,11 @@ function NewInvoiceContent() {
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-gray-900 flex items-center">
                 <QrCode className="mr-3 h-6 w-6 text-[#F13F33]" />
-                ZATCA QR Code Preview
+                {t('invoices.zatca_qr_preview')}
               </h3>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm font-medium text-gray-600">ZATCA Compliant</span>
+                <span className="text-sm font-medium text-gray-600">{t('invoices.zatca_compliant')}</span>
               </div>
             </div>
             
@@ -727,10 +727,10 @@ function NewInvoiceContent() {
               <div className="text-center">
                 <QrCode className="h-16 w-16 text-gray-400 mx-auto mb-3" />
                 <p className="text-sm text-gray-500">
-                  QR code will be generated automatically when invoice is created
+                  {t('invoices.qr_code_generated_automatically')}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Contains: Seller info, VAT number, timestamp, amounts
+                  {t('invoices.qr_code_contains')}
                 </p>
               </div>
             </div>
@@ -744,7 +744,7 @@ function NewInvoiceContent() {
               className="group inline-flex items-center px-8 py-4 border border-transparent text-lg font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="mr-3 h-6 w-6 group-hover:scale-110 transition-transform" />
-              {submitting ? t('ui.creating_invoice') : t('ui.create_invoice')}
+              {submitting ? t('invoices.creating_invoice') : t('invoices.create_invoice')}
             </button>
           </div>
         </form>

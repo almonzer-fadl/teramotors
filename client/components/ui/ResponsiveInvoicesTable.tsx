@@ -3,8 +3,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
+import { useSession } from '@/lib/simple-auth-client';
 import {
-  Edit,
+  Trash2,
   Eye,
   CreditCard,
   FileText,
@@ -66,13 +67,37 @@ interface Invoice {
 interface ResponsiveInvoicesTableProps {
   invoices: Invoice[];
   isOverdue: (dueDate: string) => boolean;
+  onDeleteInvoice?: (invoiceId: string) => void;
 }
 
 export default function ResponsiveInvoicesTable({
   invoices,
   isOverdue,
+  onDeleteInvoice,
 }: ResponsiveInvoicesTableProps) {
   const { t } = useTranslation('common');
+  const { user } = useSession();
+  const isAdmin = user?.role === 'admin';
+
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    if (!isAdmin || !onDeleteInvoice) return;
+    
+    if (window.confirm(t('invoices.delete_confirmation'))) {
+      try {
+        const response = await fetch(`/api/invoices/${invoiceId}`, {
+          method: 'DELETE',
+        });
+        
+        if (response.ok) {
+          onDeleteInvoice(invoiceId);
+        } else {
+          console.error('Failed to delete invoice');
+        }
+      } catch (error) {
+        console.error('Error deleting invoice:', error);
+      }
+    }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -221,12 +246,14 @@ export default function ResponsiveInvoicesTable({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex items-center space-x-2">
-                    <Link
-                      href={`/invoices/${invoice._id}/edit`}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Link>
+                    {isAdmin && onDeleteInvoice && (
+                      <button
+                        onClick={() => handleDeleteInvoice(invoice._id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    )}
                     <a 
                       href={`/api/invoices/${invoice._id}/print`} 
                       className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700" 
@@ -236,7 +263,7 @@ export default function ResponsiveInvoicesTable({
                       {t('common.view')}
                     </a>
                     <a 
-                      href={`/api/invoices/${invoice._id}/pdf`} 
+                      href={`/api/invoices/${invoice._id}/pdf?lang=${localStorage.getItem('i18nextLng') || 'en'}`} 
                       className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-emerald-600 rounded hover:bg-emerald-700" 
                       target="_blank"
                       download
@@ -355,13 +382,15 @@ export default function ResponsiveInvoicesTable({
 
             {/* Actions */}
             <div className="flex justify-end space-x-2 border-t border-gray-200 pt-3">
-              <Link
-                href={`/invoices/${invoice._id}/edit`}
-                className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <Edit className="h-3 w-3 me-1" />
-                {t('common.edit')}
-              </Link>
+              {isAdmin && onDeleteInvoice && (
+                <button
+                  onClick={() => handleDeleteInvoice(invoice._id)}
+                  className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                >
+                  <Trash2 className="h-3 w-3 me-1" />
+                  {t('common.delete')}
+                </button>
+              )}
               <a 
                 href={`/api/invoices/${invoice._id}/print`} 
                 className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" 
@@ -371,7 +400,7 @@ export default function ResponsiveInvoicesTable({
                 {t('common.view')}
               </a>
               <a 
-                href={`/api/invoices/${invoice._id}/pdf`} 
+                href={`/api/invoices/${invoice._id}/pdf?lang=${localStorage.getItem('i18nextLng') || 'en'}`} 
                 className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700" 
                 target="_blank"
                 download
