@@ -255,7 +255,7 @@ export default function ResponsiveEstimatesTable({
                           </div>
                           <div className="text-sm text-gray-500 truncate max-w-xs">
                             {estimate.services
-                              .map((s) => s.name || (s.serviceId?.name || 'Unknown Service'))
+                              .map((s) => s.name || (s.serviceId?.name || t('estimates.unknown_service')))
                               .join(', ')}
                           </div>
                         </div>
@@ -400,7 +400,7 @@ export default function ResponsiveEstimatesTable({
                     {estimate.services.slice(0, 2).map((service, index) => (
                       <div key={index} className="flex items-center justify-between text-xs">
                         <span className="text-gray-600 truncate flex-1">
-                          {service.name || service.serviceId?.name || 'Unknown Service'}
+                          {service.name || service.serviceId?.name || t('estimates.unknown_service')}
                         </span>
                         <span className="text-gray-500 ml-2">
                           ${service.totalCost.toFixed(2)}

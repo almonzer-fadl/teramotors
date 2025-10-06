@@ -29,8 +29,13 @@ export async function GET(
       return NextResponse.json({ error: 'Estimate not found' }, { status: 404 });
     }
 
+    // Get language from query parameter or default to English
+    const url = new URL(request.url);
+    const language = url.searchParams.get('lang') || 'en';
+    const isRTL = language === 'ar';
+
     // Generate HTML content for PDF
-    const htmlContent = generateEstimateHTML(estimate);
+    const htmlContent = generateEstimateHTML(estimate, language, isRTL);
 
     return new NextResponse(htmlContent, {
       headers: {
@@ -47,17 +52,91 @@ export async function GET(
   }
 }
 
-function generateEstimateHTML(estimate: any): string {
+function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boolean = false): string {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString();
   const formatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
 
+  // Translation object
+  const translations = {
+    en: {
+      title: "Repair Estimate",
+      company: "TeraMotors Auto Repair",
+      printButton: "🖨️ Print PDF",
+      estimateNumber: "Estimate #",
+      date: "Date",
+      validUntil: "Valid Until",
+      customerInfo: "Customer Information",
+      customer: "Customer",
+      vehicleInfo: "Vehicle Information",
+      vehicle: "Vehicle",
+      year: "Year",
+      licensePlate: "License Plate",
+      inspectionDetails: "Inspection Details",
+      inspectionDate: "Inspection Date",
+      overallCondition: "Overall Condition",
+      servicesRequired: "Services Required",
+      service: "Service",
+      quantity: "Quantity",
+      laborCost: "Labor Cost",
+      partsCost: "Parts Cost",
+      total: "Total",
+      partsRequired: "Parts Required",
+      partName: "Part Name",
+      partNumber: "Part Number",
+      unitCost: "Unit Cost",
+      subtotal: "Subtotal",
+      tax: "Tax",
+      totalAmount: "Total Amount",
+      notes: "Notes",
+      generatedOn: "Generated on",
+      systemName: "TeraMotors Auto Repair Management System",
+      status: "Status"
+    },
+    ar: {
+      title: "تقدير الإصلاح",
+      company: "تيرا موتورز لصيانة السيارات",
+      printButton: "🖨️ طباعة PDF",
+      estimateNumber: "رقم التقدير #",
+      date: "التاريخ",
+      validUntil: "صالح حتى",
+      customerInfo: "معلومات العميل",
+      customer: "العميل",
+      vehicleInfo: "معلومات المركبة",
+      vehicle: "المركبة",
+      year: "السنة",
+      licensePlate: "رقم اللوحة",
+      inspectionDetails: "تفاصيل الفحص",
+      inspectionDate: "تاريخ الفحص",
+      overallCondition: "الحالة العامة",
+      servicesRequired: "الخدمات المطلوبة",
+      service: "الخدمة",
+      quantity: "الكمية",
+      laborCost: "تكلفة العمالة",
+      partsCost: "تكلفة القطع",
+      total: "المجموع",
+      partsRequired: "القطع المطلوبة",
+      partName: "اسم القطعة",
+      partNumber: "رقم القطعة",
+      unitCost: "التكلفة الوحدة",
+      subtotal: "المجموع الفرعي",
+      tax: "الضريبة",
+      totalAmount: "المبلغ الإجمالي",
+      notes: "ملاحظات",
+      generatedOn: "تم الإنشاء في",
+      systemName: "نظام إدارة تيرا موتورز لصيانة السيارات",
+      status: "الحالة"
+    }
+  };
+
+  const t = translations[language as keyof typeof translations] || translations.en;
+
   return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${language}" dir="${isRTL ? 'rtl' : 'ltr'}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estimate Report</title>
+    <title>${t.title}</title>
     <style>
         @media print {
             body { margin: 0; }
@@ -66,19 +145,21 @@ function generateEstimateHTML(estimate: any): string {
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: ${isRTL ? "'Segoe UI', 'Tahoma', 'Arial', sans-serif" : "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"};
             line-height: 1.6;
             color: #333;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             background: #fff;
+            direction: ${isRTL ? 'rtl' : 'ltr'};
+            text-align: ${isRTL ? 'right' : 'left'};
         }
 
         .print-button {
             position: fixed;
             top: 20px;
-            right: 20px;
+            ${isRTL ? 'left: 20px;' : 'right: 20px;'}
             background: #F13F33;
             color: white;
             border: none;
@@ -211,48 +292,48 @@ function generateEstimateHTML(estimate: any): string {
     </style>
 </head>
 <body>
-    <button class="print-button no-print" onclick="window.print()">🖨️ Print PDF</button>
+    <button class="print-button no-print" onclick="window.print()">${t.printButton}</button>
 
     <div class="header">
-        <h1>Repair Estimate</h1>
-        <p>TeraMotors Auto Repair</p>
+        <h1>${t.title}</h1>
+        <p>${t.company}</p>
     </div>
 
     <div class="section">
-        <h2>Estimate Information</h2>
+        <h2>${t.estimateNumber}</h2>
         <div class="info-grid">
             <div class="info-item">
-                <h3>Estimate Number</h3>
+                <h3>${t.estimateNumber}</h3>
                 <p>#${estimate._id.toString().slice(-8)}</p>
             </div>
             <div class="info-item">
-                <h3>Status</h3>
+                <h3>${t.status}</h3>
                 <p><span class="status-badge status-${estimate.status}">${estimate.status.charAt(0).toUpperCase() + estimate.status.slice(1)}</span></p>
             </div>
             <div class="info-item">
-                <h3>Valid Until</h3>
+                <h3>${t.validUntil}</h3>
                 <p>${formatDate(estimate.validUntil)}</p>
             </div>
             <div class="info-item">
-                <h3>Created Date</h3>
+                <h3>${t.date}</h3>
                 <p>${formatDate(estimate.createdAt)}</p>
             </div>
         </div>
     </div>
 
     <div class="section">
-        <h2>Customer & Vehicle Information</h2>
+        <h2>${t.customerInfo} & ${t.vehicleInfo}</h2>
         <div class="info-grid">
             <div class="info-item">
-                <h3>Customer</h3>
+                <h3>${t.customer}</h3>
                 <p>${estimate.customerId?.firstName || 'N/A'} ${estimate.customerId?.lastName || 'N/A'}</p>
             </div>
             <div class="info-item">
-                <h3>Vehicle</h3>
+                <h3>${t.vehicle}</h3>
                 <p>${estimate.vehicleId?.year || 'N/A'} ${estimate.vehicleId?.make || 'N/A'} ${estimate.vehicleId?.model || 'N/A'}</p>
             </div>
             <div class="info-item">
-                <h3>License Plate</h3>
+                <h3>${t.licensePlate}</h3>
                 <p>${estimate.vehicleId?.licensePlate || 'N/A'}</p>
             </div>
             <div class="info-item">
@@ -264,14 +345,14 @@ function generateEstimateHTML(estimate: any): string {
 
     ${estimate.inspectionId ? `
     <div class="section">
-        <h2>Inspection Details</h2>
+        <h2>${t.inspectionDetails}</h2>
         <div class="info-grid">
             <div class="info-item">
-                <h3>Inspection Date</h3>
+                <h3>${t.inspectionDate}</h3>
                 <p>${formatDate(estimate.inspectionId.inspectionDate)}</p>
             </div>
             <div class="info-item">
-                <h3>Overall Condition</h3>
+                <h3>${t.overallCondition}</h3>
                 <p>${estimate.inspectionId.overallCondition || 'N/A'}</p>
             </div>
         </div>
@@ -280,15 +361,15 @@ function generateEstimateHTML(estimate: any): string {
 
     ${estimate.services && estimate.services.length > 0 ? `
     <div class="section">
-        <h2>Services Required</h2>
+        <h2>${t.servicesRequired}</h2>
         <table class="items-table">
             <thead>
                 <tr>
-                    <th>Service</th>
-                    <th>Quantity</th>
-                    <th>Labor Cost</th>
-                    <th>Parts Cost</th>
-                    <th>Total</th>
+                    <th>${t.service}</th>
+                    <th>${t.quantity}</th>
+                    <th>${t.laborCost}</th>
+                    <th>${t.partsCost}</th>
+                    <th>${t.total}</th>
                 </tr>
             </thead>
             <tbody>
@@ -308,14 +389,14 @@ function generateEstimateHTML(estimate: any): string {
 
     ${estimate.parts && estimate.parts.length > 0 ? `
     <div class="section">
-        <h2>Parts Required</h2>
+        <h2>${t.partsRequired}</h2>
         <table class="items-table">
             <thead>
                 <tr>
-                    <th>Part Name</th>
-                    <th>Quantity</th>
-                    <th>Unit Cost</th>
-                    <th>Total</th>
+                    <th>${t.partName}</th>
+                    <th>${t.quantity}</th>
+                    <th>${t.unitCost}</th>
+                    <th>${t.total}</th>
                 </tr>
             </thead>
             <tbody>
@@ -334,17 +415,17 @@ function generateEstimateHTML(estimate: any): string {
 
     <div class="section">
         <div class="summary">
-            <h3>Estimate Summary</h3>
+            <h3>${t.title} Summary</h3>
             <div class="summary-row">
-                <span>Subtotal:</span>
+                <span>${t.subtotal}:</span>
                 <span>${formatCurrency(estimate.subtotal || 0)}</span>
             </div>
             <div class="summary-row">
-                <span>Tax (15%):</span>
+                <span>${t.tax} (15%):</span>
                 <span>${formatCurrency(estimate.tax || 0)}</span>
             </div>
             <div class="summary-row summary-total">
-                <span>Total:</span>
+                <span>${t.totalAmount}:</span>
                 <span>${formatCurrency(estimate.total || 0)}</span>
             </div>
         </div>
@@ -352,14 +433,14 @@ function generateEstimateHTML(estimate: any): string {
 
     ${estimate.notes ? `
     <div class="section">
-        <h2>Notes</h2>
+        <h2>${t.notes}</h2>
         <p>${estimate.notes}</p>
     </div>
     ` : ''}
 
     <div class="footer">
-        <p>Generated on ${new Date().toLocaleString()}</p>
-        <p>TeraMotors Auto Repair Management System</p>
+        <p>${t.generatedOn} ${new Date().toLocaleString()}</p>
+        <p>${t.systemName}</p>
     </div>
 </body>
 </html>

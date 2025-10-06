@@ -13,6 +13,12 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Check if user is admin
+    const userRole = (session.user as any).role;
+    if (userRole !== 'admin') {
+      return Response.json({ error: 'Forbidden - Admin access required' }, { status: 403 })
+    }
+
     await connectToDatabase()
     
     const body = await request.json()

@@ -9,9 +9,6 @@ export const getNavigationItems = (userRole: string) => {
     { tKey: 'sidebar.customers', href: '/customers', icon: 'Users', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.vehicles', href: '/vehicles', icon: 'Car', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.job_cards', href: '/job-cards', icon: 'ClipboardList', roles: ['admin', 'mechanic', 'inspector'] },
-    { tKey: 'sidebar.estimates', href: '/estimates', icon: 'FileText', roles: ['admin', 'mechanic', 'inspector'] },
-    { tKey: 'sidebar.invoices', href: '/invoices', icon: 'CreditCard', roles: ['admin', 'mechanic', 'inspector'] },
-    { tKey: 'sidebar.payments', href: '/payments', icon: 'CreditCard', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.inventory', href: '/inventory', icon: 'Package', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.inspections', href: '/inspections', icon: 'Search', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.services', href: '/services', icon: 'Wrench', roles: ['admin', 'mechanic', 'inspector'] },
@@ -19,6 +16,9 @@ export const getNavigationItems = (userRole: string) => {
 
   // Admin-only items
   const adminOnlyItems = [
+    { tKey: 'sidebar.estimates', href: '/estimates', icon: 'FileText', roles: ['admin'] },
+    { tKey: 'sidebar.invoices', href: '/invoices', icon: 'CreditCard', roles: ['admin'] },
+    { tKey: 'sidebar.payments', href: '/payments', icon: 'CreditCard', roles: ['admin'] },
     { tKey: 'sidebar.reports', href: '/reports', icon: 'BarChart3', roles: ['admin'] },
     { tKey: 'sidebar.settings', href: '/settings', icon: 'Settings', roles: ['admin'] },
   ]

@@ -71,7 +71,9 @@ export default function NewTemplatePage() {
       if (response.ok) {
         router.push("/inspections/templates");
       } else {
-        console.error("Failed to create template");
+        const errorData = await response.json();
+        console.error("Failed to create template:", errorData);
+        alert(`Failed to create template: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error creating template:", error);

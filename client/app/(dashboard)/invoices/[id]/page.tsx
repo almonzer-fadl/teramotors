@@ -76,7 +76,7 @@ export default function InvoiceDetailPage() {
         </div>
         <div className="mt-4 sm:mt-0 flex gap-2">
           <a href={`/api/invoices/${id}/print`} className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500" target="_blank">عرض</a>
-          <a href={`/api/invoices/${id}/pdf`} className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500" target="_blank" download>تحميل PDF</a>
+          <a href={`/api/invoices/${id}/pdf?lang=${localStorage.getItem('i18nextLng') || 'en'}`} className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500" target="_blank" download>تحميل PDF</a>
         </div>
       </div>
 

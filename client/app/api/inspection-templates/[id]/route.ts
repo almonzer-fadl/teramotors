@@ -48,6 +48,7 @@ export async function PUT(
       id,
       {
         name: body.name,
+        description: body.description || '',
         category: body.category,
         vehicleType: body.vehicleType,
         items: body.items,

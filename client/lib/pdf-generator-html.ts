@@ -4,10 +4,12 @@ interface InvoiceData {
   invoice: any;
   jobCard?: any;
   qrCodeData?: string;
+  language?: string;
+  isRTL?: boolean;
 }
 
 export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
-  const { invoice, jobCard, qrCodeData } = data;
+  const { invoice, jobCard, qrCodeData, language = 'en', isRTL = false } = data;
   
   const services = jobCard?.services || [];
   const parts = jobCard?.partsUsed || [];
@@ -15,6 +17,70 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
   const partsTotal = parts.reduce((sum: number, p: any) => sum + (p.quantity * p.cost), 0);
   const subtotal = servicesTotal + partsTotal;
   const grandTotal = typeof invoice.totalAmount === 'number' ? invoice.totalAmount : subtotal;
+
+  // Translation object
+  const translations = {
+    en: {
+      title: "Invoice",
+      company: "TeraMotors Auto Repair",
+      invoiceNumber: "Invoice #",
+      date: "Date",
+      customerInfo: "Customer Information",
+      customer: "Customer",
+      vehicleInfo: "Vehicle Information",
+      vehicle: "Vehicle",
+      year: "Year",
+      licensePlate: "License Plate",
+      services: "Services",
+      service: "Service",
+      quantity: "Qty",
+      laborHours: "Hours",
+      laborRate: "Rate",
+      total: "Total",
+      parts: "Parts",
+      partName: "Part Name",
+      partNumber: "Part #",
+      unitCost: "Unit Cost",
+      subtotal: "Subtotal",
+      tax: "Tax (15%)",
+      grandTotal: "Grand Total",
+      notes: "Notes",
+      generatedOn: "Generated on",
+      systemName: "TeraMotors Auto Repair Management System",
+      status: "Status"
+    },
+    ar: {
+      title: "فاتورة",
+      company: "تيرا موتورز لصيانة السيارات",
+      invoiceNumber: "رقم الفاتورة #",
+      date: "التاريخ",
+      customerInfo: "معلومات العميل",
+      customer: "العميل",
+      vehicleInfo: "معلومات المركبة",
+      vehicle: "المركبة",
+      year: "السنة",
+      licensePlate: "رقم اللوحة",
+      services: "الخدمات",
+      service: "الخدمة",
+      quantity: "الكمية",
+      laborHours: "الساعات",
+      laborRate: "المعدل",
+      total: "المجموع",
+      parts: "القطع",
+      partName: "اسم القطعة",
+      partNumber: "رقم القطعة",
+      unitCost: "تكلفة الوحدة",
+      subtotal: "المجموع الفرعي",
+      tax: "الضريبة (15%)",
+      grandTotal: "المجموع الإجمالي",
+      notes: "ملاحظات",
+      generatedOn: "تم الإنشاء في",
+      systemName: "نظام إدارة صيانة السيارات تيرا موتورز",
+      status: "الحالة"
+    }
+  };
+
+  const t = translations[language as keyof typeof translations] || translations.en;
 
   // Generate QR code as data URL
   let qrCodeDataUrl = '';
@@ -28,13 +94,14 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
 
   return `
     <!DOCTYPE html>
-    <html dir="rtl" lang="ar">
+    <html dir="${isRTL ? 'rtl' : 'ltr'}" lang="${language}">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>فاتورة</title>
+        <title>${t.title}</title>
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
             
             * {
                 margin: 0;
@@ -43,8 +110,8 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
             }
             
             body {
-                font-family: 'Noto Sans Arabic', Arial, sans-serif;
-                direction: rtl;
+                font-family: ${isRTL ? "'Noto Sans Arabic', Arial, sans-serif" : "'Inter', Arial, sans-serif"};
+                direction: ${isRTL ? 'rtl' : 'ltr'};
                 background: white;
                 color: #333;
                 line-height: 1.6;
@@ -101,7 +168,7 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
             .qr-code {
                 position: absolute;
                 top: 20px;
-                left: 20px;
+                ${isRTL ? 'left: 20px;' : 'right: 20px;'}
                 width: 100px;
                 height: 100px;
                 text-align: center;
@@ -224,44 +291,44 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
         ` : ''}
         
         <div class="header">
-            <h1>فاتورة #${String(invoice._id || '').slice(-6)}</h1>
+            <h1>${t.title} #${String(invoice._id || '').slice(-6)}</h1>
         </div>
         
         <div class="invoice-info">
             <div class="info-section">
-                <h3>معلومات الفاتورة</h3>
-                <p><strong>التاريخ:</strong> ${new Date(invoice.createdAt || Date.now()).toLocaleDateString('ar-SA')}</p>
-                <p><strong>تاريخ الاستحقاق:</strong> ${new Date(invoice.dueDate || Date.now()).toLocaleDateString('ar-SA')}</p>
-                <p><strong>الحالة:</strong> ${invoice.status || 'معلق'}</p>
+                <h3>${t.invoiceNumber}${String(invoice._id || '').slice(-6)}</h3>
+                <p><strong>${t.date}:</strong> ${new Date(invoice.createdAt || Date.now()).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}</p>
+                <p><strong>${t.date}:</strong> ${new Date(invoice.dueDate || Date.now()).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}</p>
+                <p><strong>${t.status}:</strong> ${invoice.status || (isRTL ? 'معلق' : 'Pending')}</p>
             </div>
             
             <div class="info-section">
-                <h3>معلومات العميل</h3>
-                <p><strong>الاسم:</strong> ${(invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}</p>
+                <h3>${t.customerInfo}</h3>
+                <p><strong>${t.customer}:</strong> ${(invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}</p>
                 ${invoice.customerId?.email ? `<p><strong>البريد الإلكتروني:</strong> ${invoice.customerId.email}</p>` : ''}
                 ${invoice.customerId?.phone ? `<p><strong>الهاتف:</strong> ${invoice.customerId.phone}</p>` : ''}
             </div>
             
             <div class="info-section">
-                <h3>معلومات المركبة</h3>
+                <h3>${t.vehicleInfo}</h3>
                 ${invoice.vehicleId ? `
-                    <p><strong>المركبة:</strong> ${invoice.vehicleId.year} ${invoice.vehicleId.make} ${invoice.vehicleId.model}</p>
-                    ${invoice.vehicleId.licensePlate ? `<p><strong>رقم اللوحة:</strong> ${invoice.vehicleId.licensePlate}</p>` : ''}
+                    <p><strong>${t.vehicle}:</strong> ${invoice.vehicleId.year} ${invoice.vehicleId.make} ${invoice.vehicleId.model}</p>
+                    ${invoice.vehicleId.licensePlate ? `<p><strong>${t.licensePlate}:</strong> ${invoice.vehicleId.licensePlate}</p>` : ''}
                 ` : ''}
             </div>
         </div>
         
         ${services.length > 0 ? `
         <div class="section">
-            <h2>الخدمات</h2>
+            <h2>${t.services}</h2>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>الخدمة</th>
-                        <th>الكمية</th>
-                        <th>ساعات العمل</th>
-                        <th>معدل العمل</th>
-                        <th>الإجمالي</th>
+                        <th>${t.service}</th>
+                        <th>${t.quantity}</th>
+                        <th>${t.laborHours}</th>
+                        <th>${t.laborRate}</th>
+                        <th>${t.total}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -281,14 +348,14 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
         
         ${parts.length > 0 ? `
         <div class="section">
-            <h2>القطع</h2>
+            <h2>${t.parts}</h2>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>القطعة</th>
-                        <th>الكمية</th>
-                        <th>التكلفة</th>
-                        <th>الإجمالي</th>
+                        <th>${t.partName}</th>
+                        <th>${t.quantity}</th>
+                        <th>${t.unitCost}</th>
+                        <th>${t.total}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -307,18 +374,18 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
         
         <div class="totals">
             <div class="total-row">
-                <span>المجموع الفرعي:</span>
-                <span>${subtotal.toFixed(2)} ريال</span>
+                <span>${t.subtotal}:</span>
+                <span>${subtotal.toFixed(2)} ${isRTL ? 'ريال' : 'SAR'}</span>
             </div>
             <div class="total-row grand-total">
-                <span>الإجمالي الكلي:</span>
-                <span>${grandTotal.toFixed(2)} ريال</span>
+                <span>${t.grandTotal}:</span>
+                <span>${grandTotal.toFixed(2)} ${isRTL ? 'ريال' : 'SAR'}</span>
             </div>
         </div>
         
         ${invoice.notes ? `
         <div class="notes">
-            <h3>ملاحظات</h3>
+            <h3>${t.notes}</h3>
             <p>${invoice.notes}</p>
         </div>
         ` : ''}

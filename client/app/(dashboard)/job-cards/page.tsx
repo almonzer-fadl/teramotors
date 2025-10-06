@@ -159,6 +159,29 @@ export default function JobCardsPage() {
     }
   };
 
+  const handleDeleteJobCard = async (id: string) => {
+    if (!confirm(t("job_cards.delete_confirmation"))) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/job-cards/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setJobCards(jobCards.filter((jc) => jc._id !== id));
+        alert(t("job_cards.delete_success"));
+      } else {
+        const error = await response.json();
+        alert(error.error || t("job_cards.failed_to_delete"));
+      }
+    } catch (error) {
+      console.error("Failed to delete job card:", error);
+      alert(t("job_cards.failed_to_delete"));
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -171,6 +194,7 @@ export default function JobCardsPage() {
     <ResponsiveJobCardsGrid
       jobCards={filteredJobCards}
       onStatusChange={handleStatusChange}
+      onDeleteJobCard={handleDeleteJobCard}
       searchTerm={searchTerm}
       statusFilter={statusFilter}
       onSearchChange={setSearchTerm}
