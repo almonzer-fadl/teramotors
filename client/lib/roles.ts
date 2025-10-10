@@ -19,6 +19,7 @@ export const getNavigationItems = (userRole: string) => {
     { tKey: 'sidebar.estimates', href: '/estimates', icon: 'FileText', roles: ['admin'] },
     { tKey: 'sidebar.invoices', href: '/invoices', icon: 'CreditCard', roles: ['admin'] },
     { tKey: 'sidebar.payments', href: '/payments', icon: 'CreditCard', roles: ['admin'] },
+    { tKey: 'sidebar.whatsapp', href: '/whatsapp', icon: 'MessageSquare', roles: ['admin'] },
     { tKey: 'sidebar.reports', href: '/reports', icon: 'BarChart3', roles: ['admin'] },
     { tKey: 'sidebar.settings', href: '/settings', icon: 'Settings', roles: ['admin'] },
   ]

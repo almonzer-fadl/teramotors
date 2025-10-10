@@ -2,6 +2,7 @@ import { connectToDatabase } from '@/lib/db'
 import Customer from '@/lib/models/Customer'
 import { getServerSession } from "@/lib/auth-server";
 import { NextRequest, NextResponse } from 'next/server'
+import { WhatsAppEventListeners } from '@/lib/services/WhatsAppEventListeners'
 
 export async function GET(request: NextRequest) {
   try {
@@ -96,6 +97,9 @@ export async function POST(request: NextRequest) {
       lastName: body.lastName,
       email: body.email,
       phone: body.phone,
+      phoneNumber: body.phoneNumber || body.phone, // Use phoneNumber if provided, otherwise use phone
+      whatsappEnabled: body.whatsappEnabled !== false, // Default to true
+      language: body.language || 'ar', // Default to Arabic
       address: body.address,
       emergencyContact: body.emergencyContact,
       notes: body.notes,
@@ -103,6 +107,15 @@ export async function POST(request: NextRequest) {
     })
 
     await customer.save()
+
+    // Send welcome WhatsApp message
+    try {
+      const whatsappListeners = WhatsAppEventListeners.getInstance();
+      await whatsappListeners.onCustomerCreated(customer._id.toString());
+    } catch (whatsappError) {
+      console.error('Error sending welcome WhatsApp message:', whatsappError);
+      // Don't fail the customer creation if WhatsApp fails
+    }
 
     return NextResponse.json({ 
       success: true, 

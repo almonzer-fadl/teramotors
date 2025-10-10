@@ -1,0 +1,405 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { 
+  MessageSquare, 
+  Send, 
+  Users, 
+  CheckCircle, 
+  XCircle, 
+  Clock, 
+  AlertCircle,
+  Settings,
+  TestTube
+} from 'lucide-react';
+
+interface WhatsAppMessage {
+  _id: string;
+  customerId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+  };
+  messageType: 'welcome' | 'job_started' | 'job_completed' | 'invoice_ready' | 'advertisement';
+  content: string;
+  status: 'pending' | 'sent' | 'delivered' | 'failed';
+  language: 'ar' | 'en';
+  sentAt?: string;
+  deliveredAt?: string;
+  errorMessage?: string;
+  createdAt: string;
+}
+
+interface Customer {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  whatsappEnabled: boolean;
+  language: 'ar' | 'en';
+}
+
+export default function WhatsAppPage() {
+  const { t } = useTranslation('common');
+  const [messages, setMessages] = useState<WhatsAppMessage[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState('');
+  const [messageType, setMessageType] = useState('welcome');
+  const [language, setLanguage] = useState('ar');
+  const [customMessage, setCustomMessage] = useState('');
+
+  // Message templates
+  const messageTemplates = {
+    welcome: {
+      ar: 'مرحباً بك في تيرا موتورز! 🚗\n\nشكراً لثقتك في خدماتنا. سنبدأ العمل على سيارتك قريباً وسنخبرك بكل التحديثات.\n\nلأي استفسار، لا تتردد في التواصل معنا.',
+      en: 'Welcome to Tera Motors! 🚗\n\nThank you for trusting our services. We will start working on your car soon and keep you updated.\n\nFor any inquiries, feel free to contact us.'
+    },
+    job_started: {
+      ar: 'تم بدء العمل على سيارتك! 🔧\n\nفريقنا المختص بدأ العمل على سيارتك الآن. سنخبرك فور الانتهاء.\n\nشكراً لصبرك!',
+      en: 'We started working on your car! 🔧\n\nOur expert team has started working on your car now. We will notify you as soon as we are done.\n\nThank you for your patience!'
+    },
+    job_completed: {
+      ar: 'تم الانتهاء من سيارتك! ✅\n\nسيارتك جاهزة للاستلام. يمكنك الحضور لاستلامها في أي وقت مناسب لك.\n\nنتطلع لرؤيتك قريباً!',
+      en: 'Your car is ready! ✅\n\nYour car is ready for pickup. You can come to collect it at any convenient time.\n\nWe look forward to seeing you soon!'
+    },
+    invoice_ready: {
+      ar: 'فاتورتك جاهزة! 📄\n\nتم إنشاء فاتورتك ويمكنك مراجعتها. شكراً لاختيارك خدماتنا.\n\nنتطلع لخدمتك مرة أخرى!',
+      en: 'Your invoice is ready! 📄\n\nYour invoice has been created and you can review it. Thank you for choosing our services.\n\nWe look forward to serving you again!'
+    },
+    advertisement: {
+      ar: 'شكراً لثقتك في تيرا موتورز! 🙏\n\nنحن متخصصون في:\n• صيانة السيارات\n• إصلاح المحركات\n• تغيير الزيوت\n• فحص شامل\n\n📞 للاستفسارات: [رقم الهاتف]\n📍 العنوان: [العنوان]\n\nنتطلع لخدمتك مرة أخرى!',
+      en: 'Thank you for trusting Tera Motors! 🙏\n\nWe specialize in:\n• Car maintenance\n• Engine repair\n• Oil changes\n• Comprehensive inspection\n\n📞 For inquiries: [Phone Number]\n📍 Address: [Address]\n\nWe look forward to serving you again!'
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers();
+    fetchMessages();
+  }, []);
+
+  const fetchCustomers = async () => {
+    try {
+      const response = await fetch('/api/customers');
+      const data = await response.json();
+      setCustomers(data.customers || []);
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+    }
+  };
+
+  const fetchMessages = async () => {
+    try {
+      const response = await fetch('/api/whatsapp/messages');
+      const data = await response.json();
+      setMessages(data.messages || []);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sendTestMessage = async () => {
+    if (!selectedCustomer || !messageType) return;
+
+    setSending(true);
+    try {
+      const response = await fetch('/api/whatsapp/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerId: selectedCustomer,
+          messageType,
+          language,
+          customMessage: customMessage || undefined
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('Message sent successfully!');
+        fetchMessages();
+        setCustomMessage('');
+      } else {
+        alert('Failed to send message: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Error sending message');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'delivered':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'sent':
+        return <Clock className="h-4 w-4 text-blue-500" />;
+      case 'failed':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'delivered':
+        return 'bg-green-100 text-green-800';
+      case 'sent':
+        return 'bg-blue-100 text-blue-800';
+      case 'failed':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-yellow-100 text-yellow-800';
+    }
+  };
+
+  const getMessageTypeLabel = (type: string) => {
+    const labels = {
+      welcome: 'Welcome',
+      job_started: 'Job Started',
+      job_completed: 'Job Completed',
+      invoice_ready: 'Invoice Ready',
+      advertisement: 'Advertisement'
+    };
+    return labels[type as keyof typeof labels] || type;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">{t('whatsapp.title')}</h1>
+          <p className="text-gray-600">{t('whatsapp.description')}</p>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Settings className="h-5 w-5 text-gray-500" />
+          <span className="text-sm text-gray-500">{t('whatsapp.auto_send_enabled')}</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Send Test Message */}
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+              <TestTube className="h-5 w-5" />
+              <span>{t('whatsapp.send_test_message')}</span>
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              Send a test WhatsApp message to any customer
+            </p>
+          </div>
+          <div className="p-6 space-y-4">
+            <div>
+              <label htmlFor="customer" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('whatsapp.customer')}
+              </label>
+              <select
+                id="customer"
+                value={selectedCustomer}
+                onChange={(e) => setSelectedCustomer(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">{t('whatsapp.select_customer')}</option>
+                {customers
+                  .filter(c => c.whatsappEnabled)
+                  .map((customer) => (
+                    <option key={customer._id} value={customer._id}>
+                      {customer.firstName} {customer.lastName} - {customer.phoneNumber}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="messageType" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('whatsapp.message_type')}
+              </label>
+              <select
+                id="messageType"
+                value={messageType}
+                onChange={(e) => setMessageType(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="welcome">{t('whatsapp.message_templates.welcome')}</option>
+                <option value="job_started">{t('whatsapp.message_templates.job_started')}</option>
+                <option value="job_completed">{t('whatsapp.message_templates.job_completed')}</option>
+                <option value="invoice_ready">{t('whatsapp.message_templates.invoice_ready')}</option>
+                <option value="advertisement">{t('whatsapp.message_templates.advertisement')}</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('whatsapp.language')}
+              </label>
+              <select
+                id="language"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="customMessage" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('whatsapp.custom_message')}
+              </label>
+              <textarea
+                id="customMessage"
+                placeholder={t('whatsapp.custom_message_placeholder')}
+                value={customMessage}
+                onChange={(e) => setCustomMessage(e.target.value)}
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <label className="text-sm font-medium text-gray-700">{t('whatsapp.preview')}</label>
+              <p className="text-sm text-gray-700 mt-1 whitespace-pre-line">
+                {customMessage || messageTemplates[messageType as keyof typeof messageTemplates][language as 'ar' | 'en']}
+              </p>
+            </div>
+
+            <button 
+              onClick={sendTestMessage} 
+              disabled={!selectedCustomer || sending}
+              className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {sending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  {t('whatsapp.send_test_message')}
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Message Statistics */}
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+              <MessageSquare className="h-5 w-5" />
+              <span>{t('whatsapp.message_statistics')}</span>
+            </h3>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-600">
+                  {messages.filter(m => m.status === 'delivered').length}
+                </div>
+                <div className="text-sm text-gray-600">{t('whatsapp.delivered')}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-yellow-600">
+                  {messages.filter(m => m.status === 'sent').length}
+                </div>
+                <div className="text-sm text-gray-600">{t('whatsapp.sent')}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-600">
+                  {messages.filter(m => m.status === 'failed').length}
+                </div>
+                <div className="text-sm text-gray-600">{t('whatsapp.failed')}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-600">
+                  {messages.length}
+                </div>
+                <div className="text-sm text-gray-600">{t('whatsapp.total')}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Message History */}
+      <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">{t('whatsapp.message_history')}</h3>
+          <p className="text-sm text-gray-600 mt-1">
+            {t('whatsapp.recent_messages')}
+          </p>
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            {messages.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                {t('whatsapp.no_messages')}
+              </div>
+            ) : (
+              messages.map((message) => (
+                <div key={message._id} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium">
+                        {message.customerId.firstName} {message.customerId.lastName}
+                      </span>
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        {getMessageTypeLabel(message.messageType)}
+                      </span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(message.status)}`}>
+                        {t(`whatsapp.status.${message.status}`)}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      {getStatusIcon(message.status)}
+                      <span className="text-sm text-gray-500">
+                        {new Date(message.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-700 mb-2">
+                    <strong>{t('whatsapp.phone')}</strong> {message.customerId.phoneNumber}
+                  </div>
+                  <div className="text-sm text-gray-700 mb-2">
+                    <strong>Language:</strong> {message.language === 'ar' ? 'العربية' : 'English'}
+                  </div>
+                  <div className="text-sm text-gray-700 whitespace-pre-line">
+                    {message.content}
+                  </div>
+                  {message.errorMessage && (
+                    <div className="mt-2 text-sm text-red-600">
+                      <strong>{t('whatsapp.error')}</strong> {message.errorMessage}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

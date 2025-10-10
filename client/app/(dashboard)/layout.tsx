@@ -26,6 +26,7 @@ import {
   X,
   Bell,
   Wrench,
+  MessageSquare,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/dashboard/LanguageSwitcher";
@@ -44,6 +45,7 @@ const iconMap = {
   BarChart3,
   Settings,
   Wrench,
+  MessageSquare,
 };
 
 export default function DashboardLayout({

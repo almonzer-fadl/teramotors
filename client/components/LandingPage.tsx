@@ -1,10 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import { signIn } from "@/lib/simple-auth-client";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   Wrench, 
@@ -32,111 +29,6 @@ import {
   Globe
 } from "lucide-react";
 
-function LoginForm() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
-  const { t } = useTranslation();
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    try {
-      const result = await signIn(email, password);
-
-      if (result.success) {
-        router.push("/dashboard");
-      } else {
-        setError(result.error || t("auth.invalid_email_or_password"));
-      }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md border border-white/20">
-      <div className="text-center mb-8">
-        <div className="w-20 h-20 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-          <Wrench className="w-10 h-10 text-white" />
-        </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">
-          {t("landing.login.title")}
-        </h2>
-        <p className="text-gray-600 text-base">
-          {t("landing.login.subtitle")}
-        </p>
-      </div>
-      
-      {error && (
-        <div className="mb-6 p-4 bg-red-50/90 border border-red-200 rounded-2xl text-red-700 text-sm backdrop-blur-sm">
-          {error}
-        </div>
-      )}
-      
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold text-gray-700">
-            {t("auth.email")}
-          </label>
-          <div className="relative">
-            <input
-              name="email"
-              type="email"
-              required
-              className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm"
-              placeholder={t('ui.enter_your_email')}
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold text-gray-700">
-            {t("auth.password")}
-          </label>
-          <div className="relative">
-            <input
-              name="password"
-              type="password"
-              required
-              className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm"
-              placeholder={t('ui.enter_your_password')}
-            />
-          </div>
-        </div>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-gradient-to-r from-[#F13F33] to-[#d6352a] text-white py-4 px-6 rounded-2xl font-semibold hover:shadow-xl hover:shadow-[#F13F33]/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center hover:-translate-y-0.5"
-        >
-          {isLoading ? (
-            <div className="flex items-center">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-              {t("auth.signing_in")}
-            </div>
-          ) : (
-            t("landing.login.sign_in")
-          )}
-        </button>
-      </form>
-      
-      <div className="mt-8 text-center space-y-3">
-        <Link
-          href="/forgot-password"
-          className="text-[#063479] hover:text-[#F13F33] font-semibold text-sm block transition-colors duration-300"
-        >
-          {t("auth.forgot_password")}
-        </Link>
-      </div>
-    </div>
-  );
-}
 
 function ServiceCard({ icon: Icon, title, description }: { 
   icon: React.ComponentType<{ className?: string }>, 
@@ -512,7 +404,7 @@ export default function LandingPage() {
         <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-[#F13F33]/10 to-transparent rounded-full blur-3xl"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-20 items-start">
+          <div className="max-w-4xl mx-auto">
             <div>
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-[#F13F33]/20 border border-[#F13F33]/30 text-[#F13F33] text-sm font-medium mb-8">
                 <Phone className="w-4 h-4 mr-2" />
@@ -574,20 +466,6 @@ export default function LandingPage() {
                 </a>
               </div>
             </div>
-            
-            <div className="lg:mt-16 flex justify-center items-center">
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-2 border border-white/20 shadow-2xl w-full max-w-md">
-                <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
-                  <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold text-white mb-2">{t('landing_missing.workshop_portal')}</h3>
-                    <p className="text-gray-300 text-sm">{t('landing_missing.staff_management_access')}</p>
-                  </div>
-                  <Suspense fallback={<div className="animate-pulse bg-white/20 rounded-2xl w-full h-96"></div>}>
-                    <LoginForm />
-                  </Suspense>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -635,6 +513,14 @@ export default function LandingPage() {
                 <p>{t("landing.contact.address")}</p>
                 <p>{t("landing.contact.phone")}</p>
                 <p>{t("landing.contact.email")}</p>
+                <div className="pt-2">
+                  <Link 
+                    href="/login" 
+                    className="text-[#F13F33] hover:text-white transition-colors font-medium"
+                  >
+                    Staff Login
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

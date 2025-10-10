@@ -290,6 +290,8 @@
     "adjust_search": "Try adjusting your search terms.",
     "get_started": "Get started by adding your first customer.",
     "delete_confirm": "Are you sure you want to delete this customer?",
+    "delete_success": "Customer deleted successfully",
+    "delete_error": "Error deleting customer",
     "customer_details": "Customer Details",
     "personal_information": "Personal Information",
     "notes": "Notes",
@@ -745,6 +747,7 @@
     "inventory": "Inventory",
     "inspections": "Inspections",
     "services": "Services",
+    "whatsapp": "WhatsApp",
     "users": "User Management",
     "reports": "Reports",
     "settings": "Settings"
@@ -1212,6 +1215,7 @@
     "why_choose_us": "Why Choose Us",
     "workshop_portal": "Workshop Portal",
     "staff_management_access": "Staff & Management Access",
+    "staff_login": "Staff Login",
     "get_in_touch": "Get In Touch",
     "working_hours": "Working Hours",
     "hours": "Hours",
@@ -1293,5 +1297,41 @@
   "vehicles_missing": {
     "view_customers": "View Customers",
     "view_vehicles": "View Vehicles"
+  },
+  "whatsapp": {
+    "title": "WhatsApp Messages",
+    "description": "Manage and send WhatsApp messages to customers",
+    "send_test_message": "Send Test Message",
+    "message_type": "Message Type",
+    "language": "Language",
+    "customer": "Customer",
+    "select_customer": "Select a customer",
+    "custom_message": "Custom Message (Optional)",
+    "custom_message_placeholder": "Leave empty to use template message",
+    "preview": "Preview:",
+    "message_statistics": "Message Statistics",
+    "delivered": "Delivered",
+    "sent": "Sent",
+    "failed": "Failed",
+    "total": "Total",
+    "message_history": "Message History",
+    "recent_messages": "Recent WhatsApp messages sent to customers",
+    "no_messages": "No messages sent yet",
+    "phone": "Phone:",
+    "error": "Error:",
+    "auto_send_enabled": "Auto-send enabled",
+    "message_templates": {
+      "welcome": "Welcome",
+      "job_started": "Job Started",
+      "job_completed": "Job Completed",
+      "invoice_ready": "Invoice Ready",
+      "advertisement": "Advertisement"
+    },
+    "status": {
+      "pending": "Pending",
+      "sent": "Sent",
+      "delivered": "Delivered",
+      "failed": "Failed"
+    }
   }
 }
