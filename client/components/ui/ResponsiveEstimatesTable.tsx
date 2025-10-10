@@ -237,10 +237,16 @@ export default function ResponsiveEstimatesTable({
                         <Car className="h-4 w-4 me-2 text-gray-400" />
                         <div>
                           <div className="text-sm text-gray-900">
-                            {estimate.vehicleId.year} {estimate.vehicleId.make} {estimate.vehicleId.model}
+                            {estimate.vehicleId ? (
+                              `${estimate.vehicleId.year} ${estimate.vehicleId.make} ${estimate.vehicleId.model}`
+                            ) : (
+                              <span className="text-gray-400 italic">No vehicle data</span>
+                            )}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {estimate.vehicleId.licensePlate}
+                            {estimate.vehicleId?.licensePlate || (
+                              <span className="text-gray-400 italic">N/A</span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -382,9 +388,17 @@ export default function ResponsiveEstimatesTable({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-gray-900 truncate">
-                        {estimate.vehicleId.year} {estimate.vehicleId.make} {estimate.vehicleId.model}
+                        {estimate.vehicleId ? (
+                          `${estimate.vehicleId.year} ${estimate.vehicleId.make} ${estimate.vehicleId.model}`
+                        ) : (
+                          <span className="text-gray-400 italic">No vehicle data</span>
+                        )}
                       </div>
-                      <div className="text-xs text-gray-500">{estimate.vehicleId.licensePlate}</div>
+                      <div className="text-xs text-gray-500">
+                        {estimate.vehicleId?.licensePlate || (
+                          <span className="text-gray-400 italic">N/A</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -5,6 +5,7 @@ import Customer from '@/lib/models/Customer'
 import Vehicle from '@/lib/models/Vehicle'
 import Service from '@/lib/models/Service'
 import { getServerSession } from "@/lib/auth-server";
+import { WhatsAppEventListeners } from '@/lib/services/WhatsAppEventListeners';
 
 export async function GET() {
   try {
@@ -100,6 +101,15 @@ export async function POST(request: Request) {
       await Appointment.findByIdAndUpdate(body.appointmentId, {
         status: 'in-progress'
       })
+    }
+
+    // Send job started WhatsApp message
+    try {
+      const whatsappListeners = WhatsAppEventListeners.getInstance();
+      await whatsappListeners.onJobCardOpened(body.customerId);
+    } catch (whatsappError) {
+      console.error('Error sending job started WhatsApp message:', whatsappError);
+      // Don't fail the job card creation if WhatsApp fails
     }
 
     const populatedJobCard = await JobCard.findById(jobCard._id)

@@ -192,11 +192,19 @@ export default function ResponsiveInvoicesTable({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {invoice.vehicleId.year} {invoice.vehicleId.make}{" "}
-                    {invoice.vehicleId.model}
+                    {invoice.vehicleId ? (
+                      <>
+                        {invoice.vehicleId.year} {invoice.vehicleId.make}{" "}
+                        {invoice.vehicleId.model}
+                      </>
+                    ) : (
+                      <span className="text-gray-400 italic">No vehicle data</span>
+                    )}
                   </div>
                   <div className="text-sm text-gray-500">
-                    {invoice.vehicleId.licensePlate}
+                    {invoice.vehicleId?.licensePlate || (
+                      <span className="text-gray-400 italic">N/A</span>
+                    )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -255,7 +263,7 @@ export default function ResponsiveInvoicesTable({
                       </button>
                     )}
                     <a 
-                      href={`/api/invoices/${invoice._id}/print`} 
+                      href={`/api/invoices/${invoice._id}/pdf-arabic?lang=en&format=A4`} 
                       className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700" 
                       target="_blank"
                     >
@@ -263,13 +271,22 @@ export default function ResponsiveInvoicesTable({
                       {t('common.view')}
                     </a>
                     <a 
-                      href={`/api/invoices/${invoice._id}/pdf?lang=${localStorage.getItem('i18nextLng') || 'en'}`} 
+                      href={`/api/invoices/${invoice._id}/pdf-arabic?lang=en`} 
                       className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-emerald-600 rounded hover:bg-emerald-700" 
                       target="_blank"
                       download
                     >
                       <FileText className="h-3 w-3 me-1" />
                       PDF
+                    </a>
+                    <a 
+                      href={`/api/invoices/${invoice._id}/pdf-arabic?lang=ar`} 
+                      className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700" 
+                      target="_blank"
+                      download
+                    >
+                      <FileText className="h-3 w-3 me-1" />
+                      PDF عربي
                     </a>
                   </div>
                 </td>
@@ -321,13 +338,19 @@ export default function ResponsiveInvoicesTable({
               <div className="flex items-center">
                 <Car className="h-4 w-4 me-2 text-gray-500" />
                 <span>
-                  {invoice.vehicleId.year} {invoice.vehicleId.make} {invoice.vehicleId.model}
+                  {invoice.vehicleId ? (
+                    `${invoice.vehicleId.year} ${invoice.vehicleId.make} ${invoice.vehicleId.model}`
+                  ) : (
+                    <span className="text-gray-400 italic">No vehicle data</span>
+                  )}
                 </span>
               </div>
               <div className="flex items-center">
                 <span className="h-4 w-4 me-2 text-gray-500 text-xs">#</span>
                 <span className="text-xs text-gray-500">
-                  {invoice.vehicleId.licensePlate}
+                  {invoice.vehicleId?.licensePlate || (
+                    <span className="text-gray-400 italic">N/A</span>
+                  )}
                 </span>
               </div>
             </div>
@@ -392,7 +415,7 @@ export default function ResponsiveInvoicesTable({
                 </button>
               )}
               <a 
-                href={`/api/invoices/${invoice._id}/print`} 
+                href={`/api/invoices/${invoice._id}/pdf-arabic?lang=en&format=A4`} 
                 className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" 
                 target="_blank"
               >
@@ -400,13 +423,22 @@ export default function ResponsiveInvoicesTable({
                 {t('common.view')}
               </a>
               <a 
-                href={`/api/invoices/${invoice._id}/pdf?lang=${localStorage.getItem('i18nextLng') || 'en'}`} 
+                href={`/api/invoices/${invoice._id}/pdf-arabic?lang=en`} 
                 className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700" 
                 target="_blank"
                 download
               >
                 <FileText className="h-3 w-3 me-1" />
                 PDF
+              </a>
+              <a 
+                href={`/api/invoices/${invoice._id}/pdf-arabic?lang=ar`} 
+                className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700" 
+                target="_blank"
+                download
+              >
+                <FileText className="h-3 w-3 me-1" />
+                PDF عربي
               </a>
             </div>
           </div>

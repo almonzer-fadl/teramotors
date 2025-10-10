@@ -262,9 +262,17 @@ export default function ResponsiveJobCardsGrid({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-gray-900 truncate">
-                        {jobCard.vehicleId.year} {jobCard.vehicleId.make} {jobCard.vehicleId.model}
+                        {jobCard.vehicleId ? (
+                          `${jobCard.vehicleId.year} ${jobCard.vehicleId.make} ${jobCard.vehicleId.model}`
+                        ) : (
+                          <span className="text-gray-400 italic">No vehicle data</span>
+                        )}
                       </div>
-                      <div className="text-xs text-gray-500">{jobCard.vehicleId.licensePlate}</div>
+                      <div className="text-xs text-gray-500">
+                        {jobCard.vehicleId?.licensePlate || (
+                          <span className="text-gray-400 italic">N/A</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

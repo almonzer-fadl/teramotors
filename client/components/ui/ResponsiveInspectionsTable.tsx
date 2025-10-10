@@ -208,11 +208,19 @@ export default function ResponsiveInspectionsTable({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {inspection.vehicleId.year} {inspection.vehicleId.make}{" "}
-                    {inspection.vehicleId.model}
+                    {inspection.vehicleId ? (
+                      <>
+                        {inspection.vehicleId.year} {inspection.vehicleId.make}{" "}
+                        {inspection.vehicleId.model}
+                      </>
+                    ) : (
+                      <span className="text-gray-400 italic">No vehicle data</span>
+                    )}
                   </div>
                   <div className="text-sm text-gray-500">
-                    {inspection.vehicleId.licensePlate}
+                    {inspection.vehicleId?.licensePlate || (
+                      <span className="text-gray-400 italic">N/A</span>
+                    )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -317,13 +325,19 @@ export default function ResponsiveInspectionsTable({
               <div className="flex items-center">
                 <Car className="h-4 w-4 me-2 text-gray-500" />
                 <span>
-                  {inspection.vehicleId.year} {inspection.vehicleId.make} {inspection.vehicleId.model}
+                  {inspection.vehicleId ? (
+                    `${inspection.vehicleId.year} ${inspection.vehicleId.make} ${inspection.vehicleId.model}`
+                  ) : (
+                    <span className="text-gray-400 italic">No vehicle data</span>
+                  )}
                 </span>
               </div>
               <div className="flex items-center">
                 <span className="h-4 w-4 me-2 text-gray-500 text-xs">#</span>
                 <span className="text-xs text-gray-500">
-                  {inspection.vehicleId.licensePlate}
+                  {inspection.vehicleId?.licensePlate || (
+                    <span className="text-gray-400 italic">N/A</span>
+                  )}
                 </span>
               </div>
             </div>

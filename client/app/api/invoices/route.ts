@@ -3,6 +3,7 @@ import { Invoice, Estimate, JobCard, Customer, Vehicle, Service, Part } from '@/
 import { getServerSession } from "@/lib/auth-server";
 import { NextRequest } from 'next/server';
 import { invoiceService } from '@/lib/services/InvoiceService';
+import { WhatsAppEventListeners } from '@/lib/services/WhatsAppEventListeners';
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     const invoices = await Invoice.find({})
       .populate('customerId', 'firstName lastName')
-      .populate('vehicleId', 'make model licensePlate')
+      .populate('vehicleId', 'make model year licensePlate')
       .sort(sort)
       .skip(skip)
       .limit(limit);
@@ -245,6 +246,15 @@ export async function POST(request: Request) {
     // Optionally update the estimate status to 'converted' or similar
     if (estimateId) {
       await Estimate.findByIdAndUpdate(estimateId, { status: 'converted' });
+    }
+
+    // Send invoice ready WhatsApp message
+    try {
+      const whatsappListeners = WhatsAppEventListeners.getInstance();
+      await whatsappListeners.onInvoiceCreated(customerId.toString());
+    } catch (whatsappError) {
+      console.error('Error sending invoice ready WhatsApp message:', whatsappError);
+      // Don't fail the invoice creation if WhatsApp fails
     }
 
     return new Response(JSON.stringify({ 

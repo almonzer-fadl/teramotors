@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { getServerSession } from "@/lib/auth-server";
 import { JobCard, Customer, Vehicle, Service, Part, Appointment } from '@/lib/models';
+import { WhatsAppEventListeners } from '@/lib/services/WhatsAppEventListeners';
 
 export async function GET(
   request: NextRequest,
@@ -64,6 +65,17 @@ export async function PUT(
 
     if (!jobCard) {
       return NextResponse.json({ error: 'Job card not found' }, { status: 404 });
+    }
+
+    // Check if job card status changed to completed
+    if (body.status === 'completed' && jobCard.customerId) {
+      try {
+        const whatsappListeners = WhatsAppEventListeners.getInstance();
+        await whatsappListeners.onJobCardClosed(jobCard.customerId.toString());
+      } catch (whatsappError) {
+        console.error('Error sending job completed WhatsApp message:', whatsappError);
+        // Don't fail the job card update if WhatsApp fails
+      }
     }
 
     return NextResponse.json(jobCard);

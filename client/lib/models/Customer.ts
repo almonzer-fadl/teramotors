@@ -6,6 +6,9 @@ const CustomerSchema = new Schema({
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   phone: { type: String, required: true },
+  phoneNumber: { type: String }, // WhatsApp number (can be different from phone)
+  whatsappEnabled: { type: Boolean, default: true },
+  language: { type: String, enum: ['ar', 'en'], default: 'ar' },
   address: {
     street: String,
     city: String,

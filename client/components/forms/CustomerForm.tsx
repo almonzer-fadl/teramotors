@@ -11,6 +11,9 @@ interface CustomerFormData {
   lastName: string;
   email: string;
   phone: string;
+  phoneNumber: string;
+  whatsappEnabled: boolean;
+  language: 'ar' | 'en';
   address: {
     street: string;
     city: string;
@@ -35,12 +38,15 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
     lastName: "",
     email: "",
     phone: "",
+    phoneNumber: "",
+    whatsappEnabled: true,
+    language: "ar",
     address: {
       street: "",
       city: "",
       state: "",
       zipCode: "",
-      country: "USA",
+      country: "Saudi Arabia",
     },
     emergencyContact: {
       name: "",
@@ -62,12 +68,15 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
           lastName: customer.lastName || "",
           email: customer.email || "",
           phone: customer.phone || "",
+          phoneNumber: customer.phoneNumber || customer.phone || "",
+          whatsappEnabled: customer.whatsappEnabled !== false,
+          language: customer.language || "ar",
           address: {
             street: customer.address?.street || "",
             city: customer.address?.city || "",
             state: customer.address?.state || "",
             zipCode: customer.address?.zipCode || "",
-            country: customer.address?.country || "USA",
+            country: customer.address?.country || "Saudi Arabia",
           },
           emergencyContact: {
             name: customer.emergencyContact?.name || "",
@@ -119,7 +128,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => {
       const newFormData = { ...prev };
       const fieldParts = field.split(".");
@@ -235,6 +244,48 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     placeholder={t('ui.enter_phone_number')}
                   />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    WhatsApp Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phoneNumber}
+                    onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="+966501234567 (leave empty to use phone number)"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    Language Preference
+                  </label>
+                  <select
+                    value={formData.language}
+                    onChange={(e) => handleInputChange("language", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  >
+                    <option value="ar">العربية (Arabic)</option>
+                    <option value="en">English</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="whatsappEnabled"
+                      checked={formData.whatsappEnabled}
+                      onChange={(e) => handleInputChange("whatsappEnabled", e.target.checked)}
+                      className="h-4 w-4 text-[#F13F33] focus:ring-[#F13F33] border-gray-300 rounded"
+                    />
+                    <label htmlFor="whatsappEnabled" className="ml-2 block text-sm font-bold text-gray-700">
+                      Enable WhatsApp Messages
+                    </label>
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    Customer will receive automatic WhatsApp messages for job updates
+                  </p>
                 </div>
               </div>
             </div>

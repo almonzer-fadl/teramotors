@@ -26,7 +26,7 @@ export async function GET(
 
     const invoice = await Invoice.findById(id)
       .populate('customerId')
-      .populate('vehicleId');
+      .populate('vehicleId', 'make model year licensePlate');
 
     if (!invoice) {
       return new Response(JSON.stringify({ error: 'Invoice not found' }), { status: 404 });

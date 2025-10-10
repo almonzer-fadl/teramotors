@@ -202,11 +202,17 @@ export default function CustomersPage() {
         const response = await fetch(`/api/customers/${id}`, {
           method: "DELETE",
         });
+        
         if (response.ok) {
           setCustomers(customers.filter((c) => c._id !== id));
+          alert(t("customers.delete_success"));
+        } else {
+          const errorData = await response.json();
+          alert(errorData.error || t("customers.delete_error"));
         }
       } catch (error) {
         console.error("Failed to delete customer:", error);
+        alert(t("customers.delete_error"));
       }
     }
   };
