@@ -681,7 +681,9 @@
     "delete_success": "تم حذف بطاقة العمل بنجاح",
     "view": "عرض",
     "failed_to_delete": "فشل في حذف بطاقة العمل",
-    "deleting": "جاري الحذف..."
+    "deleting": "جاري الحذف...",
+    "no_active_job_cards": "لا يوجد كروت عمل نشطة",
+    "no_active_job_cards_description": "اضغط على الزر في الزاوية لعمل كرت عمل جديد"
   },
   "vehicles": {
     "title": "المركبات",
@@ -1269,7 +1271,8 @@
       "total": "المجموع",
       "paid": "المدفوع",
       "due": "المستحق",
-      "status": "الحالة"
+      "status": "الحالة",
+      "settings": "الإعدادات"
     }
   },
   "pagination_missing": {

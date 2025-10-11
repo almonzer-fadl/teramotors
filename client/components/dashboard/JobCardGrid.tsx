@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -26,7 +26,7 @@ interface JobCard {
 }
 
 export default function JobCardGrid() {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const [jobCards, setJobCards] = useState<JobCard[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -76,10 +76,10 @@ export default function JobCardGrid() {
       <div className="bg-gray-50 rounded-lg p-8 text-center">
         <ClipboardList className="h-12 w-12 text-gray-400 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-gray-900 mb-2">
-          {t('job_cards.no_active_job_cards')}
+          {t("job_cards.no_active_job_cards")}
         </h3>
         <p className="text-gray-500">
-          {t('job_cards.no_active_job_cards_description')}
+          {t("job_cards.no_active_job_cards_description")}
         </p>
       </div>
     );
@@ -87,17 +87,17 @@ export default function JobCardGrid() {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'created':
-      case 'draft':
+      case "created":
+      case "draft":
         return "bg-gradient-to-r from-blue-500 to-blue-600 text-white";
-      case 'in_progress':
-      case 'in progress':
+      case "in_progress":
+      case "in progress":
         return "bg-gradient-to-r from-[#F13F33] to-[#d6352a] text-white";
-      case 'completed':
+      case "completed":
         return "bg-gradient-to-r from-green-500 to-green-600 text-white";
-      case 'invoiced':
+      case "invoiced":
         return "bg-gradient-to-r from-purple-500 to-purple-600 text-white";
-      case 'pending':
+      case "pending":
         return "bg-gradient-to-r from-yellow-500 to-yellow-600 text-white";
       default:
         return "bg-gradient-to-r from-gray-500 to-gray-600 text-white";
@@ -106,18 +106,18 @@ export default function JobCardGrid() {
 
   const getStatusLabel = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'created':
-      case 'draft':
-        return t('status.created');
-      case 'in_progress':
-      case 'in progress':
-        return t('status.in_progress');
-      case 'completed':
-        return t('status.completed');
-      case 'invoiced':
-        return t('status.invoiced');
-      case 'pending':
-        return t('status.pending');
+      case "created":
+      case "draft":
+        return t("status.created");
+      case "in_progress":
+      case "in progress":
+        return t("status.in_progress");
+      case "completed":
+        return t("status.completed");
+      case "invoiced":
+        return t("status.invoiced");
+      case "pending":
+        return t("status.pending");
       default:
         return status;
     }
@@ -131,14 +131,16 @@ export default function JobCardGrid() {
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-[#063479] rounded-lg flex items-center justify-center mr-3">
+                <div className="w-8 h-8 bg-[#063479] rounded-lg flex items-center justify-center me-3">
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 text-sm">
                     {jobCard.customer.fullName}
                   </h3>
-                  <p className="text-xs text-gray-500">{t('job_cards.customer')}</p>
+                  <p className="text-xs text-gray-500">
+                    {t("job_cards.customer")}
+                  </p>
                 </div>
               </div>
               <span
@@ -169,7 +171,9 @@ export default function JobCardGrid() {
                 <div className="w-5 h-5 bg-[#F13F33] rounded-md flex items-center justify-center mr-2">
                   <Wrench className="w-3 h-3 text-white" />
                 </div>
-                <p className="text-xs font-medium text-gray-700">{t('job_cards.services_label')}</p>
+                <p className="text-xs font-medium text-gray-700">
+                  {t("job_cards.services_label")}
+                </p>
               </div>
               <div className="space-y-1">
                 {jobCard.services.slice(0, 2).map((service, index) => (
@@ -184,7 +188,9 @@ export default function JobCardGrid() {
                   <div className="flex items-center">
                     <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></div>
                     <span className="text-xs text-gray-500">
-                      {t('job_cards.and_more', { count: jobCard.services.length - 2 })}
+                      {t("job_cards.and_more", {
+                        count: jobCard.services.length - 2,
+                      })}
                     </span>
                   </div>
                 )}
@@ -198,9 +204,19 @@ export default function JobCardGrid() {
                 <span>{new Date(jobCard.createdAt).toLocaleDateString()}</span>
               </div>
               <div className="flex items-center text-xs font-medium text-[#063479] group-hover:text-[#F13F33] transition-colors">
-                <span>{t('job_cards.view')}</span>
-                <svg className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <span>{t("job_cards.view")}</span>
+                <svg
+                  className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </div>
             </div>
