@@ -168,7 +168,6 @@ const createStyles = (isRTL: boolean) => StyleSheet.create({
     color: '#666666',
   },
   statusBadge: {
-    display: 'inline-block',
     padding: '4px 12px',
     borderRadius: 20,
     fontSize: 9,
@@ -319,7 +318,7 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
               <Text style={[styles.tableHeaderText, { flex: 1 }]}>{t.total}</Text>
             </View>
             {services.map((s: any, index: number) => (
-              <View key={index} style={[styles.tableRow, index % 2 === 0 && styles.tableRowEven]}>
+              <View key={index} style={[styles.tableRow, index % 2 === 0 ? styles.tableRowEven : {}]}>
                 <Text style={[styles.tableCell, { flex: 3 }]}>{s.serviceId?.name || ''}</Text>
                 <Text style={[styles.tableCell, { flex: 1 }]}>{s.quantity}</Text>
                 <Text style={[styles.tableCell, { flex: 1 }]}>{s.laborHours}</Text>
@@ -340,7 +339,7 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
               <Text style={[styles.tableHeaderText, { flex: 1 }]}>{t.total}</Text>
             </View>
             {parts.map((p: any, index: number) => (
-              <View key={index} style={[styles.tableRow, index % 2 === 0 && styles.tableRowEven]}>
+              <View key={index} style={[styles.tableRow, index % 2 === 0 ? styles.tableRowEven : {}]}>
                 <Text style={[styles.tableCell, { flex: 3 }]}>{p.partId?.name || ''}</Text>
                 <Text style={[styles.tableCell, { flex: 1 }]}>{p.quantity}</Text>
                 <Text style={[styles.tableCell, { flex: 1 }]}>{p.cost.toFixed(2)}</Text>
