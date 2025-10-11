@@ -14,15 +14,22 @@
     "npm": ">=8.0.0"
   },
   "dependencies": {
-    "socket.io": "^4.7.5",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "express": "^4.18.2",
-    "mongoose": "^8.18.1"
+    "mongoose": "^8.18.1",
+    "puppeteer": "^24.23.1",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.7.5"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
   },
-  "keywords": ["socket.io", "real-time", "teramotors"],
+  "keywords": [
+    "socket.io",
+    "real-time",
+    "teramotors"
+  ],
   "author": "TeraMotors",
   "license": "MIT"
 }

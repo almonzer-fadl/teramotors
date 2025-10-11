@@ -1,8 +1,18 @@
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const { getPDFGenerator } = require('./lib/pdf-generator');
+
+// Import all models to register them with mongoose
+const Invoice = require('./models/Invoice');
+const JobCard = require('./models/JobCard');
+const Customer = require('./models/Customer');
+const Vehicle = require('./models/Vehicle');
+const Service = require('./models/Service');
+const Part = require('./models/Part');
 
 const app = express();
 const server = http.createServer(app);
@@ -26,19 +36,59 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// PDF Generation Endpoint
+app.get('/api/invoices/:id/pdf', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const language = req.query.lang || 'ar';
+    const format = req.query.format || 'A4';
+
+    // Fetch invoice with populated fields
+    const invoice = await Invoice.findById(id)
+      .populate('customerId')
+      .populate('vehicleId');
+
+    if (!invoice) {
+      return res.status(404).json({ error: 'Invoice not found' });
+    }
+
+    // Fetch job card if exists
+    let jobCard = null;
+    if (invoice.jobCardId) {
+      jobCard = await JobCard.findById(invoice.jobCardId)
+        .populate('services.serviceId')
+        .populate('partsUsed.partId');
+    }
+
+    // Generate PDF
+    const pdfGenerator = getPDFGenerator();
+    const pdfBuffer = await pdfGenerator.generateInvoicePDF(invoice, jobCard, {
+      language,
+      format,
+      includeQRCode: true
+    });
+
+    const filename = `invoice-${id}-${language}-${new Date().toISOString().split('T')[0]}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+
+    res.end(pdfBuffer, 'binary');
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).json({
+      error: 'Failed to generate PDF',
+      details: error.message
+    });
+  }
+});
+
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://admin:password@localhost:27017/teramotors?authSource=admin', {
-  dbName: "teramotors",
-  serverSelectionTimeoutMS: 30000,
-  socketTimeoutMS: 60000,
-  connectTimeoutMS: 30000,
-  maxPoolSize: 5,
-  minPoolSize: 1,
-  maxIdleTimeMS: 60000,
-  retryWrites: true,
-  retryReads: true,
-  bufferCommands: false,
-})
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://admin:password@localhost:27017/teramotors?authSource=admin')
 .then(() => console.log('MongoDB connected successfully'))
 .catch(err => console.error('MongoDB connection error:', err));
 
