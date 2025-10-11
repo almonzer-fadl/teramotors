@@ -87,6 +87,48 @@ app.get('/api/invoices/:id/pdf', async (req, res) => {
   }
 });
 
+// HTML Invoice View Endpoint
+app.get('/api/invoices/:id/view', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const language = req.query.lang || 'ar';
+
+    // Fetch invoice with populated fields
+    const invoice = await Invoice.findById(id)
+      .populate('customerId')
+      .populate('vehicleId');
+
+    if (!invoice) {
+      return res.status(404).send('<h1>Invoice not found</h1>');
+    }
+
+    // Fetch job card if exists
+    let jobCard = null;
+    if (invoice.jobCardId) {
+      jobCard = await JobCard.findById(invoice.jobCardId)
+        .populate('services.serviceId')
+        .populate('partsUsed.partId');
+    }
+
+    // Generate HTML using the PDF generator's HTML method
+    const pdfGenerator = getPDFGenerator();
+    const html = pdfGenerator.generateInvoiceHTML(invoice, jobCard, { language });
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+  } catch (error) {
+    console.error('Error generating HTML invoice:', error);
+    res.status(500).send(`
+      <html>
+        <body>
+          <h1>Error generating invoice</h1>
+          <p>${error.message}</p>
+        </body>
+      </html>
+    `);
+  }
+});
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://admin:password@localhost:27017/teramotors?authSource=admin')
 .then(() => console.log('MongoDB connected successfully'))

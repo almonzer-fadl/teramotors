@@ -263,7 +263,7 @@ export default function ResponsiveInvoicesTable({
                       </button>
                     )}
                     <a
-                      href={`${process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000'}/api/invoices/${invoice._id}/pdf?lang=en&format=A4`}
+                      href={`${process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000'}/api/invoices/${invoice._id}/view?lang=en`}
                       className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -418,7 +418,7 @@ export default function ResponsiveInvoicesTable({
                 </button>
               )}
               <a
-                href={`${process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000'}/api/invoices/${invoice._id}/pdf?lang=en&format=A4`}
+                href={`${process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000'}/api/invoices/${invoice._id}/view?lang=en`}
                 className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 target="_blank"
                 rel="noopener noreferrer"
