@@ -2,27 +2,16 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
 import QRCode from 'qrcode';
 
-// Register Arabic fonts with better encoding support
-Font.register({
-  family: 'Noto Sans Arabic',
-  src: 'https://fonts.gstatic.com/s/notosansarabic/v18/nwpxtLGrOAZMl5nJ_wfgRg3DrWFZWsnVBJ_sS6tlqHHFlhQ5l3sQWIHPqzCfyGyvu3CBFQLaig.ttf',
-  fontStyle: 'normal',
-  fontWeight: 'normal',
-});
-
+// Register fonts with proper URLs and fallbacks
 Font.register({
   family: 'Roboto',
   src: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5Q.ttf',
-  fontStyle: 'normal',
-  fontWeight: 'normal',
 });
 
-// Register additional Arabic font for better character support
+// Use a more reliable Arabic font with proper encoding
 Font.register({
-  family: 'Amiri',
-  src: 'https://fonts.gstatic.com/s/amiri/v27/J7aRnpd8CGxBHqUpvrIw5_WN.ttf',
-  fontStyle: 'normal',
-  fontWeight: 'normal',
+  family: 'Noto Sans Arabic',
+  src: 'https://fonts.gstatic.com/s/notosansarabic/v18/nwpxtLGrOAZMl5nJ_wfgRg3DrWFZWsnVBJ_sS6tlqHHFlhQ5l3sQWIHPqzCfyGyvu3CBFQLaig.ttf',
 });
 
 export interface ServerlessPDFOptions {
@@ -37,7 +26,7 @@ const createStyles = (isRTL: boolean) => StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
     padding: 40,
-    fontFamily: isRTL ? 'Amiri' : 'Roboto',
+    fontFamily: isRTL ? 'Noto Sans Arabic' : 'Roboto',
     direction: isRTL ? 'rtl' : 'ltr',
   },
   header: {
