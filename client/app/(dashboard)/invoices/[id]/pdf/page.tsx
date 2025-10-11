@@ -14,7 +14,7 @@ export default function InvoicePdfPage() {
     if (!id) return;
     const run = async () => {
       try {
-        const res = await fetch(`/api/invoices/${id}`);
+        const res = await fetch(`/api/invoices/${id}/view`);
         if (res.ok) {
           setData(await res.json());
         }
