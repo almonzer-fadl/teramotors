@@ -2,14 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { Invoice, JobCard } from '@/lib/models';
 import { getServerSession } from "@/lib/auth-server";
-import { ArabicPDFGenerator } from '@/lib/pdf-generator-arabic';
+import { ServerlessPDFGenerator } from '@/lib/pdf-generator-serverless';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  let pdfGenerator: ArabicPDFGenerator | null = null;
-  
   try {
     const session = await getServerSession();
     if (!session?.user?.id) {
@@ -41,18 +39,12 @@ export async function GET(
         .populate('partsUsed.partId');
     }
 
-    // Generate PDF using Puppeteer
-    pdfGenerator = new ArabicPDFGenerator();
+    // Generate PDF using serverless PDF generator
+    const pdfGenerator = new ServerlessPDFGenerator();
     const pdfBuffer = await pdfGenerator.generateInvoicePDF(invoice, jobCard, {
       language,
       includeQRCode,
-      format,
-      margin: {
-        top: '20mm',
-        right: '15mm',
-        bottom: '20mm',
-        left: '15mm'
-      }
+      format
     });
 
     const filename = `invoice-${id}-${language}-${new Date().toISOString().split('T')[0]}.pdf`;
@@ -73,14 +65,5 @@ export async function GET(
       error: 'Failed to generate PDF',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
-  } finally {
-    // Clean up PDF generator
-    if (pdfGenerator) {
-      try {
-        await pdfGenerator.close();
-      } catch (closeError) {
-        console.error('Error closing PDF generator:', closeError);
-      }
-    }
   }
 }
