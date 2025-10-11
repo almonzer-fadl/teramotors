@@ -40,9 +40,6 @@ class SocketService {
       path: process.env.NEXT_PUBLIC_SOCKET_PATH || '/socket.io',
       timeout: 20000,
       forceNew: true,
-      // Add additional options for better connection stability
-      pingTimeout: 60000,
-      pingInterval: 25000,
     });
 
     this.setupEventHandlers();
