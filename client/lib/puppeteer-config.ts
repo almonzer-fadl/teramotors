@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 import puppeteer, { Browser, LaunchOptions } from 'puppeteer';
 
 export interface PuppeteerConfig {
@@ -44,7 +43,7 @@ export class PuppeteerManager {
       console.error('Failed to initialize Puppeteer browser:', error);
       
       // If browser is already running error, try fallback config directly
-      if (error.message.includes('already running')) {
+      if (error instanceof Error && error.message.includes('already running')) {
         console.log('Browser already running, trying fallback config');
       }
       
