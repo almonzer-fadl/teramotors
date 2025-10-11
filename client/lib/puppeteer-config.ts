@@ -42,19 +42,9 @@ export class PuppeteerManager {
     } catch (error) {
       console.error('Failed to initialize Puppeteer browser:', error);
       
-      // If browser is already running error, try to connect to existing browser
+      // If browser is already running error, try fallback config directly
       if (error.message.includes('already running')) {
-        try {
-          // Try to connect to existing browser
-          const browserWSEndpoint = await this.findExistingBrowser();
-          if (browserWSEndpoint) {
-            this.browser = await puppeteer.connect({ browserWSEndpoint });
-            console.log('Connected to existing Puppeteer browser');
-            return;
-          }
-        } catch (connectError) {
-          console.log('Could not connect to existing browser, trying fallback config');
-        }
+        console.log('Browser already running, trying fallback config');
       }
       
       // Fallback configuration for production environments
@@ -67,25 +57,6 @@ export class PuppeteerManager {
         throw new Error('Failed to initialize Puppeteer browser. Please ensure Chrome is installed or configure Puppeteer properly.');
       }
     }
-  }
-
-  private async findExistingBrowser(): Promise<string | null> {
-    // Try to find existing browser process
-    try {
-      const { exec } = require('child_process');
-      const { promisify } = require('util');
-      const execAsync = promisify(exec);
-      
-      const { stdout } = await execAsync('ps aux | grep chrome | grep -v grep');
-      if (stdout.includes('chrome')) {
-        // Browser is running, but we can't easily get the endpoint
-        // Return null to trigger fallback
-        return null;
-      }
-    } catch (error) {
-      // Ignore errors
-    }
-    return null;
   }
 
   private getConfig(): LaunchOptions {
