@@ -54,7 +54,7 @@ export async function GET(
 
 function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boolean = false): string {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString();
-  const formatCurrency = (amount: number) => `$${amount.toFixed(2)}`;
+  const formatCurrency = (amount: number) => `ر.س ${amount.toFixed(2)}`;
 
   // Translation object
   const translations = {

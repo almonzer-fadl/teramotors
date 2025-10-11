@@ -57,8 +57,14 @@ export async function GET(
 }
 
 function generateInvoiceHTML(invoice: any, jobCard: any, language: string = 'en', isRTL: boolean = false): string {
-  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US');
-  const formatCurrency = (amount: number) => `${amount.toFixed(2)} ${isRTL ? 'ريال' : 'SAR'}`;
+  const formatDate = (dateString: string) => {
+    const d = new Date(dateString);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${day}/${month}/${year}`;
+  };
+  const formatCurrency = (amount: number) => `ر.س ${amount.toFixed(2)}`;
 
   // Translation object
   const translations = {
@@ -419,7 +425,7 @@ function generateInvoiceHTML(invoice: any, jobCard: any, language: string = 'en'
         ` : ''}
 
         <div style="margin-top: 40px; text-align: center; color: #666; font-size: 12px;">
-            <p>${t.generatedOn} ${new Date().toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}</p>
+            <p>${t.generatedOn} ${formatDate(new Date().toISOString())}</p>
             <p>${t.systemName}</p>
         </div>
     </div>

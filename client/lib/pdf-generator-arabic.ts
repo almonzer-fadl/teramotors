@@ -1,6 +1,7 @@
-import puppeteer, { Browser, Page } from 'puppeteer';
+import { Browser, Page } from 'puppeteer';
 import QRCode from 'qrcode';
 import { Invoice, JobCard } from '@/lib/models';
+import { getPuppeteerBrowser } from './puppeteer-config';
 
 export interface ArabicPDFOptions {
   language: 'ar' | 'en';
@@ -19,18 +20,14 @@ export class ArabicPDFGenerator {
 
   async initialize() {
     if (!this.browser) {
-      this.browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-      });
+      this.browser = await getPuppeteerBrowser();
     }
   }
 
   async close() {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
+    // Note: We don't close the browser here as it's managed by the singleton
+    // The browser will be closed when the application shuts down
+    this.browser = null;
   }
 
   async generateInvoicePDF(
@@ -493,19 +490,16 @@ export class ArabicPDFGenerator {
 
   private formatDate(date: Date | string | number, isRTL: boolean): string {
     const d = new Date(date);
-    return d.toLocaleDateString(isRTL ? 'ar-SA' : 'en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
+    // Always use Latin numbers for dates
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${day}/${month}/${year}`;
   }
 
   private formatCurrency(amount: number, isRTL: boolean): string {
-    return new Intl.NumberFormat(isRTL ? 'ar-SA' : 'en-US', {
-      style: 'currency',
-      currency: 'SAR',
-      minimumFractionDigits: 2,
-    }).format(amount);
+    // Always use Latin numbers and Riyal symbol
+    return `ر.س ${amount.toFixed(2)}`;
   }
 
   private getStatusText(status: string, isRTL: boolean): string {
