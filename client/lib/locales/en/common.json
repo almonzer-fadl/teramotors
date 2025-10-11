@@ -685,7 +685,9 @@
     "delete_success": "Job card deleted successfully",
     "failed_to_delete": "Failed to delete job card",
     "view": "View",
-    "deleting": "Deleting..."
+    "deleting": "Deleting...",
+    "no_active_job_cards": "There are no active cards",
+    "no_active_job_cards_description": "Click on the button in the corner to create a new one"
   },
   "vehicles": {
     "title": "Vehicles",
@@ -1275,7 +1277,8 @@
       "total": "Total",
       "paid": "Paid",
       "due": "Due",
-      "status": "Status"
+      "status": "Status",
+      "settings": "Settings"
     }
   },
   "pagination_missing": {
