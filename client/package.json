@@ -17,7 +17,11 @@
     "test:ci": "jest --ci --coverage --watchAll=false",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:debug": "playwright test --debug"
+    "test:e2e:debug": "playwright test --debug",
+    "puppeteer:install": "npx puppeteer browsers install chrome",
+    "puppeteer:install-chromium": "npx puppeteer browsers install chromium",
+    "docker:build": "docker build -f Dockerfile.puppeteer -t teramotors-pdf .",
+    "docker:run": "docker run -p 3000:3000 teramotors-pdf"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -36,6 +40,7 @@
     "cloudinary": "^2.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "critters": "^0.0.23",
     "csv-parser": "^3.2.0",
     "dayjs": "^1.11.18",
     "i18n": "^0.15.1",

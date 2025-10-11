@@ -32,14 +32,17 @@ class SocketService {
       reconnection: true,
       reconnectionAttempts: this.maxReconnectAttempts,
       reconnectionDelay: this.reconnectDelay,
-      // Avoid long-polling to prevent xhr poll error; use websockets directly
-      transports: ['websocket'],
-      upgrade: false,
+      // Use both websocket and polling for better compatibility
+      transports: ['websocket', 'polling'],
+      upgrade: true,
       withCredentials: true,
       // Allow custom path via env if backend uses non-default path
       path: process.env.NEXT_PUBLIC_SOCKET_PATH || '/socket.io',
-      timeout: 10000,
+      timeout: 20000,
       forceNew: true,
+      // Add additional options for better connection stability
+      pingTimeout: 60000,
+      pingInterval: 25000,
     });
 
     this.setupEventHandlers();
