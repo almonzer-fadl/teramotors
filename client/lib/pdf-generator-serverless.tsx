@@ -2,15 +2,27 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
 import QRCode from 'qrcode';
 
-// Register Arabic fonts
+// Register Arabic fonts with better encoding support
 Font.register({
   family: 'Noto Sans Arabic',
   src: 'https://fonts.gstatic.com/s/notosansarabic/v18/nwpxtLGrOAZMl5nJ_wfgRg3DrWFZWsnVBJ_sS6tlqHHFlhQ5l3sQWIHPqzCfyGyvu3CBFQLaig.ttf',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
 });
 
 Font.register({
   family: 'Roboto',
   src: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5Q.ttf',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+});
+
+// Register additional Arabic font for better character support
+Font.register({
+  family: 'Amiri',
+  src: 'https://fonts.gstatic.com/s/amiri/v27/J7aRnpd8CGxBHqUpvrIw5_WN.ttf',
+  fontStyle: 'normal',
+  fontWeight: 'normal',
 });
 
 export interface ServerlessPDFOptions {
@@ -25,7 +37,7 @@ const createStyles = (isRTL: boolean) => StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: '#FFFFFF',
     padding: 40,
-    fontFamily: isRTL ? 'Noto Sans Arabic' : 'Roboto',
+    fontFamily: isRTL ? 'Amiri' : 'Roboto',
     direction: isRTL ? 'rtl' : 'ltr',
   },
   header: {
@@ -204,11 +216,19 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
   const styles = createStyles(isRTL);
   const t = getTranslations(options.language);
 
-  // Calculate totals
+  // Calculate totals with better error handling
   const services = jobCard?.services || [];
   const parts = jobCard?.partsUsed || [];
-  const servicesTotal = services.reduce((sum: number, s: any) => sum + (s.laborHours * s.laborRate), 0);
-  const partsTotal = parts.reduce((sum: number, p: any) => sum + (p.quantity * p.cost), 0);
+  const servicesTotal = services.reduce((sum: number, s: any) => {
+    const laborHours = s?.laborHours || 0;
+    const laborRate = s?.laborRate || 0;
+    return sum + (laborHours * laborRate);
+  }, 0);
+  const partsTotal = parts.reduce((sum: number, p: any) => {
+    const quantity = p?.quantity || 0;
+    const cost = p?.cost || 0;
+    return sum + (quantity * cost);
+  }, 0);
   const subtotal = servicesTotal + partsTotal;
   const tax = subtotal * 0.15;
   const grandTotal = subtotal + tax;
@@ -241,7 +261,7 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
           <View style={styles.headerText}>
             <Text style={styles.companyName}>{t.company}</Text>
             <Text style={styles.invoiceTitle}>
-              {t.title} #{String(invoice._id || '').slice(-6)}
+              {t.title} #{String(invoice?._id || '').slice(-6)}
             </Text>
           </View>
           {qrCodeDataUrl && (
@@ -253,16 +273,16 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
         <View style={styles.infoSection}>
           <View style={styles.infoBox}>
             <Text style={styles.infoTitle}>
-              {t.invoiceNumber}{String(invoice._id || '').slice(-6)}
+              {t.invoiceNumber}{String(invoice?._id || '').slice(-6)}
             </Text>
             <Text style={styles.infoText}>
-              <Text style={{ fontWeight: 'bold' }}>{t.date}:</Text> {formatDate(invoice.createdAt || Date.now())}
+              <Text style={{ fontWeight: 'bold' }}>{t.date}:</Text> {formatDate(invoice?.createdAt || Date.now())}
             </Text>
             <Text style={styles.infoText}>
-              <Text style={{ fontWeight: 'bold' }}>{t.dueDate}:</Text> {formatDate(invoice.dueDate || Date.now())}
+              <Text style={{ fontWeight: 'bold' }}>{t.dueDate}:</Text> {formatDate(invoice?.dueDate || Date.now())}
             </Text>
             <Text style={styles.infoText}>
-              <Text style={{ fontWeight: 'bold' }}>{t.status}:</Text> {getStatusText(invoice.status || 'pending')}
+              <Text style={{ fontWeight: 'bold' }}>{t.status}:</Text> {getStatusText(invoice?.status || 'pending')}
             </Text>
           </View>
 
@@ -270,14 +290,14 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
             <Text style={styles.infoTitle}>{t.customerInfo}</Text>
             <Text style={styles.infoText}>
               <Text style={{ fontWeight: 'bold' }}>{t.customer}:</Text>{' '}
-              {(invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}
+              {(invoice?.customerId?.firstName || '') + ' ' + (invoice?.customerId?.lastName || '')}
             </Text>
-            {invoice.customerId?.email && (
+            {invoice?.customerId?.email && (
               <Text style={styles.infoText}>
                 <Text style={{ fontWeight: 'bold' }}>Email:</Text> {invoice.customerId.email}
               </Text>
             )}
-            {invoice.customerId?.phone && (
+            {invoice?.customerId?.phone && (
               <Text style={styles.infoText}>
                 <Text style={{ fontWeight: 'bold' }}>Phone:</Text> {invoice.customerId.phone}
               </Text>
@@ -289,7 +309,7 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
         <View style={styles.infoSection}>
           <View style={styles.infoBox}>
             <Text style={styles.infoTitle}>{t.vehicleInfo}</Text>
-            {invoice.vehicleId ? (
+            {invoice?.vehicleId ? (
               <>
                 <Text style={styles.infoText}>
                   <Text style={{ fontWeight: 'bold' }}>{t.vehicle}:</Text>{' '}
@@ -319,11 +339,11 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
             </View>
             {services.map((s: any, index: number) => (
               <View key={index} style={[styles.tableRow, index % 2 === 0 ? styles.tableRowEven : {}]}>
-                <Text style={[styles.tableCell, { flex: 3 }]}>{s.serviceId?.name || ''}</Text>
-                <Text style={[styles.tableCell, { flex: 1 }]}>{s.quantity}</Text>
-                <Text style={[styles.tableCell, { flex: 1 }]}>{s.laborHours}</Text>
-                <Text style={[styles.tableCell, { flex: 1 }]}>{s.laborRate.toFixed(2)}</Text>
-                <Text style={[styles.tableCell, { flex: 1 }]}>{(s.laborHours * s.laborRate).toFixed(2)}</Text>
+                <Text style={[styles.tableCell, { flex: 3 }]}>{s?.serviceId?.name || s?.name || ''}</Text>
+                <Text style={[styles.tableCell, { flex: 1 }]}>{s?.quantity || 0}</Text>
+                <Text style={[styles.tableCell, { flex: 1 }]}>{s?.laborHours || 0}</Text>
+                <Text style={[styles.tableCell, { flex: 1 }]}>{(s?.laborRate || 0).toFixed(2)}</Text>
+                <Text style={[styles.tableCell, { flex: 1 }]}>{((s?.laborHours || 0) * (s?.laborRate || 0)).toFixed(2)}</Text>
               </View>
             ))}
           </View>
@@ -340,10 +360,10 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
             </View>
             {parts.map((p: any, index: number) => (
               <View key={index} style={[styles.tableRow, index % 2 === 0 ? styles.tableRowEven : {}]}>
-                <Text style={[styles.tableCell, { flex: 3 }]}>{p.partId?.name || ''}</Text>
-                <Text style={[styles.tableCell, { flex: 1 }]}>{p.quantity}</Text>
-                <Text style={[styles.tableCell, { flex: 1 }]}>{p.cost.toFixed(2)}</Text>
-                <Text style={[styles.tableCell, { flex: 1 }]}>{(p.quantity * p.cost).toFixed(2)}</Text>
+                <Text style={[styles.tableCell, { flex: 3 }]}>{p?.partId?.name || p?.name || ''}</Text>
+                <Text style={[styles.tableCell, { flex: 1 }]}>{p?.quantity || 0}</Text>
+                <Text style={[styles.tableCell, { flex: 1 }]}>{(p?.cost || 0).toFixed(2)}</Text>
+                <Text style={[styles.tableCell, { flex: 1 }]}>{((p?.quantity || 0) * (p?.cost || 0)).toFixed(2)}</Text>
               </View>
             ))}
           </View>
@@ -387,7 +407,7 @@ function getTranslations(language: 'ar' | 'en') {
   return {
     ar: {
       title: "فاتورة",
-      company: "تيرا موتورز لصيانة السيارات",
+      company: "تيرا لصيانه السيارات",
       invoiceNumber: "رقم الفاتورة #",
       date: "التاريخ",
       dueDate: "تاريخ الاستحقاق",
