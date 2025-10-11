@@ -62,6 +62,7 @@ export class PuppeteerManager {
   private getConfig(): LaunchOptions {
     const isProduction = process.env.NODE_ENV === 'production';
     const isDocker = process.env.DOCKER === 'true';
+    const isVercel = process.env.VERCEL === '1';
     
     const baseArgs = [
       '--no-sandbox',
@@ -133,13 +134,16 @@ export class PuppeteerManager {
       protocolTimeout: 30000,
     };
 
-    // Set executable path if provided
-    if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+    // Set executable path based on environment
+    if (isVercel) {
+      // Vercel doesn't support Puppeteer with Chrome, use Chromium instead
+      config.executablePath = undefined; // Let Puppeteer find Chromium
+    } else if (process.env.PUPPETEER_EXECUTABLE_PATH) {
       config.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
     }
 
     // Set cache directory if provided, with process-specific identifier to avoid conflicts
-    if (process.env.PUPPETEER_CACHE_DIR) {
+    if (process.env.PUPPETEER_CACHE_DIR && !isVercel) {
       config.userDataDir = `${process.env.PUPPETEER_CACHE_DIR}-${process.pid}`;
     }
 
@@ -147,6 +151,8 @@ export class PuppeteerManager {
   }
 
   private getFallbackConfig(): LaunchOptions {
+    const isVercel = process.env.VERCEL === '1';
+    
     return {
       headless: true,
       args: [
@@ -169,6 +175,8 @@ export class PuppeteerManager {
       ],
       timeout: 60000,
       protocolTimeout: 60000,
+      // Don't set executablePath for Vercel - let Puppeteer find Chromium
+      executablePath: isVercel ? undefined : process.env.PUPPETEER_EXECUTABLE_PATH,
     };
   }
 
