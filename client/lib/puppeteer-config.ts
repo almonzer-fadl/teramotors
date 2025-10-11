@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import puppeteer, { Browser, LaunchOptions } from 'puppeteer';
 
 export interface PuppeteerConfig {
