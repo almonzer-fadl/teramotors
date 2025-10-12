@@ -10,6 +10,8 @@
     "install-server": "cd server && npm install",
     "install-all": "npm run install-client && npm run install-server",
     "postinstall": "cd client && npm install",
+    "install-puppeteer": "cd server && npx puppeteer browsers install chrome",
+    "build-server": "cd server && npm install && npx puppeteer browsers install chrome",
     "cleanup-db": "node cleanup-database-mongo.js",
     "cleanup-db-dry": "node cleanup-database-mongo.js --dry-run",
     "cleanup-db-force": "node cleanup-database-mongo.js --confirm"
