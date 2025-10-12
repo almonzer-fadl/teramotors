@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db';
-import { Invoice, JobCard } from '@/lib/models';
 import { getServerSession } from "@/lib/auth-server";
-import { ArabicServerlessPDFGenerator } from '@/lib/pdf-generator-arabic-serverless';
 
 export async function GET(
   request: NextRequest,
@@ -14,41 +11,28 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await connectToDatabase();
-
     const { id } = await params;
-    
-    // Get language from query parameter or default to Arabic
     const url = new URL(request.url);
-    const language = (url.searchParams.get('lang') || 'ar') as 'ar' | 'en';
+    const language = 'ar'; // Fixed to Arabic for this route
     const includeQRCode = url.searchParams.get('qr') !== 'false';
     const format = (url.searchParams.get('format') || 'A4') as 'A4' | 'Letter';
 
-    const invoice = await Invoice.findById(id)
-      .populate('customerId')
-      .populate('vehicleId', 'make model year licensePlate');
-
-    if (!invoice) {
-      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
-    }
-
-    let jobCard: any = null;
-    if (invoice.jobCardId) {
-      jobCard = await JobCard.findById(invoice.jobCardId)
-        .populate('services.serviceId')
-        .populate('partsUsed.partId');
-    }
-
-    // Generate PDF using Arabic serverless PDF generator
-    const pdfGenerator = new ArabicServerlessPDFGenerator();
-    const pdfBuffer = await pdfGenerator.generateInvoicePDF(invoice, jobCard, {
-      includeQRCode,
-      format
+    // Call server-side PDF generation (server doesn't require auth)
+    const serverUrl = process.env.SERVER_URL || 'http://localhost:5000';
+    const serverResponse = await fetch(`${serverUrl}/api/invoices/${id}/pdf?lang=${language}&qr=${includeQRCode}&format=${format}`, {
+      method: 'GET',
     });
 
+    if (!serverResponse.ok) {
+      const errorText = await serverResponse.text();
+      console.error('Server error:', errorText);
+      throw new Error(`Server responded with status: ${serverResponse.status} - ${errorText}`);
+    }
+
+    const pdfBuffer = await serverResponse.arrayBuffer();
     const filename = `invoice-${id}-${language}-${new Date().toISOString().split('T')[0]}.pdf`;
 
-    return new NextResponse(pdfBuffer as any, {
+    return new NextResponse(pdfBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,
@@ -57,10 +41,9 @@ export async function GET(
         'Expires': '0'
       },
     });
-
   } catch (error) {
     console.error('Error generating Arabic PDF:', error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: 'Failed to generate PDF',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
