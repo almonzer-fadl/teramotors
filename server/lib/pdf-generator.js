@@ -8,7 +8,10 @@ class PDFGenerator {
 
   async initialize() {
     if (!this.browser) {
-      this.browser = await puppeteer.launch({
+      const isProduction = process.env.NODE_ENV === 'production';
+      const isRender = process.env.RENDER === 'true';
+
+      const launchOptions = {
         headless: true,
         args: [
           '--no-sandbox',
@@ -19,7 +22,15 @@ class PDFGenerator {
           '--no-zygote',
           '--disable-gpu'
         ]
-      });
+      };
+
+      // For Render, let Puppeteer use the installed Chrome from cache
+      if (isRender || isProduction) {
+        // Don't set executablePath, let Puppeteer find it in PUPPETEER_CACHE_DIR
+        console.log('Running in production/Render - using Puppeteer-managed Chrome');
+      }
+
+      this.browser = await puppeteer.launch(launchOptions);
     }
   }
 
