@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 export default function InvoiceDetailPage() {
+  const { t } = useTranslation('common');
   const params = useParams();
   const id = (params as any)?.id as string;
   const [data, setData] = useState<{ invoice: any; jobCard: any } | null>(null);
@@ -62,10 +64,6 @@ export default function InvoiceDetailPage() {
   }
 
   const { invoice, jobCard } = data;
-
-  function t(arg0: string): string | undefined {
-    throw new Error('Function not implemented.');
-  }
 
   return (
     <div className="space-y-6">
