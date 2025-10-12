@@ -36,6 +36,19 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Debug endpoint to check invoices
+app.get('/api/debug/invoices', async (req, res) => {
+  try {
+    const invoices = await Invoice.find().limit(5).select('_id invoiceNumber');
+    res.json({ 
+      total: await Invoice.countDocuments(),
+      invoices: invoices 
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // PDF Generation Endpoint
 app.get('/api/invoices/:id/pdf', async (req, res) => {
   try {
@@ -43,14 +56,34 @@ app.get('/api/invoices/:id/pdf', async (req, res) => {
     const language = req.query.lang || 'ar';
     const format = req.query.format || 'A4';
 
+    console.log(`Looking for invoice with ID: ${id}`);
+    
+    // First, let's check if there are any invoices at all
+    const totalInvoices = await Invoice.countDocuments();
+    console.log(`Total invoices in database: ${totalInvoices}`);
+    
+    // Let's also get a sample of invoice IDs
+    const sampleInvoices = await Invoice.find().limit(3).select('_id invoiceNumber');
+    console.log(`Sample invoices:`, sampleInvoices);
+    
     // Fetch invoice with populated fields
     const invoice = await Invoice.findById(id)
       .populate('customerId')
       .populate('vehicleId');
 
     if (!invoice) {
-      return res.status(404).json({ error: 'Invoice not found' });
+      console.log(`Invoice ${id} not found`);
+      return res.status(404).json({ 
+        error: 'Invoice not found',
+        debug: {
+          totalInvoices,
+          sampleInvoices,
+          requestedId: id
+        }
+      });
     }
+    
+    console.log(`Found invoice: ${invoice.invoiceNumber}`);
 
     // Fetch job card if exists
     let jobCard = null;
@@ -130,8 +163,16 @@ app.get('/api/invoices/:id/view', async (req, res) => {
 });
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://admin:password@localhost:27017/teramotors?authSource=admin')
-.then(() => console.log('MongoDB connected successfully'))
+const mongoUri = process.env.MONGODB_URI || 'mongodb://admin:password@localhost:27017/teramotors?authSource=admin';
+console.log('Connecting to MongoDB with URI:', mongoUri);
+
+mongoose.connect(mongoUri, {
+  dbName: 'teramotors'
+})
+.then(() => {
+  console.log('MongoDB connected successfully');
+  console.log('Database name:', mongoose.connection.db.databaseName);
+})
 .catch(err => console.error('MongoDB connection error:', err));
 
 // Socket.io connection handling
