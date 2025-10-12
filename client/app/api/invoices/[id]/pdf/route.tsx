@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { Invoice, JobCard } from '@/lib/models';
 import { getServerSession } from "@/lib/auth-server";
-import { ServerlessPDFGenerator } from '@/lib/pdf-generator-serverless';
+import { EnglishServerlessPDFGenerator } from '@/lib/pdf-generator-english-serverless';
 
 export async function GET(
   request: NextRequest,
@@ -39,10 +39,9 @@ export async function GET(
         .populate('partsUsed.partId');
     }
 
-    // Generate PDF using serverless PDF generator
-    const pdfGenerator = new ServerlessPDFGenerator();
+    // Generate PDF using English serverless PDF generator
+    const pdfGenerator = new EnglishServerlessPDFGenerator();
     const pdfBuffer = await pdfGenerator.generateInvoicePDF(invoice, jobCard, {
-      language,
       includeQRCode,
       format
     });
@@ -52,7 +51,7 @@ export async function GET(
     return new NextResponse(pdfBuffer as any, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="${filename}"`,
+        'Content-Disposition': `attachment; filename="${filename}"`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0'
@@ -60,9 +59,11 @@ export async function GET(
     });
   } catch (error) {
     console.error('Error generating Invoice PDF:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json({ 
       error: 'Failed to generate PDF',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
     }, { status: 500 });
   }
 }

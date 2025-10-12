@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { Invoice, JobCard } from '@/lib/models';
 import { getServerSession } from "@/lib/auth-server";
-import { ServerlessPDFGenerator } from '@/lib/pdf-generator-serverless';
+import { ArabicServerlessPDFGenerator } from '@/lib/pdf-generator-arabic-serverless';
 
 export async function GET(
   request: NextRequest,
@@ -39,10 +39,9 @@ export async function GET(
         .populate('partsUsed.partId');
     }
 
-    // Generate PDF using serverless PDF generator
-    const pdfGenerator = new ServerlessPDFGenerator();
+    // Generate PDF using Arabic serverless PDF generator
+    const pdfGenerator = new ArabicServerlessPDFGenerator();
     const pdfBuffer = await pdfGenerator.generateInvoicePDF(invoice, jobCard, {
-      language,
       includeQRCode,
       format
     });
@@ -52,7 +51,7 @@ export async function GET(
     return new NextResponse(pdfBuffer as any, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="${filename}"`,
+        'Content-Disposition': `attachment; filename="${filename}"`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0'

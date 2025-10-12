@@ -1,14 +1,15 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer';
 import QRCode from 'qrcode';
 
 // Register fonts with proper URLs and fallbacks
+// Register fonts that work well with react-pdf
 Font.register({
   family: 'Roboto',
   src: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Me5Q.ttf',
 });
 
-// Use a more reliable Arabic font with proper encoding
 Font.register({
   family: 'Noto Sans Arabic',
   src: 'https://fonts.gstatic.com/s/notosansarabic/v18/nwpxtLGrOAZMl5nJ_wfgRg3DrWFZWsnVBJ_sS6tlqHHFlhQ5l3sQWIHPqzCfyGyvu3CBFQLaig.ttf',
@@ -234,6 +235,13 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
     return `${amount.toFixed(2)} ر.س`;
   };
 
+  // Text function with proper Unicode handling
+  const getText = (text: string | undefined | null): string => {
+    if (!text) return '';
+    // Ensure proper Unicode normalization
+    return String(text).normalize('NFC');
+  };
+
   const getStatusText = (status: string): string => {
     const statusMap = {
       ar: { pending: 'معلق', paid: 'مدفوع', cancelled: 'ملغي' },
@@ -279,16 +287,16 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
             <Text style={styles.infoTitle}>{t.customerInfo}</Text>
             <Text style={styles.infoText}>
               <Text style={{ fontWeight: 'bold' }}>{t.customer}:</Text>{' '}
-              {(invoice?.customerId?.firstName || '') + ' ' + (invoice?.customerId?.lastName || '')}
+              {getText(invoice?.customerId?.firstName) + ' ' + getText(invoice?.customerId?.lastName)}
             </Text>
             {invoice?.customerId?.email && (
               <Text style={styles.infoText}>
-                <Text style={{ fontWeight: 'bold' }}>Email:</Text> {invoice.customerId.email}
+                <Text style={{ fontWeight: 'bold' }}>Email:</Text> {getText(invoice.customerId.email)}
               </Text>
             )}
             {invoice?.customerId?.phone && (
               <Text style={styles.infoText}>
-                <Text style={{ fontWeight: 'bold' }}>Phone:</Text> {invoice.customerId.phone}
+                <Text style={{ fontWeight: 'bold' }}>Phone:</Text> {getText(invoice.customerId.phone)}
               </Text>
             )}
           </View>
@@ -302,11 +310,11 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
               <>
                 <Text style={styles.infoText}>
                   <Text style={{ fontWeight: 'bold' }}>{t.vehicle}:</Text>{' '}
-                  {invoice.vehicleId.year} {invoice.vehicleId.make} {invoice.vehicleId.model}
+                  {invoice.vehicleId.year} {getText(invoice.vehicleId.make)} {getText(invoice.vehicleId.model)}
                 </Text>
                 {invoice.vehicleId.licensePlate && (
                   <Text style={styles.infoText}>
-                    <Text style={{ fontWeight: 'bold' }}>{t.licensePlate}:</Text> {invoice.vehicleId.licensePlate}
+                    <Text style={{ fontWeight: 'bold' }}>{t.licensePlate}:</Text> {getText(invoice.vehicleId.licensePlate)}
                   </Text>
                 )}
               </>
@@ -328,7 +336,7 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
             </View>
             {services.map((s: any, index: number) => (
               <View key={index} style={[styles.tableRow, index % 2 === 0 ? styles.tableRowEven : {}]}>
-                <Text style={[styles.tableCell, { flex: 3 }]}>{s?.serviceId?.name || s?.name || ''}</Text>
+                <Text style={[styles.tableCell, { flex: 3 }]}>{getText(s?.serviceId?.name || s?.name || '')}</Text>
                 <Text style={[styles.tableCell, { flex: 1 }]}>{s?.quantity || 0}</Text>
                 <Text style={[styles.tableCell, { flex: 1 }]}>{s?.laborHours || 0}</Text>
                 <Text style={[styles.tableCell, { flex: 1 }]}>{(s?.laborRate || 0).toFixed(2)}</Text>
@@ -349,7 +357,7 @@ const InvoicePDFDocument: React.FC<InvoicePDFDocumentProps> = ({
             </View>
             {parts.map((p: any, index: number) => (
               <View key={index} style={[styles.tableRow, index % 2 === 0 ? styles.tableRowEven : {}]}>
-                <Text style={[styles.tableCell, { flex: 3 }]}>{p?.partId?.name || p?.name || ''}</Text>
+                <Text style={[styles.tableCell, { flex: 3 }]}>{getText(p?.partId?.name || p?.name || '')}</Text>
                 <Text style={[styles.tableCell, { flex: 1 }]}>{p?.quantity || 0}</Text>
                 <Text style={[styles.tableCell, { flex: 1 }]}>{(p?.cost || 0).toFixed(2)}</Text>
                 <Text style={[styles.tableCell, { flex: 1 }]}>{((p?.quantity || 0) * (p?.cost || 0)).toFixed(2)}</Text>
@@ -396,7 +404,7 @@ function getTranslations(language: 'ar' | 'en') {
   return {
     ar: {
       title: "فاتورة",
-      company: "تيرا لصيانه السيارات",
+      company: "تيرا موتورز لصيانة السيارات",
       invoiceNumber: "رقم الفاتورة #",
       date: "التاريخ",
       dueDate: "تاريخ الاستحقاق",

@@ -262,21 +262,19 @@ export default function ResponsiveInvoicesTable({
                         <Trash2 className="h-4 w-4" />
                       </button>
                     )}
-                    <a
-                      href={`/api/invoices/${invoice._id}/view?lang=en`}
+                    <Link
+                      href={`/invoices/${invoice._id}`}
                       className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
-                      target="_blank"
-                      rel="noopener noreferrer"
                     >
                       <Eye className="h-3 w-3 me-1" />
                       {t('common.view')}
-                    </a>
+                    </Link>
                     <a
                       href={`/api/invoices/${invoice._id}/pdf?lang=en`}
                       className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-emerald-600 rounded hover:bg-emerald-700"
                       target="_blank"
                       rel="noopener noreferrer"
-                      download
+                      download={`invoice-${invoice._id.slice(-6)}-en.pdf`}
                     >
                       <FileText className="h-3 w-3 me-1" />
                       PDF
@@ -286,7 +284,7 @@ export default function ResponsiveInvoicesTable({
                       className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700"
                       target="_blank"
                       rel="noopener noreferrer"
-                      download
+                      download={`invoice-${invoice._id.slice(-6)}-ar.pdf`}
                     >
                       <FileText className="h-3 w-3 me-1" />
                       PDF عربي
@@ -417,21 +415,19 @@ export default function ResponsiveInvoicesTable({
                   {t('common.delete')}
                 </button>
               )}
-              <a
-                href={`/api/invoices/${invoice._id}/view?lang=en`}
+              <Link
+                href={`/invoices/${invoice._id}`}
                 className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                target="_blank"
-                rel="noopener noreferrer"
               >
                 <Eye className="h-3 w-3 me-1" />
                 {t('common.view')}
-              </a>
+              </Link>
               <a
                 href={`/api/invoices/${invoice._id}/pdf?lang=en`}
                 className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
                 target="_blank"
                 rel="noopener noreferrer"
-                download
+                download={`invoice-${invoice._id.slice(-6)}-en.pdf`}
               >
                 <FileText className="h-3 w-3 me-1" />
                 PDF
@@ -441,7 +437,7 @@ export default function ResponsiveInvoicesTable({
                 className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
                 target="_blank"
                 rel="noopener noreferrer"
-                download
+                download={`invoice-${invoice._id.slice(-6)}-ar.pdf`}
               >
                 <FileText className="h-3 w-3 me-1" />
                 PDF عربي
