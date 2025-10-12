@@ -18,7 +18,7 @@ export async function GET(
     const format = (url.searchParams.get('format') || 'A4') as 'A4' | 'Letter';
 
     // Call server-side PDF generation (server doesn't require auth)
-    const serverUrl = process.env.SERVER_URL || 'http://localhost:5000';
+    const serverUrl = process.env.SERVER_URL || process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:5000';
     const serverResponse = await fetch(`${serverUrl}/api/invoices/${id}/pdf?lang=${language}&qr=${includeQRCode}&format=${format}`, {
       method: 'GET',
     });
