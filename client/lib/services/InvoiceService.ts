@@ -73,12 +73,13 @@ export class InvoiceService {
     
     // Convert services to invoice items
     jobCardData.services.forEach((service: any, index: number) => {
+      const totalServicePrice = (service.laborHours || 0) * (service.laborRate || 0);
       items.push({
         id: `service-${index}`,
         name: service.serviceId?.name || 'Service',
         description: `Labor hours: ${service.laborHours}`,
-        quantity: service.quantity,
-        unitPrice: service.laborRate,
+        quantity: service.quantity || 1,
+        unitPrice: totalServicePrice,
         vatRate: ZATCAUtils.getStandardVATRate(),
         category: 'service',
       });
@@ -90,8 +91,8 @@ export class InvoiceService {
         id: `part-${index}`,
         name: part.partId?.name || 'Part',
         description: 'Auto part',
-        quantity: part.quantity,
-        unitPrice: part.cost,
+        quantity: part.quantity || 1,
+        unitPrice: part.cost || 0,
         vatRate: ZATCAUtils.getStandardVATRate(),
         category: 'part',
       });
