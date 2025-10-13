@@ -20,6 +20,7 @@ import {
   Bell,
   Wrench,
   Settings,
+  MessageCircle,
 } from "lucide-react";
 import JobCardGrid from "@/components/dashboard/JobCardGrid";
 import ModernDashboardWidget from "@/components/dashboard/ModernDashboardWidget";
@@ -210,6 +211,14 @@ export default function DashboardPage() {
               color: 'bg-blue-800',
               count: '',
               route: '/reports'
+            },
+            {
+              title: t('dashboard_missing.modern_widget.whatsapp'),
+              titleEn: 'WhatsApp',
+              icon: MessageCircle,
+              color: 'bg-green-500',
+              count: '',
+              route: '/whatsapp'
             },
             {
               title: t('dashboard_missing.modern_widget.settings'),

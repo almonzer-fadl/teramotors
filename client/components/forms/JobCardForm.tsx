@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, X, Plus, Trash2, FileText } from "lucide-react";
+import { ArrowLeft, Save, X, Trash2, FileText, Wrench, Package } from "lucide-react";
 import { socketService } from "../../lib/services/socket";
 import { useTranslation } from "react-i18next";
 import { useSession } from "../../lib/hooks/useSession";
@@ -77,6 +77,7 @@ export default function JobCardForm({
     partsUsed: [],
     notes: "",
   });
+
 
   const isEditing = !!jobCardId;
 
@@ -358,6 +359,7 @@ export default function JobCardForm({
     handleInputChange("partsUsed", updatedParts);
   };
 
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
@@ -393,7 +395,7 @@ export default function JobCardForm({
             <div className="px-8 py-8">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mr-4">
-                  <Plus className="w-6 h-6 text-white" />
+                  <Wrench className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900">
                   {t("forms.job_card_details")}
@@ -404,46 +406,50 @@ export default function JobCardForm({
                   <label className="block text-sm font-bold text-gray-700">
                     {t("forms.customer")}
                   </label>
-                  <select
-                    required
-                    value={formData.customerId}
-                    onChange={(e) =>
-                      handleInputChange("customerId", e.target.value)
-                    }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                  >
-                    <option value="">{t("forms.select_customer")}</option>
-                    {customers.map((c) => (
-                      <option key={c._id} value={c._id}>
-                        {c.firstName} {c.lastName}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      required
+                      value={formData.customerId}
+                      onChange={(e) =>
+                        handleInputChange("customerId", e.target.value)
+                      }
+                      className="w-full px-6 py-4 pr-12 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    >
+                      <option value="">{t("forms.select_customer")}</option>
+                      {customers.map((c, index) => (
+                        <option key={c._id || `customer-${index}`} value={c._id}>
+                          {c.firstName} {c.lastName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
                     {t("forms.vehicle")}
                   </label>
-                  <select
-                    required
-                    value={formData.vehicleId}
-                    onChange={(e) => handleInputChange("vehicleId", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 disabled:opacity-50"
-                    disabled={!formData.customerId}
-                  >
-                    <option value="">{t("forms.select_vehicle")}</option>
-                    {vehicles
-                      .filter((v) => {
-                        if (!formData.customerId) return false;
-                        const customerId = typeof v.customerId === 'object' ? v.customerId._id : v.customerId;
-                        return customerId === formData.customerId;
-                      })
-                      .map((v) => (
-                        <option key={v._id} value={v._id}>
-                          {v.make} {v.model} ({v.year})
-                        </option>
-                      ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      required
+                      value={formData.vehicleId}
+                      onChange={(e) => handleInputChange("vehicleId", e.target.value)}
+                      className="w-full px-6 py-4 pr-12 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 disabled:opacity-50"
+                      disabled={!formData.customerId}
+                    >
+                      <option value="">{t("forms.select_vehicle")}</option>
+                      {vehicles
+                        .filter((v) => {
+                          if (!formData.customerId) return false;
+                          const customerId = typeof v.customerId === 'object' ? v.customerId._id : v.customerId;
+                          return customerId === formData.customerId;
+                        })
+                        .map((v) => (
+                          <option key={v._id} value={v._id}>
+                            {v.make} {v.model} ({v.year})
+                          </option>
+                        ))}
+                    </select>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
@@ -522,7 +528,7 @@ export default function JobCardForm({
             <div className="px-8 py-8">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mr-4">
-                  <Plus className="w-6 h-6 text-white" />
+                  <Wrench className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900">
                   {t("forms.services")}
@@ -535,20 +541,22 @@ export default function JobCardForm({
                 >
                   <div className="col-span-2 space-y-2">
                     <label className="block text-sm font-bold text-gray-700">{t('forms.service')}</label>
-                    <select
-                      value={service.serviceId}
-                      onChange={(e) =>
-                        handleServiceChange(index, "serviceId", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    >
-                      <option value="">{t("forms.select_service")}</option>
-                      {services.map((s) => (
-                        <option key={s._id} value={s._id}>
-                          {s.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={service.serviceId}
+                        onChange={(e) =>
+                          handleServiceChange(index, "serviceId", e.target.value)
+                        }
+                        className="w-full px-4 py-3 pr-8 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      >
+                        <option value="">{t("forms.select_service")}</option>
+                        {services.map((s) => (
+                          <option key={s._id} value={s._id}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="block text-sm font-bold text-gray-700">{t('forms.qty')}</label>
@@ -606,7 +614,7 @@ export default function JobCardForm({
                 onClick={addService}
                 className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Wrench className="mr-2 h-4 w-4" />
                 {t("forms.add_service")}
               </button>
             </div>
@@ -617,7 +625,7 @@ export default function JobCardForm({
             <div className="px-8 py-8">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
-                  <Plus className="w-6 h-6 text-white" />
+                  <Wrench className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900">
                   {t("forms.parts_used")}
@@ -630,20 +638,22 @@ export default function JobCardForm({
                 >
                   <div className="col-span-2 space-y-2">
                     <label className="block text-sm font-bold text-gray-700">{t('job_cards.select_part')}</label>
-                    <select
-                      value={part.partId}
-                      onChange={(e) =>
-                        handlePartChange(index, "partId", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    >
-                      <option value="">{t("forms.select_part")}</option>
-                      {parts.map((p) => (
-                        <option key={p._id} value={p._id}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={part.partId}
+                        onChange={(e) =>
+                          handlePartChange(index, "partId", e.target.value)
+                        }
+                        className="w-full px-4 py-3 pr-8 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      >
+                        <option value="">{t("forms.select_part")}</option>
+                        {parts.map((p) => (
+                          <option key={p._id} value={p._id}>
+                            {p.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="block text-sm font-bold text-gray-700">{t('forms.qty')}</label>
@@ -691,11 +701,12 @@ export default function JobCardForm({
                 onClick={addPart}
                 className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Package className="mr-2 h-4 w-4" />
                 {t("forms.add_part")}
               </button>
             </div>
           </div>
+
 
           {/* Form Actions */}
           <div className="flex justify-end space-x-6">
@@ -733,6 +744,7 @@ export default function JobCardForm({
           </div>
         </form>
       </div>
+
     </div>
   );
 }

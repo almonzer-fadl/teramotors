@@ -358,6 +358,14 @@ const PrintInvoiceDocument = ({
             <div className="qr-code">
               <img src={qrCodeDataUrl} alt="ZATCA QR" />
               <div className="qr-label">{t.zatcaCompliant}</div>
+              {invoice.zatca && (
+                <div className="qr-info" style={{ fontSize: '10px', marginTop: '5px', textAlign: 'center', color: '#666' }}>
+                  <div>Company: Tera Visions</div>
+                  <div>الرقم الوطني الموحد: {invoice.zatca.vatNumber || '7051569718'}</div>
+                  <div>Total: {invoice.zatca.totalAmount || '0.00'} SAR</div>
+                  <div>VAT Amount: {invoice.zatca.vatAmount || '0.00'} SAR</div>
+                </div>
+              )}
             </div>
           )}
         </div>
