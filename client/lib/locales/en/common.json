@@ -1124,6 +1124,8 @@
     "failed_to_update_status": "Failed to update status",
     "failed_to_create_invoice": "Failed to create invoice",
     "failed_to_create_payment": "Failed to create payment",
+    "no_notes_available": "No notes available",
+    "save_and_create_invoice": "Save & Create Invoice",
     "creating_invoice": "Creating Invoice...",
     "create_invoice": "Create Invoice",
     "creating": "Creating...",

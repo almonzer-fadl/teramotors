@@ -1117,6 +1117,8 @@
     "failed_to_update_status": "فشل تحديث الحالة",
     "failed_to_create_invoice": "فشل إنشاء الفاتورة",
     "failed_to_create_payment": "فشل إنشاء الدفعة",
+    "no_notes_available": "لا توجد ملاحظات متاحة",
+    "save_and_create_invoice": "حفظ وإنشاء فاتورة",
     "creating_invoice": "جارٍ إنشاء الفاتورة...",
     "create_invoice": "إنشاء فاتورة",
     "creating": "جارٍ الإنشاء...",
