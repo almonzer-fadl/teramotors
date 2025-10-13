@@ -35,7 +35,9 @@ export interface CompanyConfig {
     
     // Unified National Number validation (10 digits)
     const vatRegex = /^\d{10}$/;
-    if (!vatRegex.test(config.vatNumber)) {
+    const trimmedVatNumber = String(config.vatNumber).trim();
+    if (!vatRegex.test(trimmedVatNumber)) {
+      console.error('VAT Number validation failed:', trimmedVatNumber, 'Length:', trimmedVatNumber.length, 'Original:', config.vatNumber);
       errors.push("Invalid Unified National Number format. Must be 10 digits");
     }
     
