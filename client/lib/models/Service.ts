@@ -5,7 +5,8 @@ const ServiceSchema = new Schema({
   name: { type: String, required: true },
   description: { type: String, required: false },
   category: { type: String, required: true },
-  laborRate: { type: Number, required: true },
+  fixedPrice: { type: Number, required: true, min: 0 },
+  laborRate: { type: Number, required: false },
   laborHours: { type: Number, required: true, min: 0 },
   partsRequired: [{
     partId: { type: Schema.Types.ObjectId, ref: 'Part' },
