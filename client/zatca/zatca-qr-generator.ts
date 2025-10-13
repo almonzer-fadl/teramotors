@@ -17,8 +17,12 @@ export class ZATCAQRGenerator {
     this.companyName = companyName || COMPANY_CONFIG.name;
     this.companyVATNumber = companyVATNumber || COMPANY_CONFIG.vatNumber;
     
+    // Ensure VAT number is a string and trim whitespace
+    this.companyVATNumber = String(this.companyVATNumber).trim();
+    
     // Validate company info
     if (!ZATCAUtils.isValidSaudiVATNumber(this.companyVATNumber)) {
+      console.error('Invalid VAT number:', this.companyVATNumber, 'Length:', this.companyVATNumber.length);
       throw new Error('Invalid company VAT number provided to ZATCAQRGenerator');
     }
   }
