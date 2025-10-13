@@ -25,7 +25,6 @@ interface VehicleMinimal {
 interface ServiceMinimal {
   _id: string;
   name: string;
-  fixedPrice: number;
   laborHours: number;
   laborRate: number;
 }
@@ -43,7 +42,7 @@ interface JobCardFormData {
   priority: "low" | "medium" | "high" | "urgent";
   estimatedStartTime: string;
   estimatedEndTime: string;
-  services: { serviceId: string; quantity: number; laborHours: number; laborRate: number; fixedPrice: number }[];
+  services: { serviceId: string; quantity: number; laborHours: number; laborRate: number }[];
   partsUsed: { partId: string; quantity: number; cost: number }[];
   notes: string;
 }
@@ -252,7 +251,6 @@ export default function JobCardForm({
       if (service) {
         updatedServices[index].laborHours = service.laborHours;
         updatedServices[index].laborRate = service.laborRate;
-        updatedServices[index].fixedPrice = service.fixedPrice;
       }
     }
 
@@ -275,7 +273,7 @@ export default function JobCardForm({
   const addService = () => {
     handleInputChange("services", [
       ...formData.services,
-      { serviceId: "", quantity: 1, laborHours: 0, laborRate: 0, fixedPrice: 0 },
+      { serviceId: "", quantity: 1, laborHours: 0, laborRate: 0 },
     ]);
   };
 

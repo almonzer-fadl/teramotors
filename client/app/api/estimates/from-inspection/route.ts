@@ -52,8 +52,7 @@ export async function POST(request: Request) {
         )
         
         if (matchingService) {
-          // Use fixedPrice if available, otherwise fallback to laborHours * laborRate for backward compatibility
-          const laborCost = matchingService.fixedPrice || (matchingService.laborHours * matchingService.laborRate)
+          const laborCost = matchingService.laborHours * matchingService.laborRate
           const partsCost = item.estimatedCost || 0
           const totalCost = laborCost + partsCost
           
