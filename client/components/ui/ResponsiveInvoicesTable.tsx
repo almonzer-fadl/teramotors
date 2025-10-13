@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/lib/simple-auth-client';
+import PrintModal from '@/components/pdf/PrintModal';
 import {
   Trash2,
   Eye,
@@ -17,6 +18,7 @@ import {
   DollarSign,
   Calendar,
   AlertTriangle,
+  Printer,
 } from 'lucide-react';
 
 interface Invoice {
@@ -78,6 +80,11 @@ export default function ResponsiveInvoicesTable({
   const { t } = useTranslation('common');
   const { user } = useSession();
   const isAdmin = user?.role === 'admin';
+  
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [selectedJobCard, setSelectedJobCard] = useState<any>(null);
+  const [qrCodeData, setQrCodeData] = useState<string>('');
 
   const handleDeleteInvoice = async (invoiceId: string) => {
     if (!isAdmin || !onDeleteInvoice) return;
@@ -96,6 +103,36 @@ export default function ResponsiveInvoicesTable({
       } catch (error) {
         console.error('Error deleting invoice:', error);
       }
+    }
+  };
+
+  const handlePrintInvoice = async (invoice: Invoice) => {
+    try {
+      // Fetch invoice details with job card and QR code
+      const response = await fetch(`/api/invoices/${invoice._id}/view`);
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedInvoice(data.invoice);
+        setSelectedJobCard(data.jobCard);
+        
+        // Get QR code data
+        const qrCode = data.invoice?.zatca?.qrCode || data.invoice?.zatca?.qrCodeImage;
+        if (qrCode) {
+          if (typeof qrCode === 'string' && qrCode.startsWith('data:')) {
+            setQrCodeData(qrCode);
+          } else {
+            setQrCodeData(`data:image/png;base64,${qrCode}`);
+          }
+        } else {
+          setQrCodeData('');
+        }
+        
+        setShowPrintModal(true);
+      } else {
+        console.error('Failed to fetch invoice details');
+      }
+    } catch (error) {
+      console.error('Error fetching invoice details:', error);
     }
   };
 
@@ -269,26 +306,13 @@ export default function ResponsiveInvoicesTable({
                       <Eye className="h-3 w-3 me-1" />
                       {t('common.view')}
                     </Link>
-                    <a
-                      href={`/api/invoices/${invoice._id}/pdf?lang=en`}
+                    <button
+                      onClick={() => handlePrintInvoice(invoice)}
                       className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-emerald-600 rounded hover:bg-emerald-700"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download={`invoice-${invoice._id.slice(-6)}-en.pdf`}
                     >
-                      <FileText className="h-3 w-3 me-1" />
-                      PDF
-                    </a>
-                    <a
-                      href={`/api/invoices/${invoice._id}/pdf-arabic?lang=ar`}
-                      className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-purple-600 rounded hover:bg-purple-700"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download={`invoice-${invoice._id.slice(-6)}-ar.pdf`}
-                    >
-                      <FileText className="h-3 w-3 me-1" />
-                      PDF عربي
-                    </a>
+                      <Printer className="h-3 w-3 me-1" />
+                      طباعة
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -422,30 +446,34 @@ export default function ResponsiveInvoicesTable({
                 <Eye className="h-3 w-3 me-1" />
                 {t('common.view')}
               </Link>
-              <a
-                href={`/api/invoices/${invoice._id}/pdf?lang=en`}
+              <button
+                onClick={() => handlePrintInvoice(invoice)}
                 className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
-                target="_blank"
-                rel="noopener noreferrer"
-                download={`invoice-${invoice._id.slice(-6)}-en.pdf`}
               >
-                <FileText className="h-3 w-3 me-1" />
-                PDF
-              </a>
-              <a
-                href={`/api/invoices/${invoice._id}/pdf-arabic?lang=ar`}
-                className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
-                target="_blank"
-                rel="noopener noreferrer"
-                download={`invoice-${invoice._id.slice(-6)}-ar.pdf`}
-              >
-                <FileText className="h-3 w-3 me-1" />
-                PDF عربي
-              </a>
+                <Printer className="h-3 w-3 me-1" />
+                طباعة
+              </button>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Print Modal */}
+      {selectedInvoice && (
+        <PrintModal
+          isOpen={showPrintModal}
+          onClose={() => {
+            setShowPrintModal(false);
+            setSelectedInvoice(null);
+            setSelectedJobCard(null);
+            setQrCodeData('');
+          }}
+          invoice={selectedInvoice}
+          jobCard={selectedJobCard}
+          qrCodeData={qrCodeData}
+          language={'ar'}
+        />
+      )}
     </div>
   );
 }
