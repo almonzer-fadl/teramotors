@@ -21,7 +21,7 @@ describe('ZATCA Compliance Tests', () => {
         ]
       }
 
-      const generator = new ZATCAQRGenerator('TeraMotors', '300000000000003')
+      const generator = new ZATCAQRGenerator('TeraMotors', '7051569718')
       const result = await generator.generateInvoice(invoiceData)
       
       expect(result.success).toBe(true)
@@ -46,7 +46,7 @@ describe('ZATCA Compliance Tests', () => {
         ]
       }
 
-      const generator = new ZATCAQRGenerator('TeraMotors', '300000000000003')
+      const generator = new ZATCAQRGenerator('TeraMotors', '7051569718')
       const result = await generator.generateInvoice(invoiceData)
       
       expect(result.success).toBe(true)
@@ -61,7 +61,7 @@ describe('ZATCA Compliance Tests', () => {
         items: []
       }
 
-      const generator = new ZATCAQRGenerator('TeraMotors', '300000000000003')
+      const generator = new ZATCAQRGenerator('TeraMotors', '7051569718')
       const result = await generator.generateInvoice(invalidData)
       
       expect(result.success).toBe(false)
@@ -406,7 +406,7 @@ describe('ZATCA Compliance Tests', () => {
       }
 
       // Test QR code generation
-      const generator = new ZATCAQRGenerator('TeraMotors', '300000000000003')
+      const generator = new ZATCAQRGenerator('TeraMotors', '7051569718')
       const result = await generator.generateInvoice(invoiceData)
 
       expect(result.success).toBe(true)
