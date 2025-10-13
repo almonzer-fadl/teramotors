@@ -13,8 +13,8 @@ export interface CompanyConfig {
   
   // Your company information - UPDATE THESE WITH YOUR ACTUAL DETAILS
   export const COMPANY_CONFIG: CompanyConfig = {
-    name: process.env.COMPANY_NAME || "Tera Motors LLC",
-    vatNumber: process.env.COMPANY_VAT_NUMBER || "300000000000003", // REPLACE with your real VAT number
+    name: process.env.COMPANY_NAME || "تيرا فيجنز لصيانه السيارات",
+    vatNumber: process.env.COMPANY_VAT_NUMBER || "7051569718", // Unified National Number
     address: {
       street: "King Fahd Road, Building 123",
       city: "Riyadh",
@@ -33,10 +33,10 @@ export interface CompanyConfig {
       errors.push("Company name is required");
     }
     
-    // Saudi VAT number validation (15 digits, starts and ends with 3)
-    const vatRegex = /^3\d{13}3$/;
+    // Unified National Number validation (10 digits)
+    const vatRegex = /^\d{10}$/;
     if (!vatRegex.test(config.vatNumber)) {
-      errors.push("Invalid Saudi VAT number format. Must be 15 digits starting and ending with 3");
+      errors.push("Invalid Unified National Number format. Must be 10 digits");
     }
     
     if (!config.address.postalCode || !/^\d{5}$/.test(config.address.postalCode)) {

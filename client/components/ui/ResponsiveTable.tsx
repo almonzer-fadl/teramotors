@@ -101,10 +101,16 @@ export default function ResponsiveTable({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {customer.address.street}, {customer.address.city}
+                    {customer.address?.street && customer.address?.city 
+                      ? `${customer.address.street}, ${customer.address.city}`
+                      : 'No address'
+                    }
                   </div>
                   <div className="text-sm text-gray-500">
-                    {customer.address.state} {customer.address.zipCode}
+                    {customer.address?.state && customer.address?.zipCode
+                      ? `${customer.address.state} ${customer.address.zipCode}`
+                      : ''
+                    }
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -201,7 +207,10 @@ export default function ResponsiveTable({
                 <div className="flex items-center text-sm text-gray-500">
                   <MapPin className="h-4 w-4 me-2" />
                   <span className="truncate">
-                    {customer.address.street}, {customer.address.city}, {customer.address.state}
+                    {customer.address?.street && customer.address?.city && customer.address?.state
+                      ? `${customer.address.street}, ${customer.address.city}, ${customer.address.state}`
+                      : 'No address'
+                    }
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
