@@ -214,9 +214,9 @@ if (validation.isValid) {
 ```
 Error: Invalid Saudi VAT number format
 ```
-**Solution**: VAT number must be exactly 15 digits, starting and ending with 3
-- ✅ Correct: `300000000000003`
-- ❌ Wrong: `123456789012345`
+**Solution**: Unified National Number must be exactly 10 digits
+- ✅ Correct: `7051569718`
+- ❌ Wrong: `123456789`
 
 ### Issue 2: QR Code Too Large
 ```
@@ -242,7 +242,7 @@ Warning: VAT amount doesn't match calculated value
 ```bash
 # Set production values
 COMPANY_NAME="Your Real Company Name"
-COMPANY_VAT_NUMBER="300000000000003"
+COMPANY_VAT_NUMBER="7051569718"
 ZATCA_ENVIRONMENT="production"
 ```
 

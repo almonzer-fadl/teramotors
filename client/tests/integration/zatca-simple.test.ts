@@ -4,7 +4,7 @@ import { ZATCAUtils } from '@/zatca/zatca-utils'
 
 describe('ZATCA Simple Tests', () => {
   test('should create ZATCAQRGenerator instance', () => {
-    const generator = new ZATCAQRGenerator('TeraMotors', '300000000000003')
+    const generator = new ZATCAQRGenerator('TeraMotors', '7051569718')
     expect(generator).toBeDefined()
   })
 
@@ -76,7 +76,7 @@ describe('ZATCA Simple Tests', () => {
       ]
     }
 
-    const generator = new ZATCAQRGenerator('TeraMotors', '300000000000003')
+    const generator = new ZATCAQRGenerator('TeraMotors', '7051569718')
     const result = await generator.generateInvoice(invoiceData)
     
     expect(result.success).toBe(true)
