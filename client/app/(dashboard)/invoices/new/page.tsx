@@ -126,6 +126,15 @@ function NewInvoiceContent() {
     loadData();
   }, []);
 
+  // Auto-select job card if jobCardId is provided in URL
+  useEffect(() => {
+    const jobCardId = params.get('jobCardId');
+    if (jobCardId && jobCards.length > 0) {
+      setSelectedJobCardId(jobCardId);
+      setMode("jobCard");
+    }
+  }, [params, jobCards]);
+
   // Fetch job card details when selected
   const fetchJobCardDetails = async (jobCardId: string) => {
     if (!jobCardId) return;

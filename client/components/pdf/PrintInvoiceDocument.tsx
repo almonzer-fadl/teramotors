@@ -54,7 +54,7 @@ const PrintInvoiceDocument = ({
   const translations = {
     ar: {
       title: "فاتورة",
-      company: "تيرا موتورز لصيانة السيارات",
+      company: "تيرا لصيانة السيارات",
       invoiceNumber: "رقم الفاتورة #",
       date: "التاريخ",
       dueDate: "تاريخ الاستحقاق",

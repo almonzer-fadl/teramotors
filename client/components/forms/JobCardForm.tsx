@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, X, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, X, Plus, Trash2, FileText } from "lucide-react";
 import { socketService } from "../../lib/services/socket";
 import { useTranslation } from "react-i18next";
 import { useSession } from "../../lib/hooks/useSession";
@@ -230,6 +230,36 @@ export default function JobCardForm({
       if (response.ok) {
         socketService.emitJobCreated();
         router.push("/job-cards");
+      } else {
+        const error = await response.json();
+        alert(error.message || t("forms.failed_to_save_job_card"));
+      }
+    } catch (error) {
+      console.error("Failed to save job card:", error);
+      alert(t("forms.failed_to_save_job_card"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveAndCreateInvoice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/job-cards", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        socketService.emitJobCreated();
+        // Navigate to invoice creation with the job card ID
+        router.push(`/invoices/new?jobCardId=${result.jobCard._id}`);
       } else {
         const error = await response.json();
         alert(error.message || t("forms.failed_to_save_job_card"));
@@ -677,6 +707,17 @@ export default function JobCardForm({
               <X className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
               {t("forms.cancel")}
             </button>
+            {!isEditing && (
+              <button
+                type="button"
+                onClick={handleSaveAndCreateInvoice}
+                disabled={loading}
+                className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-green-600 to-green-700 hover:shadow-xl hover:shadow-green-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <FileText className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                {loading ? t("forms.saving") : "حفظ وإنشاء فاتورة"}
+              </button>
+            )}
             <button
               type="submit"
               disabled={loading}
