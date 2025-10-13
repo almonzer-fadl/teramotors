@@ -23,9 +23,8 @@ interface ServiceMinimal {
   name: string;
   description?: string;
   category: string;
-  fixedPrice: number;
   laborHours: number;
-  laborRate?: number;
+  laborRate: number;
   partsRequired?: { partId: string; quantity: number }[];
 }
 interface PartMinimal {
@@ -543,9 +542,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                             if (selectedService) {
                               updateService(index, 'serviceId', selectedService._id);
                               updateService(index, 'name', selectedService.name);
-                              // Use fixedPrice if available, otherwise fallback to laborRate * laborHours for backward compatibility
-                              const servicePrice = selectedService.fixedPrice || (selectedService.laborRate || 0) * selectedService.laborHours;
-                              updateService(index, 'laborCost', servicePrice);
+                              updateService(index, 'laborCost', selectedService.laborRate * selectedService.laborHours);
                             } else {
                               updateService(index, 'serviceId', null);
                             }
@@ -553,14 +550,11 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300"
                         >
                           <option value="">{t('forms.select_service')}</option>
-                          {services && Array.isArray(services) && services.map((service) => {
-                            const servicePrice = service.fixedPrice || ((service.laborRate || 0) * service.laborHours);
-                            return (
-                              <option key={service._id} value={service._id}>
-                                {service.name} - ${servicePrice}
-                              </option>
-                            );
-                          })}
+                          {services && Array.isArray(services) && services.map((service) => (
+                            <option key={service._id} value={service._id}>
+                              {service.name} - ${service.laborRate * service.laborHours}
+                            </option>
+                          ))}
                         </select>
                         {service.name && (
                           <p className="mt-2 text-sm text-gray-600">

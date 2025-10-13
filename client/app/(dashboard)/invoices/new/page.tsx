@@ -21,7 +21,6 @@ interface ServiceLine {
   quantity: number;
   laborHours: number;
   laborRate: number;
-  fixedPrice?: number;
 }
 
 interface PartLine {
@@ -182,11 +181,10 @@ function NewInvoiceContent() {
 
   // Calculate totals
   const totals = useMemo(() => {
-    const servicesTotal = services.reduce((sum, service) => {
-      // Use fixedPrice if available, otherwise fallback to laborHours * laborRate for backward compatibility
-      const servicePrice = service.fixedPrice || (service.laborHours * service.laborRate);
-      return sum + service.quantity * servicePrice;
-    }, 0);
+    const servicesTotal = services.reduce(
+      (sum, service) => sum + service.quantity * service.laborHours * service.laborRate,
+      0
+    );
     const partsTotal = parts.reduce(
       (sum, part) => sum + part.quantity * part.cost,
       0
