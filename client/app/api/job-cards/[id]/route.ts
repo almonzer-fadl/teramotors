@@ -52,9 +52,15 @@ export async function PUT(
     
     const body = await request.json();
     
+    // Filter out empty appointmentId to prevent ObjectId casting error
+    const updateData = { ...body };
+    if (updateData.appointmentId === '' || updateData.appointmentId === null || updateData.appointmentId === undefined) {
+      delete updateData.appointmentId;
+    }
+    
     const jobCard = await JobCard.findByIdAndUpdate(
       id,
-      body,
+      updateData,
       { new: true }
     )
       .populate('appointmentId')

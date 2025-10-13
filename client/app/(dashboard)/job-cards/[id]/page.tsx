@@ -601,20 +601,9 @@ export default function JobCardDetailsPage() {
                     <label className="block text-sm font-bold text-gray-700 mb-2">
                       {t("forms.select_service")}
                     </label>
-                    <select
-                      value={serviceId}
-                      onChange={(e) =>
-                        handleServiceChange(index, "serviceId", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    >
-                      <option value="">{t("forms.select_service")}</option>
-                      {services.map((s) => (
-                        <option key={s._id} value={s._id}>
-                          {s.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-700">
+                      {selectedService && selectedService.name ? selectedService.name : t("forms.no_service_selected")}
+                    </div>
                     {selectedService && selectedService.name && (
                       <p className="mt-2 text-sm text-gray-600">
                         <strong>{t("job_cards.selected")}</strong> {selectedService.name}
@@ -625,85 +614,29 @@ export default function JobCardDetailsPage() {
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     {t("forms.qty")}
                   </label>
-                  <input
-                    type="number"
-                    value={service.quantity}
-                    onChange={(e) =>
-                      handleServiceChange(index, "quantity", parseInt(e.target.value))
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    min="1"
-                  />
+                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-700">
+                    {service.quantity}
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     {t("job_cards.labor_hours")}
                   </label>
-                  <input
-                    type="number"
-                    value={service.laborHours}
-                    onChange={(e) =>
-                      handleServiceChange(index, "laborHours", parseFloat(e.target.value))
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    min="0"
-                    step="0.1"
-                  />
+                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-700">
+                    {service.laborHours}
+                  </div>
                 </div>
-                {isAdmin ? (
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t("forms.labor_placeholder")}
-                    </label>
-                    <input
-                      type="number"
-                      value={service.laborRate}
-                      onChange={(e) =>
-                        handleServiceChange(index, "laborRate", parseFloat(e.target.value))
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      min="0"
-                      step="0.01"
-                    />
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    {t("forms.labor_placeholder")}
+                  </label>
+                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-700">
+                    {service.laborRate}
                   </div>
-                ) : (
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t("forms.labor_placeholder")}
-                    </label>
-                    <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
-                      {t("job_cards.admin_only")}
-                    </div>
-                  </div>
-                )}
-                <div className="flex items-end">
-                  <button
-                    type="button"
-                    onClick={() => removeService(index)}
-                    className="text-red-500 hover:text-red-700 p-3 rounded-xl hover:bg-red-50 transition-all duration-300"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
                 </div>
               </div>
               );
             })}
-            <div className="flex justify-between items-center mt-6">
-              <button
-                type="button"
-                onClick={addService}
-                className="group inline-flex items-center px-6 py-3 border-2 border-dashed border-gray-300 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-[#F13F33] hover:text-[#F13F33] transition-all duration-300"
-              >
-                <Plus className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                {t("job_cards.add_service")}
-              </button>
-              <button
-                onClick={saveServices}
-                className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 transition-all duration-300 hover:-translate-y-0.5"
-              >
-                {t("job_cards.save_services")}
-              </button>
-            </div>
           </div>
         </div>
 
@@ -724,20 +657,9 @@ export default function JobCardDetailsPage() {
                     <label className="block text-sm font-bold text-gray-700 mb-2">
                       {t("forms.select_part")}
                     </label>
-                    <select
-                      value={partId}
-                      onChange={(e) =>
-                        handlePartChange(index, "partId", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    >
-                      <option value="">{t("forms.select_part")}</option>
-                      {parts.map((p) => (
-                        <option key={p._id} value={p._id}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-700">
+                      {selectedPart && selectedPart.name ? selectedPart.name : t("forms.no_part_selected")}
+                    </div>
                     {selectedPart && selectedPart.name && (
                       <p className="mt-2 text-sm text-gray-600">
                         <strong>{t("job_cards.selected")}</strong> {selectedPart.name}
@@ -748,70 +670,21 @@ export default function JobCardDetailsPage() {
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     {t("forms.qty")}
                   </label>
-                  <input
-                    type="number"
-                    value={part.quantity}
-                    onChange={(e) =>
-                      handlePartChange(index, "quantity", parseInt(e.target.value))
-                    }
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    min="1"
-                  />
+                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-700">
+                    {part.quantity}
+                  </div>
                 </div>
-                {isAdmin ? (
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t("forms.cost_placeholder")}
-                    </label>
-                    <input
-                      type="number"
-                      value={part.cost}
-                      onChange={(e) =>
-                        handlePartChange(index, "cost", parseFloat(e.target.value))
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      min="0"
-                      step="0.01"
-                    />
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    {t("forms.cost_placeholder")}
+                  </label>
+                  <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-700">
+                    {part.cost}
                   </div>
-                ) : (
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t("forms.cost_placeholder")}
-                    </label>
-                    <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
-                      {t("job_cards.admin_only")}
-                    </div>
-                  </div>
-                )}
-                <div className="flex items-end">
-                  <button
-                    type="button"
-                    onClick={() => removePart(index)}
-                    className="text-red-500 hover:text-red-700 p-3 rounded-xl hover:bg-red-50 transition-all duration-300"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
                 </div>
               </div>
               );
             })}
-            <div className="flex justify-between items-center mt-6">
-              <button
-                type="button"
-                onClick={addPart}
-                className="group inline-flex items-center px-6 py-3 border-2 border-dashed border-gray-300 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:bg-gray-50 hover:border-[#F13F33] hover:text-[#F13F33] transition-all duration-300"
-              >
-                <Plus className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                {t("job_cards.add_part")}
-              </button>
-              <button
-                onClick={saveParts}
-                className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 transition-all duration-300 hover:-translate-y-0.5"
-              >
-                {t("job_cards.save_parts")}
-              </button>
-            </div>
           </div>
         </div>
 
@@ -821,20 +694,8 @@ export default function JobCardDetailsPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t("forms.notes")}
             </h2>
-            <textarea
-              value={jobCard.notes || ""}
-              onChange={(e) => setJobCard({ ...jobCard, notes: e.target.value })}
-              className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
-              rows={4}
-              placeholder={t("ui.enter_job_card_notes")}
-            />
-            <div className="flex justify-end mt-6">
-              <button
-                onClick={saveNotes}
-                className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 transition-all duration-300 hover:-translate-y-0.5"
-              >
-                {t("job_cards.save_notes")}
-              </button>
+            <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-100 text-gray-700 min-h-[100px]">
+              {jobCard.notes || t("ui.no_notes_available")}
             </div>
           </div>
         </div>
