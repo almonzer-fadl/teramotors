@@ -194,9 +194,12 @@ export async function POST(request: Request) {
           // Fallback totals if ZATCA failed
           const servicesTotal = Array.isArray(manualServices) ? manualServices.reduce((sum: number, s: any) => {
             const qty = Number(s.quantity || 0);
+            const fixedPrice = Number(s.fixedPrice || 0);
             const hours = Number(s.laborHours || 0);
             const rate = Number(s.laborRate || 0);
-            return sum + (qty * hours * rate);
+            // Use fixedPrice if available, otherwise fallback to hours * rate for backward compatibility
+            const servicePrice = fixedPrice || (hours * rate);
+            return sum + (qty * servicePrice);
           }, 0) : 0;
           const partsTotal = Array.isArray(manualParts) ? manualParts.reduce((sum: number, p: any) => {
             const qty = Number(p.quantity || 0);
@@ -209,9 +212,12 @@ export async function POST(request: Request) {
         // If anything fails in ZATCA path, fallback to totals only
         const servicesTotal = Array.isArray(manualServices) ? manualServices.reduce((sum: number, s: any) => {
           const qty = Number(s.quantity || 0);
+          const fixedPrice = Number(s.fixedPrice || 0);
           const hours = Number(s.laborHours || 0);
           const rate = Number(s.laborRate || 0);
-          return sum + (qty * hours * rate);
+          // Use fixedPrice if available, otherwise fallback to hours * rate for backward compatibility
+          const servicePrice = fixedPrice || (hours * rate);
+          return sum + (qty * servicePrice);
         }, 0) : 0;
         const partsTotal = Array.isArray(manualParts) ? manualParts.reduce((sum: number, p: any) => {
           const qty = Number(p.quantity || 0);

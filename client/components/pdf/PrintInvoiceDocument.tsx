@@ -18,10 +18,14 @@ const PrintInvoiceDocument = ({
 }: PrintInvoiceDocumentProps) => {
   const isRTL = true; // Force Arabic RTL layout
 
-  // Calculate totals exactly like Puppeteer version
+  // Calculate totals using fixed prices
   const services = jobCard?.services || [];
   const parts = jobCard?.partsUsed || [];
-  const servicesTotal = services.reduce((sum: number, s: any) => sum + (s.laborHours * s.laborRate), 0);
+  const servicesTotal = services.reduce((sum: number, s: any) => {
+    // Use fixedPrice if available, otherwise fallback to laborHours * laborRate for backward compatibility
+    const servicePrice = s.fixedPrice || (s.laborHours * s.laborRate);
+    return sum + (s.quantity * servicePrice);
+  }, 0);
   const partsTotal = parts.reduce((sum: number, p: any) => sum + (p.quantity * p.cost), 0);
   const subtotal = servicesTotal + partsTotal;
   const tax = subtotal * 0.15;
@@ -397,20 +401,23 @@ const PrintInvoiceDocument = ({
                 <th>{t.service}</th>
                 <th>{t.quantity}</th>
                 <th>{t.laborHours}</th>
-                <th>{t.laborRate}</th>
+                <th>السعر الثابت</th>
                 <th>{t.total}</th>
               </tr>
             </thead>
             <tbody>
-              {services.map((s: any, index: number) => (
-                <tr key={index}>
-                  <td>{s.serviceId?.name || ''}</td>
-                  <td>{s.quantity}</td>
-                  <td>{s.laborHours}</td>
-                  <td>{s.laborRate.toFixed(2)}</td>
-                  <td>{(s.laborHours * s.laborRate).toFixed(2)}</td>
-                </tr>
-              ))}
+              {services.map((s: any, index: number) => {
+                const servicePrice = s.fixedPrice || (s.laborHours * s.laborRate);
+                return (
+                  <tr key={index}>
+                    <td>{s.serviceId?.name || ''}</td>
+                    <td>{s.quantity}</td>
+                    <td>{s.laborHours}</td>
+                    <td>{servicePrice.toFixed(2)}</td>
+                    <td>{(s.quantity * servicePrice).toFixed(2)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

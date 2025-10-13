@@ -32,6 +32,7 @@ interface ServiceMinimal {
   _id: string;
   name: string;
   description: string;
+  fixedPrice: number;
   laborHours: number;
   laborRate: number;
 }
@@ -77,10 +78,11 @@ interface JobCard {
   notes?: string;
   photos: string[];
   services: { 
-    serviceId: { _id: string; name: string; description: string; laborHours: number; laborRate: number } | string; 
+    serviceId: { _id: string; name: string; description: string; fixedPrice: number; laborHours: number; laborRate: number } | string; 
     quantity: number; 
     laborHours: number; 
-    laborRate: number 
+    laborRate: number;
+    fixedPrice: number;
   }[];
   partsUsed: { 
     partId: { _id: string; name: string; partNumber: string; cost: number } | string; 
@@ -269,6 +271,7 @@ export default function JobCardDetailsPage() {
         if (service) {
           updatedServices[index].laborHours = service.laborHours;
           updatedServices[index].laborRate = service.laborRate;
+          updatedServices[index].fixedPrice = service.fixedPrice;
         }
       }
       
@@ -280,7 +283,7 @@ export default function JobCardDetailsPage() {
     if (jobCard) {
       const updatedServices = [
         ...jobCard.services,
-        { serviceId: "", quantity: 1, laborHours: 0, laborRate: 0 },
+        { serviceId: "", quantity: 1, laborHours: 0, laborRate: 0, fixedPrice: 0 },
       ];
       setJobCard({ ...jobCard, services: updatedServices });
     }
@@ -653,13 +656,13 @@ export default function JobCardDetailsPage() {
                 {isAdmin ? (
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t("forms.labor_placeholder")}
+                      السعر الثابت
                     </label>
                     <input
                       type="number"
-                      value={service.laborRate}
+                      value={service.fixedPrice || 0}
                       onChange={(e) =>
-                        handleServiceChange(index, "laborRate", parseFloat(e.target.value))
+                        handleServiceChange(index, "fixedPrice", parseFloat(e.target.value))
                       }
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                       min="0"
@@ -669,10 +672,10 @@ export default function JobCardDetailsPage() {
                 ) : (
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t("forms.labor_placeholder")}
+                      السعر الثابت
                     </label>
                     <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
-                      {t("job_cards.admin_only")}
+                      {service.fixedPrice || (service.laborHours * service.laborRate)} ر.س
                     </div>
                   </div>
                 )}
