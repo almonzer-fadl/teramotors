@@ -9,13 +9,35 @@ const serviceSchema = new mongoose.Schema({
     type: String
   },
   category: {
-    type: String
+    type: String,
+    required: true
   },
-  estimatedDuration: {
-    type: Number
+  fixedPrice: {
+    type: Number,
+    required: true,
+    min: 0
   },
-  defaultLaborRate: {
-    type: Number
+  laborRate: {
+    type: Number,
+    required: false
+  },
+  laborHours: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  partsRequired: [{
+    partId: { type: mongoose.Schema.Types.ObjectId, ref: 'Part' },
+    quantity: { type: Number, required: true, min: 1 },
+    cost: { type: Number, required: true, min: 0 }
+  }],
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  isTemplate: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true
