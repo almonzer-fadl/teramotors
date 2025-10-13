@@ -16,6 +16,9 @@ class SocketService {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
+  private hasLoggedConnectionError = false;
+  private hasLoggedReconnectError = false;
+  private hasLoggedReconnectFailed = false;
 
   connect() {
     if (this.socket?.connected) return;
@@ -23,6 +26,15 @@ class SocketService {
     if (!URL) {
       if (process.env.NODE_ENV === 'development') {
         console.log('[Socket] NEXT_PUBLIC_SOCKET_URL not set; skipping socket connection');
+      }
+      return;
+    }
+
+    // If we've already failed to connect multiple times, don't keep trying
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      if (process.env.NODE_ENV === 'development' && !this.hasLoggedReconnectFailed) {
+        console.warn('[Socket] Max reconnection attempts reached; skipping connection');
+        this.hasLoggedReconnectFailed = true;
       }
       return;
     }
@@ -58,6 +70,10 @@ class SocketService {
     this.socket.on('connect', () => {
       console.log('[Socket] Connected to server');
       this.reconnectAttempts = 0;
+      // Reset error flags on successful connection
+      this.hasLoggedConnectionError = false;
+      this.hasLoggedReconnectError = false;
+      this.hasLoggedReconnectFailed = false;
     });
 
     this.socket.on('disconnect', (reason) => {
@@ -65,8 +81,14 @@ class SocketService {
     });
 
     this.socket.on('connect_error', (error) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[Socket] Connection error:', error?.message || error);
+      // Only log timeout errors in development, and only once per session
+      if (process.env.NODE_ENV === 'development' && !this.hasLoggedConnectionError) {
+        if (error?.message === 'timeout') {
+          console.warn('[Socket] Connection timeout - server may not be running');
+        } else {
+          console.error('[Socket] Connection error:', error?.message || error);
+        }
+        this.hasLoggedConnectionError = true;
       }
       this.reconnectAttempts++;
     });
@@ -76,14 +98,21 @@ class SocketService {
     });
 
     this.socket.on('reconnect_error', (error) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[Socket] Reconnection error:', error?.message || error);
+      // Only log reconnection errors in development, and only once per session
+      if (process.env.NODE_ENV === 'development' && !this.hasLoggedReconnectError) {
+        if (error?.message === 'timeout') {
+          console.warn('[Socket] Reconnection timeout - server may not be running');
+        } else {
+          console.error('[Socket] Reconnection error:', error?.message || error);
+        }
+        this.hasLoggedReconnectError = true;
       }
     });
 
     this.socket.on('reconnect_failed', () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('[Socket] Failed to reconnect after', this.maxReconnectAttempts, 'attempts');
+      if (process.env.NODE_ENV === 'development' && !this.hasLoggedReconnectFailed) {
+        console.warn('[Socket] Failed to reconnect after', this.maxReconnectAttempts, 'attempts - server may not be running');
+        this.hasLoggedReconnectFailed = true;
       }
     });
   }

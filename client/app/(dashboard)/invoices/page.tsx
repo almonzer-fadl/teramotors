@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Plus,
   Search,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
 import ResponsiveInvoicesTable from "@/components/ui/ResponsiveInvoicesTable";
+import PrintModal from "@/components/pdf/PrintModal";
 import { useTranslation } from "react-i18next";
 
 interface Invoice {
@@ -67,8 +69,9 @@ interface PaginationInfo {
   hasPrevPage: boolean;
 }
 
-export default function InvoicesPage() {
+function InvoicesPageContent() {
   const { t } = useTranslation("common");
+  const searchParams = useSearchParams();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -84,9 +87,26 @@ export default function InvoicesPage() {
     hasPrevPage: false
   });
 
+  // Print modal state
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [selectedJobCard, setSelectedJobCard] = useState<any>(null);
+  const [qrCodeData, setQrCodeData] = useState<string>("");
+
   useEffect(() => {
     fetchInvoices(searchTerm, statusFilter, currentPage, itemsPerPage);
   }, [searchTerm, statusFilter, currentPage, itemsPerPage]);
+
+  // Handle print parameter from URL
+  useEffect(() => {
+    const printInvoiceId = searchParams.get('print');
+    if (printInvoiceId && invoices.length > 0) {
+      const invoice = invoices.find(inv => inv._id === printInvoiceId);
+      if (invoice) {
+        handlePrintInvoice(invoice);
+      }
+    }
+  }, [searchParams, invoices]);
 
   const fetchInvoices = async (search: string, status: string, page: number, limit: number) => {
     setLoading(true);
@@ -152,6 +172,36 @@ export default function InvoicesPage() {
 
   const handleDeleteInvoice = (invoiceId: string) => {
     setInvoices(prev => prev.filter(invoice => invoice._id !== invoiceId));
+  };
+
+  const handlePrintInvoice = async (invoice: Invoice) => {
+    try {
+      // Fetch invoice details with job card and QR code
+      const response = await fetch(`/api/invoices/${invoice._id}/view`);
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedInvoice(data.invoice);
+        setSelectedJobCard(data.jobCard);
+
+        // Get QR code data
+        const qrCode = data.invoice?.zatca?.qrCode || data.invoice?.zatca?.qrCodeImage;
+        if (qrCode) {
+          if (typeof qrCode === 'string' && qrCode.startsWith('data:')) {
+            setQrCodeData(qrCode);
+          } else {
+            setQrCodeData(`data:image/png;base64,${qrCode}`);
+          }
+        } else {
+          setQrCodeData('');
+        }
+
+        setShowPrintModal(true);
+      } else {
+        console.error('Failed to fetch invoice details');
+      }
+    } catch (error) {
+      console.error('Error fetching invoice details:', error);
+    }
   };
 
   const handleItemsPerPageChange = (itemsPerPage: number) => {
@@ -354,7 +404,36 @@ export default function InvoicesPage() {
             )}
           </div>
         )}
+
+        {/* Print Modal */}
+        {selectedInvoice && (
+          <PrintModal
+            isOpen={showPrintModal}
+            onClose={() => {
+              setShowPrintModal(false);
+              setSelectedInvoice(null);
+              setSelectedJobCard(null);
+              setQrCodeData('');
+            }}
+            invoice={selectedInvoice}
+            jobCard={selectedJobCard}
+            qrCodeData={qrCodeData}
+            language={'ar'}
+          />
+        )}
       </div>
     </div>
+  );
+}
+
+export default function InvoicesPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <InvoicesPageContent />
+    </Suspense>
   );
 }

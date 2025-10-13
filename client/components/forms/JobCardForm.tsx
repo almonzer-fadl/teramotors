@@ -715,7 +715,7 @@ export default function JobCardForm({
                 className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-green-600 to-green-700 hover:shadow-xl hover:shadow-green-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
               >
                 <FileText className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                {loading ? t("forms.saving") : "حفظ وإنشاء فاتورة"}
+                {loading ? t("forms.saving") : t("ui.save_and_create_invoice")}
               </button>
             )}
             <button

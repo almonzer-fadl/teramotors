@@ -62,6 +62,7 @@ function NewInvoiceContent() {
   const [notes, setNotes] = useState<string>("");
   const [taxRate, setTaxRate] = useState<number>(15);
 
+
   // Load initial data
   useEffect(() => {
     const loadData = async () => {
@@ -132,6 +133,8 @@ function NewInvoiceContent() {
     if (jobCardId && jobCards.length > 0) {
       setSelectedJobCardId(jobCardId);
       setMode("jobCard");
+      // Fetch job card details to populate the form
+      fetchJobCardDetails(jobCardId);
     }
   }, [params, jobCards]);
 
@@ -234,7 +237,8 @@ function NewInvoiceContent() {
 
       if (response.ok) {
         const invoice = await response.json();
-        router.push(`/invoices/${invoice._id}`);
+        // Navigate to invoices table
+        router.push('/invoices');
       } else {
         throw new Error("Failed to create invoice");
       }
@@ -273,6 +277,7 @@ function NewInvoiceContent() {
     updated[index] = { ...updated[index], [field]: value };
     setParts(updated);
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -757,6 +762,7 @@ function NewInvoiceContent() {
             </button>
           </div>
         </form>
+
       </div>
     </div>
   );

@@ -277,25 +277,6 @@ export default function ResponsiveJobCardsGrid({
                   </div>
                 </div>
 
-                {/* Appointment Info */}
-                <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="h-4 w-4 me-2 text-gray-400" />
-                    <span>
-                      {jobCard.appointmentId && jobCard.appointmentId.appointmentDate
-                        ? new Date(jobCard.appointmentId.appointmentDate).toLocaleDateString()
-                        : t('job_cards.no_appointment')}
-                    </span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="h-4 w-4 me-2 text-gray-400" />
-                    <span>
-                      {jobCard.appointmentId && jobCard.appointmentId.startTime && jobCard.appointmentId.endTime
-                        ? `${jobCard.appointmentId.startTime} - ${jobCard.appointmentId.endTime}`
-                        : t('job_cards.no_time')}
-                    </span>
-                  </div>
-                </div>
 
                 {/* Services */}
                 <div className="space-y-2">
