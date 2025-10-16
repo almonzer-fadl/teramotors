@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, X, Trash2, FileText, Wrench, Package } from "lucide-react";
+import { ArrowLeft, Save, X, Trash2, FileText, Wrench, Package, Plus } from "lucide-react";
 import { socketService } from "../../lib/services/socket";
 import { useTranslation } from "react-i18next";
 import { useSession } from "../../lib/hooks/useSession";
+import InlineInspectionCreator from "./InlineInspectionCreator";
+import InlineInvoiceCreator from "./InlineInvoiceCreator";
+import Link from "next/link";
 
 interface AppointmentMinimal {
   _id: string;
@@ -38,6 +41,8 @@ interface JobCardFormData {
   appointmentId: string;
   customerId: string;
   vehicleId: string;
+  inspectionId?: string;
+  invoiceId?: string;
   status: "pending" | "in-progress" | "completed" | "cancelled";
   priority: "low" | "medium" | "high" | "urgent";
   estimatedStartTime: string;
@@ -65,10 +70,14 @@ export default function JobCardForm({
   const [vehicles, setVehicles] = useState<VehicleMinimal[]>([]);
   const [services, setServices] = useState<ServiceMinimal[]>([]);
   const [parts, setParts] = useState<PartMinimal[]>([]);
+  const [isInspectionModalOpen, setInspectionModalOpen] = useState(false);
+  const [isInvoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [formData, setFormData] = useState<JobCardFormData>({
     appointmentId: "",
     customerId: "",
     vehicleId: "",
+    inspectionId: "",
+    invoiceId: "",
     status: "pending",
     priority: "medium",
     estimatedStartTime: "",
@@ -106,6 +115,8 @@ export default function JobCardForm({
           appointmentId: jobCard.appointmentId?._id || "",
           customerId: jobCard.customerId?._id || "",
           vehicleId: jobCard.vehicleId?._id || "",
+          inspectionId: jobCard.inspectionId?._id || jobCard.inspectionId || "",
+          invoiceId: jobCard.invoiceId?._id || jobCard.invoiceId || "",
           status: jobCard.status || "pending",
           priority: jobCard.priority || "medium",
           estimatedStartTime: jobCard.estimatedStartTime
@@ -362,6 +373,19 @@ export default function JobCardForm({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <InlineInspectionCreator
+        isOpen={isInspectionModalOpen}
+        onClose={() => setInspectionModalOpen(false)}
+        defaultCustomerId={formData.customerId}
+        defaultVehicleId={formData.vehicleId}
+        onCreated={(insp) => setFormData(prev => ({ ...prev, inspectionId: insp._id }))}
+      />
+      <InlineInvoiceCreator
+        isOpen={isInvoiceModalOpen}
+        onClose={() => setInvoiceModalOpen(false)}
+        jobCardId={jobCardId || ""}
+        onCreated={(invoice) => setFormData(prev => ({ ...prev, invoiceId: invoice._id }))}
+      />
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
         <div className="px-4 sm:px-6 lg:px-8">
@@ -449,6 +473,42 @@ export default function JobCardForm({
                           </option>
                         ))}
                     </select>
+                    <div className="mt-3 flex items-center gap-3 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => setInspectionModalOpen(true)}
+                        disabled={!formData.customerId || !formData.vehicleId}
+                        className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        {t('inspections.new_inspection')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setInvoiceModalOpen(true)}
+                        disabled={!formData.customerId || !formData.vehicleId}
+                        className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-500 disabled:opacity-50"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        {t('invoices.create_invoice')}
+                      </button>
+                      {formData.inspectionId && (
+                        <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-3 py-2">
+                          {t('inspections.linked')} {" "}
+                          <Link href={`/inspections/${formData.inspectionId}`} className="underline">
+                            #{formData.inspectionId.slice(-6)}
+                          </Link>
+                        </div>
+                      )}
+                      {formData.invoiceId && (
+                        <div className="text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2">
+                          {t('invoices.linked')} {" "}
+                          <Link href={`/invoices/${formData.invoiceId}`} className="underline">
+                            #{formData.invoiceId.slice(-6)}
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-2">

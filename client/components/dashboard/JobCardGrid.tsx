@@ -176,7 +176,7 @@ export default function JobCardGrid() {
                 </p>
               </div>
               <div className="space-y-1">
-                {jobCard.services.slice(0, 2).map((service, index) => (
+                {jobCard.services.slice(0, 3).map((service, index) => (
                   <div key={index} className="flex items-center">
                     <div className="w-1.5 h-1.5 bg-[#F13F33] rounded-full mr-2"></div>
                     <span className="text-xs text-gray-600 truncate">
@@ -184,12 +184,12 @@ export default function JobCardGrid() {
                     </span>
                   </div>
                 ))}
-                {jobCard.services.length > 2 && (
+                {jobCard.services.length > 3 && (
                   <div className="flex items-center">
                     <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></div>
                     <span className="text-xs text-gray-500">
                       {t("job_cards.and_more", {
-                        count: jobCard.services.length - 2,
+                        count: jobCard.services.length - 3,
                       })}
                     </span>
                   </div>

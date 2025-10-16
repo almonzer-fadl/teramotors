@@ -255,6 +255,7 @@
     "condition_fair": "Fair",
     "condition_poor": "Poor",
     "condition_critical": "Critical",
+    "condition_excellent": "Excellent",
     "vehicle_photo_alt": "Vehicle photo {{index}}",
     "na": "N/A",
     "failed_to_save_appointment": "Failed to save appointment",
@@ -264,7 +265,12 @@
     "failed_to_save_job_card": "Failed to save job card",
     "failed_to_save_part": "Failed to save part",
     "failed_to_save_service": "Failed to save service",
-    "failed_to_save_vehicle": "Failed to save vehicle"
+    "failed_to_save_vehicle": "Failed to save vehicle",
+    "category_general": "General",
+    "category_safety": "Safety",
+    "category_maintenance": "Maintenance",
+    "category_performance": "Performance",
+    "category": "Category"
   },
   "header": {
     "language": "Language",
@@ -576,7 +582,8 @@
       "fair": "Fair",
       "poor": "Poor",
       "critical": "Critical"
-    }
+    },
+    "no_items": "No items"
   },
   "inventory": {
     "title": "Inventory",
@@ -644,6 +651,7 @@
     "search_placeholder": "Search job cards...",
     "details_title": "Job Card Details",
     "status_in-progress": "In Progress",
+    "status_pending": "Pending",
     "status": "Status",
     "vehicle_info": "Vehicle Information",
     "customer_info": "Customer Information",
@@ -687,7 +695,13 @@
     "view": "View",
     "deleting": "Deleting...",
     "no_active_job_cards": "There are no active cards",
-    "no_active_job_cards_description": "Click on the button in the corner to create a new one"
+    "no_active_job_cards_description": "Click on the button in the corner to create a new one",
+    "more_services_count": "{{count}} more services",
+    "and_more": "and {{count}} more",
+    "start": "Start",
+    "stop": "Stop",
+    "no_active_workers": "No active workers",
+    "active_workers": "Active workers"
   },
   "vehicles": {
     "title": "Vehicles",
@@ -904,7 +918,21 @@
     "completed_jobs": "Completed Jobs",
     "access_denied": "Access Denied",
     "access_denied_description": "You don't have permission to access reports.",
-    "loading": "Loading reports..."
+    "loading": "Loading reports...",
+    "work_logs": "Work Logs",
+    "latest_n": "Latest {{count}} logs",
+    "user": "User",
+    "role": "Role",
+    "job": "Job",
+    "started": "Started",
+    "ended": "Ended",
+    "duration": "Duration",
+    "jobcard_suffix": "Job Card Suffix",
+    "user_id": "User ID",
+    "any_role": "Any Role",
+    "min_minutes": "Min Minutes",
+    "max_minutes": "Max Minutes",
+    "view_invoice": "View Invoice"
   },
   "services": {
     "title": "Services",
@@ -1148,7 +1176,12 @@
     "reschedule": "Reschedule",
     "teramotors_logo": "TeraMotors Logo",
     "zatca_qr": "ZATCA QR",
-    "description_of_inspection_item": "Description of this inspection item"
+    "description_of_inspection_item": "Description of this inspection item",
+    "condition_good": "Good",
+    "condition_fair": "Fair",
+    "condition_poor": "Poor",
+    "condition_critical": "Critical",
+    "example_items": "Example items: engine, brakes, tires"
   },
   "alerts": {
     "migration_completed": "Migration completed! {{count}} users migrated successfully.",

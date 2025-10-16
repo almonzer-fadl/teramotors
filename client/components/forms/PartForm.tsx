@@ -200,7 +200,7 @@ export default function PartForm({ partId }: { partId?: string }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="category" className="block text-sm font-bold text-gray-700">{t('inventory.category')}</label>
+                  <label htmlFor="category" className="block text-sm font-bold text-gray-700">{t('inventory.category')} <span className="text-gray-400">({t('forms.optional')})</span></label>
                   <Combobox
                     options={partCategories}
                     value={formData.category}

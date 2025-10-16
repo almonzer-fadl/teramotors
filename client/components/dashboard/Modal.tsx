@@ -8,9 +8,10 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   title?: string;
+  size?: 'sm' | 'lg' | 'xl' | 'full';
 }
 
-export default function Modal({ isOpen, onClose, children, title }: ModalProps) {
+export default function Modal({ isOpen, onClose, children, title, size = 'sm' }: ModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -18,21 +19,37 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
       }
     };
     document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    // Prevent background scroll when modal is open
+    const previousOverflow = document.body.style.overflow;
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = previousOverflow;
+    };
   }, [onClose]);
 
   if (!isOpen) return null;
 
+  const containerWidth = size === 'full'
+    ? 'w-full max-w-7xl h-[92vh]'
+    : size === 'xl'
+      ? 'w-full max-w-5xl max-h-[90vh]'
+      : size === 'lg'
+        ? 'w-full max-w-2xl max-h-[90vh]'
+        : 'w-full max-w-md max-h-[90vh]';
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md m-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overscroll-contain">
+      <div className={`bg-white rounded-lg shadow-xl ${containerWidth} m-4 flex flex-col`}>
         <div className="flex items-center justify-between p-4 border-b">
           {title && <h2 className="text-lg font-semibold">{title}</h2>}
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X className="h-6 w-6" />
           </button>
         </div>
-        <div className="p-4">
+        <div className="p-4 overflow-auto flex-1">
           {children}
         </div>
       </div>

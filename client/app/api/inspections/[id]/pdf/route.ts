@@ -34,10 +34,19 @@ export async function GET(
     // Generate HTML content for PDF
     const htmlContent = generateInspectionHTML(inspection, language, isRTL);
 
+    // Sanitize filename to ASCII-only to avoid ByteString errors in headers
+    const rawName = `inspection-${(inspection.vehicleId as any)?.licensePlate || 'unknown'}-${new Date(inspection.inspectionDate).toISOString().split('T')[0]}`;
+    const safeName = rawName
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '') // strip diacritics
+      .replace(/[^\x00-\x7F]/g, '') // remove non-ascii
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Za-z0-9._-]/g, '') || 'inspection';
+
     return new NextResponse(htmlContent, {
       headers: {
-        'Content-Type': 'text/html',
-        'Content-Disposition': `inline; filename="inspection-${(inspection.vehicleId as any)?.licensePlate || 'unknown'}-${new Date(inspection.inspectionDate).toISOString().split('T')[0]}.html"`,
+        'Content-Type': 'text/html; charset=utf-8',
+        'Content-Disposition': `inline; filename="${safeName}.html"`,
       },
     });
   } catch (error) {

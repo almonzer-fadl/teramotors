@@ -62,13 +62,21 @@ export async function PUT(
     // Calculate total estimated cost
     const totalEstimatedCost = body.items.reduce((sum: number, item: any) => sum + (item.estimatedCost || 0), 0);
 
+    const update: any = {
+      ...body,
+      totalEstimatedCost,
+      updatedAt: new Date()
+    };
+
+    // If templateId is empty string, unset it to avoid ObjectId cast errors
+    if (update.templateId === "" || update.templateId === null || update.templateId === undefined) {
+      delete update.templateId;
+      update.$unset = { templateId: 1 };
+    }
+
     const inspection = await VehicleInspection.findByIdAndUpdate(
       id,
-      {
-        ...body,
-        totalEstimatedCost,
-        updatedAt: new Date()
-      },
+      update,
       { new: true }
     )
       .populate('vehicleId', 'make model year licensePlate')

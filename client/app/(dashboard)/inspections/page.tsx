@@ -79,6 +79,7 @@ export default function InspectionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [generatingPDF, setGeneratingPDF] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -189,6 +190,20 @@ export default function InspectionsPage() {
       </div>
     );
   }
+
+  const handleDelete = async (inspectionId: string) => {
+    if (!confirm(t('inspections.confirm_delete') || 'Delete inspection?')) return;
+    setDeletingId(inspectionId);
+    try {
+      const res = await fetch(`/api/inspections/${inspectionId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed');
+      await fetchData();
+    } catch (e) {
+      alert(t('common.error_generic'));
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const totalInspections = filteredInspections.length;
   const completedInspections = filteredInspections.filter(i => i.status === 'completed').length;
@@ -327,6 +342,8 @@ export default function InspectionsPage() {
           inspections={filteredInspections}
           onGeneratePDF={generatePDF}
           generatingPDF={generatingPDF}
+          onDelete={handleDelete}
+          deletingId={deletingId}
         />
 
         {/* Empty State */}
