@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 const PartSchema = new Schema({
   name: { type: String, required: true },
   description: { type: String, required: false },
-  category: { type: String, required: true },
+  category: { type: String, required: false },
   manufacturer: { type: String, required: false },
   cost: { type: Number, required: true },
   sellingPrice: { type: Number, required: true },

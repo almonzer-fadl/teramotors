@@ -263,7 +263,13 @@
     "failed_to_save_job_card": "فشل حفظ بطاقة العمل",
     "failed_to_save_part": "فشل حفظ قطعة الغيار",
     "failed_to_save_service": "فشل حفظ الخدمة",
-    "failed_to_save_vehicle": "فشل حفظ المركبة"
+    "failed_to_save_vehicle": "فشل حفظ المركبة",
+    "category_general": "عام",
+    "category_safety": "أمان",
+    "category_maintenance": "صيانة",
+    "category_performance": "أداء",
+    "category": "الفئة",
+    "condition_excellent": "ممتاز"
   },
   "header": {
     "language": "اللغة",
@@ -574,7 +580,8 @@
       "fair": "مقبول",
       "poor": "ضعيف",
       "critical": "حرج"
-    }
+    },
+    "no_items": "لا يوجد عناصر"
   },
   "inventory": {
     "title": "المخزن",
@@ -640,6 +647,7 @@
     "search_placeholder": "البحث في كروت العمل...",
     "details_title": "تفاصيل بطاقة العمل",
     "status_in-progress": "قيد التنفيذ",
+    "status_pending":"في الانتظار",
     "status": "الحالة",
     "vehicle_info": "معلومات المركبة",
     "customer_info": "معلومات العميل",
@@ -665,6 +673,7 @@
     "add_part": "إضافة قطعة",
     "save_part": "حفظ القطعة",
     "save_note": "حفظ الملاحظة",
+    "more_services_count": "خدمات أخرى",
     "select_service": "اختر خدمة",
     "select_part": "اختر قطعة",
     "qty": "الكمية",
@@ -683,7 +692,11 @@
     "failed_to_delete": "فشل في حذف بطاقة العمل",
     "deleting": "جاري الحذف...",
     "no_active_job_cards": "لا يوجد كروت عمل نشطة",
-    "no_active_job_cards_description": "اضغط على الزر في الزاوية لعمل كرت عمل جديد"
+    "no_active_job_cards_description": "اضغط على الزر في الزاوية لعمل كرت عمل جديد",
+    "start": "بدء",
+    "stop": "إنهاء",
+    "no_active_workers": "لا يوجد عمال نشطين",
+    "active_workers": "عمال نشطين"
   },
   "vehicles": {
     "title": "المركبات",
@@ -897,7 +910,21 @@
     "job_status_distribution": "توزيع حالة الوظائف",
     "performance_metrics": "مقاييس الأداء",
     "avg_completion_time": "متوسط وقت الإنجاز",
-    "completed_jobs": "الوظائف المكتملة"
+    "completed_jobs": "الوظائف المكتملة",
+    "work_logs": "سجلات العمل",
+    "latest_n": "آخر {{count}} سجل",
+    "user": "المستخدم",
+    "role": "الدور",
+    "job": "بطاقة العمل",
+    "started": "بدء",
+    "ended": "انهاء",
+    "duration": "المدة",
+    "jobcard_suffix": "لاحقة بطاقة العمل",
+    "user_id": "معرف المستخدم",
+    "any_role": "أي دور",
+    "min_minutes": "الحد الأدنى (دقائق)",
+    "max_minutes": "الحد الأقصى (دقائق)",
+    "view_invoice": "عرض الفاتورة"
   },
   "services": {
     "title": "الخدمات",
@@ -1141,7 +1168,12 @@
     "reschedule": "إعادة الجدولة",
     "teramotors_logo": "شعار تيرا موتورز",
     "zatca_qr": "رمز ZATCA QR",
-    "description_of_inspection_item": "وصف عنصر الفحص هذا"
+    "description_of_inspection_item": "وصف عنصر الفحص هذا",
+    "condition_good": "جيد",
+    "condition_fair": "مقبول",
+    "condition_poor": "ضعيف",
+    "condition_critical": "حرج",
+    "example_items": "عناصر مثالية: محرك, فرامل, إطارات"
   },
   "alerts": {
     "migration_completed": "تمت الهجرة! {{count}} مستخدم تم نقلهم بنجاح.",

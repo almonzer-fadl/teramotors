@@ -38,7 +38,7 @@ export default function ServiceForm({
     description: '',
     category: '',
     laborRate: 0,
-    laborHours: 0,
+    laborHours: 1,
     isActive: true,
     isTemplate: false,
   });
@@ -219,7 +219,7 @@ export default function ServiceForm({
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="category" className="block text-sm font-bold text-gray-700">{t('forms.select_category')}</label>
+                  <label htmlFor="category" className="block text-sm font-bold text-gray-700">{t('forms.select_category')} <span className="text-gray-400">({t('forms.optional')})</span></label>
                   <Combobox
                     options={serviceCategories}
                     value={formData.category}

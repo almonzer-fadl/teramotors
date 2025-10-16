@@ -18,6 +18,7 @@ import {
   Trash2,
 } from "lucide-react";
 import FileUpload from "@/components/dashboard/FileUpload";
+import InlineInvoiceCreator from "@/components/forms/InlineInvoiceCreator";
 import { useTranslation } from "react-i18next";
 import { socket } from "@/lib/services/socket";
 import { useSession } from "@/lib/hooks/useSession";
@@ -100,6 +101,8 @@ export default function JobCardDetailsPage() {
   const [deleting, setDeleting] = useState(false);
   const [parts, setParts] = useState<PartMinimal[]>([]);
   const [services, setServices] = useState<ServiceMinimal[]>([]);
+  const [linkedInvoiceId, setLinkedInvoiceId] = useState<string | null>(null);
+  const [showInvoiceCreator, setShowInvoiceCreator] = useState(false);
   
   const isAdmin = user?.role === 'admin';
 
@@ -108,6 +111,7 @@ export default function JobCardDetailsPage() {
       fetchJobCard();
       fetchParts();
       fetchServices();
+      fetchLinkedInvoice();
     }
   }, [id]);
 
@@ -152,6 +156,28 @@ export default function JobCardDetailsPage() {
       console.error("Failed to fetch services:", error);
       setServices([]); // Set empty array on error
     }
+  };
+
+  const fetchLinkedInvoice = async () => {
+    try {
+      const response = await fetch(`/api/job-cards/${id}/invoice`);
+      if (response.ok) {
+        const data = await response.json();
+        setLinkedInvoiceId(data.invoice?._id || null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch linked invoice:', error);
+    }
+  };
+
+  const createInvoiceFromJobCard = async () => {
+    setShowInvoiceCreator(true);
+  };
+
+  const handleInvoiceCreated = (invoice: { _id: string }) => {
+    setLinkedInvoiceId(invoice._id);
+    setShowInvoiceCreator(false);
+    alert(t('invoices.invoice_created_successfully'));
   };
 
   const handleTimeTracking = async (action: "start" | "end") => {
@@ -384,24 +410,6 @@ export default function JobCardDetailsPage() {
                 </p>
               </div>
               <div className="flex space-x-2">
-                {!jobCard.actualStartTime && (
-                  <button
-                    onClick={() => handleTimeTracking("start")}
-                    className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:shadow-xl hover:shadow-blue-600/25 transition-all duration-300 hover:-translate-y-0.5"
-                  >
-                    <Clock className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                    {t("job_cards.start_job")}
-                  </button>
-                )}
-                {jobCard.actualStartTime && !jobCard.actualEndTime && (
-                  <button
-                    onClick={() => handleTimeTracking("end")}
-                    className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-red-600 to-red-700 hover:shadow-xl hover:shadow-red-600/25 transition-all duration-300 hover:-translate-y-0.5"
-                  >
-                    <CheckCircle className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                    {t("job_cards.end_job")}
-                  </button>
-                )}
                 {isAdmin && (
                   <button
                     onClick={handleDeleteJobCard}
@@ -476,6 +484,31 @@ export default function JobCardDetailsPage() {
                   {t(`job_cards.status_${jobCard.status}`)}
                 </span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Inspection Details Section */}
+        {/* Invoice Quick Actions */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden mb-8">
+          <div className="px-8 py-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">{t('invoices.title')}</h2>
+              <p className="text-gray-600 text-sm mt-1">
+                {linkedInvoiceId ? t('common.view') : t('invoices.create_invoice')}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              {!linkedInvoiceId && (
+                <button onClick={createInvoiceFromJobCard} className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm hover:bg-blue-700 transition-colors">
+                  {t('invoices.create_invoice')}
+                </button>
+              )}
+              {linkedInvoiceId && (
+                <Link href={`/invoices/${linkedInvoiceId}`} className="px-4 py-2 rounded-xl border text-sm hover:bg-gray-50 transition-colors">
+                  {t('invoices.view_invoice')}
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -740,6 +773,14 @@ export default function JobCardDetailsPage() {
             </div>
           </div>
         </div>
+
+        {/* Inline Invoice Creator Modal */}
+        <InlineInvoiceCreator
+          isOpen={showInvoiceCreator}
+          onClose={() => setShowInvoiceCreator(false)}
+          jobCardId={Array.isArray(id) ? id[0] || "" : id || ""}
+          onCreated={handleInvoiceCreated}
+        />
       </div>
     </div>
   );

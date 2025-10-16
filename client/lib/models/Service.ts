@@ -4,9 +4,9 @@ const { Schema } = mongoose;
 const ServiceSchema = new Schema({
   name: { type: String, required: true },
   description: { type: String, required: false },
-  category: { type: String, required: true },
+  category: { type: String, required: false },
   laborRate: { type: Number, required: true },
-  laborHours: { type: Number, required: true, min: 0 },
+  laborHours: { type: Number, required: true, min: 0, default: 1 },
   partsRequired: [{
     partId: { type: Schema.Types.ObjectId, ref: 'Part' },
     quantity: { type: Number, required: true, min: 1 },

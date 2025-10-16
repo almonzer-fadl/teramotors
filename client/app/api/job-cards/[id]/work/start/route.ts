@@ -1,0 +1,39 @@
+import { getServerSession } from '@/lib/auth-server'
+import { connectToDatabase } from '@/lib/db'
+import WorkLog from '@/lib/models/WorkLog'
+import JobCard from '@/lib/models/JobCard'
+
+export async function POST(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession()
+    if (!session?.user?.id) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    await connectToDatabase()
+
+    const { id } = await context.params
+    const job = await JobCard.findById(id)
+    if (!job) return Response.json({ error: 'Job card not found' }, { status: 404 })
+
+    const body = await request.json().catch(() => ({} as any))
+    const role = body?.role || session.user.role || 'mechanic'
+
+    // Prevent duplicate active logs for this user on this job
+    const existing = await WorkLog.findOne({ jobCardId: id, userId: session.user.id, endedAt: { $exists: false } })
+    if (existing) return Response.json({ success: true, workLog: existing })
+
+    const log = new WorkLog({ jobCardId: id, userId: session.user.id, role, startedAt: new Date() })
+    await log.save()
+
+    return Response.json({ success: true, workLog: log })
+  } catch (e) {
+    console.error('Error starting work log:', e)
+    return Response.json({ error: 'Failed to start work' }, { status: 500 })
+  }
+}
+
+

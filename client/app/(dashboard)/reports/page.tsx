@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Pagination from '@/components/ui/Pagination'
 import { useSession } from '@/lib/hooks/useSession'
 import { hasPermission } from '@/lib/roles'
 import { 
@@ -68,6 +69,17 @@ export default function ReportsPage() {
   const [dateRange, setDateRange] = useState('30')
   const [reportType, setReportType] = useState('overview')
   const { t } = useTranslation()
+  const [workLogs, setWorkLogs] = useState<any[]>([])
+  const [logsPage, setLogsPage] = useState(1)
+  const [logsLimit, setLogsLimit] = useState(30)
+  const [logsTotal, setLogsTotal] = useState(0)
+  const [filterRole, setFilterRole] = useState('')
+  const [filterUserId, setFilterUserId] = useState('')
+  const [filterJobCardIdEnds, setFilterJobCardIdEnds] = useState('')
+  const [filterStartDate, setFilterStartDate] = useState('')
+  const [filterEndDate, setFilterEndDate] = useState('')
+  const [filterMinDuration, setFilterMinDuration] = useState('')
+  const [filterMaxDuration, setFilterMaxDuration] = useState('')
   // Check if user has admin permissions
   const userRole = (user as any)?.role || 'mechanic'
   const canAccessReports = hasPermission(userRole, 'canAccessReports')
@@ -75,8 +87,9 @@ export default function ReportsPage() {
   useEffect(() => {
     if (canAccessReports) {
       fetchReportData()
+      fetchWorkLogs()
     }
-  }, [canAccessReports, dateRange])
+  }, [canAccessReports, dateRange, logsPage, logsLimit])
 
   const fetchReportData = async () => {
     try {
@@ -89,6 +102,29 @@ export default function ReportsPage() {
       console.error('Error fetching report data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchWorkLogs = async () => {
+    try {
+      const params = new URLSearchParams()
+      params.set('page', String(logsPage))
+      params.set('limit', String(logsLimit))
+      if (filterRole) params.set('role', filterRole)
+      if (filterUserId) params.set('userId', filterUserId)
+      if (filterJobCardIdEnds) params.set('jobCardEndsWith', filterJobCardIdEnds)
+      if (filterStartDate) params.set('startDate', filterStartDate)
+      if (filterEndDate) params.set('endDate', filterEndDate)
+      if (filterMinDuration) params.set('minDurationMs', String(Number(filterMinDuration) * 60000))
+      if (filterMaxDuration) params.set('maxDurationMs', String(Number(filterMaxDuration) * 60000))
+      const response = await fetch(`/api/reports/work-logs?${params.toString()}`)
+      if (response.ok) {
+        const data = await response.json()
+        setWorkLogs(data.logs || [])
+        if (data.pagination) setLogsTotal(data.pagination.totalCount || 0)
+      }
+    } catch (e) {
+      // ignore
     }
   }
 
@@ -391,6 +427,18 @@ export default function ReportsPage() {
                   ))}
                 </tbody>
               </table>
+          <div className="p-4">
+            <Pagination
+              currentPage={logsPage}
+              totalPages={Math.max(1, Math.ceil((logsTotal || 0) / logsLimit))}
+              totalItems={logsTotal}
+              itemsPerPage={logsLimit}
+              onPageChange={(p) => setLogsPage(p)}
+              onItemsPerPageChange={(n) => { setLogsLimit(n); setLogsPage(1) }}
+              itemsPerPageOptions={[10, 30, 50, 100]}
+              className="mt-2"
+            />
+          </div>
             </div>
           </div>
 
@@ -466,6 +514,70 @@ export default function ReportsPage() {
                 <div className="text-sm text-gray-500">{t('reports.gross_profit')}</div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Work Logs */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h3 className="text-lg font-medium text-gray-900">{t('reports.work_logs')}</h3>
+            <div className="text-sm text-gray-500">{t('reports.latest_n', { count: workLogs.length })}</div>
+          </div>
+          <div className="px-6 py-4 border-b border-gray-200 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+            <input
+              value={filterJobCardIdEnds}
+              onChange={(e) => { setFilterJobCardIdEnds(e.target.value.toUpperCase()); setLogsPage(1) }}
+              placeholder={t('reports.jobcard_suffix') as string}
+              className="px-3 py-2 border rounded-md text-sm"
+            />
+            <input
+              value={filterUserId}
+              onChange={(e) => { setFilterUserId(e.target.value); setLogsPage(1) }}
+              placeholder={t('reports.user_id') as string}
+              className="px-3 py-2 border rounded-md text-sm"
+            />
+            <select
+              value={filterRole}
+              onChange={(e) => { setFilterRole(e.target.value); setLogsPage(1) }}
+              className="px-3 py-2 border rounded-md text-sm"
+            >
+              <option value="">{t('reports.any_role')}</option>
+              <option value="mechanic">{t('roles.mechanic')}</option>
+              <option value="inspector">{t('roles.inspector')}</option>
+              <option value="admin">{t('roles.admin')}</option>
+            </select>
+            <input type="date" value={filterStartDate} onChange={(e)=>{ setFilterStartDate(e.target.value); setLogsPage(1) }} className="px-3 py-2 border rounded-md text-sm" />
+            <input type="date" value={filterEndDate} onChange={(e)=>{ setFilterEndDate(e.target.value); setLogsPage(1) }} className="px-3 py-2 border rounded-md text-sm" />
+            <div className="flex items-center gap-2">
+              <input type="number" min="0" value={filterMinDuration} onChange={(e)=>{ setFilterMinDuration(e.target.value); setLogsPage(1) }} placeholder={t('reports.min_minutes') as string} className="w-1/2 px-3 py-2 border rounded-md text-sm" />
+              <input type="number" min="0" value={filterMaxDuration} onChange={(e)=>{ setFilterMaxDuration(e.target.value); setLogsPage(1) }} placeholder={t('reports.max_minutes') as string} className="w-1/2 px-3 py-2 border rounded-md text-sm" />
+            </div>
+          </div>
+          <div className="overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reports.user')}</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reports.role')}</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reports.job')}</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reports.started')}</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reports.ended')}</th>
+                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">{t('reports.duration')}</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {workLogs.map((log, idx) => (
+                  <tr key={idx}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{log.userId?.displayName || `${log.userId?.firstName || ''} ${log.userId?.lastName || ''}`}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{log.role}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#{(log.jobCardId?._id || '').slice(-6)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(log.startedAt).toLocaleString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{log.endedAt ? new Date(log.endedAt).toLocaleString() : '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{typeof log.durationMs === 'number' ? `${Math.round(log.durationMs / 60000)} min` : '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

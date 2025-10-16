@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Plus,
@@ -138,6 +138,29 @@ export default function ResponsiveJobCardsGrid({
     }
   };
 
+  const [activeWorkersMap, setActiveWorkersMap] = useState<Record<string, { names: string[]; isSelfActive: boolean }>>({})
+
+  useEffect(() => {
+    const loadActive = async () => {
+      const entries = await Promise.all(jobCards.map(async (jc) => {
+        try {
+          const res = await fetch(`/api/job-cards/${jc._id}/work/active`)
+          if (!res.ok) return [jc._id, { names: [] as string[], isSelfActive: false }] as const
+          const data = await res.json()
+          const names: string[] = (data.logs || []).map((l: any) => l.userId?.displayName || `${l.userId?.firstName || ''} ${l.userId?.lastName || ''}`.trim()).filter(Boolean)
+          const isSelfActive = (data.logs || []).some((l: any) => (l.userId?._id || '').toString() === (user as any)?.id)
+          return [jc._id, { names, isSelfActive }] as const
+        } catch {
+          return [jc._id, { names: [] as string[], isSelfActive: false }] as const
+        }
+      }))
+      const map: Record<string, { names: string[]; isSelfActive: boolean }> = {}
+      entries.forEach(([id, info]) => { map[id] = info })
+      setActiveWorkersMap(map)
+    }
+    void loadActive()
+  }, [jobCards, user])
+
   const totalLaborHours = (services: JobCard['services']) => {
     return services.reduce((sum, s) => sum + s.laborHours, 0);
   };
@@ -207,8 +230,9 @@ export default function ResponsiveJobCardsGrid({
           {jobCards.map((jobCard) => (
             <div
               key={jobCard._id}
-              className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+              className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col"
             >
+              {/* Active Workers moved under header near ID */}
               {/* Card Header */}
               <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                 <div className="flex items-center justify-between mb-3">
@@ -222,7 +246,7 @@ export default function ResponsiveJobCardsGrid({
                       {t(`status.${jobCard.status.replace("-", "_")}`)}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-1">
+                <div className="flex items-center space-x-2">
                     {getPriorityIcon(jobCard.priority)}
                     <span
                       className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
@@ -231,6 +255,24 @@ export default function ResponsiveJobCardsGrid({
                     >
                       {t(`priority.${jobCard.priority}`)}
                     </span>
+                  {/* Start/Stop Buttons */}
+                  {activeWorkersMap[jobCard._id]?.isSelfActive ? (
+                    <button
+                      onClick={async () => { try { await fetch(`/api/job-cards/${jobCard._id}/work/stop`, { method: 'POST' }); } catch {} finally { try { const res = await fetch(`/api/job-cards/${jobCard._id}/work/active`); const data = await res.json(); setActiveWorkersMap(prev => ({ ...prev, [jobCard._id]: { names: (data.logs||[]).map((l:any)=>l.userId?.displayName||`${l.userId?.firstName||''} ${l.userId?.lastName||''}`.trim()).filter(Boolean), isSelfActive: false } })) } catch {} } }}
+                      className="ml-2 inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-white bg-gray-700 hover:bg-gray-800"
+                      title={t('job_cards.stop_work')}
+                    >
+                      <Clock className="h-3 w-3 mr-1" /> {t('job_cards.stop')}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={async () => { try { await fetch(`/api/job-cards/${jobCard._id}/work/start`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }); } catch {} finally { try { const res = await fetch(`/api/job-cards/${jobCard._id}/work/active`); const data = await res.json(); const names = (data.logs||[]).map((l:any)=>l.userId?.displayName||`${l.userId?.firstName||''} ${l.userId?.lastName||''}`.trim()).filter(Boolean); setActiveWorkersMap(prev => ({ ...prev, [jobCard._id]: { names, isSelfActive: true } })) } catch {} } }}
+                      className="ml-2 inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-white bg-blue-600 hover:bg-blue-700"
+                      title={t('job_cards.start_work')}
+                    >
+                      <Clock className="h-3 w-3 mr-1" /> {t('job_cards.start')}
+                    </button>
+                  )}
                   </div>
                 </div>
                 
@@ -238,10 +280,16 @@ export default function ResponsiveJobCardsGrid({
                 <div className="text-xs text-gray-500 font-mono">
                   #{jobCard._id.slice(-8).toUpperCase()}
                 </div>
+                {/* Active Workers under header */}
+                <div className="text-xs text-gray-500 font-mono mt-1">
+                  {activeWorkersMap[jobCard._id]?.names?.length
+                    ? `${t('job_cards.active_workers')}: ${activeWorkersMap[jobCard._id].names.join(', ')}`
+                    : t('job_cards.no_active_workers')}
+                </div>
               </div>
 
               {/* Card Body */}
-              <div className="px-6 py-4 space-y-4">
+              <div className="px-6 py-4 space-y-4 flex-1 flex flex-col">
                 {/* Customer & Vehicle */}
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3">
@@ -285,7 +333,7 @@ export default function ResponsiveJobCardsGrid({
                     {t('job_cards.services_label')}
                   </div>
                   <div className="space-y-1">
-                    {jobCard.services.slice(0, 2).map((service, index) => (
+                    {jobCard.services.slice(0, 3).map((service, index) => (
                       <div key={index} className="flex items-center justify-between text-xs">
                         <span className="text-gray-600 truncate flex-1">
                           {service.serviceId.name}
@@ -295,16 +343,23 @@ export default function ResponsiveJobCardsGrid({
                         </span>
                       </div>
                     ))}
-                    {jobCard.services.length > 2 && (
-                      <div className="text-xs text-gray-500">
-                        +{jobCard.services.length - 2} {t('job_cards.more_services')}
-                      </div>
-                    )}
+                    {jobCard.services.length > 3 && (() => {
+                      const remaining = jobCard.services.slice(3);
+                      const remainingNames = remaining
+                        .map((s) => (typeof s.serviceId === 'object' && s.serviceId ? s.serviceId.name : ''))
+                        .filter(Boolean)
+                        .join(', ');
+                      return (
+                        <div className="text-xs text-gray-500" title={remainingNames}>
+                          {t('job_cards.more_services_count', { count: remaining.length })}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
                 {/* Stats */}
-                <div className={`grid gap-3 pt-2 border-t border-gray-100 ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                <div className={`grid gap-3 pt-2 border-t border-gray-100 ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'} mt-auto`}>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-gray-900">
                       {totalLaborHours(jobCard.services)}h
@@ -331,8 +386,8 @@ export default function ResponsiveJobCardsGrid({
               </div>
 
               {/* Card Footer */}
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-                <div className="flex items-center justify-between">
+              <div className="px-6 bg-gray-50 border-t border-gray-100 h-16 flex items-center">
+                <div className="flex items-center justify-between w-full">
                   <div className="flex space-x-2">
                     <Link
                       href={`/job-cards/${jobCard._id}`}
@@ -341,13 +396,15 @@ export default function ResponsiveJobCardsGrid({
                       <Eye className="h-3 w-3 me-1" />
                       {t('common.view')}
                     </Link>
-                    <Link
-                      href={`/job-cards/${jobCard._id}/edit`}
-                      className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                    >
-                      <Edit className="h-3 w-3 me-1" />
-                      {t('common.edit')}
-                    </Link>
+                    {isAdmin && (
+                      <Link
+                        href={`/job-cards/${jobCard._id}/edit`}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                      >
+                        <Edit className="h-3 w-3 me-1" />
+                        {t('common.edit')}
+                      </Link>
+                    )}
                     {isAdmin && onDeleteJobCard && (
                       <button
                         onClick={() => onDeleteJobCard(jobCard._id)}

@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Upload } from "lucide-react";
 import ResponsiveServicesTable from "@/components/ui/ResponsiveServicesTable";
+import Pagination from "@/components/ui/Pagination";
+import ExcelImportModal from "@/components/dashboard/ExcelImportModal";
 import { socket } from "@/lib/services/socket";
 import { useSession } from "@/lib/hooks/useSession";
 import { hasPermission } from "@/lib/roles";
@@ -33,6 +35,9 @@ export default function ServicesPage() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Check if user has admin permissions
   const userRole = (user as any)?.role || 'inspector';
@@ -132,6 +137,14 @@ export default function ServicesPage() {
     }
   };
 
+  // Pagination hooks must be declared before any conditional returns
+  const paginatedServices = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return sortedServices.slice(start, start + itemsPerPage);
+  }, [sortedServices, currentPage, itemsPerPage]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedServices.length / itemsPerPage));
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -143,6 +156,52 @@ export default function ServicesPage() {
   const totalServices = sortedServices.length;
   const activeServices = sortedServices.filter(s => s.isActive).length;
   const inactiveServices = sortedServices.filter(s => !s.isActive).length;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (perPage: number) => {
+    setItemsPerPage(perPage);
+    setCurrentPage(1);
+  };
+
+  const handleImport = async (file: File) => {
+    console.log('Starting import for file:', file.name);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      console.log('Sending request to /api/services/import');
+      const response = await fetch('/api/services/import', {
+        method: 'POST',
+        body: formData,
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
+        return { success: false, message: `Server error: ${response.status}` };
+      }
+
+      const result = await response.json();
+      console.log('Import result:', result);
+      
+      if (result.success) {
+        // Refresh the services list
+        fetchServices(searchTerm, sortKey, sortDirection, selectedCategory);
+        return { success: true, message: result.message };
+      } else {
+        return { success: false, message: result.error?.message || 'Import failed' };
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      return { success: false, message: `Failed to import services: ${error instanceof Error ? error.message : 'Unknown error'}` };
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
@@ -165,13 +224,14 @@ export default function ServicesPage() {
               <Plus className="me-2 h-4 w-4" />
               {t('services.add_service')}
             </Link>
-            <Link
-              href="/services/new?fromTemplate=true"
-              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 transition-colors"
+            
+            <button
+              onClick={() => setIsImportModalOpen(true)}
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-purple-500 transition-colors"
             >
-              <Plus className="me-2 h-4 w-4" />
-              {t('services.new_from_template')}
-            </Link>
+              <Upload className="me-2 h-4 w-4" />
+              Import from Excel
+            </button>
           </div>
         </div>
 
@@ -275,12 +335,21 @@ export default function ServicesPage() {
 
         {/* Services Table */}
         <ResponsiveServicesTable
-          services={sortedServices}
+          services={paginatedServices}
           sortKey={sortKey}
           sortDirection={sortDirection}
           onSort={handleSort}
           onDelete={handleDelete}
           canDelete={canDeleteServices}
+        />
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={sortedServices.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
         />
 
         {/* Empty State */}
@@ -308,6 +377,18 @@ export default function ServicesPage() {
             )}
           </div>
         )}
+
+        {/* Excel Import Modal */}
+        <ExcelImportModal
+          isOpen={isImportModalOpen}
+          onClose={() => setIsImportModalOpen(false)}
+          onImport={handleImport}
+          title="Import Services from Excel"
+          description="Upload an Excel file to import multiple services at once"
+          acceptedFileTypes=".xlsx,.xls"
+          maxFileSize="5MB"
+          exampleHeaders={['name', 'price', 'description', 'category', 'laborHours']}
+        />
       </div>
     </div>
   );

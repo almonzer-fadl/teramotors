@@ -93,6 +93,10 @@ export async function POST(request: Request) {
       jobCardData.estimatedEndTime = new Date(body.estimatedEndTime);
     }
 
+    if (body.inspectionId) {
+      jobCardData.inspectionId = body.inspectionId;
+    }
+
     const jobCard = new JobCard(jobCardData)
 
     await jobCard.save()

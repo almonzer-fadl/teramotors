@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { Plus, Search, Package, DollarSign, AlertTriangle, CheckCircle } from "lucide-react";
+import { Plus, Search, Package, DollarSign, AlertTriangle, CheckCircle, Upload } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
 import ResponsiveInventoryTable from "@/components/ui/ResponsiveInventoryTable";
+import ExcelImportModal from "@/components/dashboard/ExcelImportModal";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -33,6 +34,9 @@ export default function InventoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     fetchParts(searchTerm, sortKey, sortDirection);
@@ -89,12 +93,53 @@ export default function InventoryPage() {
     });
   }, [parts, sortKey, sortDirection]);
 
+  const paginatedParts = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return sortedParts.slice(start, start + itemsPerPage);
+  }, [sortedParts, currentPage, itemsPerPage]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedParts.length / itemsPerPage));
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (perPage: number) => {
+    setItemsPerPage(perPage);
+    setCurrentPage(1);
+  };
+
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortKey(key);
       setSortDirection("asc");
+    }
+  };
+
+  const handleImport = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('/api/parts/import', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Refresh the parts list
+        fetchParts(searchTerm, sortKey, sortDirection);
+        return { success: true, message: result.message };
+      } else {
+        return { success: false, message: result.error?.message || 'Import failed' };
+      }
+    } catch (error) {
+      console.error('Import error:', error);
+      return { success: false, message: 'Failed to import parts' };
     }
   };
 
@@ -136,7 +181,7 @@ export default function InventoryPage() {
               {t('inventory.description')}
             </p>
           </div>
-          <div className="flex-shrink-0">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/inventory/new"
               className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
@@ -144,6 +189,13 @@ export default function InventoryPage() {
               <Plus className="me-2 h-4 w-4" />
               {t('inventory.add_part')}
             </Link>
+            <button
+              onClick={() => setIsImportModalOpen(true)}
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-purple-500 transition-colors"
+            >
+              <Upload className="me-2 h-4 w-4" />
+              Import from Excel
+            </button>
           </div>
         </div>
 
@@ -253,11 +305,20 @@ export default function InventoryPage() {
 
         {/* Parts Table */}
         <ResponsiveInventoryTable
-          parts={sortedParts}
+          parts={paginatedParts}
           onDelete={handleDelete}
           onSort={handleSort}
           sortKey={sortKey}
           sortDirection={sortDirection}
+        />
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={sortedParts.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
         />
 
         {/* Empty State */}
@@ -285,6 +346,18 @@ export default function InventoryPage() {
             )}
           </div>
         )}
+
+        {/* Excel Import Modal */}
+        <ExcelImportModal
+          isOpen={isImportModalOpen}
+          onClose={() => setIsImportModalOpen(false)}
+          onImport={handleImport}
+          title="Import Parts from Excel"
+          description="Upload an Excel file to import multiple parts at once"
+          acceptedFileTypes=".xlsx,.xls"
+          maxFileSize="5MB"
+          exampleHeaders={['name', 'price', 'description', 'category', 'manufacturer', 'cost', 'stockQuantity', 'minStockLevel', 'location', 'partNumber']}
+        />
       </div>
     </div>
   );

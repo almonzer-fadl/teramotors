@@ -13,6 +13,7 @@ import {
   Car,
   FileText,
   Calendar,
+  Trash2,
 } from 'lucide-react';
 
 interface InspectionTemplate {
@@ -76,12 +77,16 @@ interface ResponsiveInspectionsTableProps {
   inspections: VehicleInspection[];
   onGeneratePDF: (inspectionId: string) => void;
   generatingPDF: string | null;
+  onDelete?: (inspectionId: string) => void;
+  deletingId?: string | null;
 }
 
 export default function ResponsiveInspectionsTable({
   inspections,
   onGeneratePDF,
   generatingPDF,
+  onDelete,
+  deletingId,
 }: ResponsiveInspectionsTableProps) {
   const { t } = useTranslation('common');
 
@@ -275,6 +280,20 @@ export default function ResponsiveInspectionsTable({
                         <Download className="h-4 w-4" />
                       )}
                     </button>
+                    {onDelete && (
+                      <button
+                        onClick={() => onDelete(inspection._id)}
+                        disabled={deletingId === inspection._id}
+                        className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                        title={t('common.delete')}
+                      >
+                        {deletingId === inspection._id ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -410,6 +429,20 @@ export default function ResponsiveInspectionsTable({
                 )}
                 PDF
               </button>
+              {onDelete && (
+                <button
+                  onClick={() => onDelete(inspection._id)}
+                  disabled={deletingId === inspection._id}
+                  className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
+                >
+                  {deletingId === inspection._id ? (
+                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white me-1"></div>
+                  ) : (
+                    <Trash2 className="h-3 w-3 me-1" />
+                  )}
+                  {t('common.delete')}
+                </button>
+              )}
             </div>
           </div>
         ))}
