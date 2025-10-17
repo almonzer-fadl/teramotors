@@ -414,7 +414,7 @@ export default function JobCardForm({
 
       <div className="px-4 sm:px-6 lg:px-8 py-12">
         <form onSubmit={handleSubmit} className="space-y-10">
-          {/* Job Card Details Section */}
+          {/* Main Details Section - Customer and Vehicle Only */}
           <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
             <div className="px-8 py-8">
               <div className="flex items-center mb-8">
@@ -422,7 +422,7 @@ export default function JobCardForm({
                   <Wrench className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900">
-                  {t("forms.job_card_details")}
+                  {t("forms.job_card_Main_details")}
                 </h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -510,74 +510,6 @@ export default function JobCardForm({
                       )}
                     </div>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
-                    {t("forms.status")}
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => handleInputChange("status", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                  >
-                    <option value="pending">{t("estimates.pending")}</option>
-                    <option value="in-progress">{t("forms.in_progress")}</option>
-                    <option value="completed">{t("forms.completed")}</option>
-                    <option value="cancelled">{t("forms.cancelled")}</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
-                    {t("forms.priority")}
-                  </label>
-                  <select
-                    value={formData.priority}
-                    onChange={(e) => handleInputChange("priority", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                  >
-                    <option value="low">{t("forms.low")}</option>
-                    <option value="medium">{t("forms.medium")}</option>
-                    <option value="high">{t("forms.high")}</option>
-                    <option value="urgent">{t("forms.urgent")}</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
-                    {t("forms.start_time")}
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.estimatedStartTime}
-                    onChange={(e) =>
-                      handleInputChange("estimatedStartTime", e.target.value)
-                    }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
-                    {t("forms.end_time")}
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={formData.estimatedEndTime}
-                    onChange={(e) =>
-                      handleInputChange("estimatedEndTime", e.target.value)
-                    }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                  />
-                </div>
-                <div className="md:col-span-2 space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
-                    {t("forms.notes")}
-                  </label>
-                  <textarea
-                    value={formData.notes}
-                    onChange={(e) => handleInputChange("notes", e.target.value)}
-                    rows={4}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
-                    placeholder={t('ui.enter_job_card_notes')}
-                  />
                 </div>
               </div>
             </div>
@@ -767,7 +699,90 @@ export default function JobCardForm({
             </div>
           </div>
 
-
+          {/* Additional Job Card Details Section */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="px-8 py-8">
+              <div className="flex items-center mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {t("job_cards.additional_details")}
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("forms.status")}
+                  </label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => handleInputChange("status", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  >
+                    <option value="pending">{t("estimates.pending")}</option>
+                    <option value="in-progress">{t("forms.in_progress")}</option>
+                    <option value="completed">{t("forms.completed")}</option>
+                    <option value="cancelled">{t("forms.cancelled")}</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("forms.priority")}
+                  </label>
+                  <select
+                    value={formData.priority}
+                    onChange={(e) => handleInputChange("priority", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  >
+                    <option value="low">{t("forms.low")}</option>
+                    <option value="medium">{t("forms.medium")}</option>
+                    <option value="high">{t("forms.high")}</option>
+                    <option value="urgent">{t("forms.urgent")}</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("forms.start_time")}
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={formData.estimatedStartTime}
+                    onChange={(e) =>
+                      handleInputChange("estimatedStartTime", e.target.value)
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("forms.end_time")}
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={formData.estimatedEndTime}
+                    onChange={(e) =>
+                      handleInputChange("estimatedEndTime", e.target.value)
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("forms.notes")}
+                  </label>
+                  <textarea
+                    value={formData.notes}
+                    onChange={(e) => handleInputChange("notes", e.target.value)}
+                    rows={4}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
+                    placeholder={t('ui.enter_job_card_notes')}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          
           {/* Form Actions */}
           <div className="flex justify-end space-x-6">
             <button

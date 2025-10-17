@@ -82,8 +82,11 @@ export async function POST(request: Request) {
     
     const body = await request.json();
     
-    const { estimateId, jobCardId, dueDate, notes, paymentMethod } = body;
+    const { estimateId, jobCardId, dueDate, notes, paymentMethod, discount } = body;
     const { customerId: manualCustomerId, vehicleId: manualVehicleId, services: manualServices, partsUsed: manualParts } = body;
+
+    // Debug logging
+    console.log('Invoice creation request body:', { discount, jobCardId, manualCustomerId, manualVehicleId });
 
     let totalAmount = 0;
     let customerId;
@@ -111,6 +114,7 @@ export async function POST(request: Request) {
         notes,
         dueDate: dueDate ? new Date(dueDate) : undefined,
         paymentMethod,
+        discount: discount || jobCard.discount || 0, // Use job card discount if not provided in request
       });
 
       if (zatcaResult.success && zatcaResult.invoice) {
@@ -132,7 +136,11 @@ export async function POST(request: Request) {
         // Fallback calculation if ZATCA fails
         const servicesTotal = (jobCard.services || []).reduce((sum: number, s: any) => sum + (s.laborHours * s.laborRate), 0);
         const partsTotal = (jobCard.partsUsed || []).reduce((sum: number, p: any) => sum + (p.quantity * p.cost), 0);
-        totalAmount = servicesTotal + partsTotal;
+        const subtotal = servicesTotal + partsTotal;
+        const tax = partsTotal * 0.15; // 15% tax ONLY on parts
+        const jobCardDiscount = discount || jobCard.discount || 0; // Use job card discount if not provided
+        const discountAmount = (subtotal + tax) * (jobCardDiscount / 100);
+        totalAmount = subtotal + tax - discountAmount;
         customerId = jobCard.customerId;
         vehicleId = jobCard.vehicleId;
       }
@@ -154,7 +162,7 @@ export async function POST(request: Request) {
               description: `Labor hours: ${Number(s.laborHours || 0)}`,
               quantity: Number(s.quantity || 0) || 1,
               unitPrice: Number(s.laborRate || 0),
-              vatRate: undefined,
+              vatRate: 0, // No tax on services
             });
           });
         }
@@ -166,10 +174,14 @@ export async function POST(request: Request) {
               description: 'Auto part',
               quantity: Number(p.quantity || 0) || 1,
               unitPrice: Number(p.cost || 0),
-              vatRate: undefined,
+              vatRate: 15, // 15% tax on parts
             });
           });
         }
+
+        // Calculate absolute discount from percentage
+        const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+        const discountAmount = subtotal * ((discount || 0) / 100);
 
         const zatcaResult = await invoiceService.createInvoice({
           items,
@@ -177,6 +189,7 @@ export async function POST(request: Request) {
           paymentMethod,
           notes,
           dueDate: dueDate ? new Date(dueDate) : undefined,
+          globalDiscount: discountAmount,
         });
 
         if (zatcaResult.success && zatcaResult.invoice) {
@@ -203,7 +216,7 @@ export async function POST(request: Request) {
             const cost = Number(p.cost || 0);
             return sum + (qty * cost);
           }, 0) : 0;
-          totalAmount = servicesTotal + partsTotal;
+          totalAmount = servicesTotal + partsTotal - (discount || 0);
         }
       } catch (e) {
         // If anything fails in ZATCA path, fallback to totals only
@@ -218,8 +231,7 @@ export async function POST(request: Request) {
           const cost = Number(p.cost || 0);
           return sum + (qty * cost);
         }, 0) : 0;
-        totalAmount = servicesTotal + partsTotal;
-      }
+                  totalAmount = servicesTotal + partsTotal - (discount || 0);      }
 
       customerId = manualCustomerId;
       vehicleId = manualVehicleId;
@@ -232,11 +244,15 @@ export async function POST(request: Request) {
       status: 'pending',
       notes,
       totalAmount,
+      discount,
       paidAmount: 0,
       dueDate: dueDate ? new Date(dueDate) : new Date(),
       paymentMethod,
       zatca: zatcaData,
     };
+
+    // Debug logging
+    console.log('Invoice document to be saved:', { discount, totalAmount, customerId, vehicleId });
     if (jobCardId) {
       invoiceDoc.jobCardId = jobCardId;
     }

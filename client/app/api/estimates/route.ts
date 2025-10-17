@@ -155,7 +155,7 @@ export async function POST(request: Request) {
     const servicesTotal = cleanedServices.reduce((sum: number, service: any) => sum + service.totalCost, 0)
     const partsTotal = cleanedParts.reduce((sum: number, part: any) => sum + part.totalCost, 0)
     const subtotal = servicesTotal + partsTotal
-    const tax = subtotal * 0.15 // 15% tax rate
+    const tax = partsTotal * 0.15 // 15% tax rate ONLY on parts
     const total = subtotal + tax
 
     // Set valid until date (30 days from now)

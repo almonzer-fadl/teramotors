@@ -118,7 +118,7 @@
     "services": "الخدمات",
     "add_service": "إضافة خدمة",
     "subtotal": "المجموع الفرعي",
-    "tax": "الضريبة (15%)",
+    "tax": "ضريبة القطع (15%)",
     "total": "المجموع",
     "update_estimate": "تحديث التقدير",
     "save_estimate": "حفظ التقدير",
@@ -269,7 +269,10 @@
     "category_maintenance": "صيانة",
     "category_performance": "أداء",
     "category": "الفئة",
-    "condition_excellent": "ممتاز"
+    "condition_excellent": "ممتاز",
+    "discount_percentage": "الخصم (%)",
+    "enter_discount_percentage": "أدخل نسبة الخصم",
+    "discount_note": "سيتم حساب الخصم كنسبة مئوية من المبلغ الإجمالي"
   },
   "header": {
     "language": "اللغة",
@@ -429,14 +432,15 @@
     "select_job_card": "اختر بطاقة العمل",
     "choose_job_card": "اختر بطاقة عمل مكتملة لإنشاء فاتورة منها",
     "no_job_cards": "لم يتم العثور على بطاقات عمل مكتملة",
-    "job_card_details": "تفاصيل بطاقة العمل",
+    "job_card_additional_details": "تفاصيل بطاقة العمل الإضافية",
+    "job_card_Main_details": "تفاصيل بطاقة العمل الرئيسية",
     "customer_information": "معلومات العميل",
     "vehicle_information": "معلومات المركبة",
     "services_performed": "الخدمات المنجزة",
     "parts_used": "القطع المستخدمة",
     "invoice_summary": "ملخص الفاتورة",
     "subtotal": "المجموع الفرعي",
-    "tax": "الضريبة (15%)",
+    "tax": "ضريبة القطع (15%)",
     "total_amount": "المبلغ الإجمالي",
     "payment_terms": "شروط الدفع",
     "due_date": "تاريخ الاستحقاق",
@@ -696,7 +700,8 @@
     "start": "بدء",
     "stop": "إنهاء",
     "no_active_workers": "لا يوجد عمال نشطين",
-    "active_workers": "عمال نشطين"
+    "active_workers": "عمال نشطين",
+    "additional_details": "تفاصيل إضافية"
   },
   "vehicles": {
     "title": "المركبات",

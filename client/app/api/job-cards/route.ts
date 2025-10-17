@@ -78,7 +78,8 @@ export async function POST(request: Request) {
       priority: body.priority || 'medium',
       services: body.services || [],
       partsUsed: body.partsUsed || [],
-      notes: body.notes
+      notes: body.notes,
+      discount: body.discount || 0
     };
 
     if (body.appointmentId) {

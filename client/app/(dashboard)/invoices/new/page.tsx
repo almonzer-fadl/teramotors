@@ -61,6 +61,7 @@ function NewInvoiceContent() {
   const [dueDate, setDueDate] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
   const [taxRate, setTaxRate] = useState<number>(15);
+  const [discount, setDiscount] = useState<number>(0);
 
 
   // Load initial data
@@ -171,6 +172,7 @@ function NewInvoiceContent() {
           }));
           setParts(invoiceParts);
         }
+        setDiscount(jobCard.discount || 0);
       }
     } catch (error) {
       console.error("Failed to fetch job card details:", error);
@@ -188,6 +190,7 @@ function NewInvoiceContent() {
       setSelectedVehicleId("");
       setServices([{ name: "", quantity: 1, laborHours: 1, laborRate: 0 }]);
       setParts([{ name: "", quantity: 1, cost: 0 }]);
+      setDiscount(0);
     }
   };
 
@@ -202,11 +205,12 @@ function NewInvoiceContent() {
       0
     );
     const subtotal = servicesTotal + partsTotal;
-    const tax = subtotal * (taxRate / 100);
-    const total = subtotal + tax;
+    const tax = partsTotal * (taxRate / 100); // Tax ONLY on parts
+    const discountAmount = (subtotal + tax) * (discount / 100); // Discount as percentage of total
+    const total = subtotal + tax - discountAmount;
 
-    return { servicesTotal, partsTotal, subtotal, tax, total };
-  }, [services, parts, taxRate]);
+    return { servicesTotal, partsTotal, subtotal, tax, total, discount: discountAmount };
+  }, [services, parts, taxRate, discount]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,6 +223,7 @@ function NewInvoiceContent() {
         dueDate,
         notes,
         taxRate,
+        discount,
         ...(mode === "jobCard"
           ? { jobCardId: selectedJobCardId }
           : {
@@ -662,7 +667,7 @@ function NewInvoiceContent() {
                 <Calculator className="mr-3 h-7 w-7 text-[#F13F33]" />
                 Tax & Notes
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     Tax Rate (%)
@@ -674,6 +679,21 @@ function NewInvoiceContent() {
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     min="0"
                     step="0.01"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    Discount (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={discount}
+                    onChange={(e) => setDiscount(parseFloat(e.target.value))}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    placeholder="0"
                   />
                 </div>
                 <div>
@@ -712,8 +732,14 @@ function NewInvoiceContent() {
                   <span className="text-lg font-bold text-gray-700">{t('invoices.subtotal')}:</span>
                   <span className="text-lg font-bold text-gray-900">${totals.subtotal.toFixed(2)}</span>
                 </div>
+                {totals.discount > 0 && (
+                  <div className="flex justify-between items-center p-4 bg-gray-50/80 rounded-2xl">
+                    <span className="text-lg font-bold text-red-600">{t('invoices.discount', 'Discount')}:</span>
+                    <span className="text-lg font-bold text-red-600">-${totals.discount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center p-4 bg-gray-50/80 rounded-2xl">
-                  <span className="text-lg font-bold text-gray-700">{t('invoices.tax')} ({taxRate}%):</span>
+                  <span className="text-lg font-bold text-gray-700">{t('invoices.tax')} ({taxRate}% on parts):</span>
                   <span className="text-lg font-bold text-gray-900">${totals.tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center p-6 bg-[#F13F33]/10 rounded-2xl border-2 border-[#F13F33]/20">

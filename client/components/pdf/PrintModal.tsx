@@ -120,30 +120,94 @@ const PrintModal = ({
               padding: 20px;
             }
             
+            .print-invoice-container {
+              font-family: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              direction: rtl;
+              background: white;
+              width: 210mm;
+              min-height: 297mm;
+              margin: 0 auto;
+              padding: 20mm;
+              box-sizing: border-box;
+            }
+
             .header {
-              text-align: right;
-              border-bottom: 3px solid #F13F33;
-              padding-bottom: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-bottom: 2px solid #000;
+              padding: 20px 0;
               margin-bottom: 30px;
               position: relative;
             }
-            
+
+            .logo-container {
+              display: flex;
+              align-items: center;
+              flex-direction: column;
+              background: linear-gradient(to right, #063479, #052a5f);
+              border-radius: 12px;
+              padding: 20px;
+              box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+
+            .logo-image {
+              width: 48px;
+              height: 48px;
+              border-radius: 12px;
+              object-fit: contain;
+              background: white;
+              padding: 4px;
+              margin-bottom: 8px;
+            }
+
             .company-name {
-              font-size: 28px;
-              font-weight: 700;
-              color: #F13F33;
-              margin: 0;
-              font-family: "Cairo", sans-serif;
-            }
-            
-            .invoice-title {
               font-size: 24px;
+              font-weight: 800;
+              color: white;
+              margin: 0;
+              letter-spacing: 0.04em;
+              text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            }
+
+            .company-name .highlight {
+              color: #F13F33;
+            }
+
+            .company-subtitle {
+              font-size: 10px;
               font-weight: 600;
-              color: #333;
-              margin: 10px 0;
+              text-transform: uppercase;
+              letter-spacing: 0.15em;
+              color: white;
+              background: rgba(0, 0, 0, 0.4);
+              border-radius: 4px;
+              padding: 2px 8px;
+              margin-top: 4px;
+            }
+
+            .company-details {
+              position: absolute;
+              right: 20px;
+              top: 50%;
+              transform: translateY(-50%);
+              text-align: right;
+              color: #000;
+              font-size: 14px;
+              line-height: 1.6;
+            }
+
+            .invoice-title {
+              font-size: 20px;
+              font-weight: 600;
+              color: #000;
+              margin: 15px 0 0 0;
+              text-align: center;
               font-family: "Cairo", sans-serif;
             }
-            
+
             .qr-code {
               position: absolute;
               top: 0;
@@ -156,75 +220,75 @@ const PrintModal = ({
               border-radius: 8px;
               padding: 10px;
             }
-            
+
             .qr-code img {
               width: 100px;
               height: 100px;
               border-radius: 4px;
             }
-            
+
             .qr-label {
               font-size: 10px;
               color: #666;
               margin-top: 5px;
               font-family: "Cairo", sans-serif;
             }
-            
+
             .invoice-info {
               display: grid;
               grid-template-columns: 1fr 1fr;
               gap: 30px;
               margin-bottom: 30px;
             }
-            
+
             .info-section h3 {
               font-size: 18px;
               font-weight: 600;
-              color: #F13F33;
+              color: #000;
               margin-bottom: 15px;
               border-bottom: 2px solid #e5e7eb;
               padding-bottom: 5px;
               font-family: "Cairo", sans-serif;
             }
-            
+
             .info-section p {
               margin: 8px 0;
               color: #666;
               font-family: "Cairo", sans-serif;
             }
-            
+
             .services-table, .parts-table {
               width: 100%;
               border-collapse: collapse;
               margin: 20px 0;
               font-size: 14px;
             }
-            
+
             .services-table th, .parts-table th {
-              background: #F13F33;
+              background: #1e3a8a;
               color: white;
               padding: 12px 8px;
               text-align: right;
               font-weight: 600;
               font-family: "Cairo", sans-serif;
             }
-            
+
             .services-table td, .parts-table td {
               padding: 10px 8px;
               border-bottom: 1px solid #e5e7eb;
               text-align: right;
               font-family: "Cairo", sans-serif;
             }
-            
+
             .services-table tr:nth-child(even), .parts-table tr:nth-child(even) {
               background-color: #f8f9fa;
             }
-            
+
             .totals {
               margin-top: 30px;
               text-align: left;
             }
-            
+
             .total-row {
               display: flex;
               justify-content: space-between;
@@ -232,37 +296,37 @@ const PrintModal = ({
               border-bottom: 1px solid #e5e7eb;
               font-family: "Cairo", sans-serif;
             }
-            
+
             .grand-total {
               font-weight: 700;
               font-size: 18px;
-              color: #F13F33;
-              border-top: 2px solid #F13F33;
+              color: #000;
+              border-top: 2px solid #000;
               margin-top: 10px;
               padding-top: 10px;
               font-family: "Cairo", sans-serif;
             }
-            
+
             .notes {
               margin-top: 30px;
               padding: 20px;
               background: #f8f9fa;
               border-radius: 8px;
-              border-right: 4px solid #F13F33;
+              border-right: 4px solid #000;
             }
-            
+
             .notes h3 {
               font-family: "Cairo", sans-serif;
               font-weight: 600;
-              color: #F13F33;
+              color: #000;
               margin-bottom: 10px;
             }
-            
+
             .notes p {
               font-family: "Cairo", sans-serif;
               color: #666;
             }
-            
+
             .footer {
               margin-top: 40px;
               text-align: center;
@@ -270,7 +334,7 @@ const PrintModal = ({
               font-size: 12px;
               font-family: "Cairo", sans-serif;
             }
-            
+
             .status-badge {
               display: inline-block;
               padding: 4px 12px;
@@ -279,26 +343,165 @@ const PrintModal = ({
               font-weight: 500;
               font-family: "Cairo", sans-serif;
             }
-            
+
             .status-pending {
               background-color: #fef3c7;
               color: #92400e;
             }
-            
+
             .status-paid {
               background-color: #d1fae5;
               color: #065f46;
             }
-            
+
             .status-cancelled {
               background-color: #fee2e2;
               color: #991b1b;
             }
             
             @media print {
-              body { margin: 0; padding: 0; }
-              .container { padding: 0; }
-              .print-invoice-container { padding: 0; }
+              * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+              }
+              
+              @page {
+                margin: 0;
+                size: A4 portrait;
+              }
+              
+              body { 
+                margin: 0; 
+                background: white;
+              }
+              .print-invoice-container { 
+                padding: 8mm;
+                width: 210mm;
+                min-height: auto;
+                max-height: 297mm;
+                margin: 0;
+                box-shadow: none;
+                background: white;
+                font-size: 12px;
+                overflow: hidden;
+              }
+              .page-break { page-break-before: always; }
+              
+              /* Compress layout for single page */
+              .header {
+                padding: 8px 0;
+                margin-bottom: 10px;
+              }
+              
+              .logo-container {
+                padding: 12px;
+              }
+              
+              .company-name {
+                font-size: 18px;
+              }
+              
+              .invoice-title {
+                font-size: 14px;
+                margin: 8px 0 0 0;
+              }
+              
+              .invoice-info {
+                gap: 10px;
+                margin-bottom: 10px;
+              }
+              
+              .info-section h3 {
+                font-size: 14px;
+                margin-bottom: 8px;
+              }
+              
+              .info-section p {
+                margin: 4px 0;
+                font-size: 11px;
+              }
+              
+              .services-table, .parts-table {
+                margin: 10px 0;
+                font-size: 11px;
+              }
+              
+              .services-table th, .parts-table th {
+                padding: 8px 6px;
+                font-size: 11px;
+              }
+              
+              .services-table td, .parts-table td {
+                padding: 6px;
+                font-size: 11px;
+              }
+              
+              .totals {
+                margin-top: 15px;
+              }
+              
+              .total-row {
+                padding: 4px 0;
+                font-size: 11px;
+              }
+              
+              .grand-total {
+                font-size: 14px;
+                margin-top: 5px;
+                padding-top: 5px;
+              }
+              
+              .notes {
+                margin-top: 15px;
+                padding: 10px;
+              }
+              
+              .footer {
+                margin-top: 10px;
+                font-size: 9px;
+                padding-top: 5px;
+              }
+              
+              /* Keep colors in print */
+              .logo-container {
+                background: linear-gradient(to right, #063479, #052a5f) !important;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+              }
+              
+              .company-name {
+                color: white !important;
+              }
+              
+              .company-name .highlight {
+                color: #F13F33 !important;
+              }
+              
+              .company-subtitle {
+                color: white !important;
+                background: rgba(0, 0, 0, 0.4) !important;
+              }
+              
+              .services-table th, .parts-table th {
+                background: #1e3a8a !important;
+                color: white !important;
+              }
+              
+              /* Status badge colors */
+              .status-pending {
+                background-color: #fef3c7 !important;
+                color: #92400e !important;
+              }
+              
+              .status-paid {
+                background-color: #d1fae5 !important;
+                color: #065f46 !important;
+              }
+              
+              .status-cancelled {
+                background-color: #fee2e2 !important;
+                color: #991b1b !important;
+              }
             }
           </style>
         </head>

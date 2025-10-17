@@ -19,14 +19,18 @@ const PrintInvoiceDocument = ({
 }: PrintInvoiceDocumentProps) => {
   const isRTL = true; // Force Arabic RTL layout
 
-  // Calculate totals exactly like Puppeteer version
+  // Calculate totals with discount and tax only on parts
   const services = jobCard?.services || [];
   const parts = jobCard?.partsUsed || [];
   const servicesTotal = services.reduce((sum: number, s: any) => sum + (s.laborHours * s.laborRate), 0);
   const partsTotal = parts.reduce((sum: number, p: any) => sum + (p.quantity * p.cost), 0);
   const subtotal = servicesTotal + partsTotal;
-  const tax = subtotal * 0.15;
-  const grandTotal = subtotal + tax;
+  const tax = partsTotal * 0.15; // Tax only on parts
+  const discount = jobCard?.discount || invoice?.discount || 0;
+  const discountAmount = (subtotal + tax) * (discount / 100);
+  const grandTotal = subtotal + tax - discountAmount;
+
+
 
   // Generate QR code
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
@@ -55,7 +59,7 @@ const PrintInvoiceDocument = ({
   const translations = {
     ar: {
       title: "فاتورة",
-      company: "تيرا فيجنز لصيانة السيارات",
+      company: "تيرا فيجنز",
       invoiceNumber: "رقم الفاتورة #",
       date: "التاريخ",
       dueDate: "تاريخ الاستحقاق",
@@ -76,7 +80,8 @@ const PrintInvoiceDocument = ({
       partNumber: "رقم القطعة",
       unitCost: "تكلفة الوحدة",
       subtotal: "المجموع الفرعي",
-      tax: "الضريبة (15%)",
+      tax: "ضريبة القطع (15%)",
+      discount: "الخصم",
       grandTotal: "المجموع الإجمالي",
       notes: "ملاحظات",
       generatedOn: "تم الإنشاء في",
@@ -107,7 +112,8 @@ const PrintInvoiceDocument = ({
       partNumber: "Part #",
       unitCost: "Unit Cost",
       subtotal: "Subtotal",
-      tax: "Tax (15%)",
+      tax: "Tax on Parts (15%)",
+      discount: "Discount",
       grandTotal: "Grand Total",
       notes: "Notes",
       generatedOn: "Generated on",
@@ -157,38 +163,86 @@ const PrintInvoiceDocument = ({
           color: #333;
           direction: ${isRTL ? 'rtl' : 'ltr'};
           background: white;
-          max-width: 100%;
+          width: 210mm;
+          min-height: 297mm;
           margin: 0 auto;
-          padding: 20px;
+          padding: 20mm;
+          box-sizing: border-box;
         }
 
-        .container {
-          max-width: 100%;
-          margin: 0 auto;
-          padding: 20px;
-        }
 
         .header {
-          text-align: ${isRTL ? 'right' : 'left'};
-          border-bottom: 3px solid #F13F33;
-          padding-bottom: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-bottom: 2px solid #000;
+          padding: 20px 0;
           margin-bottom: 30px;
           position: relative;
         }
 
+        .logo-container {
+          display: flex;
+          align-items: center;
+          flex-direction: column;
+          background: linear-gradient(to right, #063479, #052a5f);
+          border-radius: 12px;
+          padding: 20px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .logo-image {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          object-fit: contain;
+          background: white;
+          padding: 4px;
+          margin-bottom: 8px;
+        }
+
         .company-name {
-          font-size: 28px;
-          font-weight: 700;
-          color: #F13F33;
+          font-size: 24px;
+          font-weight: 800;
+          color: white;
           margin: 0;
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
+          letter-spacing: 0.04em;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .company-name .highlight {
+          color: #F13F33;
+        }
+
+        .company-subtitle {
+          font-size: 10px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: white;
+          background: rgba(0, 0, 0, 0.4);
+          border-radius: 4px;
+          padding: 2px 8px;
+          margin-top: 4px;
+        }
+
+        .company-details {
+          position: absolute;
+          right: 20px;
+          top: 50%;
+          transform: translateY(-50%);
+          text-align: right;
+          color: #000;
+          font-size: 14px;
+          line-height: 1.6;
         }
 
         .invoice-title {
-          font-size: 24px;
+          font-size: 20px;
           font-weight: 600;
-          color: #333;
-          margin: 10px 0;
+          color: #000;
+          margin: 15px 0 0 0;
+          text-align: center;
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
         }
 
@@ -228,7 +282,7 @@ const PrintInvoiceDocument = ({
         .info-section h3 {
           font-size: 18px;
           font-weight: 600;
-          color: #F13F33;
+          color: #000;
           margin-bottom: 15px;
           border-bottom: 2px solid #e5e7eb;
           padding-bottom: 5px;
@@ -249,7 +303,7 @@ const PrintInvoiceDocument = ({
         }
 
         .services-table th, .parts-table th {
-          background: #F13F33;
+          background: #1e3a8a;
           color: white;
           padding: 12px 8px;
           text-align: ${isRTL ? 'right' : 'left'};
@@ -284,8 +338,8 @@ const PrintInvoiceDocument = ({
         .grand-total {
           font-weight: 700;
           font-size: 18px;
-          color: #F13F33;
-          border-top: 2px solid #F13F33;
+          color: #000;
+          border-top: 2px solid #000;
           margin-top: 10px;
           padding-top: 10px;
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
@@ -296,13 +350,13 @@ const PrintInvoiceDocument = ({
           padding: 20px;
           background: #f8f9fa;
           border-radius: 8px;
-          border-${isRTL ? 'right' : 'left'}: 4px solid #F13F33;
+          border-${isRTL ? 'right' : 'left'}: 4px solid #000;
         }
 
         .notes h3 {
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
           font-weight: 600;
-          color: #F13F33;
+          color: #000;
           margin-bottom: 10px;
         }
 
@@ -344,16 +398,72 @@ const PrintInvoiceDocument = ({
         }
 
         @media print {
-          body { margin: 0; }
-          .container { padding: 0; }
-          .print-invoice-container { padding: 0; }
+          body { 
+            margin: 0; 
+            background: white;
+          }
+          .print-invoice-container { 
+            padding: 15mm;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0;
+            box-shadow: none;
+            background: white;
+          }
+          .page-break { page-break-before: always; }
+          
+          /* Ensure all text is black in print */
+          * {
+            color: #000 !important;
+          }
+          
+          /* Ensure table headers are deep blue in print */
+          .services-table th, .parts-table th {
+            background: #1e3a8a !important;
+            color: white !important;
+          }
+          
+          /* Ensure company details are black in print */
+          .company-details {
+            color: #000 !important;
+          }
+          
+          /* Ensure info section headers are black in print */
+          .info-section h3 {
+            color: #000 !important;
+          }
+          
+          /* Ensure grand total is black in print */
+          .grand-total {
+            color: #000 !important;
+            border-top: 2px solid #000 !important;
+          }
+          
+          /* Ensure notes border is black in print */
+          .notes {
+            border-right: 4px solid #000 !important;
+          }
         }
       `}</style>
 
-      <div className="container">
-        <div className="header">
-          <h1 className="company-name">{t.company}</h1>
-          <h2 className="invoice-title">{t.title} #{String(invoice._id || '').slice(-6)}</h2>
+      <div className="header">
+          <div className="logo-container">
+            <img 
+              src="/icon.png" 
+              alt="TeraMotors Logo" 
+              className="logo-image"
+            />
+            <div className="company-name">
+              Tera<span className="highlight">Visions</span>
+            </div>
+            <div className="company-subtitle">Auto Repair</div>
+          </div>
+          
+          <div className="company-details">
+            <div>الرياض، صناعيه الرمال <br/>المملكه العربيه السعوديه</div>
+            <div>+966599006314</div>
+            <div>info@teramotors.com</div>
+          </div>
 
           {qrCodeDataUrl && (
             <div className="qr-code">
@@ -362,10 +472,12 @@ const PrintInvoiceDocument = ({
             </div>
           )}
         </div>
+        
+        <h2 className="invoice-title">{t.title} #{String(invoice._id || '').slice(-6)}</h2>
 
         <div className="invoice-info">
           <div className="info-section">
-            <h3>{t.invoiceNumber}{String(invoice._id || '').slice(-6)}</h3>
+            <h3>{t.date}</h3>
             <p><strong>{t.date}:</strong> {formatDate(invoice.createdAt || Date.now(), isRTL)}</p>
             <p><strong>{t.dueDate}:</strong> {formatDate(invoice.dueDate || Date.now(), isRTL)}</p>
             <p><strong>{t.status}:</strong> <span className={`status-badge status-${invoice.status || 'pending'}`}>{getStatusText(invoice.status, isRTL)}</span></p>
@@ -448,6 +560,12 @@ const PrintInvoiceDocument = ({
             <span>{t.tax}:</span>
             <span>{formatCurrency(tax, isRTL)}</span>
           </div>
+          {discount > 0 && (
+            <div className="total-row">
+              <span>{t.discount} ({discount}%):</span>
+              <span>-{formatCurrency(discountAmount, isRTL)}</span>
+            </div>
+          )}
           <div className="total-row grand-total">
             <span>{t.grandTotal}:</span>
             <span>{formatCurrency(grandTotal, isRTL)}</span>
@@ -465,7 +583,6 @@ const PrintInvoiceDocument = ({
           <p>{t.generatedOn} {formatDate(new Date(), isRTL)}</p>
           <p>{t.systemName}</p>
         </div>
-      </div>
     </div>
   );
 };

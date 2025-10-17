@@ -70,6 +70,7 @@ interface JobCard {
     cost: number;
   }>;
   notes?: string;
+  discount?: number;
   createdAt: string;
 }
 
@@ -177,7 +178,10 @@ export default function ResponsiveJobCardsGrid({
   const totalCost = (jobCard: JobCard) => {
     const servicesCost = jobCard.services.reduce((sum, s) => sum + (s.laborHours * s.laborRate), 0);
     const partsCost = (jobCard.partsUsed || []).reduce((sum, p) => sum + (p.quantity * p.cost), 0);
-    return servicesCost + partsCost;
+    const subtotal = servicesCost + partsCost;
+    const tax = partsCost * 0.15; // 15% tax only on parts
+    const discountAmount = (subtotal + tax) * ((jobCard.discount || 0) / 100); // Discount as percentage
+    return subtotal + tax - discountAmount;
   };
 
   return (

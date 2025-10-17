@@ -352,7 +352,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
     const servicesTotal = formData.services.reduce((sum, service) => sum + service.totalCost, 0);
     const partsTotal = formData.parts.reduce((sum, part) => sum + part.totalCost, 0);
     const subtotal = servicesTotal + partsTotal;
-    const tax = subtotal * 0.15; // 15% tax
+    const tax = partsTotal * 0.15; // 15% tax ONLY on parts
     const total = subtotal + tax;
 
     setFormData(prev => ({
