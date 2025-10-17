@@ -57,6 +57,9 @@ export async function PUT(
     if (updateData.appointmentId === '' || updateData.appointmentId === null || updateData.appointmentId === undefined) {
       delete updateData.appointmentId;
     }
+    if (updateData.inspectionId === '' || updateData.inspectionId === null || updateData.inspectionId === undefined) {
+      delete updateData.inspectionId;
+    }
     
     const jobCard = await JobCard.findByIdAndUpdate(
       id,
