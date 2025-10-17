@@ -119,7 +119,7 @@
     "services": "Services",
     "add_service": "Add Service",
     "subtotal": "Subtotal",
-    "tax": "Tax (15%)",
+    "tax": "Tax on Parts (15%)",
     "total": "Total",
     "update_estimate": "Update Estimate",
     "save_estimate": "Save Estimate",
@@ -165,7 +165,8 @@
     "notes_placeholder": "Any additional notes about this customer...",
     "qty_placeholder": "Qty",
     "qty": "Qty",
-    "job_card_details": "Job Card Details",
+    "job_card_additional_details": "Job Card Additional Details",
+    "job_card_Main_details": "Job Card Main Details",
     "select_part": "Select Part",
     "cost_placeholder": "Cost",
     "labor_placeholder": "Labor Rate",
@@ -270,7 +271,10 @@
     "category_safety": "Safety",
     "category_maintenance": "Maintenance",
     "category_performance": "Performance",
-    "category": "Category"
+    "category": "Category",
+    "discount_percentage": "Discount (%)",
+    "enter_discount_percentage": "Enter discount percentage",
+    "discount_note": "Discount will be calculated as a percentage of the total amount"
   },
   "header": {
     "language": "Language",
@@ -438,7 +442,7 @@
     "parts_used": "Parts Used",
     "invoice_summary": "Invoice Summary",
     "subtotal": "Subtotal",
-    "tax": "Tax (15%)",
+    "tax": "Tax on Parts (15%)",
     "total_amount": "Total Amount",
     "payment_terms": "Payment Terms",
     "due_date": "Due Date",
@@ -701,7 +705,8 @@
     "start": "Start",
     "stop": "Stop",
     "no_active_workers": "No active workers",
-    "active_workers": "Active workers"
+    "active_workers": "Active workers",
+    "additional_details": "Additional Details"
   },
   "vehicles": {
     "title": "Vehicles",

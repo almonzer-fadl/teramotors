@@ -44,6 +44,7 @@ interface JobCard {
     laborRate: number;
   }>;
   notes?: string;
+  discount?: number;
   createdAt: string;
 }
 

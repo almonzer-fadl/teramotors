@@ -421,7 +421,7 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
                 <span>${formatCurrency(estimate.subtotal || 0)}</span>
             </div>
             <div class="summary-row">
-                <span>${t.tax} (15%):</span>
+                <span>${t.tax} (15% on parts):</span>
                 <span>${formatCurrency(estimate.tax || 0)}</span>
             </div>
             <div class="summary-row summary-total">

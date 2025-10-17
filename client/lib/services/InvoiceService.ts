@@ -30,6 +30,7 @@ export class InvoiceService {
     notes?: string;
     dueDate?: Date;
     paymentMethod?: string;
+    discount?: number;
   }): Promise<InvoiceGenerationResult> {
     try {
       // Convert job card data to ZATCA invoice format
@@ -71,7 +72,7 @@ export class InvoiceService {
   private convertJobCardToInvoiceData(jobCardData: any): InvoiceData {
     const items: InvoiceItem[] = [];
     
-    // Convert services to invoice items
+    // Convert services to invoice items (NO TAX on services)
     jobCardData.services.forEach((service: any, index: number) => {
       const totalServicePrice = (service.laborHours || 0) * (service.laborRate || 0);
       items.push({
@@ -80,7 +81,7 @@ export class InvoiceService {
         description: `Labor hours: ${service.laborHours}`,
         quantity: service.quantity || 1,
         unitPrice: totalServicePrice,
-        vatRate: ZATCAUtils.getStandardVATRate(),
+        vatRate: 0, // No tax on services
         category: 'service',
       });
     });
@@ -108,6 +109,10 @@ export class InvoiceService {
     // Generate invoice number
     const invoiceNumber = ZATCAUtils.generateInvoiceNumber('INV', this.invoiceCounter++);
 
+    // Calculate global discount from percentage
+    const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+    const globalDiscount = subtotal * ((jobCardData.discount || 0) / 100);
+
     return {
       status: 'draft', // Required by InvoiceData
       invoiceNumber,
@@ -118,6 +123,7 @@ export class InvoiceService {
       items,
       paymentMethod: jobCardData.paymentMethod as any || 'cash',
       notes: jobCardData.notes,
+      globalDiscount,
     };
   }
 

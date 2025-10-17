@@ -4,7 +4,7 @@ const invoiceSchema = new mongoose.Schema({
   jobCardId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'JobCard',
-    required: true
+    required: false
   },
   customerId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +19,7 @@ const invoiceSchema = new mongoose.Schema({
   mechanicId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false
   },
   status: {
     type: String,
@@ -45,9 +45,16 @@ const invoiceSchema = new mongoose.Schema({
   paymentDate: {
     type: Date
   },
-  notes: {
-    type: String
-  },
+    notes: {
+      type: String
+    },
+    discount: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100
+    }
+  ,
   zatca: {
     qrCode: String,
     qrCodeImage: String,

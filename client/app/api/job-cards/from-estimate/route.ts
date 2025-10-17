@@ -66,7 +66,8 @@ export async function POST(request: Request) {
       priority: 'medium',
       services: jobCardServices,
       partsUsed: jobCardParts,
-      notes: `Created from estimate - ${estimate.notes || 'No notes'}`
+      notes: `Created from estimate - ${estimate.notes || 'No notes'}`,
+      discount: 0 // Default discount when creating from estimate
     })
 
     await jobCard.save()

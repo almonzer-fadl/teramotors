@@ -111,8 +111,9 @@ export async function POST(request: Request) {
       }
     }
 
-    // Calculate tax and total
-    const tax = subtotal * 0.08 // 8% tax
+    // Calculate tax and total (tax only on parts)
+    const partsTotal = estimateParts.reduce((sum, part) => sum + part.totalCost, 0)
+    const tax = partsTotal * 0.15 // 15% tax ONLY on parts
     const total = subtotal + tax
 
     // Set valid until date (30 days from now)

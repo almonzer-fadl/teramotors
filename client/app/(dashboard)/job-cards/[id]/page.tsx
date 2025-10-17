@@ -76,6 +76,7 @@ interface JobCard {
   actualEndTime?: string;
   laborHours: number;
   notes?: string;
+  discount?: number;
   photos: string[];
   services: { 
     serviceId: { _id: string; name: string; description: string; laborHours: number; laborRate: number } | string; 
@@ -729,6 +730,18 @@ export default function JobCardDetailsPage() {
             </h2>
             <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-100 text-gray-700 min-h-[100px]">
               {jobCard.notes || t("ui.no_notes_available")}
+            </div>
+          </div>
+        </div>
+
+        {/* Discount Section */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+          <div className="px-8 py-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              {t("common.discount_percentage")}
+            </h2>
+            <div className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl bg-gray-100 text-gray-700">
+              {jobCard.discount ? `${jobCard.discount}%` : "0%"}
             </div>
           </div>
         </div>
