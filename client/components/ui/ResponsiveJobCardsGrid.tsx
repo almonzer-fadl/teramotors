@@ -60,6 +60,15 @@ interface JobCard {
     laborHours: number;
     laborRate: number;
   }>;
+  partsUsed?: Array<{
+    partId: {
+      _id: string;
+      name: string;
+      price: number;
+    };
+    quantity: number;
+    cost: number;
+  }>;
   notes?: string;
   createdAt: string;
 }
@@ -165,8 +174,10 @@ export default function ResponsiveJobCardsGrid({
     return services.reduce((sum, s) => sum + s.laborHours, 0);
   };
 
-  const totalCost = (services: JobCard['services']) => {
-    return services.reduce((sum, s) => sum + (s.laborHours * s.laborRate), 0);
+  const totalCost = (jobCard: JobCard) => {
+    const servicesCost = jobCard.services.reduce((sum, s) => sum + (s.laborHours * s.laborRate), 0);
+    const partsCost = (jobCard.partsUsed || []).reduce((sum, p) => sum + (p.quantity * p.cost), 0);
+    return servicesCost + partsCost;
   };
 
   return (
@@ -369,7 +380,7 @@ export default function ResponsiveJobCardsGrid({
                   {isAdmin && (
                     <div className="text-center">
                       <div className="text-lg font-semibold text-gray-900">
-                        ${totalCost(jobCard.services).toFixed(0)}
+                        ${totalCost(jobCard).toFixed(0)}
                       </div>
                       <div className="text-xs text-gray-500">{t('job_cards.estimated_cost')}</div>
                     </div>
