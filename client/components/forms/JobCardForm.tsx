@@ -8,6 +8,11 @@ import { useTranslation } from "react-i18next";
 import { useSession } from "../../lib/hooks/useSession";
 import InlineInspectionCreator from "./InlineInspectionCreator";
 import InlineInvoiceCreator from "./InlineInvoiceCreator";
+import SearchableComboBox, { SearchableComboBoxOption } from "../ui/SearchableComboBox";
+import QuickCreateCustomer from "./QuickCreateCustomer";
+import QuickCreateVehicle from "./QuickCreateVehicle";
+import QuickCreatePart from "./QuickCreatePart";
+import QuickCreateService from "./QuickCreateService";
 import Link from "next/link";
 
 interface AppointmentMinimal {
@@ -72,6 +77,10 @@ export default function JobCardForm({
   const [parts, setParts] = useState<PartMinimal[]>([]);
   const [isInspectionModalOpen, setInspectionModalOpen] = useState(false);
   const [isInvoiceModalOpen, setInvoiceModalOpen] = useState(false);
+  const [isCustomerModalOpen, setCustomerModalOpen] = useState(false);
+  const [isVehicleModalOpen, setVehicleModalOpen] = useState(false);
+  const [isPartModalOpen, setPartModalOpen] = useState(false);
+  const [isServiceModalOpen, setServiceModalOpen] = useState(false);
   const [formData, setFormData] = useState<JobCardFormData>({
     appointmentId: "",
     customerId: "",
@@ -370,6 +379,82 @@ export default function JobCardForm({
     handleInputChange("partsUsed", updatedParts);
   };
 
+  // Convert customers to SearchableComboBox options
+  const customerOptions: SearchableComboBoxOption[] = customers.map(c => ({
+    value: c._id,
+    label: `${c.firstName} ${c.lastName}`,
+    searchText: `${c.firstName} ${c.lastName}`,
+  }));
+
+  // Convert vehicles to SearchableComboBox options (filtered by customer)
+  const vehicleOptions: SearchableComboBoxOption[] = vehicles
+    .filter((v) => {
+      if (!formData.customerId) return false;
+      const customerId = typeof v.customerId === 'object' ? v.customerId._id : v.customerId;
+      return customerId === formData.customerId;
+    })
+    .map(v => ({
+      value: v._id,
+      label: `${v.make} ${v.model} (${v.year})`,
+      searchText: `${v.make} ${v.model} ${v.year}`,
+    }));
+
+  // Convert parts to SearchableComboBox options
+  const partOptions: SearchableComboBoxOption[] = parts.map(p => ({
+    value: p._id,
+    label: p.name,
+    searchText: p.name,
+  }));
+
+  // Convert services to SearchableComboBox options
+  const serviceOptions: SearchableComboBoxOption[] = services.map(s => ({
+    value: s._id,
+    label: s.name,
+    searchText: s.name,
+  }));
+
+  // Handler for customer creation
+  const handleCustomerCreated = (customer: { _id: string; firstName: string; lastName: string }) => {
+    setCustomers(prev => [...prev, customer]);
+    handleInputChange('customerId', customer._id);
+    fetchInitialData(); // Refresh data
+  };
+
+  // Handler for vehicle creation
+  const handleVehicleCreated = (vehicle: { _id: string; make: string; model: string; year: number }) => {
+    const newVehicle: VehicleMinimal = {
+      _id: vehicle._id,
+      make: vehicle.make,
+      model: vehicle.model,
+      year: vehicle.year,
+      customerId: formData.customerId,
+    };
+    setVehicles(prev => [...prev, newVehicle]);
+    handleInputChange('vehicleId', vehicle._id);
+    fetchInitialData(); // Refresh data
+  };
+
+  // Handler for part creation
+  const handlePartCreated = (part: { _id: string; name: string }) => {
+    const newPart: PartMinimal = {
+      _id: part._id,
+      name: part.name,
+    };
+    setParts(prev => [...prev, newPart]);
+    fetchInitialData(); // Refresh data
+  };
+
+  // Handler for service creation
+  const handleServiceCreated = (service: { _id: string; name: string; laborHours: number; laborRate: number }) => {
+    const newService: ServiceMinimal = {
+      _id: service._id,
+      name: service.name,
+      laborHours: service.laborHours,
+      laborRate: service.laborRate,
+    };
+    setServices(prev => [...prev, newService]);
+    fetchInitialData(); // Refresh data
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -385,6 +470,27 @@ export default function JobCardForm({
         onClose={() => setInvoiceModalOpen(false)}
         jobCardId={jobCardId || ""}
         onCreated={(invoice) => setFormData(prev => ({ ...prev, invoiceId: invoice._id }))}
+      />
+      <QuickCreateCustomer
+        isOpen={isCustomerModalOpen}
+        onClose={() => setCustomerModalOpen(false)}
+        onCreated={handleCustomerCreated}
+      />
+      <QuickCreateVehicle
+        isOpen={isVehicleModalOpen}
+        onClose={() => setVehicleModalOpen(false)}
+        customerId={formData.customerId}
+        onCreated={handleVehicleCreated}
+      />
+      <QuickCreatePart
+        isOpen={isPartModalOpen}
+        onClose={() => setPartModalOpen(false)}
+        onCreated={handlePartCreated}
+      />
+      <QuickCreateService
+        isOpen={isServiceModalOpen}
+        onClose={() => setServiceModalOpen(false)}
+        onCreated={handleServiceCreated}
       />
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
@@ -428,52 +534,35 @@ export default function JobCardForm({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
-                    {t("forms.customer")}
+                    {t("forms.customer")} <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <select
-                      required
-                      value={formData.customerId}
-                      onChange={(e) =>
-                        handleInputChange("customerId", e.target.value)
-                      }
-                      className="w-full px-6 py-4 pr-12 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    >
-                      <option value="">{t("forms.select_customer")}</option>
-                      {customers.map((c, index) => (
-                        <option key={c._id || `customer-${index}`} value={c._id}>
-                          {c.firstName} {c.lastName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <SearchableComboBox
+                    value={formData.customerId}
+                    onChange={(value) => handleInputChange("customerId", value)}
+                    options={customerOptions}
+                    placeholder={t("forms.select_customer")}
+                    required={true}
+                    onCreateNew={() => setCustomerModalOpen(true)}
+                    createNewLabel={t("customers.create_new_customer")}
+                    emptyMessage={t("customers.no_customers_found")}
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-bold text-gray-700">
-                    {t("forms.vehicle")}
+                    {t("forms.vehicle")} <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative">
-                    <select
-                      required
-                      value={formData.vehicleId}
-                      onChange={(e) => handleInputChange("vehicleId", e.target.value)}
-                      className="w-full px-6 py-4 pr-12 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 disabled:opacity-50"
-                      disabled={!formData.customerId}
-                    >
-                      <option value="">{t("forms.select_vehicle")}</option>
-                      {vehicles
-                        .filter((v) => {
-                          if (!formData.customerId) return false;
-                          const customerId = typeof v.customerId === 'object' ? v.customerId._id : v.customerId;
-                          return customerId === formData.customerId;
-                        })
-                        .map((v) => (
-                          <option key={v._id} value={v._id}>
-                            {v.make} {v.model} ({v.year})
-                          </option>
-                        ))}
-                    </select>
-                    <div className="mt-3 flex items-center gap-3 flex-wrap">
+                  <SearchableComboBox
+                    value={formData.vehicleId}
+                    onChange={(value) => handleInputChange("vehicleId", value)}
+                    options={vehicleOptions}
+                    placeholder={t("forms.select_vehicle")}
+                    required={true}
+                    disabled={!formData.customerId}
+                    onCreateNew={() => setVehicleModalOpen(true)}
+                    createNewLabel={t("vehicles.create_new_vehicle")}
+                    emptyMessage={t("vehicles.no_vehicles_found")}
+                  />
+                  <div className="mt-3 flex items-center gap-3 flex-wrap">
                       <button
                         type="button"
                         onClick={() => setInspectionModalOpen(true)}
@@ -509,7 +598,6 @@ export default function JobCardForm({
                         </div>
                       )}
                     </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -533,22 +621,15 @@ export default function JobCardForm({
                 >
                   <div className="col-span-2 space-y-2">
                     <label className="block text-sm font-bold text-gray-700">{t('forms.service')}</label>
-                    <div className="relative">
-                      <select
-                        value={service.serviceId}
-                        onChange={(e) =>
-                          handleServiceChange(index, "serviceId", e.target.value)
-                        }
-                        className="w-full px-4 py-3 pr-8 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      >
-                        <option value="">{t("forms.select_service")}</option>
-                        {services.map((s) => (
-                          <option key={s._id} value={s._id}>
-                            {s.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <SearchableComboBox
+                      value={service.serviceId}
+                      onChange={(value) => handleServiceChange(index, "serviceId", value)}
+                      options={serviceOptions}
+                      placeholder={t("forms.select_service")}
+                      onCreateNew={() => setServiceModalOpen(true)}
+                      createNewLabel={t("services.create_new_service")}
+                      emptyMessage={t("services.no_services_found")}
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="block text-sm font-bold text-gray-700">{t('forms.qty')}</label>
@@ -630,22 +711,15 @@ export default function JobCardForm({
                 >
                   <div className="col-span-2 space-y-2">
                     <label className="block text-sm font-bold text-gray-700">{t('job_cards.select_part')}</label>
-                    <div className="relative">
-                      <select
-                        value={part.partId}
-                        onChange={(e) =>
-                          handlePartChange(index, "partId", e.target.value)
-                        }
-                        className="w-full px-4 py-3 pr-8 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      >
-                        <option value="">{t("forms.select_part")}</option>
-                        {parts.map((p) => (
-                          <option key={p._id} value={p._id}>
-                            {p.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <SearchableComboBox
+                      value={part.partId}
+                      onChange={(value) => handlePartChange(index, "partId", value)}
+                      options={partOptions}
+                      placeholder={t("forms.select_part")}
+                      onCreateNew={() => setPartModalOpen(true)}
+                      createNewLabel={t("inventory.create_new_part")}
+                      emptyMessage={t("inventory.no_parts_found")}
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="block text-sm font-bold text-gray-700">{t('forms.qty')}</label>
