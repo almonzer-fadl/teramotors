@@ -562,42 +562,7 @@ export default function JobCardForm({
                     createNewLabel={t("vehicles.create_new_vehicle")}
                     emptyMessage={t("vehicles.no_vehicles_found")}
                   />
-                  <div className="mt-3 flex items-center gap-3 flex-wrap">
-                      <button
-                        type="button"
-                        onClick={() => setInspectionModalOpen(true)}
-                        disabled={!formData.customerId || !formData.vehicleId}
-                        className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50"
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        {t('inspections.new_inspection')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setInvoiceModalOpen(true)}
-                        disabled={!formData.customerId || !formData.vehicleId}
-                        className="inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-500 disabled:opacity-50"
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        {t('invoices.create_invoice')}
-                      </button>
-                      {formData.inspectionId && (
-                        <div className="text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-3 py-2">
-                          {t('inspections.linked')} {" "}
-                          <Link href={`/inspections/${formData.inspectionId}`} className="underline">
-                            #{formData.inspectionId.slice(-6)}
-                          </Link>
-                        </div>
-                      )}
-                      {formData.invoiceId && (
-                        <div className="text-sm text-blue-700 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2">
-                          {t('invoices.linked')} {" "}
-                          <Link href={`/invoices/${formData.invoiceId}`} className="underline">
-                            #{formData.invoiceId.slice(-6)}
-                          </Link>
-                        </div>
-                      )}
-                    </div>
+                  <div className="mt-3" />
                 </div>
               </div>
             </div>
@@ -858,7 +823,45 @@ export default function JobCardForm({
           </div>
           
           {/* Form Actions */}
-          <div className="flex justify-end space-x-6">
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            {formData.inspectionId ? (
+              <Link
+                href={`/inspections/${formData.inspectionId}`}
+                className="group inline-flex items-center px-8 py-4 border-2 border-green-600 text-sm font-bold rounded-2xl text-green-700 bg-white hover:bg-green-50 hover:border-green-700 transition-all duration-300"
+              >
+                {t('inspections.view_inspection')}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setInspectionModalOpen(true)}
+                disabled={!formData.customerId || !formData.vehicleId}
+                className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-green-600 to-green-700 hover:shadow-xl hover:shadow-green-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <Plus className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                {t('inspections.new_inspection')}
+              </button>
+            )}
+
+            {formData.invoiceId ? (
+              <Link
+                href={`/invoices/${formData.invoiceId}`}
+                className="group inline-flex items-center px-8 py-4 border-2 border-blue-600 text-sm font-bold rounded-2xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-700 transition-all duration-300"
+              >
+                {t('invoices.view_invoice')}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setInvoiceModalOpen(true)}
+                disabled={!formData.customerId || !formData.vehicleId}
+                className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:shadow-xl hover:shadow-blue-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <Plus className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                {t('invoices.create_invoice')}
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => router.back()}
@@ -867,17 +870,6 @@ export default function JobCardForm({
               <X className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
               {t("forms.cancel")}
             </button>
-            {!isEditing && (
-              <button
-                type="button"
-                onClick={handleSaveAndCreateInvoice}
-                disabled={loading}
-                className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-green-600 to-green-700 hover:shadow-xl hover:shadow-green-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
-              >
-                <FileText className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                {loading ? t("forms.saving") : t("ui.save_and_create_invoice")}
-              </button>
-            )}
             <button
               type="submit"
               disabled={loading}

@@ -144,7 +144,11 @@ export default function ResponsiveTable({
                       <Edit className="h-4 w-4" />
                     </Link>
                     <button
-                      onClick={() => onDelete(customer._id)}
+                      onClick={() => {
+                        if (confirm('Are you sure you want to delete this customer? This will archive related vehicles.')) {
+                          onDelete(customer._id)
+                        }
+                      }}
                       className="text-red-600 hover:text-red-900"
                     >
                       <Trash2 className="h-4 w-4" />

@@ -18,17 +18,18 @@ export default function Modal({ isOpen, onClose, children, title, size = 'sm' }:
         onClose();
       }
     };
-    document.addEventListener('keydown', handleEscape);
-    // Prevent background scroll when modal is open
-    const previousOverflow = document.body.style.overflow;
+    
     if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      // Prevent background scroll when modal is open
       document.body.style.overflow = 'hidden';
+      
+      return () => {
+        document.removeEventListener('keydown', handleEscape);
+        document.body.style.overflow = '';
+      };
     }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [onClose]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

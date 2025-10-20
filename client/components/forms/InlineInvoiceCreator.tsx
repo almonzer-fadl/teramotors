@@ -86,13 +86,52 @@ export default function InlineInvoiceCreator({ isOpen, onClose, jobCardId, onCre
       setParts(partsJson.parts || partsJson || []);
       setServices(servicesJson.services || servicesJson || []);
 
-      // Auto-fill customer and vehicle from job card
-      if (jobCardJson.jobCard) {
-        const jobCard = jobCardJson.jobCard;
+      // Build invoice items from full job card
+      const jobCard = jobCardJson.jobCard || jobCardJson;
+      if (jobCard && jobCard._id) {
+        const items: typeof form.items = [];
+        // Map services to invoice items
+        (jobCard.services || []).forEach((svc: any) => {
+          const svcId = typeof svc.serviceId === 'object' ? svc.serviceId._id : svc.serviceId;
+          const svcRef = (servicesJson.services || servicesJson || []).find((s: any) => s._id === svcId);
+          const name = svcRef?.name || svc?.name || 'Service';
+          const rate = svc.laborRate ?? svcRef?.laborRate ?? 0;
+          const qty = svc.quantity ?? 1;
+          items.push({
+            type: 'service',
+            itemId: svcId || '',
+            name,
+            description: name,
+            quantity: qty,
+            unitPrice: rate,
+            total: qty * rate,
+          });
+        });
+        // Map parts to invoice items
+        (jobCard.partsUsed || []).forEach((pt: any) => {
+          const partId = typeof pt.partId === 'object' ? pt.partId._id : pt.partId;
+          const partRef = (partsJson.parts || partsJson || []).find((p: any) => p._id === partId);
+          const name = partRef?.name || pt?.name || 'Part';
+          const unit = pt.cost ?? partRef?.cost ?? partRef?.sellingPrice ?? 0;
+          const qty = pt.quantity ?? 1;
+          items.push({
+            type: 'part',
+            itemId: partId || '',
+            name,
+            description: name,
+            quantity: qty,
+            unitPrice: unit,
+            total: qty * unit,
+          });
+        });
+
+        const totals = calculateTotals(items);
         setForm(prev => ({
           ...prev,
-          customerId: jobCard.customerId?._id || '',
-          vehicleId: jobCard.vehicleId?._id || '',
+          customerId: jobCard.customerId?._id || jobCard.customerId || '',
+          vehicleId: jobCard.vehicleId?._id || jobCard.vehicleId || '',
+          items,
+          ...totals,
         }));
       }
     } catch (e) {
