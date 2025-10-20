@@ -18,7 +18,7 @@ interface Vehicle {
   year: number;
   color: string;
   licensePlate: string;
-  mileage: number;
+  mileage?: number | null;
   transmission: string;
   fuelType: string;
   isActive: boolean;
@@ -109,7 +109,7 @@ export default function ResponsiveVehicleTable({
                     <div className="flex items-center">
                       <Gauge className="h-4 w-4 me-2 text-gray-400" />
                       <span className="text-sm text-gray-900">
-                        {vehicle.mileage.toLocaleString()} {t('vehicles.miles')}
+                        {typeof vehicle.mileage === 'number' ? vehicle.mileage.toLocaleString() : '-'} {t('vehicles.miles')}
                       </span>
                     </div>
                   </td>
@@ -145,7 +145,11 @@ export default function ResponsiveVehicleTable({
                         <Edit className="h-4 w-4" />
                       </Link>
                       <button
-                        onClick={() => onDelete(vehicle._id)}
+                        onClick={() => {
+                          if (confirm('Are you sure you want to delete this vehicle?')) {
+                            onDelete(vehicle._id)
+                          }
+                        }}
                         className="text-red-600 hover:text-red-900"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -202,7 +206,11 @@ export default function ResponsiveVehicleTable({
                       <Edit className="h-4 w-4" />
                     </Link>
                     <button
-                      onClick={() => onDelete(vehicle._id)}
+                      onClick={() => {
+                        if (confirm('Are you sure you want to delete this vehicle?')) {
+                          onDelete(vehicle._id)
+                        }
+                      }}
                       className="text-red-600 hover:text-red-900 p-1"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -214,7 +222,7 @@ export default function ResponsiveVehicleTable({
                   <div className="flex items-center justify-between">
                     <div className="flex items-center text-sm text-gray-500">
                       <Gauge className="h-4 w-4 me-2" />
-                      <span>{vehicle.mileage.toLocaleString()} {t('vehicles.miles')}</span>
+                      <span>{typeof vehicle.mileage === 'number' ? vehicle.mileage.toLocaleString() : '-'} {t('vehicles.miles')}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-500">
                       <Settings className="h-4 w-4 me-2" />

@@ -90,22 +90,13 @@ export async function DELETE(
     }
 
     await connectToDatabase();
-    
-    // Check if customer has vehicles
-    const vehicles = await Vehicle.find({ customerId: id });
-    if (vehicles.length > 0) {
-      return new Response(JSON.stringify({ 
-        error: 'Cannot delete customer with existing vehicles. Please remove vehicles first.' 
-      }), { status: 400 });
-    }
 
-    const customer = await Customer.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true }
-    );
+    // Hard delete any vehicles belonging to this customer to avoid 400s
+    await Vehicle.deleteMany({ customerId: id });
 
-    if (!customer) {
+    // Hard delete the customer
+    const deleted = await Customer.findByIdAndDelete(id);
+    if (!deleted) {
       return new Response(JSON.stringify({ error: 'Customer not found' }), { status: 404 });
     }
 

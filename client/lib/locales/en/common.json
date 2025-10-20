@@ -61,6 +61,32 @@
     "select_from_list": "Select from list",
     "enter_custom_make": "Enter custom make",
     "enter_custom_model": "Enter custom model",
+    "first_name_placeholder": "Enter first name",
+    "last_name_placeholder": "Enter last name",
+    "email_placeholder": "Enter email address",
+    "phone_placeholder": "Enter phone number",
+    "language_preference": "Language Preference",
+    "arabic": "Arabic",
+    "english": "English",
+    "whatsapp_notifications": "WhatsApp Notifications",
+    "enable_whatsapp": "Enable WhatsApp notifications",
+    "make": "Make",
+    "model": "Model",
+    "year": "Year",
+    "license_plate_placeholder": "e.g., ABC-1234",
+    "part_number_placeholder": "e.g., BP-001",
+    "cost_price": "Cost Price",
+    "selling_price": "Selling Price",
+    "stock_quantity": "Stock Quantity",
+    "min_stock_level": "Minimum Stock Level",
+    "description_placeholder": "Enter description...",
+    "service_name_placeholder": "e.g., Oil Change",
+    "service_active": "Service is active",
+    "creating": "Creating...",
+    "failed_to_create_customer": "Failed to create customer",
+    "failed_to_create_vehicle": "Failed to create vehicle",
+    "failed_to_create_part": "Failed to create part",
+    "failed_to_create_service": "Failed to create service",
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
@@ -640,7 +666,12 @@
       "wheels_tires": "Wheels & Tires",
       "body_exterior": "Body & Exterior",
       "interior": "Interior",
-      "exhaust": "Exhaust"
+      "exhaust": "Exhaust",
+      "body": "Body",
+      "filters": "Filters",
+      "fluids": "Fluids",
+      "tires": "Tires",
+      "other": "Other"
     }
   },
   "inventory_alerts": {
@@ -992,7 +1023,14 @@
       "electrical_services": "Electrical Services",
       "ac_heating": "Air Conditioning and Heating",
       "exhaust_services": "Exhaust System Services",
-      "inspection_services": "Inspection Services"
+      "inspection_services": "Inspection Services",
+      "maintenance": "Maintenance",
+      "repair": "Repair",
+      "inspection": "Inspection",
+      "diagnostic": "Diagnostic",
+      "bodywork": "Bodywork",
+      "detailing": "Detailing",
+      "other": "Other"
     }
   },
   "landing": {
@@ -1205,8 +1243,15 @@
     "condition_fair": "Fair",
     "condition_poor": "Poor",
     "condition_critical": "Critical",
-    "example_items": "Example items: engine, brakes, tires"
+    "example_items": "Example items: engine, brakes, tires",
+    "create_new": "Create New",
+    "no_results_found": "No results found",
+    "no_matches_create_new": "No matches found. Create a new one?",
+    "search_placeholder": "Type to search...",
+    "loading": "Loading...",
+    "select_option": "Select an option"
   },
+
   "alerts": {
     "migration_completed": "Migration completed! {{count}} users migrated successfully.",
     "migration_failed": "Migration failed: {{message}}",
@@ -1402,13 +1447,5 @@
       "delivered": "Delivered",
       "failed": "Failed"
     }
-  },
-  "ui": {
-    "create_new": "Create New",
-    "no_results_found": "No results found",
-    "no_matches_create_new": "No matches found. Create a new one?",
-    "search_placeholder": "Type to search...",
-    "loading": "Loading...",
-    "select_option": "Select an option"
   }
 }

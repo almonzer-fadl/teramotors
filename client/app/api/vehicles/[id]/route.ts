@@ -89,13 +89,9 @@ export async function DELETE(
 
     await connectToDatabase();
     
-    const vehicle = await Vehicle.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true }
-    );
+    const deleted = await Vehicle.findByIdAndDelete(id);
 
-    if (!vehicle) {
+    if (!deleted) {
       return new Response(JSON.stringify({ error: 'Vehicle not found' }), { status: 404 });
     }
 
