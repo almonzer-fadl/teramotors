@@ -1,6 +1,94 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Asal Arabic ITF */
+@font-face {
+  font-family: 'Asal Arabic ITF';
+  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Asal Arabic ITF';
+  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Asal Arabic ITF';
+  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Asal Arabic ITF';
+  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Asal Arabic ITF';
+  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF Extra Bold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Asal Arabic ITF';
+  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+/* Franklin Gothic */
+@font-face {
+  font-family: 'Franklin Gothic';
+  src: url('/Font/FranklinGothic-Book.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Franklin Gothic';
+  src: url('/Font/FranklinGothic-BookItalic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Franklin Gothic';
+  src: url('/Font/FranklinGothic-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Franklin Gothic';
+  src: url('/Font/FranklinGothic-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Franklin Gothic';
+  src: url('/Font/FranklinGothic-Demi.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Franklin Gothic';
+  src: url('/Font/FranklinGothic-DemiItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Franklin Gothic';
+  src: url('/Font/FranklinGothic-Heavy.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Franklin Gothic';
+  src: url('/Font/FranklinGothic-HeavyItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -118,5 +206,13 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  .font-arabic {
+    font-family: 'Asal Arabic ITF', sans-serif;
+  }
+
+  .font-english {
+    font-family: 'Franklin Gothic', sans-serif;
   }
 }

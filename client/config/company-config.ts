@@ -16,9 +16,9 @@ export interface CompanyConfig {
     name: process.env.COMPANY_NAME || "تيرا فيجنز لصيانه السيارات",
     vatNumber: process.env.COMPANY_VAT_NUMBER || "7051569718", // Unified National Number
     address: {
-      street: "King Fahd Road, Building 123",
+      street: "صناعية, الرمال, الرياض",
       city: "Riyadh",
-      postalCode: "12345",
+      postalCode: "13252",
       country: "SA"
     },
     businessType: "Auto repair Shop", // Update this

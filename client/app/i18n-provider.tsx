@@ -23,6 +23,13 @@ export default function I18nProvider({
       if (typeof window !== 'undefined') {
         document.documentElement.lang = i18n.language;
         document.documentElement.dir = i18n.dir(i18n.language);
+        if (i18n.language === 'ar') {
+          document.documentElement.classList.add('font-arabic');
+          document.documentElement.classList.remove('font-english');
+        } else {
+          document.documentElement.classList.add('font-english');
+          document.documentElement.classList.remove('font-arabic');
+        }
       }
     };
 

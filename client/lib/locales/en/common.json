@@ -1035,12 +1035,50 @@
   },
   "landing": {
     "hero": {
-      "title": "TeraMotors Auto Repair",
+      "title": "Tera Auto Repair",
       "subtitle": "Your Trusted Partner for Professional Auto Repair Services",
       "description": "With over 15 years of experience, we provide expert automotive repair and maintenance services. From routine oil changes to complex engine repairs, we keep your vehicle running smoothly and safely.",
       "book_appointment": "Book Appointment",
       "call_now": "Call Now",
-      "phone": "(555) 123-4567"
+      "phone": "+966590090612"
+    },
+    "subscriptions": {
+      "title": "Service Plans",
+      "subtitle": "Choose the perfect plan for your auto repair needs",
+      "basic": {
+        "title": "Basic Plan",
+        "feature1": "Basic vehicle inspection",
+        "feature2": "Oil change service",
+        "feature3": "Tire rotation",
+        "price": "109 SAR/month"
+      },
+      "standard": {
+        "title": "Standard Plan",
+        "feature1": "All Basic features",
+        "feature2": "Brake system check",
+        "feature3": "Battery testing",
+        "feature4": "Priority scheduling",
+        "price": "221 SAR/month"
+      },
+      "premium": {
+        "title": "Premium Plan",
+        "feature1": "All Standard features",
+        "feature2": "Engine diagnostics",
+        "feature3": "Transmission service",
+        "feature4": "24/7 roadside assistance",
+        "feature5": "Free towing up to 50 miles",
+        "price": "371 SAR/month"
+      },
+      "enterprise": {
+        "title": "Enterprise Plan",
+        "feature1": "All Premium features",
+        "feature2": "Fleet management",
+        "feature3": "Custom maintenance schedules",
+        "feature4": "Dedicated account manager",
+        "feature5": "Volume discounts",
+        "feature6": "Custom reporting",
+        "price": "Contact Us"
+      }
     },
     "services": {
       "title": "Our Services",
@@ -1105,8 +1143,8 @@
     "contact": {
       "title": "Get In Touch",
       "subtitle": "Ready to schedule your next service?",
-      "address": "123 Auto Repair Street, City, State 12345",
-      "phone": "(555) 123-4567",
+      "address": "صناعية, الرمال, الرياض 13252, المملكة العربية السعودية",
+      "phone": "+966590090612",
       "email": "info@teramotors.com",
       "hours": "Mon-Fri: 7AM-6PM, Sat: 8AM-4PM, Sun: Closed",
       "book_online": "Book Online",
@@ -1317,7 +1355,8 @@
   },
   "landing_missing": {
     "professional_service": "Professional Service",
-    "trusted_by_thousands": "Trusted by thousands of customers across the region",
+    "trusted_by_thousands": "Trusted by thousands of customers in more than 5 countries", 
+    "trusted_by_leading_organizations": "We are proud to work with these respected organizations",
     "years_experience": "Years Experience",
     "satisfaction": "Satisfaction",
     "support_24_7": "Support",
@@ -1349,7 +1388,13 @@
     "forgot_your_password": "Forgot your password?",
     "testimonial_1": "TeraMotors has been servicing my fleet for 5 years. Their attention to detail and honest pricing keeps me coming back.",
     "testimonial_2": "When my car broke down unexpectedly, TeraMotors got me back on the road quickly and affordably. Highly recommended!",
-    "testimonial_3": "The team at TeraMotors understands cars like no one else. They've kept my classic car running perfectly for years."
+    "testimonial_3": "The team at TeraMotors understands cars like no one else. They've kept my classic car running perfectly for years.",
+    "subscriptions": "Service Plans",
+    "basic_plan": "Basic Plan",
+    "premium_plan": "Premium Plan",
+    "enterprise_plan": "Enterprise Plan",
+    "custom_plan": "Custom Plan",
+    "our_subscriptions": "Our Service Plans"
   },
   "dashboard_missing": {
     "welcome_back": "Welcome back {{role}} user",
