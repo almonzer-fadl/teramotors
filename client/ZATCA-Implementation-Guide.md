@@ -16,7 +16,7 @@ export const COMPANY_CONFIG: CompanyConfig = {
   address: {
     street: "Your Street Address",
     city: "Your City",
-    postalCode: "12345",
+    postalCode: "13252",
     country: "SA"
   },
   businessType: "Your Business Type",

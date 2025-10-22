@@ -254,7 +254,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     value={formData.phoneNumber}
                     onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    placeholder="+966501234567 (leave empty to use phone number)"
+                    placeholder="+966590090612 (leave empty to use phone number)"
                   />
                 </div>
                 <div className="space-y-2">
