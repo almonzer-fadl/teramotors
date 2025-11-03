@@ -226,6 +226,7 @@ export default function ResponsiveJobCardsGrid({
                   onChange={(e) => onStatusFilterChange(e.target.value)}
                   className="rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                 >
+                  <option value="active">{t('job_cards.active_jobs')}</option>
                   <option value="all">{t('appointments.all_status')}</option>
                   <option value="pending">{t('estimates.pending')}</option>
                   <option value="in-progress">{t('appointments.in_progress')}</option>
@@ -454,11 +455,11 @@ export default function ResponsiveJobCardsGrid({
               {t('job_cards.no_job_cards_found')}
             </h3>
             <p className="mt-2 text-sm text-gray-500">
-              {searchTerm || statusFilter !== "all"
+              {searchTerm || (statusFilter !== "all" && statusFilter !== "active")
                 ? t('job_cards.adjust_search')
                 : t('job_cards.get_started')}
             </p>
-            {!searchTerm && statusFilter === "all" && (
+            {!searchTerm && (statusFilter === "all" || statusFilter === "active") && (
               <div className="mt-6">
                 <Link
                   href="/job-cards/new"

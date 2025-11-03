@@ -30,21 +30,31 @@ type SortDirection = "asc" | "desc";
 export default function InventoryPage() {
   const { t } = useTranslation('common');
   const [parts, setParts] = useState<Part[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  // Debounce search term
   useEffect(() => {
-    fetchParts(searchTerm, sortKey, sortDirection);
-  }, [searchTerm, sortKey, sortDirection]);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // Wait 300ms after user stops typing
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchParts(debouncedSearchTerm, sortKey, sortDirection);
+  }, [debouncedSearchTerm, sortKey, sortDirection]);
 
   useEffect(() => {
     socket.on("update-parts", () => {
-      fetchParts(searchTerm, sortKey, sortDirection);
+      fetchParts(debouncedSearchTerm, sortKey, sortDirection);
     });
   });
 
@@ -53,7 +63,6 @@ export default function InventoryPage() {
     sort: SortKey,
     direction: SortDirection
   ) => {
-    setLoading(true);
     try {
       const params = new URLSearchParams({ search, sort, direction });
       const response = await fetch(`/api/parts?${params.toString()}`);
@@ -67,7 +76,7 @@ export default function InventoryPage() {
       console.error("Failed to fetch parts:", error);
       setParts([]);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   };
 
@@ -129,10 +138,10 @@ export default function InventoryPage() {
       });
 
       const result = await response.json();
-      
+
       if (result.success) {
         // Refresh the parts list
-        fetchParts(searchTerm, sortKey, sortDirection);
+        fetchParts(debouncedSearchTerm, sortKey, sortDirection);
         return { success: true, message: result.message };
       } else {
         return { success: false, message: result.error?.message || 'Import failed' };
@@ -158,7 +167,7 @@ export default function InventoryPage() {
     }
   };
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

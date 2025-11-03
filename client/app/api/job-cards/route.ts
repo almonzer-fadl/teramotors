@@ -71,13 +71,18 @@ export async function POST(request: Request) {
       }
     }
 
+    // Filter out parts with empty or invalid partId
+    const validPartsUsed = (body.partsUsed || []).filter((part: any) => {
+      return part.partId && part.partId.trim() !== '';
+    });
+
     const jobCardData: any = {
       customerId: body.customerId,
       vehicleId: body.vehicleId,
       status: body.status || 'pending',
       priority: body.priority || 'medium',
       services: body.services || [],
-      partsUsed: body.partsUsed || [],
+      partsUsed: validPartsUsed,
       notes: body.notes,
       discount: body.discount || 0
     };

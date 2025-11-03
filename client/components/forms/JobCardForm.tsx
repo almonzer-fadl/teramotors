@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Trash2, FileText, Wrench, Package, Plus } from "lucide-react";
 import { socketService } from "../../lib/services/socket";
@@ -68,7 +68,8 @@ export default function JobCardForm({
   const router = useRouter();
   const { user } = useSession();
   const [loading, setLoading] = useState(false);
-  
+  const scrollPositionRef = useRef<number | null>(null);
+
   const isAdmin = user?.role === 'admin';
   const [appointments, setAppointments] = useState<AppointmentMinimal[]>([]);
   const [customers, setCustomers] = useState<CustomerMinimal[]>([]);
@@ -152,6 +153,23 @@ export default function JobCardForm({
       fetchAppointmentDetails(appointmentId);
     }
   }, [jobCardId, isEditing, appointmentId]);
+
+  // Restore scroll position after parts/services update
+  useEffect(() => {
+    if (scrollPositionRef.current !== null) {
+      const scrollY = scrollPositionRef.current;
+      // Aggressively restore scroll position
+      const restore = () => window.scrollTo(0, scrollY);
+      restore();
+      requestAnimationFrame(restore);
+      setTimeout(restore, 10);
+      setTimeout(restore, 50);
+      setTimeout(restore, 100);
+      setTimeout(() => {
+        scrollPositionRef.current = null;
+      }, 150);
+    }
+  }, [formData.services.length, formData.partsUsed.length]);
 
   const fetchInitialData = async () => {
     try {
@@ -321,14 +339,27 @@ export default function JobCardForm({
     }));
   };
 
-  const addService = () => {
+  const addService = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    // Save current scroll position
+    scrollPositionRef.current = window.scrollY;
+
     handleInputChange("services", [
       ...formData.services,
       { serviceId: "", quantity: 1, laborHours: 0, laborRate: 0 },
     ]);
   };
 
-  const removeService = (index: number) => {
+  const removeService = (index: number, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    scrollPositionRef.current = window.scrollY;
+
     const updatedServices = formData.services.filter((_, i) => i !== index);
     handleInputChange("services", updatedServices);
   };
@@ -367,14 +398,27 @@ export default function JobCardForm({
     handleInputChange("partsUsed", updatedParts);
   };
 
-  const addPart = () => {
+  const addPart = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    // Save current scroll position
+    scrollPositionRef.current = window.scrollY;
+
     handleInputChange("partsUsed", [
       ...formData.partsUsed,
       { partId: "", quantity: 1, cost: 0 },
     ]);
   };
 
-  const removePart = (index: number) => {
+  const removePart = (index: number, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    scrollPositionRef.current = window.scrollY;
+
     const updatedParts = formData.partsUsed.filter((_, i) => i !== index);
     handleInputChange("partsUsed", updatedParts);
   };
@@ -640,7 +684,7 @@ export default function JobCardForm({
                   )}
                   <button
                     type="button"
-                    onClick={() => removeService(index)}
+                    onClick={(e) => removeService(index, e)}
                     className="text-red-500 hover:text-red-700"
                   >
                     <Trash2 className="h-5 w-5" />
@@ -649,7 +693,7 @@ export default function JobCardForm({
               ))}
               <button
                 type="button"
-                onClick={addService}
+                onClick={(e) => addService(e)}
                 className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
                 <Wrench className="mr-2 h-4 w-4" />
@@ -720,7 +764,7 @@ export default function JobCardForm({
                   )}
                   <button
                     type="button"
-                    onClick={() => removePart(index)}
+                    onClick={(e) => removePart(index, e)}
                     className="text-red-500 hover:text-red-700"
                   >
                     <Trash2 className="h-5 w-5" />
@@ -729,7 +773,7 @@ export default function JobCardForm({
               ))}
               <button
                 type="button"
-                onClick={addPart}
+                onClick={(e) => addPart(e)}
                 className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
                 <Package className="mr-2 h-4 w-4" />
