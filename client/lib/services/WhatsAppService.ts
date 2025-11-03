@@ -1,13 +1,18 @@
-import twilio from 'twilio';
 import WhatsAppMessage from '@/lib/models/WhatsAppMessage';
 import Customer from '@/lib/models/Customer';
+import { WahaService } from './WahaService';
 
-// Twilio configuration
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const whatsappFrom = process.env.TWILIO_WHATSAPP_FROM; // Your WhatsApp Business number
+// Waha configuration
+const wahaApiUrl = process.env.WAHA_API_URL || 'http://localhost:3000';
+const wahaApiKey = process.env.WAHA_API_KEY;
+const wahaSessionName = process.env.WAHA_SESSION_NAME || 'teramotors';
 
-const client = twilio(accountSid, authToken);
+// Initialize Waha client
+const wahaClient = new WahaService({
+  apiUrl: wahaApiUrl,
+  apiKey: wahaApiKey,
+  sessionName: wahaSessionName
+});
 
 export class WhatsAppService {
   private static instance: WhatsAppService;
@@ -68,7 +73,7 @@ export class WhatsAppService {
     }
   }
 
-  // Send WhatsApp message
+  // Send WhatsApp message via Waha
   public async sendMessage(
     customerId: string,
     messageType: 'welcome' | 'job_started' | 'job_completed' | 'invoice_ready' | 'advertisement',
@@ -76,11 +81,6 @@ export class WhatsAppService {
     mediaUrl?: string
   ): Promise<boolean> {
     try {
-      if (!accountSid || !authToken || !whatsappFrom) {
-        console.error('Twilio credentials not configured');
-        return false;
-      }
-
       const customerWhatsApp = await this.getCustomerWhatsApp(customerId);
       if (!customerWhatsApp) {
         console.error('Customer WhatsApp number not found');
@@ -101,33 +101,26 @@ export class WhatsAppService {
       });
       await messageRecord.save();
 
-      // Prepare message for Twilio
-      const messageData: any = {
-        from: whatsappFrom,
-        to: `whatsapp:${customerWhatsApp}`,
-        body: content
-      };
+      // Format phone number for Waha (remove + and add @c.us)
+      const chatId = wahaClient.formatPhoneNumber(customerWhatsApp);
 
-      if (mediaUrl) {
-        messageData.mediaUrl = [mediaUrl];
-      }
+      // Send message via Waha
+      const response = await wahaClient.sendTextMessage(chatId, content);
+      const messageId = wahaClient.extractMessageId(response);
 
-      // Send message via Twilio
-      const message = await client.messages.create(messageData);
-
-      // Update message record with Twilio response
+      // Update message record with Waha response
       await WhatsAppMessage.findByIdAndUpdate(messageRecord._id, {
-        twilioMessageId: message.sid,
+        wahaMessageId: messageId,
         status: 'sent',
         sentAt: new Date()
       });
 
-      console.log(`WhatsApp message sent successfully: ${message.sid}`);
+      console.log(`WhatsApp message sent via Waha: ${messageId}`);
       return true;
 
     } catch (error) {
       console.error('Error sending WhatsApp message:', error);
-      
+
       // Update message record with error
       if (customerId) {
         await WhatsAppMessage.findOneAndUpdate(
@@ -138,7 +131,7 @@ export class WhatsAppService {
           }
         );
       }
-      
+
       return false;
     }
   }
@@ -157,18 +150,12 @@ export class WhatsAppService {
     }
   }
 
-  // Get message status from Twilio
-  public async updateMessageStatus(twilioMessageId: string): Promise<void> {
+  // Get message status (Waha handles this via webhooks, but keeping for compatibility)
+  public async updateMessageStatus(messageId: string): Promise<void> {
     try {
-      const message = await client.messages(twilioMessageId).fetch();
-      
-      await WhatsAppMessage.findOneAndUpdate(
-        { twilioMessageId },
-        {
-          status: message.status === 'delivered' ? 'delivered' : 'sent',
-          deliveredAt: message.status === 'delivered' ? new Date() : undefined
-        }
-      );
+      // With Waha, status updates come via webhooks
+      // This method is kept for backward compatibility
+      console.log(`Status check for message ${messageId} - handled by Waha webhooks`);
     } catch (error) {
       console.error('Error updating message status:', error);
     }

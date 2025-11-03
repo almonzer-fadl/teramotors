@@ -6,7 +6,8 @@ export interface IWhatsAppMessage extends Document {
   content: string;
   mediaUrl?: string;
   status: 'pending' | 'sent' | 'delivered' | 'failed';
-  twilioMessageId?: string;
+  twilioMessageId?: string; // For backward compatibility
+  wahaMessageId?: string; // Waha message ID
   sentAt?: Date;
   deliveredAt?: Date;
   errorMessage?: string;
@@ -39,6 +40,9 @@ const WhatsAppMessageSchema = new Schema<IWhatsAppMessage>({
     default: 'pending'
   },
   twilioMessageId: {
+    type: String
+  },
+  wahaMessageId: {
     type: String
   },
   sentAt: {

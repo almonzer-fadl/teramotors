@@ -3,17 +3,18 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { 
-  MessageSquare, 
-  Send, 
-  Users, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
+import {
+  MessageSquare,
+  Send,
+  Users,
+  CheckCircle,
+  XCircle,
+  Clock,
   AlertCircle,
   Settings,
   TestTube
 } from 'lucide-react';
+import { WahaConfigModal } from '@/components/modals/WahaConfigModal';
 
 interface WhatsAppMessage {
   _id: string;
@@ -52,6 +53,7 @@ export default function WhatsAppPage() {
   const [messageType, setMessageType] = useState('welcome');
   const [language, setLanguage] = useState('ar');
   const [customMessage, setCustomMessage] = useState('');
+  const [showWahaConfig, setShowWahaConfig] = useState(false);
 
   // Message templates
   const messageTemplates = {
@@ -191,11 +193,16 @@ export default function WhatsAppPage() {
           <h1 className="text-3xl font-bold text-gray-900">{t('whatsapp.title')}</h1>
           <p className="text-gray-600">{t('whatsapp.description')}</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Settings className="h-5 w-5 text-gray-500" />
-          <span className="text-sm text-gray-500">{t('whatsapp.auto_send_enabled')}</span>
-        </div>
+        <button
+          onClick={() => setShowWahaConfig(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        >
+          <Settings className="h-5 w-5" />
+          <span>إعدادات Waha</span>
+        </button>
       </div>
+
+      <WahaConfigModal isOpen={showWahaConfig} onClose={() => setShowWahaConfig(false)} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Send Test Message */}
