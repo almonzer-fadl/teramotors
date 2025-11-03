@@ -53,7 +53,7 @@ export default function JobCardsPage() {
   const [jobCards, setJobCards] = useState<JobCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("active");
 
   useEffect(() => {
     fetchJobCards();
@@ -129,7 +129,11 @@ export default function JobCardsPage() {
       );
 
     const matchesStatus =
-      statusFilter === "all" || jobCard.status === statusFilter;
+      statusFilter === "all"
+        ? true
+        : statusFilter === "active"
+        ? jobCard.status === "pending" || jobCard.status === "in-progress"
+        : jobCard.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });

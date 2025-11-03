@@ -29,8 +29,9 @@ export default function ServicesPage() {
   const { t } = useTranslation('common');
   const { user } = useSession();
   const [services, setServices] = useState<Service[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [categories, setCategories] = useState<string[]>([]);
@@ -43,12 +44,21 @@ export default function ServicesPage() {
   const userRole = (user as any)?.role || 'inspector';
   const canDeleteServices = hasPermission(userRole, 'canDelete');
 
+  // Debounce search term
   useEffect(() => {
-    fetchServices(searchTerm, sortKey, sortDirection, selectedCategory);
-  }, [searchTerm, sortKey, sortDirection, selectedCategory]);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // Wait 300ms after user stops typing
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchServices(debouncedSearchTerm, sortKey, sortDirection, selectedCategory);
+  }, [debouncedSearchTerm, sortKey, sortDirection, selectedCategory]);
   useEffect(() => {
     socket.on("update-services", () => {
-      fetchServices(searchTerm, sortKey, sortDirection, selectedCategory);
+      fetchServices(debouncedSearchTerm, sortKey, sortDirection, selectedCategory);
     });
     return () => {
       socket.off("update-services");
@@ -76,7 +86,6 @@ export default function ServicesPage() {
     direction: SortDirection,
     category: string
   ) => {
-    setLoading(true);
     try {
       const params = new URLSearchParams({ search, sort, direction, category });
       const response = await fetch(`/api/services?${params.toString()}`);
@@ -87,7 +96,7 @@ export default function ServicesPage() {
     } catch (error) {
       console.error("Failed to fetch services:", error);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   };
 
@@ -145,7 +154,7 @@ export default function ServicesPage() {
 
   const totalPages = Math.max(1, Math.ceil(sortedServices.length / itemsPerPage));
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -192,7 +201,7 @@ export default function ServicesPage() {
       
       if (result.success) {
         // Refresh the services list
-        fetchServices(searchTerm, sortKey, sortDirection, selectedCategory);
+        fetchServices(debouncedSearchTerm, sortKey, sortDirection, selectedCategory);
         return { success: true, message: result.message };
       } else {
         return { success: false, message: result.error?.message || 'Import failed' };

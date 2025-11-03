@@ -41,14 +41,14 @@ export async function PUT(
     }
 
     await connectToDatabase();
-    
+
     const body = await request.json();
-    
-    // Handle empty partNumber - set to undefined if empty string
-    if (body.partNumber === '') {
-      body.partNumber = undefined;
+
+    // Handle empty partNumber - remove it entirely if empty or null
+    if (!body.partNumber || body.partNumber.trim() === '') {
+      delete body.partNumber;
     }
-    
+
     const part = await Part.findByIdAndUpdate(
       id,
       body,

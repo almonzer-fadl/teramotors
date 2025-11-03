@@ -153,7 +153,16 @@ export default function SearchableComboBox({
     if (isOpen && dropdownRef.current) {
       const highlightedElement = dropdownRef.current.children[highlightedIndex] as HTMLElement;
       if (highlightedElement) {
-        highlightedElement.scrollIntoView({ block: 'nearest' });
+        // Only scroll within the dropdown, not the whole page
+        const dropdown = dropdownRef.current;
+        const dropdownRect = dropdown.getBoundingClientRect();
+        const elementRect = highlightedElement.getBoundingClientRect();
+
+        if (elementRect.bottom > dropdownRect.bottom) {
+          dropdown.scrollTop += elementRect.bottom - dropdownRect.bottom;
+        } else if (elementRect.top < dropdownRect.top) {
+          dropdown.scrollTop -= dropdownRect.top - elementRect.top;
+        }
       }
     }
   }, [highlightedIndex, isOpen]);
@@ -187,7 +196,9 @@ export default function SearchableComboBox({
     if (disabled) return;
     if (!isOpen) {
       setIsOpen(true);
-      setTimeout(() => inputRef.current?.focus(), 50);
+      setTimeout(() => {
+        inputRef.current?.focus({ preventScroll: true });
+      }, 50);
     } else {
       setIsOpen(false);
       setSearchQuery('');

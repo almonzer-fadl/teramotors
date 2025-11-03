@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'name';
     const direction = searchParams.get('direction') || 'asc';
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const limit = parseInt(searchParams.get('limit') || '1000'); // Increased default to show all parts
 
     const query: any = { isActive: true };
 
@@ -87,14 +87,14 @@ export async function POST(request: Request) {
     }
 
     await connectToDatabase();
-    
+
     const body = await request.json();
-    
-    // Handle empty partNumber - set to undefined if empty string
-    if (body.partNumber === '') {
-      body.partNumber = undefined;
+
+    // Handle empty partNumber - remove it entirely if empty or null
+    if (!body.partNumber || body.partNumber.trim() === '') {
+      delete body.partNumber;
     }
-    
+
     const part = new Part(body);
 
     await part.save();
