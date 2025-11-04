@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import FileUpload from "@/components/dashboard/FileUpload";
 import InlineInvoiceCreator from "@/components/forms/InlineInvoiceCreator";
+import InlineEstimateCreator from "@/components/forms/InlineEstimateCreator";
 import { useTranslation } from "react-i18next";
 import { socket } from "@/lib/services/socket";
 import { useSession } from "@/lib/hooks/useSession";
@@ -104,7 +105,9 @@ export default function JobCardDetailsPage() {
   const [services, setServices] = useState<ServiceMinimal[]>([]);
   const [linkedInvoiceId, setLinkedInvoiceId] = useState<string | null>(null);
   const [showInvoiceCreator, setShowInvoiceCreator] = useState(false);
-  
+  const [showEstimateCreator, setShowEstimateCreator] = useState(false);
+  const [linkedEstimateId, setLinkedEstimateId] = useState<string | null>(null);
+
   const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
@@ -113,6 +116,7 @@ export default function JobCardDetailsPage() {
       fetchParts();
       fetchServices();
       fetchLinkedInvoice();
+      fetchLinkedEstimate();
     }
   }, [id]);
 
@@ -171,14 +175,38 @@ export default function JobCardDetailsPage() {
     }
   };
 
+  const fetchLinkedEstimate = async () => {
+    try {
+      const response = await fetch(`/api/estimates?jobCardId=${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        // Find the first estimate linked to this job card
+        const linkedEstimate = data.estimates?.find((est: any) => est.jobCardId?._id === id || est.jobCardId === id);
+        setLinkedEstimateId(linkedEstimate?._id || null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch linked estimate:', error);
+    }
+  };
+
   const createInvoiceFromJobCard = async () => {
     setShowInvoiceCreator(true);
+  };
+
+  const createEstimateFromJobCard = async () => {
+    setShowEstimateCreator(true);
   };
 
   const handleInvoiceCreated = (invoice: { _id: string }) => {
     setLinkedInvoiceId(invoice._id);
     setShowInvoiceCreator(false);
     alert(t('invoices.invoice_created_successfully'));
+  };
+
+  const handleEstimateCreated = (estimate: { _id: string }) => {
+    setLinkedEstimateId(estimate._id);
+    setShowEstimateCreator(false);
+    alert(t('estimates.estimate_created_successfully'));
   };
 
   const handleTimeTracking = async (action: "start" | "end") => {
@@ -489,27 +517,53 @@ export default function JobCardDetailsPage() {
           </div>
         </div>
 
-        {/* Inspection Details Section */}
-        {/* Invoice Quick Actions */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden mb-8">
-          <div className="px-8 py-6 flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">{t('invoices.title')}</h2>
-              <p className="text-gray-600 text-sm mt-1">
-                {linkedInvoiceId ? t('common.view') : t('invoices.create_invoice')}
-              </p>
+        {/* Invoice and Estimate Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Invoice Quick Actions */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="px-8 py-6 flex flex-col">
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-gray-900">{t('invoices.title')}</h2>
+                <p className="text-gray-600 text-sm mt-1">
+                  {linkedInvoiceId ? t('common.view') : t('invoices.create_invoice')}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {!linkedInvoiceId && (
+                  <button onClick={createInvoiceFromJobCard} className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm hover:bg-blue-700 transition-colors">
+                    {t('invoices.create_invoice')}
+                  </button>
+                )}
+                {linkedInvoiceId && (
+                  <Link href={`/invoices/${linkedInvoiceId}`} className="px-4 py-2 rounded-xl border text-sm hover:bg-gray-50 transition-colors">
+                    {t('invoices.view_invoice')}
+                  </Link>
+                )}
+              </div>
             </div>
-            <div className="flex gap-2">
-              {!linkedInvoiceId && (
-                <button onClick={createInvoiceFromJobCard} className="px-4 py-2 rounded-xl bg-blue-600 text-white text-sm hover:bg-blue-700 transition-colors">
-                  {t('invoices.create_invoice')}
-                </button>
-              )}
-              {linkedInvoiceId && (
-                <Link href={`/invoices/${linkedInvoiceId}`} className="px-4 py-2 rounded-xl border text-sm hover:bg-gray-50 transition-colors">
-                  {t('invoices.view_invoice')}
-                </Link>
-              )}
+          </div>
+
+          {/* Estimate Quick Actions */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="px-8 py-6 flex flex-col">
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-gray-900">{t('estimates.title')}</h2>
+                <p className="text-gray-600 text-sm mt-1">
+                  {linkedEstimateId ? t('common.view') : t('estimates.create_estimate')}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {!linkedEstimateId && (
+                  <button onClick={createEstimateFromJobCard} className="px-4 py-2 rounded-xl bg-green-600 text-white text-sm hover:bg-green-700 transition-colors">
+                    {t('estimates.create_estimate')}
+                  </button>
+                )}
+                {linkedEstimateId && (
+                  <Link href={`/estimates/${linkedEstimateId}`} className="px-4 py-2 rounded-xl border text-sm hover:bg-gray-50 transition-colors">
+                    {t('estimates.view_estimate')}
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -793,6 +847,14 @@ export default function JobCardDetailsPage() {
           onClose={() => setShowInvoiceCreator(false)}
           jobCardId={Array.isArray(id) ? id[0] || "" : id || ""}
           onCreated={handleInvoiceCreated}
+        />
+
+        {/* Inline Estimate Creator Modal */}
+        <InlineEstimateCreator
+          isOpen={showEstimateCreator}
+          onClose={() => setShowEstimateCreator(false)}
+          jobCardId={Array.isArray(id) ? id[0] || "" : id || ""}
+          onCreated={handleEstimateCreated}
         />
       </div>
     </div>

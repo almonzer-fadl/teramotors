@@ -43,13 +43,22 @@ interface Customer {
   language: 'ar' | 'en';
 }
 
+interface Invoice {
+  _id: string;
+  customerId: string;
+  totalAmount: number;
+  createdAt: string;
+}
+
 export default function WhatsAppPage() {
   const { t } = useTranslation('common');
   const [messages, setMessages] = useState<WhatsAppMessage[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState('');
+  const [selectedInvoice, setSelectedInvoice] = useState('');
   const [messageType, setMessageType] = useState('welcome');
   const [language, setLanguage] = useState('ar');
   const [customMessage, setCustomMessage] = useState('');
@@ -106,6 +115,27 @@ export default function WhatsAppPage() {
     }
   };
 
+  const fetchInvoicesForCustomer = async (customerId: string) => {
+    try {
+      const response = await fetch(`/api/invoices?customerId=${customerId}&limit=100`);
+      const data = await response.json();
+      setInvoices(data.invoices || []);
+    } catch (error) {
+      console.error('Error fetching invoices:', error);
+      setInvoices([]);
+    }
+  };
+
+  const handleCustomerChange = (customerId: string) => {
+    setSelectedCustomer(customerId);
+    setSelectedInvoice('');
+    if (customerId) {
+      fetchInvoicesForCustomer(customerId);
+    } else {
+      setInvoices([]);
+    }
+  };
+
   const sendTestMessage = async () => {
     if (!selectedCustomer || !messageType) return;
 
@@ -120,7 +150,8 @@ export default function WhatsAppPage() {
           customerId: selectedCustomer,
           messageType,
           language,
-          customMessage: customMessage || undefined
+          customMessage: customMessage || undefined,
+          invoiceId: messageType === 'invoice_ready' && selectedInvoice ? selectedInvoice : undefined
         }),
       });
 
@@ -224,7 +255,7 @@ export default function WhatsAppPage() {
               <select
                 id="customer"
                 value={selectedCustomer}
-                onChange={(e) => setSelectedCustomer(e.target.value)}
+                onChange={(e) => handleCustomerChange(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">{t('whatsapp.select_customer')}</option>
@@ -255,6 +286,31 @@ export default function WhatsAppPage() {
                 <option value="advertisement">{t('whatsapp.message_templates.advertisement')}</option>
               </select>
             </div>
+
+            {messageType === 'invoice_ready' && (
+              <div>
+                <label htmlFor="invoice" className="block text-sm font-medium text-gray-700 mb-1">
+                  Select Invoice (Optional)
+                </label>
+                <select
+                  id="invoice"
+                  value={selectedInvoice}
+                  onChange={(e) => setSelectedInvoice(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={!selectedCustomer || invoices.length === 0}
+                >
+                  <option value="">No invoice link (template only)</option>
+                  {invoices.map((invoice) => (
+                    <option key={invoice._id} value={invoice._id}>
+                      Invoice #{invoice._id.slice(-8)} - ${invoice.totalAmount.toFixed(2)} - {new Date(invoice.createdAt).toLocaleDateString()}
+                    </option>
+                  ))}
+                </select>
+                {selectedCustomer && invoices.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-1">No invoices found for this customer</p>
+                )}
+              </div>
+            )}
 
             <div>
               <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
@@ -371,7 +427,7 @@ export default function WhatsAppPage() {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <span className="font-medium">
-                        {message.customerId.firstName} {message.customerId.lastName}
+                        {message.customerId ? `${message.customerId.firstName} ${message.customerId.lastName}` : 'Unknown Customer'}
                       </span>
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                         {getMessageTypeLabel(message.messageType)}
@@ -388,7 +444,7 @@ export default function WhatsAppPage() {
                     </div>
                   </div>
                   <div className="text-sm text-gray-700 mb-2">
-                    <strong>{t('whatsapp.phone')}</strong> {message.customerId.phoneNumber}
+                    <strong>{t('whatsapp.phone')}</strong> {message.customerId?.phoneNumber || 'N/A'}
                   </div>
                   <div className="text-sm text-gray-700 mb-2">
                     <strong>Language:</strong> {message.language === 'ar' ? 'العربية' : 'English'}
