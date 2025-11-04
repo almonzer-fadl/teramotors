@@ -54,7 +54,7 @@ export const connectToDatabase = async (): Promise<void> => {
       maxIdleTimeMS: 60000, // Increased idle time
       retryWrites: true,
       retryReads: true,
-      bufferCommands: false, // Disable mongoose buffering
+      bufferCommands: true, // Enable mongoose buffering to queue commands until connection is ready
     });
     
     isConnected = true;

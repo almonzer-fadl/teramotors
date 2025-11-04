@@ -744,7 +744,10 @@
     "stop": "إنهاء",
     "no_active_workers": "لا يوجد عمال نشطين",
     "active_workers": "عمال نشطين",
-    "additional_details": "تفاصيل إضافية"
+    "additional_details": "تفاصيل إضافية",
+    "save_and_create_invoice": "حفظ وإنشاء فاتورة",
+    "save_and_create_estimate": "حفظ وإنشاء عرض سعر",
+    "job_card_saved_successfully": "تم حفظ كرت العمل بنجاح"
   },
   "vehicles": {
     "title": "المركبات",
@@ -1247,6 +1250,7 @@
     "failed_to_create_payment": "فشل إنشاء الدفعة",
     "no_notes_available": "لا توجد ملاحظات متاحة",
     "save_and_create_invoice": "حفظ وإنشاء فاتورة",
+    "save_and_create_estimate": "حفظ وإنشاء عرض سعر",
     "creating_invoice": "جارٍ إنشاء الفاتورة...",
     "create_invoice": "إنشاء فاتورة",
     "creating": "جارٍ الإنشاء...",
