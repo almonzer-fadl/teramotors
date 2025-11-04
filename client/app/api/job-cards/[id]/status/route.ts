@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/db';
 import { getServerSession } from "@/lib/auth-server";
 import JobCard from '@/lib/models/JobCard';
 import Part from '@/lib/models/Part';
+import { WhatsAppEventListeners } from '@/lib/services/WhatsAppEventListeners';
 
 export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
@@ -18,14 +19,24 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     
     const updatedJobCard = await JobCard.findByIdAndUpdate(id, { status }, { new: true });
 
+    if (!updatedJobCard) {
+      return new Response(JSON.stringify({ error: 'Job card not found' }), { status: 404 });
+    }
+
     if (status === 'completed') {
+      // Decrement parts inventory
       for (const part of updatedJobCard.partsUsed) {
         await Part.findByIdAndUpdate(part.partId, { $inc: { stockQuantity: -part.quantity } });
       }
-    }
 
-    if (!updatedJobCard) {
-      return new Response(JSON.stringify({ error: 'Job card not found' }), { status: 404 });
+      // Send job completed WhatsApp message
+      try {
+        const whatsappListeners = WhatsAppEventListeners.getInstance();
+        await whatsappListeners.onJobCardClosed(updatedJobCard.customerId.toString());
+      } catch (whatsappError) {
+        console.error('Error sending job completed WhatsApp message:', whatsappError);
+        // Don't fail the status update if WhatsApp fails
+      }
     }
 
     return new Response(JSON.stringify({ success: true, jobCard: updatedJobCard }));

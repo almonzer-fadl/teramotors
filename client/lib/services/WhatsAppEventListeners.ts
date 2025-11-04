@@ -80,29 +80,44 @@ export class WhatsAppEventListeners {
   }
 
   // Invoice created - Send invoice ready message
-  public async onInvoiceCreated(customerId: string): Promise<void> {
+  public async onInvoiceCreated(customerId: string, invoiceId?: string): Promise<void> {
     try {
+      console.log(`[WhatsApp Event] onInvoiceCreated called for customer ${customerId}, invoice ${invoiceId}`);
+
       const customer = await Customer.findById(customerId);
-      if (!customer || !customer.whatsappEnabled) {
+
+      if (!customer) {
+        console.log(`[WhatsApp Event] Customer ${customerId} not found`);
+        return;
+      }
+
+      console.log(`[WhatsApp Event] Customer found: ${customer.firstName} ${customer.lastName}, whatsappEnabled: ${customer.whatsappEnabled}, phone: ${customer.phoneNumber}`);
+
+      if (!customer.whatsappEnabled) {
+        console.log(`[WhatsApp Event] WhatsApp is disabled for customer ${customerId}`);
         return;
       }
 
       const language = customer.language || 'ar';
-      
-      // Send invoice ready message
+      console.log(`[WhatsApp Event] Sending invoice ready message in ${language} with invoice link: ${invoiceId || 'none'}`);
+
+      // Send invoice ready message with invoice link
       await this.whatsappService.sendMessage(
-        customerId, 
-        'invoice_ready', 
-        language
+        customerId,
+        'invoice_ready',
+        language,
+        undefined,
+        invoiceId
       );
 
       // Schedule advertisement message for 24 hours later
       await this.whatsappService.scheduleAdvertisement(customerId, language);
 
-      console.log(`Invoice ready message sent to customer ${customerId}`);
-      console.log(`Advertisement message scheduled for customer ${customerId}`);
+      console.log(`[WhatsApp Event] Invoice ready message sent to customer ${customerId}`);
+      console.log(`[WhatsApp Event] Advertisement message scheduled for customer ${customerId}`);
     } catch (error) {
-      console.error('Error sending invoice ready message:', error);
+      console.error('[WhatsApp Event] Error sending invoice ready message:', error);
+      throw error; // Re-throw to see the error in the invoice creation route
     }
   }
 

@@ -9,20 +9,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { customerId, messageType, language = 'ar', mediaUrl } = await request.json();
+    const { customerId, messageType, language = 'ar', mediaUrl, invoiceId } = await request.json();
 
     if (!customerId || !messageType) {
-      return NextResponse.json({ 
-        error: 'Customer ID and message type are required' 
+      return NextResponse.json({
+        error: 'Customer ID and message type are required'
       }, { status: 400 });
     }
 
     const whatsappService = WhatsAppService.getInstance();
     const success = await whatsappService.sendMessage(
-      customerId, 
-      messageType, 
-      language, 
-      mediaUrl
+      customerId,
+      messageType,
+      language,
+      mediaUrl,
+      invoiceId
     );
 
     if (success) {

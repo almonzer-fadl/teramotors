@@ -19,9 +19,17 @@ export async function middleware(request: NextRequest) {
   ]
 
   // Check if the current path is public
-  const isPublicRoute = publicRoutes.some(route => 
+  const isPublicRoute = publicRoutes.some(route =>
     pathname.startsWith(route)
   )
+
+  // Allow public access to invoice PDF view for customers from WhatsApp
+  const isInvoicePdfView = pathname.match(/^\/invoices\/[^\/]+\/pdf$/);
+  const isInvoiceViewApi = pathname.match(/^\/api\/invoices\/[^\/]+\/view$/);
+
+  if (isInvoicePdfView || isInvoiceViewApi) {
+    return NextResponse.next()
+  }
 
   // If it's a public route, allow access
   if (isPublicRoute) {

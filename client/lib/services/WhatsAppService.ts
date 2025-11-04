@@ -78,17 +78,33 @@ export class WhatsAppService {
     customerId: string,
     messageType: 'welcome' | 'job_started' | 'job_completed' | 'invoice_ready' | 'advertisement',
     language: 'ar' | 'en' = 'ar',
-    mediaUrl?: string
+    mediaUrl?: string,
+    invoiceId?: string
   ): Promise<boolean> {
     try {
+      console.log(`[WhatsApp Service] sendMessage called: customer=${customerId}, type=${messageType}, lang=${language}, invoiceId=${invoiceId}`);
+
       const customerWhatsApp = await this.getCustomerWhatsApp(customerId);
       if (!customerWhatsApp) {
-        console.error('Customer WhatsApp number not found');
+        console.error('[WhatsApp Service] Customer WhatsApp number not found');
         return false;
       }
 
+      console.log(`[WhatsApp Service] Customer WhatsApp number: ${customerWhatsApp}`);
+
       const templates = this.getMessageTemplates();
-      const content = templates[messageType][language];
+      let content = templates[messageType][language];
+
+      // Add invoice link if invoiceId is provided and message type is invoice_ready
+      if (invoiceId && messageType === 'invoice_ready') {
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const invoiceLink = `${appUrl}/invoices/${invoiceId}/pdf`;
+        const linkText = language === 'ar'
+          ? `\n\n🔗 اضغط هنا لعرض الفاتورة:\n${invoiceLink}`
+          : `\n\n🔗 Click here to view your invoice:\n${invoiceLink}`;
+        content = content + linkText;
+        console.log(`[WhatsApp Service] Added invoice link to message: ${invoiceLink}`);
+      }
 
       // Create message record in database
       const messageRecord = new WhatsAppMessage({
@@ -101,12 +117,17 @@ export class WhatsAppService {
       });
       await messageRecord.save();
 
+      console.log(`[WhatsApp Service] Message record created in DB, ID: ${messageRecord._id}`);
+
       // Format phone number for Waha (remove + and add @c.us)
       const chatId = wahaClient.formatPhoneNumber(customerWhatsApp);
+      console.log(`[WhatsApp Service] Formatted chat ID: ${chatId}`);
 
       // Send message via Waha
+      console.log(`[WhatsApp Service] Sending message via Waha...`);
       const response = await wahaClient.sendTextMessage(chatId, content);
       const messageId = wahaClient.extractMessageId(response);
+      console.log(`[WhatsApp Service] Waha response received, message ID: ${messageId}`);
 
       // Update message record with Waha response
       await WhatsAppMessage.findByIdAndUpdate(messageRecord._id, {
@@ -115,11 +136,11 @@ export class WhatsAppService {
         sentAt: new Date()
       });
 
-      console.log(`WhatsApp message sent via Waha: ${messageId}`);
+      console.log(`[WhatsApp Service] ✅ WhatsApp message sent successfully via Waha: ${messageId}`);
       return true;
 
     } catch (error) {
-      console.error('Error sending WhatsApp message:', error);
+      console.error('[WhatsApp Service] ❌ Error sending WhatsApp message:', error);
 
       // Update message record with error
       if (customerId) {

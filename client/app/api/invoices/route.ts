@@ -259,17 +259,35 @@ export async function POST(request: Request) {
     const invoice = new Invoice(invoiceDoc);
     await invoice.save();
 
+    // Automatically update job card status to 'completed' when invoice is created
+    if (jobCardId) {
+      await JobCard.findByIdAndUpdate(jobCardId, {
+        status: 'completed',
+        updatedAt: new Date()
+      });
+
+      // Send job completed WhatsApp message when invoice completes the job
+      try {
+        const whatsappListeners = WhatsAppEventListeners.getInstance();
+        await whatsappListeners.onJobCardClosed(customerId.toString());
+      } catch (whatsappError) {
+        console.error('Error sending job completed WhatsApp message:', whatsappError);
+      }
+    }
+
     // Optionally update the estimate status to 'converted' or similar
     if (estimateId) {
       await Estimate.findByIdAndUpdate(estimateId, { status: 'converted' });
     }
 
-    // Send invoice ready WhatsApp message
+    // Send invoice ready WhatsApp message with invoice link
     try {
+      console.log(`[Invoice Created] Attempting to send WhatsApp message for customer ${customerId}, invoice ${invoice._id}`);
       const whatsappListeners = WhatsAppEventListeners.getInstance();
-      await whatsappListeners.onInvoiceCreated(customerId.toString());
+      await whatsappListeners.onInvoiceCreated(customerId.toString(), invoice._id.toString());
+      console.log(`[Invoice Created] WhatsApp message sent successfully`);
     } catch (whatsappError) {
-      console.error('Error sending invoice ready WhatsApp message:', whatsappError);
+      console.error('[Invoice Created] Error sending invoice ready WhatsApp message:', whatsappError);
       // Don't fail the invoice creation if WhatsApp fails
     }
 

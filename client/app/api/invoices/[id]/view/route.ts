@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { Invoice, JobCard } from '@/lib/models';
-import { getServerSession } from "@/lib/auth-server";
 
+// This route is public so customers can view invoices from WhatsApp links
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     await connectToDatabase();
 
     const { id } = await params;
