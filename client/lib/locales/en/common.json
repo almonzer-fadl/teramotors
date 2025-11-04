@@ -749,7 +749,10 @@
     "stop": "Stop",
     "no_active_workers": "No active workers",
     "active_workers": "Active workers",
-    "additional_details": "Additional Details"
+    "additional_details": "Additional Details",
+    "save_and_create_invoice": "Save & Create Invoice",
+    "save_and_create_estimate": "Save & Create Estimate",
+    "job_card_saved_successfully": "Job card saved successfully"
   },
   "vehicles": {
     "title": "Vehicles",
@@ -1255,6 +1258,7 @@
     "failed_to_create_payment": "Failed to create payment",
     "no_notes_available": "No notes available",
     "save_and_create_invoice": "Save & Create Invoice",
+    "save_and_create_estimate": "Save & Create Estimate",
     "creating_invoice": "Creating Invoice...",
     "create_invoice": "Create Invoice",
     "creating": "Creating...",

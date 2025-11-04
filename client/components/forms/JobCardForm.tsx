@@ -7,7 +7,6 @@ import { socketService } from "../../lib/services/socket";
 import { useTranslation } from "react-i18next";
 import { useSession } from "../../lib/hooks/useSession";
 import InlineInspectionCreator from "./InlineInspectionCreator";
-import InlineInvoiceCreator from "./InlineInvoiceCreator";
 import SearchableComboBox, { SearchableComboBoxOption } from "../ui/SearchableComboBox";
 import QuickCreateCustomer from "./QuickCreateCustomer";
 import QuickCreateVehicle from "./QuickCreateVehicle";
@@ -47,7 +46,6 @@ interface JobCardFormData {
   customerId: string;
   vehicleId: string;
   inspectionId?: string;
-  invoiceId?: string;
   status: "pending" | "in-progress" | "completed" | "cancelled";
   priority: "low" | "medium" | "high" | "urgent";
   estimatedStartTime: string;
@@ -77,7 +75,6 @@ export default function JobCardForm({
   const [services, setServices] = useState<ServiceMinimal[]>([]);
   const [parts, setParts] = useState<PartMinimal[]>([]);
   const [isInspectionModalOpen, setInspectionModalOpen] = useState(false);
-  const [isInvoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [isCustomerModalOpen, setCustomerModalOpen] = useState(false);
   const [isVehicleModalOpen, setVehicleModalOpen] = useState(false);
   const [isPartModalOpen, setPartModalOpen] = useState(false);
@@ -87,7 +84,6 @@ export default function JobCardForm({
     customerId: "",
     vehicleId: "",
     inspectionId: "",
-    invoiceId: "",
     status: "pending",
     priority: "medium",
     estimatedStartTime: "",
@@ -126,7 +122,6 @@ export default function JobCardForm({
           customerId: jobCard.customerId?._id || "",
           vehicleId: jobCard.vehicleId?._id || "",
           inspectionId: jobCard.inspectionId?._id || jobCard.inspectionId || "",
-          invoiceId: jobCard.invoiceId?._id || jobCard.invoiceId || "",
           status: jobCard.status || "pending",
           priority: jobCard.priority || "medium",
           estimatedStartTime: jobCard.estimatedStartTime
@@ -286,7 +281,8 @@ export default function JobCardForm({
     setLoading(true);
 
     try {
-      const response = await fetch("/api/job-cards", {
+      // First, save the job card
+      const jobCardResponse = await fetch("/api/job-cards", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -294,17 +290,102 @@ export default function JobCardForm({
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        socketService.emitJobCreated();
-        // Navigate to invoice creation with the job card ID
-        router.push(`/invoices/new?jobCardId=${result.jobCard._id}`);
-      } else {
-        const error = await response.json();
+      if (!jobCardResponse.ok) {
+        const error = await jobCardResponse.json();
         alert(error.message || t("forms.failed_to_save_job_card"));
+        return;
+      }
+
+      const jobCardResult = await jobCardResponse.json();
+      const jobCardId = jobCardResult.jobCard._id;
+      socketService.emitJobCreated();
+
+      // Automatically create invoice with job card data
+      const invoiceResponse = await fetch("/api/invoices", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jobCardId: jobCardId,
+          customerId: formData.customerId,
+          vehicleId: formData.vehicleId,
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+          paymentMethod: "cash",
+          notes: formData.notes || "",
+        }),
+      });
+
+      if (invoiceResponse.ok) {
+        const invoiceResult = await invoiceResponse.json();
+        alert(t("invoices.invoice_created_successfully"));
+        router.push(`/invoices/${invoiceResult.invoice._id}`);
+      } else {
+        // Job card was saved, but invoice creation failed
+        alert(t("invoices.failed_to_create_invoice") + " " + t("job_cards.job_card_saved_successfully"));
+        router.push("/job-cards");
       }
     } catch (error) {
-      console.error("Failed to save job card:", error);
+      console.error("Failed to save job card and create invoice:", error);
+      alert(t("forms.failed_to_save_job_card"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveAndCreateEstimate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // First, save the job card
+      const jobCardResponse = await fetch("/api/job-cards", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!jobCardResponse.ok) {
+        const error = await jobCardResponse.json();
+        alert(error.message || t("forms.failed_to_save_job_card"));
+        return;
+      }
+
+      const jobCardResult = await jobCardResponse.json();
+      const jobCardId = jobCardResult.jobCard._id;
+      socketService.emitJobCreated();
+
+      // Automatically create estimate with job card data
+      const estimateResponse = await fetch("/api/estimates", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jobCardId: jobCardId,
+          customerId: formData.customerId,
+          vehicleId: formData.vehicleId,
+          services: formData.services,
+          parts: formData.partsUsed,
+          validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+          status: "pending",
+          notes: formData.notes || "",
+        }),
+      });
+
+      if (estimateResponse.ok) {
+        const estimateResult = await estimateResponse.json();
+        alert(t("estimates.estimate_created_successfully"));
+        router.push(`/estimates/${estimateResult.estimate._id}`);
+      } else {
+        // Job card was saved, but estimate creation failed
+        alert(t("estimates.failed_to_create_estimate") + " " + t("job_cards.job_card_saved_successfully"));
+        router.push("/job-cards");
+      }
+    } catch (error) {
+      console.error("Failed to save job card and create estimate:", error);
       alert(t("forms.failed_to_save_job_card"));
     } finally {
       setLoading(false);
@@ -508,12 +589,6 @@ export default function JobCardForm({
         defaultCustomerId={formData.customerId}
         defaultVehicleId={formData.vehicleId}
         onCreated={(insp) => setFormData(prev => ({ ...prev, inspectionId: insp._id }))}
-      />
-      <InlineInvoiceCreator
-        isOpen={isInvoiceModalOpen}
-        onClose={() => setInvoiceModalOpen(false)}
-        jobCardId={jobCardId || ""}
-        onCreated={(invoice) => setFormData(prev => ({ ...prev, invoiceId: invoice._id }))}
       />
       <QuickCreateCustomer
         isOpen={isCustomerModalOpen}
@@ -871,7 +946,7 @@ export default function JobCardForm({
             {formData.inspectionId ? (
               <Link
                 href={`/inspections/${formData.inspectionId}`}
-                className="group inline-flex items-center px-8 py-4 border-2 border-green-600 text-sm font-bold rounded-2xl text-green-700 bg-white hover:bg-green-50 hover:border-green-700 transition-all duration-300"
+                className="group inline-flex items-center px-8 py-4 border-2 border-[#F13F33] text-sm font-bold rounded-2xl text-[#F13F33] bg-white hover:bg-[#F13F33]/50 hover:border-[#F13F33] transition-all duration-300"
               >
                 {t('inspections.view_inspection')}
               </Link>
@@ -880,30 +955,35 @@ export default function JobCardForm({
                 type="button"
                 onClick={() => setInspectionModalOpen(true)}
                 disabled={!formData.customerId || !formData.vehicleId}
-                className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-green-600 to-green-700 hover:shadow-xl hover:shadow-green-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+                className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-green-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
               >
                 <Plus className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
                 {t('inspections.new_inspection')}
               </button>
             )}
 
-            {formData.invoiceId ? (
-              <Link
-                href={`/invoices/${formData.invoiceId}`}
-                className="group inline-flex items-center px-8 py-4 border-2 border-blue-600 text-sm font-bold rounded-2xl text-blue-700 bg-white hover:bg-blue-50 hover:border-blue-700 transition-all duration-300"
-              >
-                {t('invoices.view_invoice')}
-              </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setInvoiceModalOpen(true)}
-                disabled={!formData.customerId || !formData.vehicleId}
-                className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:shadow-xl hover:shadow-blue-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
-              >
-                <Plus className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                {t('invoices.create_invoice')}
-              </button>
+            {!isEditing && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleSaveAndCreateInvoice}
+                  disabled={!formData.customerId || !formData.vehicleId || loading}
+                  className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-blue-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <FileText className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                  {t('job_cards.save_and_create_invoice')}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSaveAndCreateEstimate}
+                  disabled={!formData.customerId || !formData.vehicleId || loading}
+                  className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-green-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <FileText className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                  {t('job_cards.save_and_create_estimate')}
+                </button>
+              </>
             )}
 
             <button

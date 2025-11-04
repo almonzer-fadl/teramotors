@@ -129,10 +129,27 @@ export async function POST(request: Request) {
     }
 
     // Clean and validate services
-    const cleanedServices = body.services.map((service: any) => ({
-      ...service,
-      serviceId: service.serviceId && service.serviceId !== '' && !service.serviceId.startsWith('auto-') ? service.serviceId : null
-    }));
+    const cleanedServices = (Array.isArray(body.services) ? body.services : []).map((service: any) => {
+      const quantity = Number(service.quantity ?? 1) || 1
+      const laborHours = Number(service.laborHours ?? 0) || 0
+      const laborRate = Number(service.laborRate ?? 0) || 0
+      const laborCost = Number(service.laborCost ?? laborHours * laborRate) || 0
+      const partsCost = Number(service.partsCost ?? 0) || 0
+      const computedTotal = Number(service.totalCost ?? (quantity * (laborCost + partsCost))) || 0
+
+      return {
+        ...service,
+        serviceId: service.serviceId && service.serviceId !== '' && !String(service.serviceId).startsWith('auto-') ? service.serviceId : null,
+        quantity,
+        laborHours,
+        laborRate,
+        laborCost,
+        partsCost,
+        totalCost: computedTotal,
+        name: service.name ?? '',
+        description: service.description ?? service.name ?? ''
+      }
+    });
 
     // Validate services (only if serviceId is provided)
     for (const service of cleanedServices) {
@@ -145,15 +162,26 @@ export async function POST(request: Request) {
     }
 
     // Clean parts
-    const cleanedParts = body.parts ? body.parts.map((part: any) => ({
-      ...part,
-      partId: part.partId && part.partId !== '' ? part.partId : null
-    })) : [];
+    const cleanedParts = (Array.isArray(body.parts) ? body.parts : []).map((part: any) => {
+      const quantity = Number(part.quantity ?? 1) || 1
+      // Accept both `unitCost` and legacy `cost`
+      const unitCost = Number(part.unitCost ?? part.cost ?? 0) || 0
+      const computedTotal = Number(part.totalCost ?? (quantity * unitCost)) || 0
+
+      return {
+        ...part,
+        partId: part.partId && part.partId !== '' ? part.partId : null,
+        name: part.name ?? '',
+        quantity,
+        unitCost,
+        totalCost: computedTotal
+      }
+    });
 
 
     // Calculate totals
-    const servicesTotal = cleanedServices.reduce((sum: number, service: any) => sum + service.totalCost, 0)
-    const partsTotal = cleanedParts.reduce((sum: number, part: any) => sum + part.totalCost, 0)
+    const servicesTotal = cleanedServices.reduce((sum: number, service: any) => sum + (Number(service.totalCost) || 0), 0)
+    const partsTotal = cleanedParts.reduce((sum: number, part: any) => sum + (Number(part.totalCost) || 0), 0)
     const subtotal = servicesTotal + partsTotal
     const tax = partsTotal * 0.15 // 15% tax rate ONLY on parts
     const total = subtotal + tax
