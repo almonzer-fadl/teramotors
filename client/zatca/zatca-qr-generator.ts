@@ -30,7 +30,7 @@ export class ZATCAQRGenerator {
         '- using placeholder to avoid build-time failures.'
       );
       // Use a safe placeholder to avoid hard failures during build. Real validation happens on generate.
-      this.companyVATNumber = '300000000000000';
+      this.companyVATNumber = '314211338900003';
     }
   }
 
