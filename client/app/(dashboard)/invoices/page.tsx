@@ -415,9 +415,9 @@ function InvoicesPageContent() {
               setSelectedJobCard(null);
               setQrCodeData('');
             }}
+            
             invoice={selectedInvoice}
             jobCard={selectedJobCard}
-            qrCodeData={qrCodeData}
             language={'ar'}
           />
         )}

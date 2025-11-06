@@ -54,7 +54,9 @@ export async function PUT(
         email: body.email,
         phone: body.phone,
         address: body.address,
-        emergencyContact: body.emergencyContact,
+        vatNumber: body.vatNumber,
+        idNumber: body.idNumber,
+        companyName: body.companyName,
         notes: body.notes,
         updatedAt: new Date()
       },

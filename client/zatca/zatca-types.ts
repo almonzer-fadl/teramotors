@@ -14,7 +14,9 @@ export interface InvoiceItem {
   export interface Customer {
     id?: string;
     name?: string;
+    companyName?: string;
     vatNumber?: string;
+    idNumber?: string;
     email?: string;
     phone?: string;
     address?: {
@@ -70,6 +72,8 @@ export interface InvoiceItem {
     timestamp: string;        // ISO 8601 format
     totalAmount: string;      // Including VAT
     vatAmount: string;
+    customerVatNumber?: string;
+    customerIdNumber?: string;
     invoiceHash?: string;     // For Phase 2
     digitalSignature?: string; // For Phase 2
     publicKey?: string;       // For Phase 2

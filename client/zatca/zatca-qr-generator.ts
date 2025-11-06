@@ -90,11 +90,13 @@ export class ZATCAQRGenerator {
    */
   private generateQRCode(invoiceData: InvoiceData, totals: InvoiceTotals): string {
     const qrData: ZATCAQRData = {
-      sellerName: this.companyName,
+      sellerName: invoiceData.customer?.companyName || this.companyName,
       vatNumber: this.companyVATNumber,
       timestamp: ZATCAUtils.formatDateForZATCA(invoiceData.invoiceDate),
       totalAmount: totals.totalAmount.toFixed(2),
       vatAmount: totals.totalVAT.toFixed(2),
+      customerVatNumber: invoiceData.customer?.vatNumber,
+      customerIdNumber: invoiceData.customer?.idNumber,
     };
 
     return this.createTLVQRCode(qrData);
@@ -104,39 +106,25 @@ export class ZATCAQRGenerator {
    * Create TLV (Tag-Length-Value) encoded QR code as per ZATCA specs
    */
   private createTLVQRCode(qrData: ZATCAQRData): string {
-    const tlvFields: Buffer[] = [];
+    const tags = [
+      { tag: 1, value: qrData.sellerName },
+      { tag: 2, value: qrData.vatNumber },
+      { tag: 3, value: qrData.timestamp },
+      { tag: 4, value: qrData.totalAmount },
+      { tag: 5, value: qrData.vatAmount },
+      { tag: 6, value: qrData.customerVatNumber },
+      { tag: 7, value: qrData.customerIdNumber },
+      { tag: 8, value: qrData.invoiceHash },
+      { tag: 9, value: qrData.digitalSignature },
+      { tag: 10, value: qrData.publicKey },
+      { tag: 11, value: qrData.certificateSignature },
+    ];
 
-    // Tag 1: Seller Name
-    tlvFields.push(ZATCAUtils.createTLVField(1, qrData.sellerName));
-    
-    // Tag 2: VAT Registration Number  
-    tlvFields.push(ZATCAUtils.createTLVField(2, qrData.vatNumber));
-    
-    // Tag 3: Invoice Date & Time (ISO 8601)
-    tlvFields.push(ZATCAUtils.createTLVField(3, qrData.timestamp));
-    
-    // Tag 4: Invoice Total (including VAT)
-    tlvFields.push(ZATCAUtils.createTLVField(4, qrData.totalAmount));
-    
-    // Tag 5: VAT Amount
-    tlvFields.push(ZATCAUtils.createTLVField(5, qrData.vatAmount));
-
-    // Phase 2 fields (optional for now)
-    if (qrData.invoiceHash) {
-      tlvFields.push(ZATCAUtils.createTLVField(6, qrData.invoiceHash));
-    }
-
-    if (qrData.digitalSignature) {
-      tlvFields.push(ZATCAUtils.createTLVField(7, qrData.digitalSignature));
-    }
-
-    if (qrData.publicKey) {
-      tlvFields.push(ZATCAUtils.createTLVField(8, qrData.publicKey));
-    }
-
-    if (qrData.certificateSignature) {
-      tlvFields.push(ZATCAUtils.createTLVField(9, qrData.certificateSignature));
-    }
+    const tlvFields: Buffer[] = tags
+      .filter(tag => tag.value)
+      .map(tag => {
+        return ZATCAUtils.createTLVField(tag.tag, tag.value!);
+      });
 
     // Combine all TLV fields and encode as Base64
     const tlvBuffer = Buffer.concat(tlvFields);

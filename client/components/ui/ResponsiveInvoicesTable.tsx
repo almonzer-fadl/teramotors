@@ -109,24 +109,11 @@ export default function ResponsiveInvoicesTable({
   const handlePrintInvoice = async (invoice: Invoice) => {
     try {
       // Fetch invoice details with job card and QR code
-      const response = await fetch(`/api/invoices/${invoice._id}/view`);
+      const response = await fetch(`/api/invoices/${invoice._id}`);
       if (response.ok) {
         const data = await response.json();
         setSelectedInvoice(data.invoice);
         setSelectedJobCard(data.jobCard);
-        
-        // Get QR code data
-        const qrCode = data.invoice?.zatca?.qrCode || data.invoice?.zatca?.qrCodeImage;
-        if (qrCode) {
-          if (typeof qrCode === 'string' && qrCode.startsWith('data:')) {
-            setQrCodeData(qrCode);
-          } else {
-            setQrCodeData(`data:image/png;base64,${qrCode}`);
-          }
-        } else {
-          setQrCodeData('');
-        }
-        
         setShowPrintModal(true);
       } else {
         console.error('Failed to fetch invoice details');
@@ -466,11 +453,9 @@ export default function ResponsiveInvoicesTable({
             setShowPrintModal(false);
             setSelectedInvoice(null);
             setSelectedJobCard(null);
-            setQrCodeData('');
           }}
           invoice={selectedInvoice}
           jobCard={selectedJobCard}
-          qrCodeData={qrCodeData}
           language={'ar'}
         />
       )}

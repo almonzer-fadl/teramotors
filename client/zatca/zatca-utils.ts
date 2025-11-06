@@ -110,7 +110,7 @@ export class ZATCAUtils {
    * Validate Saudi VAT number (Unified National Number)
    */
   static isValidSaudiVATNumber(vatNumber: string): boolean {
-    const vatRegex = /^\d{10}$/;
+    const vatRegex = /^\d{15}$/;
     return vatRegex.test(vatNumber);
   }
 

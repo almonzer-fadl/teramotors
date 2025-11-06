@@ -305,9 +305,12 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
             
             <div class="info-section">
                 <h3>${t.customerInfo}</h3>
-                <p><strong>${t.customer}:</strong> ${(invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}</p>
+                <p><strong>${t.customer}:</strong> ${invoice.customerId?.companyName ? invoice.customerId.companyName : (invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}</p>
                 ${invoice.customerId?.email ? `<p><strong>البريد الإلكتروني:</strong> ${invoice.customerId.email}</p>` : ''}
                 ${invoice.customerId?.phone ? `<p><strong>الهاتف:</strong> ${invoice.customerId.phone}</p>` : ''}
+                ${invoice.customerId?.address ? `<p><strong>العنوان:</strong> ${invoice.customerId.address.street}, ${invoice.customerId.address.city}, ${invoice.customerId.address.country}</p>` : ''}
+                ${invoice.customerId?.vatNumber ? `<p><strong>الرقم الضريبي:</strong> ${invoice.customerId.vatNumber}</p>` : ''}
+                ${invoice.customerId?.idNumber ? `<p><strong>رقم الهوية/السجل التجاري:</strong> ${invoice.customerId.idNumber}</p>` : ''}
             </div>
             
             <div class="info-section">

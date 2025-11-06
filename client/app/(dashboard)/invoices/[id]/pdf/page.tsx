@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +18,7 @@ export default function InvoicePdfPage() {
     if (!id) return;
     const run = async () => {
       try {
-        const res = await fetch(`/api/invoices/${id}/view`);
+        const res = await fetch(`/api/invoices/${id}`);
         if (res.ok) {
           setData(await res.json());
         }
@@ -29,9 +29,20 @@ export default function InvoicePdfPage() {
     run();
   }, [id]);
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const qrSrc = useMemo(() => {
+    // First try to get the QR code image if available
+    const qrImage = data?.invoice?.zatca?.qrCodeImage;
+    if (qrImage) {
+      if (typeof qrImage === 'string' && qrImage.startsWith('data:')) return qrImage;
+      return `data:image/png;base64,${qrImage}`;
+    }
+    
+    // Fallback to generating QR code from base64 data
+    const qr = data?.invoice?.zatca?.qrCode;
+    if (!qr) return null;
+    if (typeof qr === 'string' && qr.startsWith('data:')) return qr;
+    return `data:image/png;base64,${qr}`;
+  }, [data?.invoice?.zatca?.qrCodeImage, data?.invoice?.zatca?.qrCode]);
 
   if (loading) {
     return (
@@ -56,6 +67,10 @@ export default function InvoicePdfPage() {
         </div>
       </div>
     );
+  }
+
+  function handlePrint(): void {
+    window.print();
   }
 
   return (
@@ -87,7 +102,7 @@ export default function InvoicePdfPage() {
           <PrintInvoiceDocument
             invoice={data.invoice}
             jobCard={data.jobCard}
-            qrCodeData={data.invoice.zatca?.qrCode}
+            qrCodeData={qrSrc ?? undefined}
             language="ar"
           />
         </div>

@@ -32,28 +32,12 @@ const PrintInvoiceDocument = ({
 
 
 
-  // Generate QR code
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
 
   useEffect(() => {
-    if (!qrCodeData) {
-      setQrCodeDataUrl('');
-      return;
+    if (qrCodeData) {
+      setQrCodeDataUrl(qrCodeData);
     }
-    
-    QRCode.toDataURL(qrCodeData, {
-      width: 200,
-      margin: 1,
-      color: { dark: '#000000', light: '#FFFFFF' },
-      errorCorrectionLevel: 'M'
-    }, (err, url) => {
-      if (err) {
-        console.error('QR Code generation error:', err);
-        setQrCodeDataUrl('');
-      } else {
-        setQrCodeDataUrl(url);
-      }
-    });
   }, [qrCodeData]);
 
   const translations = {
@@ -485,10 +469,12 @@ const PrintInvoiceDocument = ({
 
           <div className="info-section">
             <h3>{t.customerInfo}</h3>
-            <p><strong>{t.customer}:</strong> {(invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}</p>
+            <p><strong>{t.customer}:</strong> {invoice.customerId?.companyName ? invoice.customerId.companyName : (invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}</p>
             {invoice.customerId?.email && <p><strong>Email:</strong> {invoice.customerId.email}</p>}
             {invoice.customerId?.phone && <p><strong>Phone:</strong> {invoice.customerId.phone}</p>}
-          </div>
+            {invoice.customerId?.address && <p><strong>Address:</strong> ${invoice.customerId.address.street}, ${invoice.customerId.address.city}, ${invoice.customerId.address.country}</p>}
+            {invoice.customerId?.vatNumber && <p><strong>VAT Number:</strong> {invoice.customerId.vatNumber}</p>}
+            {invoice.customerId?.idNumber && <p><strong>ID Number:</strong> {invoice.customerId.idNumber}</p>}          </div>
 
           <div className="info-section">
             <h3>{t.vehicleInfo}</h3>
