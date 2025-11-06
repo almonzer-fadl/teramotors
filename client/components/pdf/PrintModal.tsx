@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import PrintInvoiceDocument from './PrintInvoiceDocument';
 
@@ -9,7 +9,6 @@ interface PrintModalProps {
   onClose: () => void;
   invoice: any;
   jobCard?: any;
-  qrCodeData?: string;
   language?: string;
 }
 
@@ -18,12 +17,26 @@ const PrintModal = ({
   onClose, 
   invoice, 
   jobCard, 
-  qrCodeData, 
   language = 'ar' 
 }: PrintModalProps) => {
   const isRTL = true; // Force Arabic RTL layout
   const { t } = useTranslation('common');
   const [isPrinting, setIsPrinting] = useState(false);
+
+  const qrSrc = useMemo(() => {
+    // First try to get the QR code image if available
+    const qrImage = invoice?.zatca?.qrCodeImage;
+    if (qrImage) {
+      if (typeof qrImage === 'string' && qrImage.startsWith('data:')) return qrImage;
+      return `data:image/png;base64,${qrImage}`;
+    }
+    
+    // Fallback to generating QR code from base64 data
+    const qr = invoice?.zatca?.qrCode;
+    if (!qr) return null;
+    if (typeof qr === 'string' && qr.startsWith('data:')) return qr;
+    return `data:image/png;base64,${qr}`;
+  }, [invoice?.zatca?.qrCodeImage, invoice?.zatca?.qrCode]);
 
   useEffect(() => {
     if (isOpen) {
@@ -557,7 +570,7 @@ const PrintModal = ({
               <PrintInvoiceDocument
                 invoice={invoice}
                 jobCard={jobCard}
-                qrCodeData={qrCodeData}
+                qrCodeData={qrSrc ?? undefined}
                 language={language}
               />
             </div>

@@ -21,11 +21,9 @@ interface CustomerFormData {
     zipCode: string;
     country: string;
   };
-  emergencyContact: {
-    name: string;
-    phone: string;
-    relationship: string;
-  };
+  vatNumber: string;
+  idNumber: string;
+  companyName: string;
   notes: string;
 }
 
@@ -48,11 +46,9 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
       zipCode: "",
       country: "Saudi Arabia",
     },
-    emergencyContact: {
-      name: "",
-      phone: "",
-      relationship: "",
-    },
+    vatNumber: "",
+    idNumber: "",
+    companyName: "",
     notes: "",
   });
 
@@ -78,11 +74,9 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
             zipCode: customer.address?.zipCode || "",
             country: customer.address?.country || "Saudi Arabia",
           },
-          emergencyContact: {
-            name: customer.emergencyContact?.name || "",
-            phone: customer.emergencyContact?.phone || "",
-            relationship: customer.emergencyContact?.relationship || "",
-          },
+          vatNumber: customer.vatNumber || "",
+          idNumber: customer.idNumber || "",
+          companyName: customer.companyName || "",
           notes: customer.notes || "",
         });
       }
@@ -364,57 +358,64 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
             </div>
           </div>
 
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
-              {t('forms.emergency_contact')}
-            </h3>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('forms.contact_name')}
-                </label>
-                <input
-                  type="text"
-                  value={formData.emergencyContact.name}
-                  onChange={(e) =>
-                    handleInputChange("emergencyContact.name", e.target.value)
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="px-8 py-8">
+              <div className="flex items-center mb-8">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  Business Information
+                </h3>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('forms.contact_phone')}
-                </label>
-                <input
-                  type="tel"
-                  value={formData.emergencyContact.phone}
-                  onChange={(e) =>
-                    handleInputChange("emergencyContact.phone", e.target.value)
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('forms.relationship')}
-                </label>
-                <input
-                  type="text"
-                  value={formData.emergencyContact.relationship}
-                  onChange={(e) =>
-                    handleInputChange(
-                      "emergencyContact.relationship",
-                      e.target.value
-                    )
-                  }
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                />
+              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.companyName}
+                    onChange={(e) =>
+                      handleInputChange("companyName", e.target.value)
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter Company Name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    VAT Number
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.vatNumber}
+                    onChange={(e) =>
+                      handleInputChange("vatNumber", e.target.value)
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter VAT Number (15 digits)"
+                    maxLength={15}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    CR / License / ID No
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.idNumber}
+                    onChange={(e) =>
+                      handleInputChange("idNumber", e.target.value)
+                    }
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    placeholder="Enter CR / License / ID No (10 digits)"
+                    maxLength={10}
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
           <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
             <div className="px-8 py-8">

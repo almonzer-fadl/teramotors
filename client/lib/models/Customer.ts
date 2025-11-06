@@ -17,11 +17,9 @@ const CustomerSchema = new Schema({
     country: String
   },
   vehicles: [{ type: Schema.Types.ObjectId, ref: 'Vehicle' }],
-  emergencyContact: {
-    name: String,
-    phone: String,
-    relationship: String
-  },
+  vatNumber: { type: String, length: 15 },
+  idNumber: { type: String, length: 10 },
+  companyName: { type: String },
   notes: String,
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },

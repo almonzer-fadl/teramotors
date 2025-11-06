@@ -101,7 +101,9 @@ export async function POST(request: NextRequest) {
       whatsappEnabled: body.whatsappEnabled !== false, // Default to true
       language: body.language || 'ar', // Default to Arabic
       address: body.address,
-      emergencyContact: body.emergencyContact,
+      vatNumber: body.vatNumber,
+      idNumber: body.idNumber,
+      companyName: body.companyName,
       notes: body.notes,
       vehicles: []
     })

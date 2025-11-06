@@ -16,7 +16,7 @@ export default function InvoiceDetailPage() {
     if (!id) return;
     const run = async () => {
       try {
-        const res = await fetch(`/api/invoices/${id}/view`);
+        const res = await fetch(`/api/invoices/${id}`);
         if (res.ok) {
           setData(await res.json());
         }
