@@ -8,7 +8,8 @@ import { useTranslation } from "react-i18next";
 
 interface TemplateItem {
   itemId: string;
-  category: string;
+  name: string;
+  uniqueCode?: string;
 }
 
 interface FormData {
@@ -33,7 +34,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
   const [items, setItems] = useState<TemplateItem[]>([]);
   const [newItem, setNewItem] = useState<TemplateItem>({
     itemId: "",
-    category: "",
+    name: "",
   });
 
   useEffect(() => {
@@ -73,9 +74,9 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
   };
 
   const addItem = () => {
-    if (newItem.itemId && newItem.category) {
+    if (newItem.itemId && newItem.name) {
       setItems(prev => [...prev, newItem]);
-      setNewItem({ itemId: "", category: "" });
+      setNewItem({ itemId: "", name: "" });
     }
   };
 
@@ -267,8 +268,21 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                   {t("templates.add_item")}
                 </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
+                <div className="flex items-end gap-4">
+                  <div className="flex-1">
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                      {t("templates.item_name")} *
+                    </label>
+                    <input
+                      type="text"
+                      value={newItem.name}
+                      onChange={(e) => handleItemChange("name", e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      placeholder="e.g., Oil Level"
+                    />
+                  </div>
+
+                  <div className="flex-1">
                     <label className="block text-sm font-bold text-gray-700 mb-2">
                       {t("templates.item_id")} *
                     </label>
@@ -277,41 +291,18 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                       value={newItem.itemId}
                       onChange={(e) => handleItemChange("itemId", e.target.value)}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder={t('templates.item_id_placeholder')}
+                      placeholder="e.g., oil-level"
                     />
                   </div>
-                  
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t("templates.category")} *
-                    </label>
-                    <select
-                      value={newItem.category}
-                      onChange={(e) => handleItemChange("category", e.target.value)}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    >
-                      <option value="">{t("templates.select_category")}</option>
-                      <option value="engine">Engine</option>
-                      <option value="brakes">Brakes</option>
-                      <option value="electrical">Electrical</option>
-                      <option value="suspension">Suspension</option>
-                      <option value="transmission">Transmission</option>
-                      <option value="exhaust">Exhaust</option>
-                      <option value="interior">Interior</option>
-                      <option value="exterior">Exterior</option>
-                    </select>
-                  </div>
-                  
-                  <div className="flex items-end">
-                    <button
-                      type="button"
-                      onClick={addItem}
-                      className="w-full inline-flex items-center justify-center px-6 py-3 bg-[#F13F33] text-white font-bold rounded-xl hover:bg-[#E03A2F] transition-all duration-300 shadow-lg hover:shadow-xl"
-                    >
-                      <Plus className="mr-2 h-5 w-5" />
-                      {t("templates.add_item")}
-                    </button>
-                  </div>
+
+                  <button
+                    type="button"
+                    onClick={addItem}
+                    className="inline-flex items-center justify-center px-6 py-3 bg-[#F13F33] text-white font-bold rounded-xl hover:bg-[#E03A2F] transition-all duration-300 shadow-lg hover:shadow-xl whitespace-nowrap"
+                  >
+                    <Plus className="mr-2 h-5 w-5" />
+                    {t("templates.add_item")}
+                  </button>
                 </div>
               </div>
 
@@ -324,13 +315,19 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                   <div className="grid gap-4">
                     {items.map((item, index) => (
                       <div key={index} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gray-200 hover:border-[#F13F33]/30 transition-all duration-300">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="text-lg font-bold text-gray-900 mb-1">
-                              {item.itemId}
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex-1 grid grid-cols-2 gap-3">
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">Name</div>
+                              <div className="text-base font-bold text-gray-900">
+                                {item.name}
+                              </div>
                             </div>
-                            <div className="text-sm text-gray-600">
-                              {item.category}
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">ID</div>
+                              <div className="text-base text-gray-700">
+                                {item.itemId}
+                              </div>
                             </div>
                           </div>
                           <button

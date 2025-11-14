@@ -8,7 +8,8 @@ const InspectionTemplateSchema = new Schema({
   category: { type: String, required: true },
   items: [{
     itemId: { type: String, required: true },
-    category: { type: String, required: true },
+    name: { type: String, required: true },
+    uniqueCode: { type: String, required: false }
   }],
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },

@@ -6,12 +6,9 @@ import { ArrowLeft, Save, X, Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface TemplateItem {
-  id: string;
+  itemId: string;
   name: string;
-  description: string;
-  category: string;
-  isRequired: boolean;
-  defaultCondition: string;
+  uniqueCode?: string;
 }
 
 interface TemplateFormData {
@@ -75,12 +72,8 @@ export default function NewTemplatePage() {
     handleInputChange("items", [
       ...formData.items,
       {
-        id: "",
+        itemId: "",
         name: "",
-        description: "",
-        category: "",
-        isRequired: true,
-        defaultCondition: "good",
       },
     ]);
   };
@@ -186,99 +179,41 @@ export default function NewTemplatePage() {
             </button>
           </div>
 
-          {formData.items.map((item, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 rounded-lg p-4 mb-4"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t("templates.item_id")}
-                  </label>
-                  <input
-                    type="text"
-                    value={item.id}
-                    onChange={(e) => handleItemChange(index, "id", e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="e.g., engine"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t("templates.item_name")}
-                  </label>
+          <div className="space-y-3">
+            {formData.items.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-3 border border-gray-200 rounded-lg p-3"
+              >
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
                   <input
                     type="text"
                     value={item.name}
                     onChange={(e) => handleItemChange(index, "name", e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="e.g., Engine"
+                    className="block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Item name (e.g., Oil Level)"
+                    required
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t("templates.category")}
-                  </label>
                   <input
                     type="text"
-                    value={item.category}
-                    onChange={(e) => handleItemChange(index, "category", e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder="e.g., Engine"
+                    value={item.itemId}
+                    onChange={(e) => handleItemChange(index, "itemId", e.target.value)}
+                    className="block w-full px-3 py-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Item ID (e.g., oil-level)"
+                    required
                   />
                 </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t("templates.description")}
-                  </label>
-                  <input
-                    type="text"
-                    value={item.description}
-                    onChange={(e) => handleItemChange(index, "description", e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                    placeholder={t('ui.description_of_inspection_item')}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t("templates.default_condition")}
-                  </label>
-                  <select
-                    value={item.defaultCondition}
-                    onChange={(e) => handleItemChange(index, "defaultCondition", e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  >
-                    <option value="good">{t("forms.condition_good")}</option>
-                    <option value="fair">{t("forms.condition_fair")}</option>
-                    <option value="poor">{t("forms.condition_poor")}</option>
-                    <option value="critical">{t("forms.condition_critical")}</option>
-                  </select>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={`isRequired-${index}`}
-                    checked={item.isRequired}
-                    onChange={(e) => handleItemChange(index, "isRequired", e.target.checked)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor={`isRequired-${index}`} className="ml-2 block text-sm text-gray-900">
-                    {t("templates.required")}
-                  </label>
-                </div>
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => removeItem(index)}
-                    className="text-red-500 hover:text-red-700 p-2"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => removeItem(index)}
+                  className="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50"
+                  title="Remove item"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <div className="flex justify-end space-x-3">

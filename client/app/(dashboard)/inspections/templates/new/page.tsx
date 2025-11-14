@@ -8,7 +8,8 @@ import { useTranslation } from "react-i18next";
 
 interface TemplateItem {
   itemId: string;
-  category: string;
+  name: string;
+  uniqueCode?: string;
 }
 
 interface FormData {
@@ -31,7 +32,7 @@ export default function NewTemplatePage() {
   const [items, setItems] = useState<TemplateItem[]>([]);
   const [newItem, setNewItem] = useState<TemplateItem>({
     itemId: "",
-    category: "",
+    name: "",
   });
 
   const handleInputChange = (field: keyof FormData, value: string) => {
@@ -43,9 +44,9 @@ export default function NewTemplatePage() {
   };
 
   const addItem = () => {
-    if (newItem.itemId && newItem.category) {
+    if (newItem.itemId && newItem.name) {
       setItems(prev => [...prev, newItem]);
-      setNewItem({ itemId: "", category: "" });
+      setNewItem({ itemId: "", name: "" });
     }
   };
 
@@ -199,8 +200,21 @@ export default function NewTemplatePage() {
                 {t("templates.add_item")}
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
+              <div className="flex items-end gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    {t("templates.item_name")} *
+                  </label>
+                  <input
+                    type="text"
+                    value={newItem.name}
+                    onChange={(e) => handleItemChange("name", e.target.value)}
+                    className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="e.g., Oil Level"
+                  />
+                </div>
+
+                <div className="flex-1">
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     {t("templates.item_id")} *
                   </label>
@@ -209,41 +223,18 @@ export default function NewTemplatePage() {
                     value={newItem.itemId}
                     onChange={(e) => handleItemChange("itemId", e.target.value)}
                     className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder={t('templates.item_id_placeholder')}
+                    placeholder="e.g., oil-level"
                   />
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    {t("templates.category")} *
-                  </label>
-                  <select
-                    value={newItem.category}
-                    onChange={(e) => handleItemChange("category", e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="">{t("templates.select_category")}</option>
-                    <option value="engine">Engine</option>
-                    <option value="brakes">Brakes</option>
-                    <option value="electrical">Electrical</option>
-                    <option value="suspension">Suspension</option>
-                    <option value="transmission">Transmission</option>
-                    <option value="exhaust">Exhaust</option>
-                    <option value="interior">Interior</option>
-                    <option value="exterior">Exterior</option>
-                  </select>
-                </div>
-                
-                <div className="flex items-end">
-                  <button
-                    type="button"
-                    onClick={addItem}
-                    className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-200"
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    {t("templates.add_item")}
-                  </button>
-                </div>
+
+                <button
+                  type="button"
+                  onClick={addItem}
+                  className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-200 whitespace-nowrap"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t("templates.add_item")}
+                </button>
               </div>
             </div>
 
@@ -256,13 +247,19 @@ export default function NewTemplatePage() {
                 <ul className="divide-y divide-gray-200">
                   {items.map((item, index) => (
                     <li key={index} className="py-3 flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900">
-                            {item.itemId}
+                      <div className="flex items-center space-x-4 flex-1">
+                        <div className="flex-1 grid grid-cols-2 gap-4">
+                          <div>
+                            <div className="text-xs text-gray-500">Name</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {item.name}
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {item.category}
+                          <div>
+                            <div className="text-xs text-gray-500">ID</div>
+                            <div className="text-sm text-gray-700">
+                              {item.itemId}
+                            </div>
                           </div>
                         </div>
                       </div>

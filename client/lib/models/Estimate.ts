@@ -27,6 +27,7 @@ const EstimateSchema = new Schema({
   subtotal: { type: Number, required: true, min: 0 },
   tax: { type: Number, required: true, min: 0 },
   total: { type: Number, required: true, min: 0 },
+  inspectionFee: { type: Number, default: 0, min: 0 },
   validUntil: { type: Date, required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
