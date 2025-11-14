@@ -3,6 +3,8 @@ const { Schema } = mongoose;
 
 const InvoiceSchema = new Schema({
   jobCardId: { type: Schema.Types.ObjectId, ref: 'JobCard', required: false },
+  inspectionId: { type: Schema.Types.ObjectId, ref: 'VehicleInspection', required: false },
+  isInspectionInvoice: { type: Boolean, default: false },
   customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
   mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: false },
@@ -44,6 +46,8 @@ InvoiceSchema.index({ dueDate: 1 });
 InvoiceSchema.index({ createdAt: -1 });
 InvoiceSchema.index({ 'zatca.invoiceNumber': 1 });
 InvoiceSchema.index({ status: 1, createdAt: 1 });
+InvoiceSchema.index({ inspectionId: 1 });
+InvoiceSchema.index({ isInspectionInvoice: 1 });
 
 const Invoice = (mongoose.models && mongoose.models.Invoice) || mongoose.model('Invoice', InvoiceSchema);
 

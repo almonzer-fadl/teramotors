@@ -15,7 +15,19 @@ const PartSchema = new Schema({
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-  partNumber: { type: String, required: false, unique: true, sparse: true }
+  partNumber: { type: String, required: false, unique: true, sparse: true },
+  uniqueCode: {
+    type: String,
+    required: false,  // Will be required after migration
+    unique: true,
+    sparse: true,
+    match: /^[A-Z]\d{3}$/  // Format: E015, B023, T007
+  },
+  compatibleVehicles: [{
+    make: { type: String, required: true },
+    model: { type: String, required: true },
+    year: { type: Number, required: true }
+  }]
 });
 
 // Add indexes for better query performance
@@ -27,6 +39,7 @@ PartSchema.index({ minStockLevel: 1 });
 PartSchema.index({ isActive: 1 });
 PartSchema.index({ createdAt: -1 });
 PartSchema.index({ isLowStock: 1 });
+PartSchema.index({ uniqueCode: 1 });
 
 // Pre-save hook to update isLowStock
 PartSchema.pre('save', function(next) {

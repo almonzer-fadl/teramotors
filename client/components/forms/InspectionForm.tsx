@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, X, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, X, Plus, Trash2, Check } from "lucide-react";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 
@@ -40,8 +40,10 @@ interface InspectionFormData {
   overallCondition: string;
   items: {
     itemId: string;
+    name: string;
     category: string;
-    condition: "good" | "fair" | "poor" | "critical";
+    condition: "good" | "fair" | "poor";
+    uniqueCode?: string;
   }[];
   recommendations: string;
   nextInspectionDate: string;
@@ -237,9 +239,12 @@ export default function InspectionForm({
         const template = await response.json();
         if (template && template.items) {
           // Convert template items to inspection items format
+          // Template has ONE category at template level, all items inherit it
           const templateItems = template.items.map((item: any) => ({
             itemId: item.itemId,
-            category: item.category,
+            name: item.name || item.itemId,
+            category: template.category, // Get category from template, not item
+            uniqueCode: item.uniqueCode,
             condition: "good" as const, // Default condition
           }));
           handleInputChange("items", templateItems);
@@ -253,7 +258,7 @@ export default function InspectionForm({
   const addItem = () => {
     handleInputChange("items", [
       ...formData.items,
-      { itemId: "", category: "general", condition: "good" },
+      { itemId: "", name: "", category: "General", condition: "good" },
     ]);
   };
 
@@ -261,6 +266,19 @@ export default function InspectionForm({
     const updatedItems = formData.items.filter((_, i) => i !== index);
     handleInputChange("items", updatedItems);
   };
+
+  // Group items by category for better organization
+  const groupedItems = useMemo(() => {
+    const groups: Record<string, Array<typeof formData.items[0] & { originalIndex: number }>> = {};
+    formData.items.forEach((item, index) => {
+      const category = item.category || 'General';
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push({ ...item, originalIndex: index });
+    });
+    return groups;
+  }, [formData.items]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -474,67 +492,109 @@ export default function InspectionForm({
                   {t('forms.inspection_items')}
                 </h3>
               </div>
-              {formData.items.map((item, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-50/80 rounded-2xl p-6 mb-6 border border-gray-200/50"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
-                    <div className="space-y-2">
-                      <label htmlFor={`itemId-${index}`} className="block text-sm font-bold text-gray-700">{t('forms.item_id')}</label>
-                      <input
-                        type="text"
-                        id={`itemId-${index}`}
-                        value={item.itemId}
-                        onChange={(e) =>
-                          handleItemChange(index, "itemId", e.target.value)
-                        }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                        placeholder="e.g., engine, brakes, tires"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor={`category-${index}`} className="block text-sm font-bold text-gray-700">{t('forms.category')}</label>
-                      <select
-                        id={`category-${index}`}
-                        value={item.category}
-                        onChange={(e) =>
-                          handleItemChange(index, "category", e.target.value)
-                        }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      >
-                        <option value="general">General</option>
-                        <option value="safety">Safety</option>
-                        <option value="maintenance">Maintenance</option>
-                        <option value="performance">Performance</option>
-                      </select>
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor={`condition-${index}`} className="block text-sm font-bold text-gray-700">{t('forms.condition')}</label>
-                      <select
-                        id={`condition-${index}`}
-                        value={item.condition}
-                        onChange={(e) =>
-                          handleItemChange(index, "condition", e.target.value)
-                        }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      >
-                        <option value="good">{t('forms.condition_good')}</option>
-                        <option value="fair">{t('forms.condition_fair')}</option>
-                        <option value="poor">{t('forms.condition_poor')}</option>
-                        <option value="critical">{t('forms.condition_critical')}</option>
-                      </select>
-                    </div>
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => removeItem(index)}
-                        className="text-red-500 hover:text-red-700 p-3 rounded-xl hover:bg-red-50 transition-all duration-300"
-                      >
-                        <Trash2 className="h-5 w-5" />
-                      </button>
-                    </div>
+              {Object.entries(groupedItems).map(([category, items]) => (
+                <div key={category} className="mb-10">
+                  {/* Category Header */}
+                  <div className="flex items-center mb-6 pb-3 border-b-2 border-blue-600">
+                    <div className="w-5 h-5 bg-blue-600 rounded-full mr-3"></div>
+                    <h4 className="text-2xl md:text-3xl font-bold text-gray-900">{category}</h4>
+                    <span className="ml-auto text-base md:text-lg text-gray-500 font-semibold">
+                      {items.length} {items.length === 1 ? 'item' : 'items'}
+                    </span>
                   </div>
+
+                  {/* Items in this category */}
+                  {items.map((item) => (
+                    <div
+                      key={item.originalIndex}
+                      className="bg-gray-50/80 rounded-xl p-4 mb-4 border border-gray-200/50"
+                    >
+                      <div className="flex items-center gap-4">
+                        {/* Item Name/ID */}
+                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <input
+                            type="text"
+                            value={item.name}
+                            onChange={(e) =>
+                              handleItemChange(item.originalIndex, "name", e.target.value)
+                            }
+                            className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all text-gray-900 placeholder-gray-500 bg-white"
+                            placeholder="Item name (e.g., Oil Level)"
+                          />
+                          <input
+                            type="text"
+                            value={item.itemId}
+                            onChange={(e) =>
+                              handleItemChange(item.originalIndex, "itemId", e.target.value)
+                            }
+                            className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all text-gray-900 placeholder-gray-500 bg-white"
+                            placeholder="ID (e.g., oil-level)"
+                          />
+                        </div>
+
+                        {/* Condition - Compact Circular Buttons */}
+                        <div className="flex gap-3 items-center">
+                          {/* Good Button - Green */}
+                          <button
+                            type="button"
+                            onClick={() => handleItemChange(item.originalIndex, "condition", "good")}
+                            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
+                              item.condition === 'good'
+                                ? 'bg-green-500 ring-2 ring-green-300'
+                                : 'bg-gray-200 hover:bg-green-100'
+                            }`}
+                            title="Good"
+                          >
+                            {item.condition === 'good' && (
+                              <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                            )}
+                          </button>
+
+                          {/* Fair Button - Yellow */}
+                          <button
+                            type="button"
+                            onClick={() => handleItemChange(item.originalIndex, "condition", "fair")}
+                            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
+                              item.condition === 'fair'
+                                ? 'bg-yellow-500 ring-2 ring-yellow-300'
+                                : 'bg-gray-200 hover:bg-yellow-100'
+                            }`}
+                            title="Fair"
+                          >
+                            {item.condition === 'fair' && (
+                              <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                            )}
+                          </button>
+
+                          {/* Poor Button - Red */}
+                          <button
+                            type="button"
+                            onClick={() => handleItemChange(item.originalIndex, "condition", "poor")}
+                            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
+                              item.condition === 'poor'
+                                ? 'bg-red-500 ring-2 ring-red-300'
+                                : 'bg-gray-200 hover:bg-red-100'
+                            }`}
+                            title="Poor"
+                          >
+                            {item.condition === 'poor' && (
+                              <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Delete Button */}
+                        <button
+                          type="button"
+                          onClick={() => removeItem(item.originalIndex)}
+                          className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-all"
+                          title="Remove item"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ))}
               <button

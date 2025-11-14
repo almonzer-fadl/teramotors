@@ -4,6 +4,21 @@ const { Schema } = mongoose;
 const JobCardSchema = new Schema({
   appointmentId: { type: Schema.Types.ObjectId, ref: 'Appointment', required: false },
   inspectionId: { type: Schema.Types.ObjectId, ref: 'VehicleInspection', required: false },
+  type: {
+    type: String,
+    enum: ['regular', 'inspection', 'repair'],
+    default: 'regular'
+  },
+  parentJobCardId: {
+    type: Schema.Types.ObjectId,
+    ref: 'JobCard',
+    required: false
+  },
+  inspectionFeeDeducted: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
   customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
   vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
   mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: false },
@@ -41,6 +56,8 @@ JobCardSchema.index({ createdAt: -1 });
 JobCardSchema.index({ estimatedStartTime: 1 });
 JobCardSchema.index({ actualStartTime: 1 });
 JobCardSchema.index({ status: 1, actualStartTime: 1, actualEndTime: 1 });
+JobCardSchema.index({ type: 1 });
+JobCardSchema.index({ parentJobCardId: 1 });
 
 const JobCard = (mongoose.models && mongoose.models.JobCard) || mongoose.model('JobCard', JobCardSchema);
 
