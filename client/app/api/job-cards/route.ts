@@ -79,6 +79,7 @@ export async function POST(request: Request) {
     const jobCardData: any = {
       customerId: body.customerId,
       vehicleId: body.vehicleId,
+      type: body.type || 'regular',
       status: body.status || 'pending',
       priority: body.priority || 'medium',
       services: body.services || [],

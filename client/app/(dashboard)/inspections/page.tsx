@@ -32,17 +32,20 @@ interface InspectionTemplate {
 
 interface VehicleInspection {
   _id: string;
-  vehicleId: {
+  jobCardId: {
     _id: string;
-    make: string;
-    model: string;
-    year: number;
-    licensePlate: string;
-  };
-  customerId: {
-    _id: string;
-    firstName: string;
-    lastName: string;
+    vehicleId: {
+      _id: string;
+      make: string;
+      model: string;
+      year: number;
+      licensePlate: string;
+    };
+    customerId: {
+      _id: string;
+      firstName: string;
+      lastName: string;
+    };
   };
   mechanicId: {
     _id: string;
@@ -54,19 +57,16 @@ interface VehicleInspection {
   };
   inspectionDate: string;
   mileage: number;
-  overallCondition: string;
   items: Array<{
     itemId: string;
-    condition: "good" | "fair" | "poor" | "critical";
-    notes: string;
-    photos: string[];
-    recommendations: string;
-    estimatedCost: number;
-    priority: "critical" | "safety" | "recommended" | "optional";
+    name: string;
+    category: string;
+    uniqueCode?: string;
+    condition: "good" | "fair" | "poor";
   }>;
-  totalEstimatedCost: number;
   recommendations: string;
   nextInspectionDate?: string;
+  nextInspectionMonths: number;
   status: "in-progress" | "completed" | "cancelled";
   createdAt: string;
 }
@@ -127,13 +127,13 @@ export default function InspectionsPage() {
 
   const filteredInspections = inspections.filter((inspection) => {
     const matchesSearch =
-      `${inspection.customerId.firstName} ${inspection.customerId.lastName}`
+      `${inspection.jobCardId?.customerId?.firstName || ''} ${inspection.jobCardId?.customerId?.lastName || ''}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      `${inspection.vehicleId.year} ${inspection.vehicleId.make} ${inspection.vehicleId.model}`
+      `${inspection.jobCardId?.vehicleId?.year || ''} ${inspection.jobCardId?.vehicleId?.make || ''} ${inspection.jobCardId?.vehicleId?.model || ''}`
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      inspection.vehicleId.licensePlate
+      (inspection.jobCardId?.vehicleId?.licensePlate || '')
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
       (inspection.templateId?.name || 'No Template')

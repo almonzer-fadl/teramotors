@@ -304,7 +304,42 @@
     "category": "Category",
     "discount_percentage": "Discount (%)",
     "enter_discount_percentage": "Enter discount percentage",
-    "discount_note": "Discount will be calculated as a percentage of the total amount"
+    "discount_note": "Discount will be calculated as a percentage of the total amount",
+    "job_type": "Job Type",
+    "next_inspection_period": "Next Inspection Period",
+    "add_manual_item": "Add Manual Item",
+    "next_inspection_date": "Next Inspection Date"
+  },
+  "job_types": {
+    "regular": "Regular Service",
+    "inspection": "Inspection Only",
+    "repair": "Repair Work",
+    "regular_desc": "Standard maintenance and service work",
+    "inspection_desc": "Vehicle inspection to assess condition and identify issues",
+    "repair_desc": "Repair work based on inspection findings or customer request"
+  },
+  "templates": {
+    "current_category": "Current Category",
+    "select_category": "Select a category",
+    "template_name": "Template Name",
+    "template_name_placeholder": "e.g., Full Vehicle Inspection",
+    "category": "Category",
+    "vehicle_type": "Vehicle Type",
+    "select_vehicle_type": "Select vehicle type",
+    "description": "Description",
+    "description_placeholder": "Enter template description",
+    "template_items": "Template Items",
+    "add_item": "Add Item",
+    "item_name": "Item Name",
+    "item_id": "Item ID",
+    "existing_items": "Existing Items",
+    "create_template": "Create Template",
+    "creating": "Creating...",
+    "basic_information": "Basic Information",
+    "edit_template": "Edit Template",
+    "edit_template_description": "Update the template details",
+    "save_changes": "Save Changes",
+    "saving": "Saving..."
   },
   "header": {
     "language": "Language",

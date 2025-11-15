@@ -34,17 +34,20 @@ interface InspectionTemplate {
 
 interface VehicleInspection {
   _id: string;
-  vehicleId: {
+  jobCardId: {
     _id: string;
-    make: string;
-    model: string;
-    year: number;
-    licensePlate: string;
-  };
-  customerId: {
-    _id: string;
-    firstName: string;
-    lastName: string;
+    vehicleId: {
+      _id: string;
+      make: string;
+      model: string;
+      year: number;
+      licensePlate: string;
+    };
+    customerId: {
+      _id: string;
+      firstName: string;
+      lastName: string;
+    };
   };
   mechanicId: {
     _id: string;
@@ -56,19 +59,16 @@ interface VehicleInspection {
   };
   inspectionDate: string;
   mileage: number;
-  overallCondition: string;
   items: Array<{
     itemId: string;
-    condition: "good" | "fair" | "poor" | "critical";
-    notes: string;
-    photos: string[];
-    recommendations: string;
-    estimatedCost: number;
-    priority: "critical" | "safety" | "recommended" | "optional";
+    name: string;
+    category: string;
+    uniqueCode?: string;
+    condition: "good" | "fair" | "poor";
   }>;
-  totalEstimatedCost: number;
   recommendations: string;
   nextInspectionDate?: string;
+  nextInspectionMonths: number;
   status: "in-progress" | "completed" | "cancelled";
   createdAt: string;
 }
@@ -175,9 +175,6 @@ export default function ResponsiveInspectionsTable({
                 {t('inspections.template')}
               </th>
               <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('inspections.overall_condition')}
-              </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                 {t('inspections.status')}
               </th>
               <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -207,23 +204,23 @@ export default function ResponsiveInspectionsTable({
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {inspection.customerId.firstName}{" "}
-                    {inspection.customerId.lastName}
+                    {inspection.jobCardId?.customerId?.firstName || ''}{" "}
+                    {inspection.jobCardId?.customerId?.lastName || ''}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {inspection.vehicleId ? (
+                    {inspection.jobCardId?.vehicleId ? (
                       <>
-                        {inspection.vehicleId.year} {inspection.vehicleId.make}{" "}
-                        {inspection.vehicleId.model}
+                        {inspection.jobCardId.vehicleId.year} {inspection.jobCardId.vehicleId.make}{" "}
+                        {inspection.jobCardId.vehicleId.model}
                       </>
                     ) : (
                       <span className="text-gray-400 italic">No vehicle data</span>
                     )}
                   </div>
                   <div className="text-sm text-gray-500">
-                    {inspection.vehicleId?.licensePlate || (
+                    {inspection.jobCardId?.vehicleId?.licensePlate || (
                       <span className="text-gray-400 italic">N/A</span>
                     )}
                   </div>
@@ -231,15 +228,6 @@ export default function ResponsiveInspectionsTable({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                     {inspection.templateId?.name || t('inspections.no_template')}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getConditionColor(
-                      inspection.overallCondition
-                    )}`}
-                  >
-                    {getConditionLabel(inspection.overallCondition)}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -338,14 +326,14 @@ export default function ResponsiveInspectionsTable({
               <div className="flex items-center">
                 <User className="h-4 w-4 me-2 text-gray-500" />
                 <span>
-                  {inspection.customerId.firstName} {inspection.customerId.lastName}
+                  {inspection.jobCardId?.customerId?.firstName || ''} {inspection.jobCardId?.customerId?.lastName || ''}
                 </span>
               </div>
               <div className="flex items-center">
                 <Car className="h-4 w-4 me-2 text-gray-500" />
                 <span>
-                  {inspection.vehicleId ? (
-                    `${inspection.vehicleId.year} ${inspection.vehicleId.make} ${inspection.vehicleId.model}`
+                  {inspection.jobCardId?.vehicleId ? (
+                    `${inspection.jobCardId.vehicleId.year} ${inspection.jobCardId.vehicleId.make} ${inspection.jobCardId.vehicleId.model}`
                   ) : (
                     <span className="text-gray-400 italic">No vehicle data</span>
                   )}
@@ -354,34 +342,23 @@ export default function ResponsiveInspectionsTable({
               <div className="flex items-center">
                 <span className="h-4 w-4 me-2 text-gray-500 text-xs">#</span>
                 <span className="text-xs text-gray-500">
-                  {inspection.vehicleId?.licensePlate || (
+                  {inspection.jobCardId?.vehicleId?.licensePlate || (
                     <span className="text-gray-400 italic">N/A</span>
                   )}
                 </span>
               </div>
             </div>
 
-            {/* Template & Condition */}
-            <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center">
-                <FileText className="h-4 w-4 me-2 text-blue-600" />
-                <div>
-                  <div className="text-sm font-medium text-gray-900">
-                    {inspection.templateId?.name || t('inspections.no_template')}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {t('inspections.template')}
-                  </div>
+            {/* Template */}
+            <div className="flex items-center mb-4 p-3 bg-gray-50 rounded-lg">
+              <FileText className="h-4 w-4 me-2 text-blue-600" />
+              <div>
+                <div className="text-sm font-medium text-gray-900">
+                  {inspection.templateId?.name || t('inspections.no_template')}
                 </div>
-              </div>
-              <div className="text-end">
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getConditionColor(
-                    inspection.overallCondition
-                  )}`}
-                >
-                  {getConditionLabel(inspection.overallCondition)}
-                </span>
+                <div className="text-xs text-gray-500">
+                  {t('inspections.template')}
+                </div>
               </div>
             </div>
 

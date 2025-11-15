@@ -302,7 +302,42 @@
     "condition_excellent": "ممتاز",
     "discount_percentage": "الخصم (%)",
     "enter_discount_percentage": "أدخل نسبة الخصم",
-    "discount_note": "سيتم حساب الخصم كنسبة مئوية من المبلغ الإجمالي"
+    "discount_note": "سيتم حساب الخصم كنسبة مئوية من المبلغ الإجمالي",
+    "job_type": "نوع العمل",
+    "next_inspection_period": "فترة الفحص القادم",
+    "add_manual_item": "إضافة عنصر يدوي",
+    "next_inspection_date": "تاريخ الفحص القادم"
+  },
+  "job_types": {
+    "regular": "صيانة عادية",
+    "inspection": "فحص فقط",
+    "repair": "أعمال إصلاح",
+    "regular_desc": "أعمال الصيانة والخدمة القياسية",
+    "inspection_desc": "فحص المركبة لتقييم الحالة وتحديد المشاكل",
+    "repair_desc": "أعمال الإصلاح بناءً على نتائج الفحص أو طلب العميل"
+  },
+  "templates": {
+    "current_category": "الفئة الحالية",
+    "select_category": "اختر فئة",
+    "template_name": "اسم القالب",
+    "template_name_placeholder": "مثال: فحص شامل للمركبة",
+    "category": "الفئة",
+    "vehicle_type": "نوع المركبة",
+    "select_vehicle_type": "اختر نوع المركبة",
+    "description": "الوصف",
+    "description_placeholder": "أدخل وصف القالب",
+    "template_items": "عناصر القالب",
+    "add_item": "إضافة عنصر",
+    "item_name": "اسم العنصر",
+    "item_id": "معرف العنصر",
+    "existing_items": "العناصر الموجودة",
+    "create_template": "إنشاء قالب",
+    "creating": "جاري الإنشاء...",
+    "basic_information": "المعلومات الأساسية",
+    "edit_template": "تعديل القالب",
+    "edit_template_description": "تحديث تفاصيل القالب",
+    "save_changes": "حفظ التغييرات",
+    "saving": "جاري الحفظ..."
   },
   "header": {
     "language": "اللغة",

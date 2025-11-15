@@ -30,17 +30,20 @@ interface InspectionItem {
 
 interface VehicleInspection {
   _id: string;
-  vehicleId: {
+  jobCardId: {
     _id: string;
-    make: string;
-    model: string;
-    year: number;
-    licensePlate: string;
-  };
-  customerId: {
-    _id: string;
-    firstName: string;
-    lastName: string;
+    vehicleId: {
+      _id: string;
+      make: string;
+      model: string;
+      year: number;
+      licensePlate: string;
+    };
+    customerId: {
+      _id: string;
+      firstName: string;
+      lastName: string;
+    };
   };
   mechanicId: {
     _id: string;
@@ -54,10 +57,10 @@ interface VehicleInspection {
   };
   inspectionDate: string;
   mileage: number;
-  overallCondition: string;
   items: InspectionItem[];
   recommendations: string;
   nextInspectionDate: string;
+  nextInspectionMonths: number;
   status: "in-progress" | "completed" | "cancelled";
   createdAt: string;
   updatedAt: string;
@@ -251,7 +254,7 @@ export default function InspectionDetailsPage() {
                   Inspection Details
                 </h1>
                 <p className="text-sm text-gray-500">
-                  {inspection.vehicleId.make} {inspection.vehicleId.model} - {formatDate(inspection.inspectionDate)}
+                  {inspection.jobCardId?.vehicleId?.make} {inspection.jobCardId?.vehicleId?.model} - {formatDate(inspection.inspectionDate)}
                 </p>
               </div>
             </div>
@@ -324,10 +327,11 @@ export default function InspectionDetailsPage() {
                   <div className="flex items-center space-x-3">
                     <Clock className="h-5 w-5 text-gray-400" />
                     <div>
-                      <p className="text-sm text-gray-500">Overall Condition</p>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold border ${getConditionColor(inspection.overallCondition)}`}>
-                        {inspection.overallCondition.toUpperCase()}
-                      </span>
+                      <p className="text-sm text-gray-500">Next Inspection</p>
+                      <p className="font-semibold text-gray-900">
+                        {inspection.nextInspectionDate ? formatDate(inspection.nextInspectionDate) : 'Not set'}
+                        {inspection.nextInspectionMonths && ` (${inspection.nextInspectionMonths} months)`}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -347,16 +351,16 @@ export default function InspectionDetailsPage() {
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Make & Model</p>
                     <p className="text-lg font-semibold text-gray-900">
-                      {inspection.vehicleId.make} {inspection.vehicleId.model}
+                      {inspection.jobCardId?.vehicleId?.make} {inspection.jobCardId?.vehicleId?.model}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Year</p>
-                    <p className="text-lg font-semibold text-gray-900">{inspection.vehicleId.year}</p>
+                    <p className="text-lg font-semibold text-gray-900">{inspection.jobCardId?.vehicleId?.year}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 mb-1">License Plate</p>
-                    <p className="text-lg font-semibold text-gray-900">{inspection.vehicleId.licensePlate}</p>
+                    <p className="text-lg font-semibold text-gray-900">{inspection.jobCardId?.vehicleId?.licensePlate}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 mb-1">Mileage</p>
@@ -433,7 +437,7 @@ export default function InspectionDetailsPage() {
                   <div>
                     <p className="text-sm text-gray-500">Name</p>
                     <p className="font-semibold text-gray-900">
-                      {inspection.customerId.firstName} {inspection.customerId.lastName}
+                      {inspection.jobCardId?.customerId?.firstName} {inspection.jobCardId?.customerId?.lastName}
                     </p>
                   </div>
                 </div>

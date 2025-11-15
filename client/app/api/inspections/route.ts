@@ -1,8 +1,7 @@
 import { connectToDatabase } from '@/lib/db'
 import VehicleInspection from '@/lib/models/VehicleInspection'
 import InspectionTemplate from '@/lib/models/InspectionTemplate'
-import Vehicle from '@/lib/models/Vehicle'
-import Customer from '@/lib/models/Customer'
+import JobCard from '@/lib/models/JobCard'
 import User from '@/lib/models/User'
 import { getServerSession } from "@/lib/auth-server";
 import { NextRequest } from 'next/server';
@@ -33,8 +32,13 @@ export async function GET(request: NextRequest) {
     const totalCount = await VehicleInspection.countDocuments({});
     
     const inspections = await VehicleInspection.find({})
-      .populate('vehicleId', 'make model year licensePlate')
-      .populate('customerId', 'firstName lastName')
+      .populate({
+        path: 'jobCardId',
+        populate: [
+          { path: 'vehicleId', select: 'make model year licensePlate' },
+          { path: 'customerId', select: 'firstName lastName' }
+        ]
+      })
       .populate('mechanicId', 'firstName lastName displayName')
       .populate('templateId', 'name')
       .sort(sort)
@@ -84,17 +88,11 @@ export async function POST(request: Request) {
     await connectToDatabase()
     
     const body = await request.json()
-    
-    // Validate that vehicle exists
-    const vehicle = await Vehicle.findById(body.vehicleId)
-    if (!vehicle) {
-      return Response.json({ error: 'Vehicle not found' }, { status: 400 })
-    }
 
-    // Validate that customer exists
-    const customer = await Customer.findById(body.customerId)
-    if (!customer) {
-      return Response.json({ error: 'Customer not found' }, { status: 400 })
+    // Validate that job card exists
+    const jobCard = await JobCard.findById(body.jobCardId)
+    if (!jobCard) {
+      return Response.json({ error: 'Job card not found' }, { status: 400 })
     }
 
     // Validate that user exists
@@ -111,19 +109,14 @@ export async function POST(request: Request) {
       }
     }
 
-    // Calculate total estimated cost
-    const totalEstimatedCost = body.items.reduce((sum: number, item: any) => sum + (item.estimatedCost || 0), 0)
-
     const inspectionData: any = {
-      vehicleId: body.vehicleId,
-      customerId: body.customerId,
+      jobCardId: body.jobCardId,
       mechanicId: body.mechanicId,
       inspectionDate: body.inspectionDate,
       mileage: body.mileage,
-      overallCondition: body.overallCondition,
       items: body.items,
-      totalEstimatedCost,
       recommendations: body.recommendations,
+      nextInspectionMonths: body.nextInspectionMonths || 3,
       status: body.status || 'in-progress'
     }
 
@@ -142,8 +135,13 @@ export async function POST(request: Request) {
     await inspection.save()
 
     const populatedInspection = await VehicleInspection.findById(inspection._id)
-      .populate('vehicleId', 'make model year licensePlate')
-      .populate('customerId', 'firstName lastName')
+      .populate({
+        path: 'jobCardId',
+        populate: [
+          { path: 'vehicleId', select: 'make model year licensePlate' },
+          { path: 'customerId', select: 'firstName lastName' }
+        ]
+      })
       .populate('mechanicId', 'firstName lastName displayName')
       .populate('templateId', 'name')
 
