@@ -118,12 +118,13 @@ export default function JobCardForm({
           quantity: part.quantity || 1,
           cost: part.cost || 0,
         })) || [];
-        
+
         setFormData({
           appointmentId: jobCard.appointmentId?._id || "",
           customerId: jobCard.customerId?._id || "",
           vehicleId: jobCard.vehicleId?._id || "",
           inspectionId: jobCard.inspectionId?._id || jobCard.inspectionId || "",
+          type: jobCard.type || "regular", // FIX: add missing 'type' property as required by JobCardFormData
           status: jobCard.status || "pending",
           priority: jobCard.priority || "medium",
           estimatedStartTime: jobCard.estimatedStartTime
@@ -723,6 +724,28 @@ export default function JobCardForm({
                     emptyMessage={t("vehicles.no_vehicles_found")}
                   />
                   <div className="mt-3" />
+                </div>
+
+                {/* Job Type */}
+                <div className="space-y-2 md:col-span-2">
+                  <label className="block text-sm font-bold text-gray-700">
+                    {t("forms.job_type")} <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    required
+                    value={formData.type}
+                    onChange={(e) => handleInputChange("type", e.target.value)}
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  >
+                    <option value="regular">{t("job_types.regular")}</option>
+                    <option value="inspection">{t("job_types.inspection")}</option>
+                    <option value="repair">{t("job_types.repair")}</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formData.type === 'regular' && t("job_types.regular_desc")}
+                    {formData.type === 'inspection' && t("job_types.inspection_desc")}
+                    {formData.type === 'repair' && t("job_types.repair_desc")}
+                  </p>
                 </div>
               </div>
             </div>
