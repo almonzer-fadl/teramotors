@@ -23,8 +23,13 @@ export async function GET(
     await connectToDatabase();
 
     const inspection = await VehicleInspection.findById(id)
-      .populate('vehicleId', 'make model year licensePlate')
-      .populate('customerId', 'firstName lastName')
+      .populate({
+        path: 'jobCardId',
+        populate: [
+          { path: 'vehicleId', select: 'make model year licensePlate' },
+          { path: 'customerId', select: 'firstName lastName' }
+        ]
+      })
       .populate('mechanicId', 'firstName lastName displayName')
       .populate('templateId', 'name');
 
@@ -59,12 +64,8 @@ export async function PUT(
 
     const body = await request.json();
 
-    // Calculate total estimated cost
-    const totalEstimatedCost = body.items.reduce((sum: number, item: any) => sum + (item.estimatedCost || 0), 0);
-
     const update: any = {
       ...body,
-      totalEstimatedCost,
       updatedAt: new Date()
     };
 
@@ -79,8 +80,13 @@ export async function PUT(
       update,
       { new: true }
     )
-      .populate('vehicleId', 'make model year licensePlate')
-      .populate('customerId', 'firstName lastName')
+      .populate({
+        path: 'jobCardId',
+        populate: [
+          { path: 'vehicleId', select: 'make model year licensePlate' },
+          { path: 'customerId', select: 'firstName lastName' }
+        ]
+      })
       .populate('mechanicId', 'firstName lastName displayName')
       .populate('templateId', 'name');
 

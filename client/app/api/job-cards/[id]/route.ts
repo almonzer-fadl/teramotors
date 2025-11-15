@@ -19,7 +19,7 @@ export async function GET(
 
     const jobCard = await JobCard.findById(id)
       .populate('appointmentId')
-      .populate('inspectionId', 'inspectionDate overallCondition totalEstimatedCost items')
+      .populate('inspectionId', 'inspectionDate items nextInspectionDate nextInspectionMonths')
       .populate('customerId', 'firstName lastName email phone')
       .populate('vehicleId', 'make model year licensePlate')
       .populate('mechanicId', 'userId')

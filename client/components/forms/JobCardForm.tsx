@@ -46,6 +46,7 @@ interface JobCardFormData {
   customerId: string;
   vehicleId: string;
   inspectionId?: string;
+  type: "regular" | "inspection" | "repair";
   status: "pending" | "in-progress" | "completed" | "cancelled";
   priority: "low" | "medium" | "high" | "urgent";
   estimatedStartTime: string;
@@ -84,6 +85,7 @@ export default function JobCardForm({
     customerId: "",
     vehicleId: "",
     inspectionId: "",
+    type: "regular",
     status: "pending",
     priority: "medium",
     estimatedStartTime: "",
@@ -615,22 +617,61 @@ export default function JobCardForm({
       <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="py-8">
-            <div className="flex items-center">
-              <button
-                onClick={() => router.back()}
-                className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
-              >
-                <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
-              </button>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  {isEditing ? t("forms.edit_job_card") : t("forms.new_job_card")}
-                </h1>
-                <p className="mt-3 text-xl text-gray-600">
-                  {isEditing
-                    ? t("forms.update_job_card_details")
-                    : t("forms.create_new_job_card")}
-                </p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <button
+                  onClick={() => router.back()}
+                  className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
+                >
+                  <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
+                </button>
+                <div>
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                    {isEditing ? t("forms.edit_job_card") : t("forms.new_job_card")}
+                  </h1>
+                  <p className="mt-3 text-xl text-gray-600">
+                    {isEditing
+                      ? t("forms.update_job_card_details")
+                      : t("forms.create_new_job_card")}
+                  </p>
+                </div>
+              </div>
+
+              {/* Job Type Toggle Buttons */}
+              <div className="flex items-center gap-2 bg-gray-100 p-1.5 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => handleInputChange("type", "regular")}
+                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                    formData.type === "regular"
+                      ? "bg-white text-gray-900 shadow-md"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  {t("job_types.regular")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleInputChange("type", "inspection")}
+                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                    formData.type === "inspection"
+                      ? "bg-white text-gray-900 shadow-md"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  {t("job_types.inspection")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleInputChange("type", "repair")}
+                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                    formData.type === "repair"
+                      ? "bg-white text-gray-900 shadow-md"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  {t("job_types.repair")}
+                </button>
               </div>
             </div>
           </div>

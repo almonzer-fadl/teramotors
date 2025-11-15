@@ -9,13 +9,13 @@ import { useTranslation } from "react-i18next";
 interface TemplateItem {
   itemId: string;
   name: string;
+  category: string;
   uniqueCode?: string;
 }
 
 interface FormData {
   name: string;
   description: string;
-  category: string;
   vehicleType: string;
 }
 
@@ -28,13 +28,14 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
   const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
-    category: "",
     vehicleType: "",
   });
   const [items, setItems] = useState<TemplateItem[]>([]);
+  const [currentCategory, setCurrentCategory] = useState("");
   const [newItem, setNewItem] = useState<TemplateItem>({
     itemId: "",
     name: "",
+    category: "",
   });
 
   useEffect(() => {
@@ -49,7 +50,6 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
         setFormData({
           name: template.name || "",
           description: template.description || "",
-          category: template.category || "",
           vehicleType: template.vehicleType || "",
         });
         setItems(template.items || []);
@@ -74,11 +74,19 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
   };
 
   const addItem = () => {
-    if (newItem.itemId && newItem.name) {
-      setItems(prev => [...prev, newItem]);
-      setNewItem({ itemId: "", name: "" });
+    if (newItem.itemId && newItem.name && currentCategory) {
+      setItems(prev => [...prev, { ...newItem, category: currentCategory }]);
+      setNewItem({ itemId: "", name: "", category: "" });
     }
   };
+
+  // Group items by category for display
+  const groupedItems = items.reduce((acc, item, index) => {
+    const category = item.category || 'General';
+    if (!acc[category]) acc[category] = [];
+    acc[category].push({ ...item, originalIndex: index });
+    return acc;
+  }, {} as Record<string, Array<TemplateItem & { originalIndex: number }>>);
 
   const removeItem = (index: number) => {
     setItems(prev => prev.filter((_, i) => i !== index));
@@ -192,29 +200,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                     placeholder={t("templates.template_name_placeholder")}
                   />
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-3">
-                    {t("templates.category")} *
-                  </label>
-                  <select
-                    required
-                    value={formData.category}
-                    onChange={(e) => handleInputChange("category", e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                  >
-                    <option value="">{t("templates.select_category")}</option>
-                    <option value="engine">Engine</option>
-                    <option value="brakes">Brakes</option>
-                    <option value="electrical">Electrical</option>
-                    <option value="suspension">Suspension</option>
-                    <option value="transmission">Transmission</option>
-                    <option value="exhaust">Exhaust</option>
-                    <option value="interior">Interior</option>
-                    <option value="exterior">Exterior</option>
-                  </select>
-                </div>
-                
+
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-3">
                     {t("templates.vehicle_type")} *
@@ -261,13 +247,44 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                   {t("templates.template_items")}
                 </h2>
               </div>
-              
+
+              {/* Category Selection */}
+              <div className="mb-6">
+                <label className="block text-sm font-bold text-gray-700 mb-3">
+                  {t("templates.current_category")} *
+                </label>
+                <select
+                  value={currentCategory}
+                  onChange={(e) => setCurrentCategory(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                >
+                  <option value="">{t("templates.select_category")}</option>
+                  <option value="Engine">Engine</option>
+                  <option value="Brakes">Brakes</option>
+                  <option value="Electrical">Electrical</option>
+                  <option value="Suspension">Suspension</option>
+                  <option value="Transmission">Transmission</option>
+                  <option value="Exhaust">Exhaust</option>
+                  <option value="Interior">Interior</option>
+                  <option value="Exterior">Exterior</option>
+                  <option value="Tires">Tires</option>
+                  <option value="Steering">Steering</option>
+                  <option value="Cooling">Cooling</option>
+                  <option value="Fuel System">Fuel System</option>
+                </select>
+                {currentCategory && (
+                  <p className="mt-2 text-sm text-blue-600 font-medium">
+                    Adding items to: <span className="font-bold">{currentCategory}</span>
+                  </p>
+                )}
+              </div>
+
               {/* Add New Item */}
               <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-6 mb-6 border-2 border-dashed border-gray-200">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">
                   {t("templates.add_item")}
                 </h3>
-                
+
                 <div className="flex items-end gap-4">
                   <div className="flex-1">
                     <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -279,6 +296,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                       onChange={(e) => handleItemChange("name", e.target.value)}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                       placeholder="e.g., Oil Level"
+                      disabled={!currentCategory}
                     />
                   </div>
 
@@ -292,13 +310,15 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                       onChange={(e) => handleItemChange("itemId", e.target.value)}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                       placeholder="e.g., oil-level"
+                      disabled={!currentCategory}
                     />
                   </div>
 
                   <button
                     type="button"
                     onClick={addItem}
-                    className="inline-flex items-center justify-center px-6 py-3 bg-[#F13F33] text-white font-bold rounded-xl hover:bg-[#E03A2F] transition-all duration-300 shadow-lg hover:shadow-xl whitespace-nowrap"
+                    disabled={!currentCategory}
+                    className="inline-flex items-center justify-center px-6 py-3 bg-[#F13F33] text-white font-bold rounded-xl hover:bg-[#E03A2F] transition-all duration-300 shadow-lg hover:shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Plus className="mr-2 h-5 w-5" />
                     {t("templates.add_item")}
@@ -306,37 +326,54 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                 </div>
               </div>
 
-              {/* Existing Items List */}
+              {/* Existing Items List - Grouped by Category */}
               {items.length > 0 && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-bold text-gray-800 mb-4">
                     {t("templates.existing_items")} ({items.length})
                   </h3>
-                  <div className="grid gap-4">
-                    {items.map((item, index) => (
-                      <div key={index} className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gray-200 hover:border-[#F13F33]/30 transition-all duration-300">
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex-1 grid grid-cols-2 gap-3">
-                            <div>
-                              <div className="text-xs text-gray-500 mb-1">Name</div>
-                              <div className="text-base font-bold text-gray-900">
-                                {item.name}
+                  <div className="space-y-6">
+                    {Object.entries(groupedItems).map(([category, categoryItems]) => (
+                      <div key={category} className="border-2 border-gray-200 rounded-xl overflow-hidden">
+                        {/* Category Header */}
+                        <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-5 py-4 border-b-2 border-blue-200">
+                          <h4 className="text-sm font-bold text-blue-900 uppercase tracking-wide">
+                            {category}
+                          </h4>
+                          <p className="text-xs text-blue-700 mt-1 font-medium">
+                            {categoryItems.length} {categoryItems.length === 1 ? 'item' : 'items'}
+                          </p>
+                        </div>
+
+                        {/* Category Items */}
+                        <div className="divide-y divide-gray-200">
+                          {categoryItems.map((item) => (
+                            <div key={item.originalIndex} className="bg-white/60 backdrop-blur-sm p-4 hover:bg-gray-50/80 transition-all duration-300">
+                              <div className="flex items-center justify-between gap-4">
+                                <div className="flex-1 grid grid-cols-2 gap-3">
+                                  <div>
+                                    <div className="text-xs text-gray-500 mb-1">Name</div>
+                                    <div className="text-base font-bold text-gray-900">
+                                      {item.name}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <div className="text-xs text-gray-500 mb-1">ID</div>
+                                    <div className="text-base text-gray-700">
+                                      {item.itemId}
+                                    </div>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeItem(item.originalIndex)}
+                                  className="p-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-300"
+                                >
+                                  <Trash2 className="h-5 w-5" />
+                                </button>
                               </div>
                             </div>
-                            <div>
-                              <div className="text-xs text-gray-500 mb-1">ID</div>
-                              <div className="text-base text-gray-700">
-                                {item.itemId}
-                              </div>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => removeItem(index)}
-                            className="p-3 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-300"
-                          >
-                            <Trash2 className="h-5 w-5" />
-                          </button>
+                          ))}
                         </div>
                       </div>
                     ))}
