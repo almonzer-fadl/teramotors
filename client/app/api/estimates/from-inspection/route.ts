@@ -26,12 +26,22 @@ export async function POST(request: Request) {
     
     // Get the inspection
     const inspection = await VehicleInspection.findById(inspectionId)
-      .populate('vehicleId', 'make model year licensePlate')
-      .populate('customerId', 'firstName lastName')
+      .populate({
+        path: 'jobCardId',
+        populate: [
+          { path: 'customerId', select: 'firstName lastName' },
+          { path: 'vehicleId', select: 'make model year licensePlate' }
+        ]
+      })
       .populate('mechanicId', 'userId')
-    
+
     if (!inspection) {
       return Response.json({ error: 'Inspection not found' }, { status: 404 })
+    }
+
+    const jobCard = inspection.jobCardId as any
+    if (!jobCard) {
+      return Response.json({ error: 'Job card not found for inspection' }, { status: 404 })
     }
 
     // Get available services and parts
@@ -123,8 +133,8 @@ export async function POST(request: Request) {
     // Create the estimate
     const estimate = new Estimate({
       inspectionId: inspection._id,
-      customerId: inspection.customerId._id,
-      vehicleId: inspection.vehicleId._id,
+      customerId: jobCard.customerId._id,
+      vehicleId: jobCard.vehicleId._id,
       mechanicId: inspection.mechanicId._id,
       services: estimateServices,
       parts: estimateParts,

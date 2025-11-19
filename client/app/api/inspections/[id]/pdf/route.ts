@@ -14,16 +14,26 @@ export async function GET(
     }
 
     await connectToDatabase();
-    
+
     const { id } = await params;
     const inspection = await VehicleInspection.findById(id)
-      .populate('vehicleId', 'make model year licensePlate')
-      .populate('customerId', 'firstName lastName')
+      .populate({
+        path: 'jobCardId',
+        populate: [
+          { path: 'customerId', select: 'firstName lastName' },
+          { path: 'vehicleId', select: 'make model year licensePlate' }
+        ]
+      })
       .populate('mechanicId', 'firstName lastName displayName')
       .populate('templateId', 'name');
 
     if (!inspection) {
       return NextResponse.json({ error: 'Inspection not found' }, { status: 404 });
+    }
+
+    const jobCard = (inspection.jobCardId as any);
+    if (!jobCard) {
+      return NextResponse.json({ error: 'Job card not found for inspection' }, { status: 404 });
     }
 
     // Get language from query parameter or default to English
@@ -32,10 +42,10 @@ export async function GET(
     const isRTL = language === 'ar';
 
     // Generate HTML content for PDF
-    const htmlContent = generateInspectionHTML(inspection, language, isRTL);
+    const htmlContent = generateInspectionHTML(inspection, jobCard, language, isRTL);
 
     // Sanitize filename to ASCII-only to avoid ByteString errors in headers
-    const rawName = `inspection-${(inspection.vehicleId as any)?.licensePlate || 'unknown'}-${new Date(inspection.inspectionDate).toISOString().split('T')[0]}`;
+    const rawName = `inspection-${jobCard.vehicleId?.licensePlate || 'unknown'}-${new Date(inspection.inspectionDate).toISOString().split('T')[0]}`;
     const safeName = rawName
       .normalize('NFKD')
       .replace(/[\u0300-\u036f]/g, '') // strip diacritics
@@ -55,7 +65,7 @@ export async function GET(
   }
 }
 
-function generateInspectionHTML(inspection: any, language: string = 'en', isRTL: boolean = false): string {
+function generateInspectionHTML(inspection: any, jobCard: any, language: string = 'en', isRTL: boolean = false): string {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString();
   
   // Translation object
@@ -285,15 +295,15 @@ function generateInspectionHTML(inspection: any, language: string = 'en', isRTL:
         <div class="info-grid">
             <div class="info-item">
                 <h3>${t.makeModel}</h3>
-                <p>${inspection.vehicleId?.make || 'N/A'} ${inspection.vehicleId?.model || 'N/A'}</p>
+                <p>${jobCard.vehicleId?.make || 'N/A'} ${jobCard.vehicleId?.model || 'N/A'}</p>
             </div>
             <div class="info-item">
                 <h3>${t.year}</h3>
-                <p>${inspection.vehicleId?.year || 'N/A'}</p>
+                <p>${jobCard.vehicleId?.year || 'N/A'}</p>
             </div>
             <div class="info-item">
                 <h3>${t.licensePlate}</h3>
-                <p>${inspection.vehicleId?.licensePlate || 'N/A'}</p>
+                <p>${jobCard.vehicleId?.licensePlate || 'N/A'}</p>
             </div>
             <div class="info-item">
                 <h3>${t.mileage}</h3>
@@ -307,7 +317,7 @@ function generateInspectionHTML(inspection: any, language: string = 'en', isRTL:
         <div class="info-grid">
             <div class="info-item">
                 <h3>${t.customer}</h3>
-                <p>${inspection.customerId?.firstName || 'N/A'} ${inspection.customerId?.lastName || 'N/A'}</p>
+                <p>${jobCard.customerId?.firstName || 'N/A'} ${jobCard.customerId?.lastName || 'N/A'}</p>
             </div>
             <div class="info-item">
                 <h3>${t.mechanic}</h3>

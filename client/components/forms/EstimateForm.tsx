@@ -246,13 +246,14 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
       const response = await fetch(`/api/inspections/${inspectionId}`);
       if (response.ok) {
         const inspection = await response.json();
-        
+        const jobCard = inspection.jobCardId;
+
         // Auto-populate customer and vehicle
         setFormData(prev => ({
           ...prev,
           inspectionId,
-          customerId: inspection.customerId._id,
-          vehicleId: inspection.vehicleId._id,
+          customerId: jobCard?.customerId?._id || '',
+          vehicleId: jobCard?.vehicleId?._id || '',
         }));
 
         // Auto-populate services from inspection items with poor/fair/critical condition
@@ -483,11 +484,14 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                   >
                     <option value="">{t('forms.select_inspection_placeholder')}</option>
-                    {inspections && Array.isArray(inspections) && inspections.map((inspection) => (
-                      <option key={inspection._id} value={inspection._id}>
-                        {inspection.vehicleId?.make} {inspection.vehicleId?.model} - {inspection.customerId?.firstName} {inspection.customerId?.lastName} ({new Date(inspection.inspectionDate).toLocaleDateString()})
-                      </option>
-                    ))}
+                    {inspections && Array.isArray(inspections) && inspections.map((inspection) => {
+                      const jobCard = (inspection as any).jobCardId;
+                      return (
+                        <option key={inspection._id} value={inspection._id}>
+                          {jobCard?.vehicleId?.make} {jobCard?.vehicleId?.model} - {jobCard?.customerId?.firstName} {jobCard?.customerId?.lastName} ({new Date(inspection.inspectionDate).toLocaleDateString()})
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
                 
