@@ -272,10 +272,11 @@ export function useNotifications() {
 
     // Inspection Events
     const handleInspectionCompleted = (inspection: any) => {
+      const vehicle = inspection.jobCardId?.vehicleId || inspection.vehicleId;
       addNotification({
         type: 'success',
         title: 'Inspection Completed',
-        message: `Vehicle inspection completed for ${inspection.vehicleId?.make} ${inspection.vehicleId?.model}`,
+        message: `Vehicle inspection completed for ${vehicle?.make} ${vehicle?.model}`,
         data: { inspection, action: 'view', url: `/inspections/${inspection._id}` },
       });
     };
