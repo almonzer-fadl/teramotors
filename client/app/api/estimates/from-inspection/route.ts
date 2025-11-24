@@ -54,72 +54,48 @@ export async function POST(request: Request) {
     let subtotal = 0
 
     for (const item of selectedItems) {
-      if (item.condition === 'poor' || item.condition === 'critical') {
-        // Find matching service
-        const matchingService = services.find(s => 
-          s.name.toLowerCase().includes(item.itemId.toLowerCase()) ||
-          s.description.toLowerCase().includes(item.itemId.toLowerCase())
-        )
-        
-        if (matchingService) {
-          const laborCost = matchingService.laborHours * matchingService.laborRate
-          const partsCost = item.estimatedCost || 0
-          const totalCost = laborCost + partsCost
-          
-          estimateServices.push({
-            serviceId: matchingService._id,
-            quantity: 1,
-            laborCost,
-            partsCost,
-            totalCost
-          })
-          
-          subtotal += totalCost
-        } else {
-          // Create a generic service entry
-          const laborCost = 2 * 50 // 2 hours at $50/hour
-          const partsCost = item.estimatedCost || 0
-          const totalCost = laborCost + partsCost
-          
-          estimateServices.push({
-            serviceId: null, // Will be handled differently
-            quantity: 1,
-            laborCost,
-            partsCost,
-            totalCost,
-            itemName: item.itemId,
-            itemDescription: `Repair ${item.itemId} - ${item.notes || 'No description'}`
-          })
-          
-          subtotal += totalCost
-        }
+      if (item.condition === 'fair' || item.condition === 'poor' || item.condition === 'critical') {
+        // Use inspection item data directly - don't try to match existing services
+        // This ensures the estimate shows exactly what was found in the inspection
+        const laborHours = 2 // Default labor hours for repair
+        const laborRate = 50 // Default labor rate
+        const laborCost = laborHours * laborRate
+        const partsCost = item.estimatedCost || 0
+        const totalCost = laborCost + partsCost
+
+        // Use uniqueCode if available, otherwise use itemId
+        const itemName = item.uniqueCode || item.itemId
+
+        estimateServices.push({
+          serviceId: null, // No service ID - this is inspection-based
+          quantity: 1,
+          laborHours,
+          laborRate,
+          laborCost,
+          partsCost,
+          totalCost,
+          name: itemName,
+          description: `${item.notes || 'Requires attention'} - Condition: ${item.condition}`
+        })
+
+        subtotal += totalCost
 
         // Add parts if estimated cost is provided
         if (item.estimatedCost > 0) {
-          const matchingPart = parts.find(p => 
-            p.name.toLowerCase().includes(item.itemId.toLowerCase())
-          )
-          
-          if (matchingPart) {
-            estimateParts.push({
-              partId: matchingPart._id,
-              quantity: 1,
-              unitCost: item.estimatedCost,
-              totalCost: item.estimatedCost
-            })
-          } else {
-            estimateParts.push({
-              partId: null,
-              quantity: 1,
-              unitCost: item.estimatedCost,
-              totalCost: item.estimatedCost,
-              partName: `${item.itemId} parts`,
-              partDescription: `Parts for ${item.itemId} repair`
-            })
-          }
+          const itemName = item.uniqueCode || item.itemId
+          estimateParts.push({
+            partId: null, // No part ID - this is inspection-based
+            quantity: 1,
+            unitCost: item.estimatedCost,
+            totalCost: item.estimatedCost,
+            name: `${itemName} - Parts`,
+            description: `Parts required for ${itemName} repair`
+          })
         }
       }
     }
+
+    console.log(`[Estimate from Inspection] Created ${estimateServices.length} services and ${estimateParts.length} parts from ${selectedItems.length} inspection items`);
 
     // Calculate tax and total (tax only on parts)
     const partsTotal = estimateParts.reduce((sum, part) => sum + part.totalCost, 0)

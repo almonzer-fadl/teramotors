@@ -42,9 +42,10 @@ export async function GET(request: NextRequest) {
     
     const estimates = await Estimate.find({})
       .populate('jobCardId', '_id')
+      .populate('inspectionId', 'inspectionDate overallCondition')
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate({        path: 'mechanicId',        populate: {          path: 'userId',          select: 'firstName lastName'        }      })
+      .populate('mechanicId', 'firstName lastName displayName')
       .populate('services.serviceId', 'name')
       .sort(sort)
       .skip(skip)
@@ -132,7 +133,7 @@ export async function POST(request: Request) {
     const cleanedServices = (Array.isArray(body.services) ? body.services : []).map((service: any) => {
       const quantity = Number(service.quantity ?? 1) || 1
       const laborHours = Number(service.laborHours ?? 0) || 0
-      const laborRate = Number(service.laborRate ?? 0) || 0
+      const laborRate = Number(service.laborRate ?? 50) || 50 // Default to 50 if not provided
       const laborCost = Number(service.laborCost ?? laborHours * laborRate) || 0
       const partsCost = Number(service.partsCost ?? 0) || 0
       const computedTotal = Number(service.totalCost ?? (quantity * (laborCost + partsCost))) || 0

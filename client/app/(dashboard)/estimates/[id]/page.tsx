@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Edit, Download, Trash2, Calendar, User, Car, FileText, DollarSign, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
+import PrintEstimateModal from '@/components/pdf/PrintEstimateModal';
 
 interface Estimate {
   _id: string;
@@ -72,6 +73,9 @@ export default function EstimateDetailPage() {
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // Print modal state
+  const [showPrintModal, setShowPrintModal] = useState(false);
+
   useEffect(() => {
     if (params.id) {
       fetchEstimate();
@@ -98,13 +102,11 @@ export default function EstimateDetailPage() {
 
   const generatePDF = async () => {
     if (!estimate) return;
-    
+
     setGeneratingPDF(true);
     try {
-      // Get current language from i18n
-      const currentLanguage = localStorage.getItem('i18nextLng') || 'en';
-      // Open PDF in new tab for viewing with language parameter
-      window.open(`/api/estimates/${estimate._id}/pdf?lang=${currentLanguage}`, '_blank');
+      // Show print modal with estimate data
+      setShowPrintModal(true);
     } catch (error) {
       console.error(t('estimates.error_generating_pdf'), error);
     } finally {
@@ -394,6 +396,18 @@ export default function EstimateDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Print Modal */}
+      {estimate && (
+        <PrintEstimateModal
+          isOpen={showPrintModal}
+          onClose={() => {
+            setShowPrintModal(false);
+          }}
+          estimate={estimate}
+          language={'ar'}
+        />
+      )}
     </div>
   );
 }

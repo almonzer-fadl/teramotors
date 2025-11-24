@@ -39,7 +39,7 @@ PartSchema.index({ minStockLevel: 1 });
 PartSchema.index({ isActive: 1 });
 PartSchema.index({ createdAt: -1 });
 PartSchema.index({ isLowStock: 1 });
-PartSchema.index({ uniqueCode: 1 });
+// uniqueCode index is already created by unique: true on the field definition
 
 // Pre-save hook to update isLowStock
 PartSchema.pre('save', function(next) {

@@ -140,7 +140,6 @@ const PrintModal = ({
               direction: rtl;
               background: white;
               width: 210mm;
-              min-height: 297mm;
               margin: 0 auto;
               padding: 20mm;
               box-sizing: border-box;
@@ -300,6 +299,8 @@ const PrintModal = ({
             .totals {
               margin-top: 30px;
               text-align: left;
+              border-top: 2px solid #000;
+              padding-top: 15px;
             }
 
             .total-row {
@@ -314,7 +315,6 @@ const PrintModal = ({
               font-weight: 700;
               font-size: 18px;
               color: #000;
-              border-top: 2px solid #000;
               margin-top: 10px;
               padding-top: 10px;
               font-family: "Cairo", sans-serif;
@@ -378,102 +378,50 @@ const PrintModal = ({
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
               }
-              
+
               @page {
-                margin: 0;
+                margin: 15mm;
                 size: A4 portrait;
               }
-              
-              body { 
-                margin: 0; 
+
+              body {
+                margin: 0;
                 background: white;
               }
-              .print-invoice-container { 
-                padding: 8mm;
-                width: 210mm;
+              .print-invoice-container {
+                padding: 0;
+                width: 100%;
                 min-height: auto;
-                max-height: 297mm;
+                max-height: none;
                 margin: 0;
                 box-shadow: none;
                 background: white;
                 font-size: 12px;
-                overflow: hidden;
+                overflow: visible;
               }
               .page-break { page-break-before: always; }
-              
-              /* Compress layout for single page */
-              .header {
-                padding: 8px 0;
-                margin-bottom: 10px;
-              }
-              
-              .logo-container {
-                padding: 12px;
-              }
-              
-              .company-name {
-                font-size: 18px;
-              }
-              
-              .invoice-title {
-                font-size: 14px;
-                margin: 8px 0 0 0;
-              }
-              
-              .invoice-info {
-                gap: 10px;
-                margin-bottom: 10px;
-              }
-              
-              .info-section h3 {
-                font-size: 14px;
-                margin-bottom: 8px;
-              }
-              
-              .info-section p {
-                margin: 4px 0;
-                font-size: 11px;
-              }
-              
+
+              /* Allow tables to break across pages */
               .services-table, .parts-table {
-                margin: 10px 0;
-                font-size: 11px;
+                page-break-inside: auto;
               }
-              
-              .services-table th, .parts-table th {
-                padding: 8px 6px;
-                font-size: 11px;
+
+              .services-table tr, .parts-table tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
               }
-              
-              .services-table td, .parts-table td {
-                padding: 6px;
-                font-size: 11px;
+
+              .services-table thead, .parts-table thead {
+                display: table-header-group;
               }
-              
-              .totals {
-                margin-top: 15px;
+
+              /* Prevent breaking inside these elements */
+              .header, .invoice-info, .info-section {
+                page-break-inside: avoid;
               }
-              
-              .total-row {
-                padding: 4px 0;
-                font-size: 11px;
-              }
-              
-              .grand-total {
-                font-size: 14px;
-                margin-top: 5px;
-                padding-top: 5px;
-              }
-              
+
               .notes {
-                margin-top: 15px;
-                padding: 10px;
-              }
-              
-              .footer {
-                margin-top: 10px;
-                font-size: 9px;
-                padding-top: 5px;
+                page-break-inside: avoid;
               }
               
               /* Keep colors in print */

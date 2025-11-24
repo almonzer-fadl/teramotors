@@ -81,8 +81,8 @@ export async function POST(request: Request) {
     await connectToDatabase();
     
     const body = await request.json();
-    
-    const { estimateId, jobCardId, dueDate, notes, paymentMethod, discount } = body;
+
+    const { estimateId, jobCardId, dueDate, notes, paymentMethod, discount, autoCloseJobCard = true } = body;
     const { customerId: manualCustomerId, vehicleId: manualVehicleId, services: manualServices, partsUsed: manualParts } = body;
 
     // Debug logging
@@ -259,8 +259,8 @@ export async function POST(request: Request) {
     const invoice = new Invoice(invoiceDoc);
     await invoice.save();
 
-    // Automatically update job card status to 'completed' when invoice is created
-    if (jobCardId) {
+    // Automatically update job card status to 'completed' when invoice is created (if autoCloseJobCard is true)
+    if (jobCardId && autoCloseJobCard) {
       await JobCard.findByIdAndUpdate(jobCardId, {
         status: 'completed',
         updatedAt: new Date()
@@ -268,8 +268,9 @@ export async function POST(request: Request) {
 
       // Send job completed WhatsApp message when invoice completes the job
       try {
+        const customerIdString = typeof customerId === 'object' && customerId._id ? customerId._id.toString() : customerId.toString();
         const whatsappListeners = WhatsAppEventListeners.getInstance();
-        await whatsappListeners.onJobCardClosed(customerId.toString());
+        await whatsappListeners.onJobCardClosed(customerIdString);
       } catch (whatsappError) {
         console.error('Error sending job completed WhatsApp message:', whatsappError);
       }
@@ -282,9 +283,10 @@ export async function POST(request: Request) {
 
     // Send invoice ready WhatsApp message with invoice link
     try {
-      console.log(`[Invoice Created] Attempting to send WhatsApp message for customer ${customerId}, invoice ${invoice._id}`);
+      const customerIdString = typeof customerId === 'object' && customerId._id ? customerId._id.toString() : customerId.toString();
+      console.log(`[Invoice Created] Attempting to send WhatsApp message for customer ${customerIdString}, invoice ${invoice._id}`);
       const whatsappListeners = WhatsAppEventListeners.getInstance();
-      await whatsappListeners.onInvoiceCreated(customerId.toString(), invoice._id.toString());
+      await whatsappListeners.onInvoiceCreated(customerIdString, invoice._id.toString());
       console.log(`[Invoice Created] WhatsApp message sent successfully`);
     } catch (whatsappError) {
       console.error('[Invoice Created] Error sending invoice ready WhatsApp message:', whatsappError);

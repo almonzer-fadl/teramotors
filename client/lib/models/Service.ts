@@ -27,7 +27,7 @@ const ServiceSchema = new Schema({
 });
 
 // Add indexes for better query performance
-ServiceSchema.index({ uniqueCode: 1 });
+// uniqueCode index is already created by unique: true on the field definition
 ServiceSchema.index({ category: 1 });
 ServiceSchema.index({ isActive: 1 });
 

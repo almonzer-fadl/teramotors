@@ -2,8 +2,24 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Search as SearchIcon, X, Clock, Filter, Download } from 'lucide-react';
-import { SearchService, SearchResult, SearchFilters } from '@/lib/search';
-import { ExportService, ExportOptions } from '@/lib/export';
+
+export interface SearchResult {
+  type: 'customer' | 'vehicle' | 'appointment' | 'job' | 'invoice' | 'estimate' | 'part';
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  score: number;
+  data: any;
+}
+
+export interface SearchFilters {
+  type?: string[];
+  dateFrom?: Date;
+  dateTo?: Date;
+  status?: string[];
+  role?: string;
+}
 
 interface SearchProps {
   onResultClick?: (result: SearchResult) => void;
@@ -79,13 +95,21 @@ export default function Search({
         })));
       setSuggestions([]);
       } else {
-        // Use global search
-        const searchResults = await SearchService.globalSearch(query, filters, 10);
-        setResults(searchResults);
-        
+        // Use global search API
+        const params = new URLSearchParams({ q: query, limit: '10' });
+        if (filters.type && filters.type.length > 0) params.append('type', filters.type.join(','));
+        if (filters.dateFrom) params.append('dateFrom', filters.dateFrom.toISOString());
+        if (filters.dateTo) params.append('dateTo', filters.dateTo.toISOString());
+        if (filters.status && filters.status.length > 0) params.append('status', filters.status.join(','));
+
+        const searchResponse = await fetch(`/api/search?${params}`);
+        const searchData = await searchResponse.json();
+        setResults(searchData.results || []);
+
         // Get suggestions for autocomplete
-        const searchSuggestions = await SearchService.getSearchSuggestions(query, 5);
-        setSuggestions(searchSuggestions);
+        const suggestionsResponse = await fetch(`/api/search/suggestions?q=${encodeURIComponent(query)}&limit=5`);
+        const suggestionsData = await suggestionsResponse.json();
+        setSuggestions(suggestionsData.suggestions || []);
       }
       
       setShowResults(true);
@@ -113,50 +137,8 @@ export default function Search({
 
   const handleExport = async (type: string, format: 'csv' | 'excel' | 'pdf') => {
     try {
-      const exportOptions: ExportOptions = {
-        format,
-        ...filters
-      };
-
-      let result;
-      switch (type) {
-        case 'customers':
-          result = await ExportService.exportCustomers(exportOptions);
-          break;
-        case 'vehicles':
-          result = await ExportService.exportVehicles(exportOptions);
-          break;
-        case 'appointments':
-          result = await ExportService.exportAppointments(exportOptions);
-          break;
-        case 'job-cards':
-          result = await ExportService.exportJobCards(exportOptions);
-          break;
-        case 'invoices':
-          result = await ExportService.exportInvoices(exportOptions);
-          break;
-        case 'estimates':
-          result = await ExportService.exportEstimates(exportOptions);
-          break;
-        case 'inventory':
-          result = await ExportService.exportInventory(exportOptions);
-          break;
-        default:
-          return;
-      }
-
-      if (result.success && result.data) {
-        // Create download link
-        const blob = new Blob([result.data], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = result.filename || `${type}-export.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      }
+      // TODO: Implement export via API route
+      console.log('Export functionality', type, format);
     } catch (error) {
       console.error('Export error:', error);
     }
@@ -204,9 +186,13 @@ export default function Search({
     }
   };
 
-  function t(arg0: string): string | undefined {
-    throw new Error('Function not implemented.');
-  }
+  const t = (key: string): string => {
+    // Simple translation function - can be replaced with i18n library
+    const translations: { [key: string]: string } = {
+      'ui.export_as_csv': 'Export as CSV'
+    };
+    return translations[key] || key;
+  };
 
   return (
     <div ref={searchRef} className={`relative ${className}`}>

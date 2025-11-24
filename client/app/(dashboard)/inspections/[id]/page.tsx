@@ -21,6 +21,8 @@ import {
   MapPin,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import PrintInspectionModal from "@/components/pdf/PrintInspectionModal";
+import PrintAllReportsModal from "@/components/pdf/PrintAllReportsModal";
 
 interface InspectionItem {
   itemId: string;
@@ -79,6 +81,16 @@ export default function InspectionDetailsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
 
+  // Print modal state
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [selectedJobCard, setSelectedJobCard] = useState<any>(null);
+
+  // Print Reports - all three modals
+  const [showAllPrintModals, setShowAllPrintModals] = useState(false);
+  const [estimateData, setEstimateData] = useState<any>(null);
+  const [invoiceData, setInvoiceData] = useState<any>(null);
+  const [loadingReports, setLoadingReports] = useState(false);
+
   useEffect(() => {
     fetchInspection();
   }, [id]);
@@ -106,10 +118,16 @@ export default function InspectionDetailsPage() {
 
     setGeneratingPDF(true);
     try {
-      // Get current language from i18n
-      const currentLanguage = localStorage.getItem('i18nextLng') || 'en';
-      // Open PDF in new tab for viewing with language parameter
-      window.open(`/api/inspections/${id}/pdf?lang=${currentLanguage}`, '_blank');
+      // Fetch job card data for printing
+      const response = await fetch(`/api/inspections/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSelectedJobCard(data.jobCardId);
+        setShowPrintModal(true);
+      } else {
+        console.error("Failed to fetch inspection details");
+        alert(t("inspections.failed_to_generate_pdf"));
+      }
     } catch (error) {
       console.error("Failed to generate PDF:", error);
       alert(t("inspections.failed_to_generate_pdf"));
@@ -158,6 +176,75 @@ export default function InspectionDetailsPage() {
 
       if (response.ok) {
         setInspection(prev => prev ? { ...prev, status: newStatus as any } : null);
+
+        // Trigger automation when status changes to "completed"
+        if (newStatus === "completed") {
+          console.log('[AUTOMATION] Starting automation workflow...');
+          try {
+            // Get inspection items that need repair (fair, poor, or critical condition)
+            const itemsNeedingRepair = inspection.items.filter((item: any) =>
+              item.condition === 'fair' || item.condition === 'poor' || item.condition === 'critical'
+            );
+
+            console.log(`[AUTOMATION] Found ${itemsNeedingRepair.length} items needing repair:`,
+              itemsNeedingRepair.map((i: any) => i.itemId));
+
+            if (itemsNeedingRepair.length === 0) {
+              alert('Inspection completed, but no items need repair. Estimate and invoice not generated.');
+              return;
+            }
+
+            // 1. Auto-generate estimate from inspection with selected items
+            console.log('[AUTOMATION STEP 1] Creating estimate from inspection...');
+            const estimateResponse = await fetch('/api/estimates/from-inspection', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                inspectionId: id,
+                selectedItems: itemsNeedingRepair
+              }),
+            });
+
+            if (!estimateResponse.ok) {
+              const errorData = await estimateResponse.json();
+              console.error('[AUTOMATION STEP 1 FAILED] Failed to create estimate:', errorData);
+              throw new Error(`Failed to create estimate: ${JSON.stringify(errorData)}`);
+            }
+
+            const estimateData = await estimateResponse.json();
+            console.log('[AUTOMATION STEP 1 SUCCESS] Estimate created:', estimateData.estimate._id);
+            console.log('Estimate services:', estimateData.estimate.services.length,
+              'Estimate parts:', estimateData.estimate.parts.length);
+
+            // 2. Auto-generate invoice from inspection job card AS IS (just inspection fee)
+            // The estimate is saved for later use when creating a repair job card
+            console.log('[AUTOMATION STEP 2] Creating invoice from inspection job card as-is...');
+            const invoiceResponse = await fetch('/api/invoices', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                jobCardId: inspection.jobCardId._id,
+                autoCloseJobCard: false // Don't close job card yet
+              }),
+            });
+
+            if (!invoiceResponse.ok) {
+              const errorData = await invoiceResponse.json();
+              console.error('[AUTOMATION STEP 2 FAILED] Failed to create invoice:', errorData);
+              throw new Error(`Failed to create invoice: ${JSON.stringify(errorData)}`);
+            }
+
+            const invoiceData = await invoiceResponse.json();
+            console.log('[AUTOMATION STEP 2 SUCCESS] Invoice created for inspection job card:', invoiceData.invoice._id);
+            console.log('Invoice total (inspection fee only):', invoiceData.invoice.totalAmount);
+
+            console.log('[AUTOMATION] All steps completed successfully!');
+            alert('Inspection completed! Estimate and invoice generated successfully. Click "Print Reports" to review and print.');
+          } catch (autoError) {
+            console.error('[AUTOMATION FAILED]', autoError);
+            alert(`Inspection marked as completed, but automation failed: ${autoError instanceof Error ? autoError.message : 'Unknown error'}. Please check the console for details.`);
+          }
+        }
       } else {
         console.error("Failed to update status");
         alert("Failed to update status");
@@ -204,6 +291,79 @@ export default function InspectionDetailsPage() {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const handlePrintAllReports = async () => {
+    if (!inspection || inspection.status !== 'completed') {
+      alert('Inspection must be completed before printing reports');
+      return;
+    }
+
+    setLoadingReports(true);
+    try {
+      // Fetch the estimate generated for this inspection
+      const estimatesResponse = await fetch(`/api/estimates?inspectionId=${id}`);
+      if (!estimatesResponse.ok) throw new Error('Failed to fetch estimate');
+      const estimatesData = await estimatesResponse.json();
+      const estimate = estimatesData.estimates?.[0] || estimatesData[0];
+
+      // Fetch the invoice generated for this job card
+      const invoicesResponse = await fetch(`/api/invoices?jobCardId=${inspection.jobCardId._id}`);
+      if (!invoicesResponse.ok) throw new Error('Failed to fetch invoice');
+      const invoicesData = await invoicesResponse.json();
+      const invoice = invoicesData.invoices?.[0] || invoicesData[0];
+
+      if (!estimate || !invoice) {
+        alert('Estimate or invoice not found. Please ensure the automation completed successfully.');
+        return;
+      }
+
+      // Fetch full details with populated data
+      const [estimateDetail, invoiceDetail] = await Promise.all([
+        fetch(`/api/estimates/${estimate._id}`).then(r => r.json()),
+        fetch(`/api/invoices/${invoice._id}/view`).then(r => r.json())
+      ]);
+
+      setEstimateData(estimateDetail);
+      setInvoiceData(invoiceDetail);
+      setSelectedJobCard(inspection.jobCardId);
+      setShowAllPrintModals(true);
+    } catch (error) {
+      console.error('Error loading reports:', error);
+      alert('Failed to load reports. Please try again.');
+    } finally {
+      setLoadingReports(false);
+    }
+  };
+
+  const handleClosePrintReports = async () => {
+    // Close all modals
+    setShowAllPrintModals(false);
+    setEstimateData(null);
+    setInvoiceData(null);
+
+    // Close the job card
+    if (inspection?.jobCardId?._id) {
+      try {
+        const response = await fetch(`/api/job-cards/${inspection.jobCardId._id}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'completed' }),
+        });
+
+        if (response.ok) {
+          alert('Reports printed successfully! Job card has been closed.');
+          // Redirect to job cards page or inspections list
+          router.push('/inspections');
+        } else {
+          console.error('Failed to close job card');
+          alert('Reports printed, but failed to close job card. Please close it manually.');
+        }
+      } catch (error) {
+        console.error('Error closing job card:', error);
+        alert('Reports printed, but failed to close job card. Please close it manually.');
+      }
+    }
   };
 
   if (loading) {
@@ -259,6 +419,16 @@ export default function InspectionDetailsPage() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
+              {inspection.status === 'completed' && (
+                <button
+                  onClick={handlePrintAllReports}
+                  disabled={loadingReports}
+                  className="inline-flex items-center px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-xl transition-all duration-300 font-medium disabled:opacity-50"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  {loadingReports ? 'Loading...' : 'Print Reports'}
+                </button>
+              )}
               <button
                 onClick={generatePDF}
                 disabled={generatingPDF}
@@ -539,6 +709,33 @@ export default function InspectionDetailsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Single Print Inspection Modal */}
+      {inspection && (
+        <PrintInspectionModal
+          isOpen={showPrintModal}
+          onClose={() => {
+            setShowPrintModal(false);
+            setSelectedJobCard(null);
+          }}
+          inspection={inspection}
+          jobCard={selectedJobCard}
+          language={'ar'}
+        />
+      )}
+
+      {/* Print All Reports Modal - Unified View */}
+      {showAllPrintModals && inspection && estimateData && invoiceData && (
+        <PrintAllReportsModal
+          isOpen={showAllPrintModals}
+          onClose={handleClosePrintReports}
+          inspection={inspection}
+          estimate={estimateData}
+          invoice={invoiceData.invoice}
+          jobCard={selectedJobCard || invoiceData.jobCard}
+          language={'ar'}
+        />
       )}
     </div>
   );

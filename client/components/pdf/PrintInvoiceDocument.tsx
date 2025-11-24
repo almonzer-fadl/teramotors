@@ -63,7 +63,8 @@ const PrintInvoiceDocument = ({
       partName: "اسم القطعة",
       partNumber: "رقم القطعة",
       unitCost: "تكلفة الوحدة",
-      subtotal: "المجموع الفرعي",
+      servicesTotal: "مجموع الخدمات",
+      partsTotal: "مجموع القطع",
       tax: "ضريبة القطع (15%)",
       discount: "الخصم",
       grandTotal: "المجموع الإجمالي",
@@ -95,7 +96,8 @@ const PrintInvoiceDocument = ({
       partName: "Part Name",
       partNumber: "Part #",
       unitCost: "Unit Cost",
-      subtotal: "Subtotal",
+      servicesTotal: "Services Total",
+      partsTotal: "Parts Total",
       tax: "Tax on Parts (15%)",
       discount: "Discount",
       grandTotal: "Grand Total",
@@ -148,7 +150,6 @@ const PrintInvoiceDocument = ({
           direction: ${isRTL ? 'rtl' : 'ltr'};
           background: white;
           width: 210mm;
-          min-height: 297mm;
           margin: 0 auto;
           padding: 20mm;
           box-sizing: border-box;
@@ -309,6 +310,8 @@ const PrintInvoiceDocument = ({
         .totals {
           margin-top: 30px;
           text-align: ${isRTL ? 'left' : 'right'};
+          border-top: 2px solid #000;
+          padding-top: 15px;
         }
 
         .total-row {
@@ -323,7 +326,6 @@ const PrintInvoiceDocument = ({
           font-weight: 700;
           font-size: 18px;
           color: #000;
-          border-top: 2px solid #000;
           margin-top: 10px;
           padding-top: 10px;
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
@@ -382,50 +384,96 @@ const PrintInvoiceDocument = ({
         }
 
         @media print {
-          body { 
-            margin: 0; 
+          @page {
+            size: A4;
+            margin: 15mm;
+          }
+
+          body {
+            margin: 0;
             background: white;
           }
-          .print-invoice-container { 
-            padding: 15mm;
-            width: 210mm;
-            min-height: 297mm;
+
+          .print-invoice-container {
+            padding: 0;
+            width: 100%;
             margin: 0;
             box-shadow: none;
             background: white;
+            min-height: auto;
           }
-          .page-break { page-break-before: always; }
-          
+
+          /* Allow page breaks */
+          .page-break {
+            page-break-before: always;
+          }
+
+          /* Prevent breaking inside these elements */
+          .header, .invoice-info, .info-section {
+            page-break-inside: avoid;
+          }
+
+          /* Allow tables to break across pages */
+          .services-table, .parts-table {
+            page-break-inside: auto;
+          }
+
+          .services-table tr, .parts-table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+
+          .services-table thead, .parts-table thead {
+            display: table-header-group;
+          }
+
+          .services-table tfoot, .parts-table tfoot {
+            display: table-footer-group;
+          }
+
           /* Ensure all text is black in print */
           * {
             color: #000 !important;
           }
-          
+
           /* Ensure table headers are deep blue in print */
           .services-table th, .parts-table th {
             background: #1e3a8a !important;
             color: white !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
-          
+
           /* Ensure company details are black in print */
           .company-details {
             color: #000 !important;
           }
-          
+
           /* Ensure info section headers are black in print */
           .info-section h3 {
             color: #000 !important;
           }
-          
+
+          /* Ensure totals border is black in print */
+          .totals {
+            border-top: 2px solid #000 !important;
+          }
+
           /* Ensure grand total is black in print */
           .grand-total {
             color: #000 !important;
-            border-top: 2px solid #000 !important;
           }
-          
+
           /* Ensure notes border is black in print */
           .notes {
-            border-right: 4px solid #000 !important;
+            border-${isRTL ? 'right' : 'left'}: 4px solid #000 !important;
+            page-break-inside: avoid;
+          }
+
+          /* Prevent orphans and widows */
+          p, li {
+            orphans: 3;
+            widows: 3;
           }
         }
       `}</style>
@@ -539,8 +587,12 @@ const PrintInvoiceDocument = ({
 
         <div className="totals">
           <div className="total-row">
-            <span>{t.subtotal}:</span>
-            <span>{formatCurrency(subtotal, isRTL)}</span>
+            <span>{t.servicesTotal}:</span>
+            <span>{formatCurrency(servicesTotal, isRTL)}</span>
+          </div>
+          <div className="total-row">
+            <span>{t.partsTotal}:</span>
+            <span>{formatCurrency(partsTotal, isRTL)}</span>
           </div>
           <div className="total-row">
             <span>{t.tax}:</span>
