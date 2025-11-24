@@ -18,6 +18,7 @@ interface PartFormData {
   minStockLevel: number;
   location: string;
   partNumber: string | undefined;
+  uniqueCode?: string;
 }
 
 export default function PartForm({ partId }: { partId?: string }) {
@@ -43,6 +44,7 @@ export default function PartForm({ partId }: { partId?: string }) {
     minStockLevel: 0,
     location: "",
     partNumber: "",
+    uniqueCode: "",
   });
 
   // Debug logging
@@ -74,6 +76,7 @@ export default function PartForm({ partId }: { partId?: string }) {
               minStockLevel: Number(part.minStockLevel) || 0,
               location: part.location || "",
               partNumber: part.partNumber || "",
+              uniqueCode: part.uniqueCode || "",
             });
           }
         } catch (error) {
@@ -92,10 +95,13 @@ export default function PartForm({ partId }: { partId?: string }) {
       const url = isEditing ? `/api/parts/${partId}` : "/api/parts";
       const method = isEditing ? "PUT" : "POST";
 
-      // Prepare data for submission - handle empty partNumber
+      // Prepare data for submission - handle empty partNumber and uniqueCode
       const submitData = { ...formData };
       if (submitData.partNumber === '') {
         submitData.partNumber = undefined;
+      }
+      if (submitData.uniqueCode === '') {
+        submitData.uniqueCode = undefined;
       }
 
       const response = await fetch(url, {
@@ -198,6 +204,24 @@ export default function PartForm({ partId }: { partId?: string }) {
                     className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
                     placeholder={t('ui.enter_part_number')}
                   />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="uniqueCode" className="block text-sm font-bold text-gray-700">
+                    Unique Code <span className="text-gray-400">(Optional - Format: E001, B001, etc.)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="uniqueCode"
+                    value={formData.uniqueCode || ''}
+                    onChange={(e) => handleInputChange("uniqueCode", e.target.value.toUpperCase())}
+                    maxLength={4}
+                    pattern="[A-Z]\d{3}"
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 font-mono"
+                    placeholder="E001"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Format: 1 letter + 3 digits (e.g., E001 for Engine, B001 for Brakes)
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="category" className="block text-sm font-bold text-gray-700">{t('inventory.category')} <span className="text-gray-400">({t('forms.optional')})</span></label>

@@ -2,47 +2,32 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import PrintInvoiceDocument from './PrintInvoiceDocument';
+import PrintInspectionDocument from './PrintInspectionDocument';
 
-interface PrintModalProps {
+interface PrintInspectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  invoice: any;
+  inspection: any;
   jobCard?: any;
   language?: string;
 }
 
-const PrintModal = ({ 
-  isOpen, 
-  onClose, 
-  invoice, 
-  jobCard, 
-  language = 'ar' 
-}: PrintModalProps) => {
+const PrintInspectionModal = ({
+  isOpen,
+  onClose,
+  inspection,
+  jobCard,
+  language = 'ar'
+}: PrintInspectionModalProps) => {
   const isRTL = true; // Force Arabic RTL layout
   const { t } = useTranslation('common');
   const [isPrinting, setIsPrinting] = useState(false);
-
-  const qrSrc = useMemo(() => {
-    // First try to get the QR code image if available
-    const qrImage = invoice?.zatca?.qrCodeImage;
-    if (qrImage) {
-      if (typeof qrImage === 'string' && qrImage.startsWith('data:')) return qrImage;
-      return `data:image/png;base64,${qrImage}`;
-    }
-    
-    // Fallback to generating QR code from base64 data
-    const qr = invoice?.zatca?.qrCode;
-    if (!qr) return null;
-    if (typeof qr === 'string' && qr.startsWith('data:')) return qr;
-    return `data:image/png;base64,${qr}`;
-  }, [invoice?.zatca?.qrCodeImage, invoice?.zatca?.qrCode]);
 
   useEffect(() => {
     if (isOpen) {
       // Add print styles to head when modal opens
       const printStyles = document.createElement('style');
-      printStyles.id = 'print-modal-styles';
+      printStyles.id = 'print-inspection-modal-styles';
       printStyles.textContent = `
         @media print {
           body * {
@@ -61,7 +46,7 @@ const PrintModal = ({
           .print-actions {
             display: none !important;
           }
-          .print-invoice-container {
+          .print-inspection-container {
             visibility: visible !important;
             position: static !important;
             width: 100% !important;
@@ -74,7 +59,7 @@ const PrintModal = ({
       document.head.appendChild(printStyles);
 
       return () => {
-        const existingStyles = document.getElementById('print-modal-styles');
+        const existingStyles = document.getElementById('print-inspection-modal-styles');
         if (existingStyles) {
           existingStyles.remove();
         }
@@ -84,29 +69,29 @@ const PrintModal = ({
 
   const handlePrint = () => {
     setIsPrinting(true);
-    
+
     // Create a new window for printing to avoid modal conflicts
     const printWindow = window.open('', '_blank', 'width=800,height=600');
     if (printWindow) {
       const printContent = document.querySelector('.print-content')?.innerHTML;
-      
+
       printWindow.document.write(`
         <!DOCTYPE html>
         <html dir="rtl" lang="ar">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Invoice Print</title>
+          <title>Inspection Report Print</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
-            
+
             * {
               margin: 0;
               padding: 0;
               box-sizing: border-box;
             }
-            
+
             body {
               font-family: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
               line-height: 1.6;
@@ -115,8 +100,8 @@ const PrintModal = ({
               background: white;
               padding: 20px;
             }
-            
-            .print-invoice-container {
+
+            .print-inspection-container {
               font-family: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
               line-height: 1.6;
               color: #333;
@@ -126,14 +111,14 @@ const PrintModal = ({
               margin: 0 auto;
               padding: 20px;
             }
-            
+
             .container {
               max-width: 100%;
               margin: 0 auto;
               padding: 20px;
             }
-            
-            .print-invoice-container {
+
+            .print-inspection-container {
               font-family: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
               line-height: 1.6;
               color: #333;
@@ -211,7 +196,7 @@ const PrintModal = ({
               line-height: 1.6;
             }
 
-            .invoice-title {
+            .inspection-title {
               font-size: 20px;
               font-weight: 600;
               color: #000;
@@ -220,33 +205,7 @@ const PrintModal = ({
               font-family: "Cairo", sans-serif;
             }
 
-            .qr-code {
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 120px;
-              height: 120px;
-              text-align: center;
-              background: white;
-              border: 1px solid #e5e7eb;
-              border-radius: 8px;
-              padding: 10px;
-            }
-
-            .qr-code img {
-              width: 100px;
-              height: 100px;
-              border-radius: 4px;
-            }
-
-            .qr-label {
-              font-size: 10px;
-              color: #666;
-              margin-top: 5px;
-              font-family: "Cairo", sans-serif;
-            }
-
-            .invoice-info {
+            .inspection-info {
               display: grid;
               grid-template-columns: 1fr 1fr;
               gap: 30px;
@@ -269,55 +228,101 @@ const PrintModal = ({
               font-family: "Cairo", sans-serif;
             }
 
-            .services-table, .parts-table {
-              width: 100%;
-              border-collapse: collapse;
+            .inspection-items {
               margin: 20px 0;
-              font-size: 14px;
             }
 
-            .services-table th, .parts-table th {
-              background: #1e3a8a;
+            .category-section {
+              margin-bottom: 30px;
+              border: 1px solid #e5e7eb;
+              border-radius: 8px;
+              overflow: hidden;
+              page-break-inside: avoid;
+            }
+
+            .category-header {
+              background: linear-gradient(to right, #1e3a8a, #1e40af);
               color: white;
-              padding: 12px 8px;
-              text-align: right;
+              padding: 12px 16px;
+              font-size: 16px;
               font-weight: 600;
               font-family: "Cairo", sans-serif;
             }
 
-            .services-table td, .parts-table td {
-              padding: 10px 8px;
-              border-bottom: 1px solid #e5e7eb;
-              text-align: right;
-              font-family: "Cairo", sans-serif;
+            .category-items {
+              padding: 0;
             }
 
-            .services-table tr:nth-child(even), .parts-table tr:nth-child(even) {
-              background-color: #f8f9fa;
-            }
-
-            .totals {
-              margin-top: 30px;
-              text-align: left;
-              border-top: 2px solid #000;
-              padding-top: 15px;
-            }
-
-            .total-row {
+            .inspection-item {
               display: flex;
+              align-items: center;
               justify-content: space-between;
-              padding: 8px 0;
+              padding: 12px 16px;
               border-bottom: 1px solid #e5e7eb;
-              font-family: "Cairo", sans-serif;
+              background: white;
             }
 
-            .grand-total {
-              font-weight: 700;
-              font-size: 18px;
-              color: #000;
-              margin-top: 10px;
-              padding-top: 10px;
+            .inspection-item:nth-child(even) {
+              background: #f9fafb;
+            }
+
+            .inspection-item:last-child {
+              border-bottom: none;
+            }
+
+            .item-name {
               font-family: "Cairo", sans-serif;
+              font-size: 14px;
+              color: #374151;
+              font-weight: 500;
+              flex: 1;
+            }
+
+            .condition-indicators {
+              display: flex;
+              gap: 12px;
+              align-items: center;
+            }
+
+            .condition-circle {
+              width: 20px;
+              height: 20px;
+              border: 2px solid #d1d5db;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              position: relative;
+            }
+
+            .condition-circle.selected.good {
+              background: #22c55e;
+              border-color: #16a34a;
+            }
+
+            .condition-circle.selected.fair {
+              background: #eab308;
+              border-color: #ca8a04;
+            }
+
+            .condition-circle.selected.poor {
+              background: #ef4444;
+              border-color: #dc2626;
+            }
+
+            .condition-circle.selected::after {
+              content: '';
+              width: 10px;
+              height: 10px;
+              background: white;
+              border-radius: 50%;
+            }
+
+            .condition-label {
+              font-family: "Cairo", sans-serif;
+              font-size: 11px;
+              color: #6b7280;
+              margin-top: 4px;
             }
 
             .notes {
@@ -348,30 +353,6 @@ const PrintModal = ({
               font-family: "Cairo", sans-serif;
             }
 
-            .status-badge {
-              display: inline-block;
-              padding: 4px 12px;
-              border-radius: 20px;
-              font-size: 12px;
-              font-weight: 500;
-              font-family: "Cairo", sans-serif;
-            }
-
-            .status-pending {
-              background-color: #fef3c7;
-              color: #92400e;
-            }
-
-            .status-paid {
-              background-color: #d1fae5;
-              color: #065f46;
-            }
-
-            .status-cancelled {
-              background-color: #fee2e2;
-              color: #991b1b;
-            }
-            
             @media print {
               * {
                 -webkit-print-color-adjust: exact !important;
@@ -388,7 +369,7 @@ const PrintModal = ({
                 margin: 0;
                 background: white;
               }
-              .print-invoice-container {
+              .print-inspection-container {
                 padding: 0;
                 width: 100%;
                 min-height: auto;
@@ -401,81 +382,71 @@ const PrintModal = ({
               }
               .page-break { page-break-before: always; }
 
-              /* Allow tables to break across pages */
-              .services-table, .parts-table {
-                page-break-inside: auto;
-              }
-
-              .services-table tr, .parts-table tr {
+              /* Prevent breaking inside category sections */
+              .category-section {
                 page-break-inside: avoid;
-                page-break-after: auto;
-              }
-
-              .services-table thead, .parts-table thead {
-                display: table-header-group;
               }
 
               /* Prevent breaking inside these elements */
-              .header, .invoice-info, .info-section {
+              .header, .inspection-info, .info-section {
                 page-break-inside: avoid;
               }
 
               .notes {
                 page-break-inside: avoid;
               }
-              
+
               /* Keep colors in print */
               .logo-container {
                 background: linear-gradient(to right, #063479, #052a5f) !important;
                 box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
               }
-              
+
               .company-name {
                 color: white !important;
               }
-              
+
               .company-name .highlight {
                 color: #F13F33 !important;
               }
-              
+
               .company-subtitle {
                 color: white !important;
                 background: rgba(0, 0, 0, 0.4) !important;
               }
-              
-              .services-table th, .parts-table th {
-                background: #1e3a8a !important;
+
+              .category-header {
+                background: linear-gradient(to right, #1e3a8a, #1e40af) !important;
                 color: white !important;
               }
-              
-              /* Status badge colors */
-              .status-pending {
-                background-color: #fef3c7 !important;
-                color: #92400e !important;
+
+              .condition-circle.selected.good {
+                background: #22c55e !important;
+                border-color: #16a34a !important;
               }
-              
-              .status-paid {
-                background-color: #d1fae5 !important;
-                color: #065f46 !important;
+
+              .condition-circle.selected.fair {
+                background: #eab308 !important;
+                border-color: #ca8a04 !important;
               }
-              
-              .status-cancelled {
-                background-color: #fee2e2 !important;
-                color: #991b1b !important;
+
+              .condition-circle.selected.poor {
+                background: #ef4444 !important;
+                border-color: #dc2626 !important;
               }
             }
           </style>
         </head>
         <body>
-          <div class="print-invoice-container">
+          <div class="print-inspection-container">
             ${printContent || ''}
           </div>
         </body>
         </html>
       `);
-      
+
       printWindow.document.close();
-      
+
       // Wait for content to load then print
       printWindow.onload = () => {
         printWindow.focus();
@@ -495,12 +466,12 @@ const PrintModal = ({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
-        
+
         <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">
-              طباعة الفاتورة
+              طباعة تقرير الفحص
             </h3>
             <button
               onClick={onClose}
@@ -515,10 +486,9 @@ const PrintModal = ({
           {/* Content */}
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
             <div className="print-content">
-              <PrintInvoiceDocument
-                invoice={invoice}
+              <PrintInspectionDocument
+                inspection={inspection}
                 jobCard={jobCard}
-                qrCodeData={qrSrc ?? undefined}
                 language={language}
               />
             </div>
@@ -546,4 +516,4 @@ const PrintModal = ({
   );
 };
 
-export default PrintModal;
+export default PrintInspectionModal;

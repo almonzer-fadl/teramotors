@@ -1,52 +1,37 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { useState, useEffect } from 'react';
-import QRCode from 'qrcode';
-
-interface PrintInvoiceDocumentProps {
-  invoice: any;
+interface PrintEstimateDocumentProps {
+  estimate: any;
   jobCard?: any;
-  qrCodeData?: string;
   language?: string;
 }
 
-const PrintInvoiceDocument = ({ 
-  invoice, 
-  jobCard, 
-  qrCodeData, 
-  language = 'ar' 
-}: PrintInvoiceDocumentProps) => {
+const PrintEstimateDocument = ({
+  estimate,
+  jobCard,
+  language = 'ar'
+}: PrintEstimateDocumentProps) => {
   const isRTL = true; // Force Arabic RTL layout
 
   // Calculate totals with discount and tax only on parts
-  const services = jobCard?.services || [];
-  const parts = jobCard?.partsUsed || [];
+  const services = estimate?.services || [];
+  const parts = estimate?.parts || [];
   const servicesTotal = services.reduce((sum: number, s: any) => sum + (s.laborHours * s.laborRate), 0);
   const partsTotal = parts.reduce((sum: number, p: any) => sum + (p.quantity * p.cost), 0);
   const subtotal = servicesTotal + partsTotal;
   const tax = partsTotal * 0.15; // Tax only on parts
-  const discount = jobCard?.discount || invoice?.discount || 0;
+  const discount = estimate?.discount || 0;
   const discountAmount = (subtotal + tax) * (discount / 100);
   const grandTotal = subtotal + tax - discountAmount;
 
-
-
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
-
-  useEffect(() => {
-    if (qrCodeData) {
-      setQrCodeDataUrl(qrCodeData);
-    }
-  }, [qrCodeData]);
-
   const translations = {
     ar: {
-      title: "فاتورة",
+      title: "تقدير",
       company: "تيرا فيجنز",
-      invoiceNumber: "رقم الفاتورة #",
+      estimateNumber: "رقم التقدير #",
       date: "التاريخ",
-      dueDate: "تاريخ الاستحقاق",
+      validUntil: "صالح حتى",
       customerInfo: "معلومات العميل",
       customer: "العميل",
       vehicleInfo: "معلومات المركبة",
@@ -63,8 +48,7 @@ const PrintInvoiceDocument = ({
       partName: "اسم القطعة",
       partNumber: "رقم القطعة",
       unitCost: "تكلفة الوحدة",
-      servicesTotal: "مجموع الخدمات",
-      partsTotal: "مجموع القطع",
+      subtotal: "المجموع الفرعي",
       tax: "ضريبة القطع (15%)",
       discount: "الخصم",
       grandTotal: "المجموع الإجمالي",
@@ -72,14 +56,14 @@ const PrintInvoiceDocument = ({
       generatedOn: "تم الإنشاء في",
       systemName: "نظام إدارة صيانة السيارات تيرا موتورز",
       status: "الحالة",
-      zatcaCompliant: "متوافق مع ZATCA"
+      estimateNote: "هذا تقدير أولي وليس فاتورة نهائية"
     },
     en: {
-      title: "Invoice",
+      title: "Estimate",
       company: "TeraMotors Auto Repair",
-      invoiceNumber: "Invoice #",
+      estimateNumber: "Estimate #",
       date: "Date",
-      dueDate: "Due Date",
+      validUntil: "Valid Until",
       customerInfo: "Customer Information",
       customer: "Customer",
       vehicleInfo: "Vehicle Information",
@@ -96,8 +80,7 @@ const PrintInvoiceDocument = ({
       partName: "Part Name",
       partNumber: "Part #",
       unitCost: "Unit Cost",
-      servicesTotal: "Services Total",
-      partsTotal: "Parts Total",
+      subtotal: "Subtotal",
       tax: "Tax on Parts (15%)",
       discount: "Discount",
       grandTotal: "Grand Total",
@@ -105,7 +88,7 @@ const PrintInvoiceDocument = ({
       generatedOn: "Generated on",
       systemName: "TeraMotors Auto Repair Management System",
       status: "Status",
-      zatcaCompliant: "ZATCA Compliant"
+      estimateNote: "This is a preliminary estimate and not a final invoice"
     }
   };
 
@@ -127,13 +110,13 @@ const PrintInvoiceDocument = ({
     const statusMap = {
       ar: {
         pending: 'معلق',
-        paid: 'مدفوع',
-        cancelled: 'ملغي'
+        approved: 'موافق عليه',
+        rejected: 'مرفوض'
       },
       en: {
         pending: 'Pending',
-        paid: 'Paid',
-        cancelled: 'Cancelled'
+        approved: 'Approved',
+        rejected: 'Rejected'
       }
     };
 
@@ -141,9 +124,9 @@ const PrintInvoiceDocument = ({
   };
 
   return (
-    <div className="print-invoice-container">
+    <div className="print-estimate-container">
       <style jsx>{`
-        .print-invoice-container {
+        .print-estimate-container {
           font-family: ${isRTL ? "'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif" : "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"};
           line-height: 1.6;
           color: #333;
@@ -222,7 +205,7 @@ const PrintInvoiceDocument = ({
           line-height: 1.6;
         }
 
-        .invoice-title {
+        .estimate-title {
           font-size: 20px;
           font-weight: 600;
           color: #000;
@@ -231,33 +214,20 @@ const PrintInvoiceDocument = ({
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
         }
 
-        .qr-code {
-          position: absolute;
-          top: 0;
-          ${isRTL ? 'left: 0;' : 'right: 0;'}
-          width: 120px;
-          height: 120px;
+        .estimate-note {
           text-align: center;
-          background: white;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
+          color: #f59e0b;
+          font-size: 14px;
+          font-weight: 600;
+          margin: 10px 0;
           padding: 10px;
-        }
-
-        .qr-code img {
-          width: 100px;
-          height: 100px;
-          border-radius: 4px;
-        }
-
-        .qr-label {
-          font-size: 10px;
-          color: #666;
-          margin-top: 5px;
+          background: #fffbeb;
+          border-radius: 8px;
+          border: 1px solid #f59e0b;
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
         }
 
-        .invoice-info {
+        .estimate-info {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 30px;
@@ -310,8 +280,6 @@ const PrintInvoiceDocument = ({
         .totals {
           margin-top: 30px;
           text-align: ${isRTL ? 'left' : 'right'};
-          border-top: 2px solid #000;
-          padding-top: 15px;
         }
 
         .total-row {
@@ -326,6 +294,7 @@ const PrintInvoiceDocument = ({
           font-weight: 700;
           font-size: 18px;
           color: #000;
+          border-top: 2px solid #000;
           margin-top: 10px;
           padding-top: 10px;
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
@@ -373,12 +342,12 @@ const PrintInvoiceDocument = ({
           color: #92400e;
         }
 
-        .status-paid {
+        .status-approved {
           background-color: #d1fae5;
           color: #065f46;
         }
 
-        .status-cancelled {
+        .status-rejected {
           background-color: #fee2e2;
           color: #991b1b;
         }
@@ -394,7 +363,7 @@ const PrintInvoiceDocument = ({
             background: white;
           }
 
-          .print-invoice-container {
+          .print-estimate-container {
             padding: 0;
             width: 100%;
             margin: 0;
@@ -409,7 +378,7 @@ const PrintInvoiceDocument = ({
           }
 
           /* Prevent breaking inside these elements */
-          .header, .invoice-info, .info-section {
+          .header, .estimate-info, .info-section {
             page-break-inside: avoid;
           }
 
@@ -454,14 +423,10 @@ const PrintInvoiceDocument = ({
             color: #000 !important;
           }
 
-          /* Ensure totals border is black in print */
-          .totals {
-            border-top: 2px solid #000 !important;
-          }
-
           /* Ensure grand total is black in print */
           .grand-total {
             color: #000 !important;
+            border-top: 2px solid #000 !important;
           }
 
           /* Ensure notes border is black in print */
@@ -475,14 +440,23 @@ const PrintInvoiceDocument = ({
             orphans: 3;
             widows: 3;
           }
+
+          /* Ensure estimate note styling is preserved */
+          .estimate-note {
+            background: #fffbeb !important;
+            border: 1px solid #f59e0b !important;
+            color: #f59e0b !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
         }
       `}</style>
 
       <div className="header">
           <div className="logo-container">
-            <img 
-              src="/icon.png" 
-              alt="TeraMotors Logo" 
+            <img
+              src="/icon.png"
+              alt="TeraMotors Logo"
               className="logo-image"
             />
             <div className="company-name">
@@ -490,46 +464,38 @@ const PrintInvoiceDocument = ({
             </div>
             <div className="company-subtitle">Auto Repair</div>
           </div>
-          
+
           <div className="company-details">
             <div>الرياض، صناعيه الرمال <br/>المملكه العربيه السعوديه</div>
             <div>+966599006314</div>
             <div>info@teramotors.com</div>
           </div>
-
-          {qrCodeDataUrl && (
-            <div className="qr-code">
-              <img src={qrCodeDataUrl} alt="ZATCA QR" />
-              <div className="qr-label">{t.zatcaCompliant}</div>
-            </div>
-          )}
         </div>
-        
-        <h2 className="invoice-title">{t.title} #{String(invoice._id || '').slice(-6)}</h2>
 
-        <div className="invoice-info">
+        <h2 className="estimate-title">{t.title} #{String(estimate._id || '').slice(-6)}</h2>
+        <div className="estimate-note">{t.estimateNote}</div>
+
+        <div className="estimate-info">
           <div className="info-section">
             <h3>{t.date}</h3>
-            <p><strong>{t.date}:</strong> {formatDate(invoice.createdAt || Date.now(), isRTL)}</p>
-            <p><strong>{t.dueDate}:</strong> {formatDate(invoice.dueDate || Date.now(), isRTL)}</p>
-            <p><strong>{t.status}:</strong> <span className={`status-badge status-${invoice.status || 'pending'}`}>{getStatusText(invoice.status, isRTL)}</span></p>
+            <p><strong>{t.date}:</strong> {formatDate(estimate.createdAt || Date.now(), isRTL)}</p>
+            <p><strong>{t.validUntil}:</strong> {formatDate(estimate.validUntil || Date.now(), isRTL)}</p>
+            <p><strong>{t.status}:</strong> <span className={`status-badge status-${estimate.status || 'pending'}`}>{getStatusText(estimate.status, isRTL)}</span></p>
           </div>
 
           <div className="info-section">
             <h3>{t.customerInfo}</h3>
-            <p><strong>{t.customer}:</strong> {invoice.customerId?.companyName ? invoice.customerId.companyName : (invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}</p>
-            {invoice.customerId?.email && <p><strong>Email:</strong> {invoice.customerId.email}</p>}
-            {invoice.customerId?.phone && <p><strong>Phone:</strong> {invoice.customerId.phone}</p>}
-            {invoice.customerId?.address && <p><strong>Address:</strong> ${invoice.customerId.address.street}, ${invoice.customerId.address.city}, ${invoice.customerId.address.country}</p>}
-            {invoice.customerId?.vatNumber && <p><strong>VAT Number:</strong> {invoice.customerId.vatNumber}</p>}
-            {invoice.customerId?.idNumber && <p><strong>ID Number:</strong> {invoice.customerId.idNumber}</p>}          </div>
+            <p><strong>{t.customer}:</strong> {estimate.customerId?.companyName ? estimate.customerId.companyName : (estimate.customerId?.firstName || '') + ' ' + (estimate.customerId?.lastName || '')}</p>
+            {estimate.customerId?.email && <p><strong>Email:</strong> {estimate.customerId.email}</p>}
+            {estimate.customerId?.phone && <p><strong>Phone:</strong> {estimate.customerId.phone}</p>}
+          </div>
 
           <div className="info-section">
             <h3>{t.vehicleInfo}</h3>
-            {invoice.vehicleId ? (
+            {estimate.vehicleId ? (
               <>
-                <p><strong>{t.vehicle}:</strong> {invoice.vehicleId.year} {invoice.vehicleId.make} {invoice.vehicleId.model}</p>
-                {invoice.vehicleId.licensePlate && <p><strong>{t.licensePlate}:</strong> {invoice.vehicleId.licensePlate}</p>}
+                <p><strong>{t.vehicle}:</strong> {estimate.vehicleId.year} {estimate.vehicleId.make} {estimate.vehicleId.model}</p>
+                {estimate.vehicleId.licensePlate && <p><strong>{t.licensePlate}:</strong> {estimate.vehicleId.licensePlate}</p>}
               </>
             ) : (
               <p>No vehicle information</p>
@@ -551,11 +517,11 @@ const PrintInvoiceDocument = ({
             <tbody>
               {services.map((s: any, index: number) => (
                 <tr key={index}>
-                  <td>{s.serviceId?.name || ''}</td>
-                  <td>{s.quantity}</td>
-                  <td>{s.laborHours}</td>
-                  <td>{s.laborRate.toFixed(2)}</td>
-                  <td>{(s.laborHours * s.laborRate).toFixed(2)}</td>
+                  <td>{s.serviceId?.name || s.name || ''}</td>
+                  <td>{s.quantity || 1}</td>
+                  <td>{s.laborHours || 0}</td>
+                  <td>{(s.laborRate || 0).toFixed(2)}</td>
+                  <td>{((s.laborHours || 0) * (s.laborRate || 0)).toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
@@ -575,7 +541,7 @@ const PrintInvoiceDocument = ({
             <tbody>
               {parts.map((p: any, index: number) => (
                 <tr key={index}>
-                  <td>{p.partId?.name || ''}</td>
+                  <td>{p.partId?.name || p.name || ''}</td>
                   <td>{p.quantity}</td>
                   <td>{p.cost.toFixed(2)}</td>
                   <td>{(p.quantity * p.cost).toFixed(2)}</td>
@@ -587,12 +553,8 @@ const PrintInvoiceDocument = ({
 
         <div className="totals">
           <div className="total-row">
-            <span>{t.servicesTotal}:</span>
-            <span>{formatCurrency(servicesTotal, isRTL)}</span>
-          </div>
-          <div className="total-row">
-            <span>{t.partsTotal}:</span>
-            <span>{formatCurrency(partsTotal, isRTL)}</span>
+            <span>{t.subtotal}:</span>
+            <span>{formatCurrency(subtotal, isRTL)}</span>
           </div>
           <div className="total-row">
             <span>{t.tax}:</span>
@@ -610,10 +572,10 @@ const PrintInvoiceDocument = ({
           </div>
         </div>
 
-        {invoice.notes && (
+        {estimate.notes && (
           <div className="notes">
             <h3>{t.notes}</h3>
-            <p>{invoice.notes}</p>
+            <p>{estimate.notes}</p>
           </div>
         )}
 
@@ -625,4 +587,4 @@ const PrintInvoiceDocument = ({
   );
 };
 
-export default PrintInvoiceDocument;
+export default PrintEstimateDocument;

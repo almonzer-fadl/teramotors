@@ -67,6 +67,7 @@ export default function InspectionForm({
     itemId: "",
     name: "",
     category: "",
+    uniqueCode: "",
     condition: "good" as const,
     isManual: true,
   });
@@ -247,15 +248,18 @@ export default function InspectionForm({
   };
 
   const addItem = () => {
-    if (newItem.itemId && newItem.name && currentCategory) {
+    if (newItem.name && currentCategory) {
+      // Generate itemId from name if not provided (for backward compatibility)
+      const itemId = newItem.itemId || newItem.name.toLowerCase().replace(/\s+/g, '-');
       handleInputChange("items", [
         ...formData.items,
-        { ...newItem, category: currentCategory, isManual: true },
+        { ...newItem, itemId, category: currentCategory, isManual: true },
       ]);
       setNewItem({
         itemId: "",
         name: "",
         category: "",
+        uniqueCode: "",
         condition: "good",
         isManual: true,
       });
@@ -469,11 +473,10 @@ export default function InspectionForm({
                   </div>
 
                   {/* Table Header */}
-                  <div className="grid grid-cols-12 gap-4 px-4 py-2 bg-gray-100 rounded-lg mb-2">
+                  <div className="grid grid-cols-10 gap-4 px-4 py-2 bg-gray-100 rounded-lg mb-2">
                     <div className="col-span-3 text-xs font-bold text-gray-600 uppercase tracking-wide">Item Name</div>
-                    <div className="col-span-3 text-xs font-bold text-gray-600 uppercase tracking-wide">Item ID</div>
+                    <div className="col-span-3 text-xs font-bold text-gray-600 uppercase tracking-wide">Unique Code</div>
                     <div className="col-span-4 text-xs font-bold text-gray-600 uppercase tracking-wide text-center">Condition</div>
-                    <div className="col-span-2 text-xs font-bold text-gray-600 uppercase tracking-wide text-center">Action</div>
                   </div>
 
                   {/* Items in this category */}
@@ -481,16 +484,16 @@ export default function InspectionForm({
                     {items.map((item) => (
                       <div
                         key={item.originalIndex}
-                        className="grid grid-cols-12 gap-4 px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors duration-150"
+                        className="grid grid-cols-10 gap-4 px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors duration-150"
                       >
                         {/* Item Name */}
                         <div className="col-span-3 flex items-center">
                           <span className="text-sm font-medium text-gray-900">{item.name}</span>
                         </div>
 
-                        {/* Item ID */}
+                        {/* Unique Code */}
                         <div className="col-span-3 flex items-center">
-                          <span className="text-m text-gray-800">{item.itemId}</span>
+                          <span className="text-sm text-gray-800">{item.uniqueCode || '-'}</span>
                         </div>
 
                         {/* Condition Buttons */}
@@ -539,22 +542,6 @@ export default function InspectionForm({
                               <Check className="w-5 h-5 text-white" strokeWidth={3} />
                             )}
                           </button>
-                        </div>
-
-                        {/* Delete Button */}
-                        <div className="col-span-2 flex items-center justify-center">
-                          {item.isManual ? (
-                            <button
-                              type="button"
-                              onClick={() => removeItem(item.originalIndex)}
-                              className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-all"
-                              title="Remove item"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          ) : (
-                            <span className="text-xs text-gray-400">-</span>
-                          )}
                         </div>
                       </div>
                     ))}
@@ -617,14 +604,14 @@ export default function InspectionForm({
 
                   <div className="flex-1">
                     <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t('templates.item_id')} *
+                      Unique Code
                     </label>
                     <input
                       type="text"
-                      value={newItem.itemId}
-                      onChange={(e) => setNewItem(prev => ({ ...prev, itemId: e.target.value }))}
+                      value={newItem.uniqueCode}
+                      onChange={(e) => setNewItem(prev => ({ ...prev, uniqueCode: e.target.value }))}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all text-gray-900 placeholder-gray-500 bg-white"
-                      placeholder="e.g., oil-level"
+                      placeholder="e.g., ABC-123"
                       disabled={!currentCategory}
                     />
                   </div>

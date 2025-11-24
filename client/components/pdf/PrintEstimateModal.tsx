@@ -2,47 +2,32 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import PrintInvoiceDocument from './PrintInvoiceDocument';
+import PrintEstimateDocument from './PrintEstimateDocument';
 
-interface PrintModalProps {
+interface PrintEstimateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  invoice: any;
+  estimate: any;
   jobCard?: any;
   language?: string;
 }
 
-const PrintModal = ({ 
-  isOpen, 
-  onClose, 
-  invoice, 
-  jobCard, 
-  language = 'ar' 
-}: PrintModalProps) => {
+const PrintEstimateModal = ({
+  isOpen,
+  onClose,
+  estimate,
+  jobCard,
+  language = 'ar'
+}: PrintEstimateModalProps) => {
   const isRTL = true; // Force Arabic RTL layout
   const { t } = useTranslation('common');
   const [isPrinting, setIsPrinting] = useState(false);
-
-  const qrSrc = useMemo(() => {
-    // First try to get the QR code image if available
-    const qrImage = invoice?.zatca?.qrCodeImage;
-    if (qrImage) {
-      if (typeof qrImage === 'string' && qrImage.startsWith('data:')) return qrImage;
-      return `data:image/png;base64,${qrImage}`;
-    }
-    
-    // Fallback to generating QR code from base64 data
-    const qr = invoice?.zatca?.qrCode;
-    if (!qr) return null;
-    if (typeof qr === 'string' && qr.startsWith('data:')) return qr;
-    return `data:image/png;base64,${qr}`;
-  }, [invoice?.zatca?.qrCodeImage, invoice?.zatca?.qrCode]);
 
   useEffect(() => {
     if (isOpen) {
       // Add print styles to head when modal opens
       const printStyles = document.createElement('style');
-      printStyles.id = 'print-modal-styles';
+      printStyles.id = 'print-estimate-modal-styles';
       printStyles.textContent = `
         @media print {
           body * {
@@ -61,7 +46,7 @@ const PrintModal = ({
           .print-actions {
             display: none !important;
           }
-          .print-invoice-container {
+          .print-estimate-container {
             visibility: visible !important;
             position: static !important;
             width: 100% !important;
@@ -74,7 +59,7 @@ const PrintModal = ({
       document.head.appendChild(printStyles);
 
       return () => {
-        const existingStyles = document.getElementById('print-modal-styles');
+        const existingStyles = document.getElementById('print-estimate-modal-styles');
         if (existingStyles) {
           existingStyles.remove();
         }
@@ -84,29 +69,29 @@ const PrintModal = ({
 
   const handlePrint = () => {
     setIsPrinting(true);
-    
+
     // Create a new window for printing to avoid modal conflicts
     const printWindow = window.open('', '_blank', 'width=800,height=600');
     if (printWindow) {
       const printContent = document.querySelector('.print-content')?.innerHTML;
-      
+
       printWindow.document.write(`
         <!DOCTYPE html>
         <html dir="rtl" lang="ar">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Invoice Print</title>
+          <title>Estimate Print</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
-            
+
             * {
               margin: 0;
               padding: 0;
               box-sizing: border-box;
             }
-            
+
             body {
               font-family: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
               line-height: 1.6;
@@ -115,8 +100,8 @@ const PrintModal = ({
               background: white;
               padding: 20px;
             }
-            
-            .print-invoice-container {
+
+            .print-estimate-container {
               font-family: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
               line-height: 1.6;
               color: #333;
@@ -126,14 +111,14 @@ const PrintModal = ({
               margin: 0 auto;
               padding: 20px;
             }
-            
+
             .container {
               max-width: 100%;
               margin: 0 auto;
               padding: 20px;
             }
-            
-            .print-invoice-container {
+
+            .print-estimate-container {
               font-family: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
               line-height: 1.6;
               color: #333;
@@ -211,7 +196,7 @@ const PrintModal = ({
               line-height: 1.6;
             }
 
-            .invoice-title {
+            .estimate-title {
               font-size: 20px;
               font-weight: 600;
               color: #000;
@@ -220,33 +205,7 @@ const PrintModal = ({
               font-family: "Cairo", sans-serif;
             }
 
-            .qr-code {
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 120px;
-              height: 120px;
-              text-align: center;
-              background: white;
-              border: 1px solid #e5e7eb;
-              border-radius: 8px;
-              padding: 10px;
-            }
-
-            .qr-code img {
-              width: 100px;
-              height: 100px;
-              border-radius: 4px;
-            }
-
-            .qr-label {
-              font-size: 10px;
-              color: #666;
-              margin-top: 5px;
-              font-family: "Cairo", sans-serif;
-            }
-
-            .invoice-info {
+            .estimate-info {
               display: grid;
               grid-template-columns: 1fr 1fr;
               gap: 30px;
@@ -299,8 +258,6 @@ const PrintModal = ({
             .totals {
               margin-top: 30px;
               text-align: left;
-              border-top: 2px solid #000;
-              padding-top: 15px;
             }
 
             .total-row {
@@ -315,6 +272,7 @@ const PrintModal = ({
               font-weight: 700;
               font-size: 18px;
               color: #000;
+              border-top: 2px solid #000;
               margin-top: 10px;
               padding-top: 10px;
               font-family: "Cairo", sans-serif;
@@ -362,16 +320,16 @@ const PrintModal = ({
               color: #92400e;
             }
 
-            .status-paid {
+            .status-approved {
               background-color: #d1fae5;
               color: #065f46;
             }
 
-            .status-cancelled {
+            .status-rejected {
               background-color: #fee2e2;
               color: #991b1b;
             }
-            
+
             @media print {
               * {
                 -webkit-print-color-adjust: exact !important;
@@ -388,7 +346,7 @@ const PrintModal = ({
                 margin: 0;
                 background: white;
               }
-              .print-invoice-container {
+              .print-estimate-container {
                 padding: 0;
                 width: 100%;
                 min-height: auto;
@@ -416,50 +374,50 @@ const PrintModal = ({
               }
 
               /* Prevent breaking inside these elements */
-              .header, .invoice-info, .info-section {
+              .header, .estimate-info, .info-section {
                 page-break-inside: avoid;
               }
 
               .notes {
                 page-break-inside: avoid;
               }
-              
+
               /* Keep colors in print */
               .logo-container {
                 background: linear-gradient(to right, #063479, #052a5f) !important;
                 box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
               }
-              
+
               .company-name {
                 color: white !important;
               }
-              
+
               .company-name .highlight {
                 color: #F13F33 !important;
               }
-              
+
               .company-subtitle {
                 color: white !important;
                 background: rgba(0, 0, 0, 0.4) !important;
               }
-              
+
               .services-table th, .parts-table th {
                 background: #1e3a8a !important;
                 color: white !important;
               }
-              
+
               /* Status badge colors */
               .status-pending {
                 background-color: #fef3c7 !important;
                 color: #92400e !important;
               }
-              
-              .status-paid {
+
+              .status-approved {
                 background-color: #d1fae5 !important;
                 color: #065f46 !important;
               }
-              
-              .status-cancelled {
+
+              .status-rejected {
                 background-color: #fee2e2 !important;
                 color: #991b1b !important;
               }
@@ -467,15 +425,15 @@ const PrintModal = ({
           </style>
         </head>
         <body>
-          <div class="print-invoice-container">
+          <div class="print-estimate-container">
             ${printContent || ''}
           </div>
         </body>
         </html>
       `);
-      
+
       printWindow.document.close();
-      
+
       // Wait for content to load then print
       printWindow.onload = () => {
         printWindow.focus();
@@ -495,12 +453,12 @@ const PrintModal = ({
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
-        
+
         <div className="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">
-              طباعة الفاتورة
+              طباعة التقدير
             </h3>
             <button
               onClick={onClose}
@@ -515,10 +473,9 @@ const PrintModal = ({
           {/* Content */}
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
             <div className="print-content">
-              <PrintInvoiceDocument
-                invoice={invoice}
+              <PrintEstimateDocument
+                estimate={estimate}
                 jobCard={jobCard}
-                qrCodeData={qrSrc ?? undefined}
                 language={language}
               />
             </div>
@@ -546,4 +503,4 @@ const PrintModal = ({
   );
 };
 
-export default PrintModal;
+export default PrintEstimateModal;

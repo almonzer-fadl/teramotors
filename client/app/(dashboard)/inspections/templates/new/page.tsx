@@ -45,9 +45,16 @@ export default function NewTemplatePage() {
   };
 
   const addItem = () => {
-    if (newItem.itemId && newItem.name && currentCategory) {
-      setItems(prev => [...prev, { ...newItem, category: currentCategory }]);
-      setNewItem({ itemId: "", name: "", category: "" });
+    if (newItem.name && currentCategory) {
+      // Auto-generate itemId from name if not provided
+      const itemId = newItem.itemId || newItem.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+      setItems(prev => [...prev, {
+        ...newItem,
+        itemId,
+        category: currentCategory
+      }]);
+      setNewItem({ itemId: "", name: "", category: "", uniqueCode: "" });
     }
   };
 
@@ -218,8 +225,8 @@ export default function NewTemplatePage() {
                 {t("templates.add_item")}
               </h3>
 
-              <div className="flex items-end gap-4">
-                <div className="flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     {t("templates.item_name")} *
                   </label>
@@ -233,30 +240,38 @@ export default function NewTemplatePage() {
                   />
                 </div>
 
-                <div className="flex-1">
+                <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">
-                    {t("templates.item_id")} *
+                    Unique Code <span className="text-gray-500 text-xs">(Format: E001, B001, C001)</span>
                   </label>
                   <input
                     type="text"
-                    value={newItem.itemId}
-                    onChange={(e) => handleItemChange("itemId", e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="e.g., oil-level"
+                    value={newItem.uniqueCode || ''}
+                    onChange={(e) => {
+                      const value = e.target.value.toUpperCase();
+                      handleItemChange("uniqueCode", value);
+                    }}
+                    maxLength={4}
+                    pattern="[A-Z]\d{3}"
+                    className="mt-1 block w-full border border-gray-300 rounded-lg shadow-sm py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                    placeholder="C001"
                     disabled={!currentCategory}
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    1 letter + 3 digits (e.g., E001 for Engine, B001 for Brakes, C001 for Cooling)
+                  </p>
                 </div>
-
-                <button
-                  type="button"
-                  onClick={addItem}
-                  disabled={!currentCategory}
-                  className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  {t("templates.add_item")}
-                </button>
               </div>
+
+              <button
+                type="button"
+                onClick={addItem}
+                disabled={!currentCategory}
+                className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                {t("templates.add_item")}
+              </button>
             </div>
 
             {/* Existing Items List - Grouped by Category */}
@@ -291,9 +306,9 @@ export default function NewTemplatePage() {
                                   </div>
                                 </div>
                                 <div>
-                                  <div className="text-xs text-gray-500">ID</div>
-                                  <div className="text-sm text-gray-700">
-                                    {item.itemId}
+                                  <div className="text-xs text-gray-500">Unique Code</div>
+                                  <div className="text-sm font-mono font-bold text-blue-600">
+                                    {item.uniqueCode || <span className="text-gray-400 text-xs">Not set</span>}
                                   </div>
                                 </div>
                               </div>

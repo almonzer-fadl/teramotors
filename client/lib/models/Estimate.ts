@@ -12,7 +12,10 @@ const EstimateSchema = new Schema({
   services: [{
     serviceId: { type: Schema.Types.ObjectId, ref: 'Service', required: false },
     name: { type: String, required: false, default: '' },
+    description: { type: String, required: false, default: '' },
     quantity: { type: Number, required: true, min: 1 },
+    laborHours: { type: Number, required: false, default: 0, min: 0 },
+    laborRate: { type: Number, required: false, default: 0, min: 0 },
     laborCost: { type: Number, required: true, min: 0 },
     partsCost: { type: Number, required: true, min: 0 },
     totalCost: { type: Number, required: true, min: 0 }
@@ -20,6 +23,7 @@ const EstimateSchema = new Schema({
   parts: [{
     partId: { type: Schema.Types.ObjectId, ref: 'Part', required: false },
     name: { type: String, required: false, default: '' },
+    description: { type: String, required: false, default: '' },
     quantity: { type: Number, required: true, min: 1 },
     unitCost: { type: Number, required: true, min: 0 },
     totalCost: { type: Number, required: true, min: 0 }

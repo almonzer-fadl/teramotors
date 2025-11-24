@@ -12,6 +12,7 @@ interface ServiceFormData {
   name: string;
   description: string;
   category: string;
+  uniqueCode?: string;
   laborRate: number;
   laborHours: number;
   isActive: boolean;
@@ -37,6 +38,7 @@ export default function ServiceForm({
     name: '',
     description: '',
     category: '',
+    uniqueCode: '',
     laborRate: 0,
     laborHours: 1,
     isActive: true,
@@ -228,6 +230,24 @@ export default function ServiceForm({
                     searchPlaceholder={t('forms.search_or_add_category')}
                     emptyPlaceholder={t('forms.no_categories_found')}
                   />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="uniqueCode" className="block text-sm font-bold text-gray-700">
+                    Unique Code <span className="text-gray-400">(Optional - Format: E001, B001, etc.)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="uniqueCode"
+                    value={formData.uniqueCode || ''}
+                    onChange={(e) => handleInputChange("uniqueCode", e.target.value.toUpperCase())}
+                    maxLength={4}
+                    pattern="[A-Z]\d{3}"
+                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 font-mono"
+                    placeholder="E001"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Format: 1 letter + 3 digits (e.g., E001 for Engine, B001 for Brakes)
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="laborRate" className="block text-sm font-bold text-gray-700">{t('services.labor_rate')}</label>

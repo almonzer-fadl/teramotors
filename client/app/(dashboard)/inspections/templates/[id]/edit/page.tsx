@@ -74,9 +74,16 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
   };
 
   const addItem = () => {
-    if (newItem.itemId && newItem.name && currentCategory) {
-      setItems(prev => [...prev, { ...newItem, category: currentCategory }]);
-      setNewItem({ itemId: "", name: "", category: "" });
+    if (newItem.name && currentCategory) {
+      // Auto-generate itemId from name if not provided
+      const itemId = newItem.itemId || newItem.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+      setItems(prev => [...prev, {
+        ...newItem,
+        itemId,
+        category: currentCategory
+      }]);
+      setNewItem({ itemId: "", name: "", category: "", uniqueCode: "" });
     }
   };
 
@@ -285,8 +292,8 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                   {t("templates.add_item")}
                 </h3>
 
-                <div className="flex items-end gap-4">
-                  <div className="flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">
                       {t("templates.item_name")} *
                     </label>
@@ -300,30 +307,38 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                     />
                   </div>
 
-                  <div className="flex-1">
+                  <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">
-                      {t("templates.item_id")} *
+                      Unique Code <span className="text-gray-500 text-xs">(Format: E001, B001, C001)</span>
                     </label>
                     <input
                       type="text"
-                      value={newItem.itemId}
-                      onChange={(e) => handleItemChange("itemId", e.target.value)}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      placeholder="e.g., oil-level"
+                      value={newItem.uniqueCode || ''}
+                      onChange={(e) => {
+                        const value = e.target.value.toUpperCase();
+                        handleItemChange("uniqueCode", value);
+                      }}
+                      maxLength={4}
+                      pattern="[A-Z]\d{3}"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 font-mono"
+                      placeholder="C001"
                       disabled={!currentCategory}
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      1 letter + 3 digits (e.g., E001 for Engine, B001 for Brakes, C001 for Cooling)
+                    </p>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={addItem}
-                    disabled={!currentCategory}
-                    className="inline-flex items-center justify-center px-6 py-3 bg-[#F13F33] text-white font-bold rounded-xl hover:bg-[#E03A2F] transition-all duration-300 shadow-lg hover:shadow-xl whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Plus className="mr-2 h-5 w-5" />
-                    {t("templates.add_item")}
-                  </button>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={addItem}
+                  disabled={!currentCategory}
+                  className="w-full inline-flex items-center justify-center px-6 py-3 bg-[#F13F33] text-white font-bold rounded-xl hover:bg-[#E03A2F] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Plus className="mr-2 h-5 w-5" />
+                  {t("templates.add_item")}
+                </button>
               </div>
 
               {/* Existing Items List - Grouped by Category */}
@@ -350,7 +365,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                           {categoryItems.map((item) => (
                             <div key={item.originalIndex} className="bg-white/60 backdrop-blur-sm p-4 hover:bg-gray-50/80 transition-all duration-300">
                               <div className="flex items-center justify-between gap-4">
-                                <div className="flex-1 grid grid-cols-2 gap-3">
+                                <div className="flex-1 grid grid-cols-2 gap-4">
                                   <div>
                                     <div className="text-xs text-gray-500 mb-1">Name</div>
                                     <div className="text-base font-bold text-gray-900">
@@ -358,9 +373,9 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                                     </div>
                                   </div>
                                   <div>
-                                    <div className="text-xs text-gray-500 mb-1">ID</div>
-                                    <div className="text-base text-gray-700">
-                                      {item.itemId}
+                                    <div className="text-xs text-gray-500 mb-1">Unique Code</div>
+                                    <div className="text-base font-mono font-bold text-blue-600">
+                                      {item.uniqueCode || <span className="text-gray-400 text-sm">Not set</span>}
                                     </div>
                                   </div>
                                 </div>
