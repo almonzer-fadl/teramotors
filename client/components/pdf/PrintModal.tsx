@@ -380,89 +380,73 @@ const PrintModal = ({
               }
 
               @page {
-                margin: 15mm;
-                size: A4 portrait;
+                size: A4;
+                margin: 10mm;
               }
 
               body {
                 margin: 0;
-                background: white;
-              }
-              .print-invoice-container {
                 padding: 0;
-                width: 100%;
-                min-height: auto;
-                max-height: none;
-                margin: 0;
-                box-shadow: none;
                 background: white;
-                font-size: 12px;
-                overflow: visible;
+                font-size: 10px;
               }
-              .page-break { page-break-before: always; }
 
-              /* Allow tables to break across pages */
+              .print-invoice-container {
+                padding: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                background: white !important;
+                min-height: auto !important;
+                overflow: visible !important;
+              }
+              
+              .header { padding: 10px 0; margin-bottom: 15px; }
+              .logo-container { padding: 15px; }
+              .logo-image { width: 40px; height: 40px; margin-bottom: 4px; }
+              .company-name { font-size: 20px; }
+              .company-subtitle { font-size: 8px; }
+              .company-details { font-size: 12px; }
+              .invoice-title { font-size: 18px; margin: 10px 0; }
+              .qr-code { width: 100px; height: 100px; padding: 5px; }
+              .qr-code img { width: 90px; height: 90px; }
+              .invoice-info { gap: 20px; margin-bottom: 20px; }
+              .info-section h3 { font-size: 16px; margin-bottom: 8px; padding-bottom: 4px; }
+              .info-section p { margin: 4px 0; font-size: 11px; }
+              
               .services-table, .parts-table {
+                margin: 15px 0;
+                font-size: 10px;
                 page-break-inside: auto;
               }
-
+              .services-table th, .parts-table th, .services-table td, .parts-table td {
+                padding: 6px 4px;
+              }
               .services-table tr, .parts-table tr {
                 page-break-inside: avoid;
                 page-break-after: auto;
               }
+              .services-table thead, .parts-table thead { display: table-header-group; }
 
-              .services-table thead, .parts-table thead {
-                display: table-header-group;
-              }
+              .totals { margin-top: 20px; padding-top: 10px; }
+              .total-row { padding: 5px 0; font-size: 11px; }
+              .grand-total { font-size: 16px; }
 
-              /* Prevent breaking inside these elements */
-              .header, .invoice-info, .info-section {
-                page-break-inside: avoid;
-              }
+              .notes { margin-top: 20px; padding: 15px; page-break-inside: avoid; }
+              .notes h3 { font-size: 14px; }
+              .footer { margin-top: 25px; font-size: 10px; }
 
-              .notes {
-                page-break-inside: avoid;
-              }
-              
+              .header, .invoice-info, .info-section { page-break-inside: avoid; }
+
               /* Keep colors in print */
-              .logo-container {
-                background: linear-gradient(to right, #063479, #052a5f) !important;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
-              }
-              
-              .company-name {
-                color: white !important;
-              }
-              
-              .company-name .highlight {
-                color: #F13F33 !important;
-              }
-              
-              .company-subtitle {
-                color: white !important;
-                background: rgba(0, 0, 0, 0.4) !important;
-              }
-              
-              .services-table th, .parts-table th {
-                background: #1e3a8a !important;
-                color: white !important;
-              }
-              
-              /* Status badge colors */
-              .status-pending {
-                background-color: #fef3c7 !important;
-                color: #92400e !important;
-              }
-              
-              .status-paid {
-                background-color: #d1fae5 !important;
-                color: #065f46 !important;
-              }
-              
-              .status-cancelled {
-                background-color: #fee2e2 !important;
-                color: #991b1b !important;
-              }
+              .logo-container { background: linear-gradient(to right, #063479, #052a5f) !important; }
+              .company-name, .company-subtitle { color: white !important; }
+              .company-name .highlight { color: #F13F33 !important; }
+              .company-subtitle { background: rgba(0, 0, 0, 0.4) !important; }
+              .services-table th, .parts-table th { background: #1e3a8a !important; color: white !important; }
+              .status-pending { background-color: #fef3c7 !important; color: #92400e !important; }
+              .status-paid { background-color: #d1fae5 !important; color: #065f46 !important; }
+              .status-cancelled { background-color: #fee2e2 !important; color: #991b1b !important; }
             }
           </style>
         </head>
