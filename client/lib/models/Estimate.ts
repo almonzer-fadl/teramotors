@@ -1,4 +1,42 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema as MongooseSchema } from 'mongoose';
+
+export interface IEstimate extends Document {
+  jobCardId?: MongooseSchema.Types.ObjectId;
+  inspectionId?: MongooseSchema.Types.ObjectId;
+  customerId: MongooseSchema.Types.ObjectId;
+  vehicleId: MongooseSchema.Types.ObjectId;
+  mechanicId?: MongooseSchema.Types.ObjectId;
+  estimateNumber: string;
+  status: 'pending' | 'approved' | 'rejected';
+  notes?: string;
+  services: {
+    serviceId?: MongooseSchema.Types.ObjectId;
+    name?: string;
+    description?: string;
+    quantity: number;
+    laborHours?: number;
+    laborRate?: number;
+    laborCost: number;
+    partsCost: number;
+    totalCost: number;
+  }[];
+  parts: {
+    partId?: MongooseSchema.Types.ObjectId;
+    name?: string;
+    description?: string;
+    quantity: number;
+    unitCost: number;
+    totalCost: number;
+  }[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  inspectionFee?: number;
+  validUntil: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const { Schema } = mongoose;
 
 const EstimateSchema = new Schema({

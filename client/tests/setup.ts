@@ -20,23 +20,21 @@ jest.mock('next/navigation', () => ({
   },
 }))
 
-// Mock Next.js auth
-jest.mock('next-auth/react', () => ({
+// Mock the custom authentication hook
+jest.mock('@/lib/simple-auth-client', () => ({
   useSession: () => ({
-    data: {
-      user: {
-        id: 'test-user-id',
-        email: 'test@example.com',
-        name: 'Test User',
-        role: 'admin'
-      }
+    user: {
+      id: 'test-user-id',
+      email: 'test@example.com',
+      name: 'Test User',
+      role: 'admin'
     },
-    status: 'authenticated'
+    isLoading: false,
+    isAuthenticated: true,
   }),
   signIn: jest.fn(),
   signOut: jest.fn(),
-  SessionProvider: ({ children }: { children: React.ReactNode }) => children,
-}))
+}));
 
 // Mock environment variables (NODE_ENV is read-only, so skip or use a workaround if needed)
 process.env.MONGODB_URI = 'mongodb://localhost:27017/teramotors-test'

@@ -1,5 +1,4 @@
-'use client';
-
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { X, RefreshCw, Power, PowerOff, CheckCircle, XCircle, Loader } from 'lucide-react';
 
@@ -177,9 +176,11 @@ export function WahaConfigModal({ isOpen, onClose }: WahaConfigModalProps) {
               <div className="p-6 bg-gray-50 rounded-lg flex flex-col items-center justify-center">
                 {qrCode ? (
                   <div className="space-y-4">
-                    <img
+                    <Image
                       src={qrCode}
                       alt="QR Code"
+                      width={256}
+                      height={256}
                       className="w-64 h-64 border-4 border-white shadow-lg rounded-lg"
                     />
                     <p className="text-sm text-center text-gray-600">
@@ -276,3 +277,4 @@ export function WahaConfigModal({ isOpen, onClose }: WahaConfigModalProps) {
     </div>
   );
 }
+
