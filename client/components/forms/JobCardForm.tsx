@@ -40,12 +40,19 @@ interface PartMinimal {
   name: string;
   compatibleVehicles?: string[];
 }
+interface EstimateMinimal {
+  _id: string;
+  estimateNumber: string;
+  customerName: string;
+  vehicleName: string;
+}
 
 interface JobCardFormData {
   appointmentId: string;
   customerId: string;
   vehicleId: string;
   inspectionId?: string;
+  estimateId?: string; // Added for repair from estimate flow
   type: "regular" | "inspection" | "repair";
   status: "pending" | "in-progress" | "completed" | "cancelled";
   priority: "low" | "medium" | "high" | "urgent";
@@ -75,6 +82,7 @@ export default function JobCardForm({
   const [vehicles, setVehicles] = useState<VehicleMinimal[]>([]);
   const [services, setServices] = useState<ServiceMinimal[]>([]);
   const [parts, setParts] = useState<PartMinimal[]>([]);
+  const [estimates, setEstimates] = useState<EstimateMinimal[]>([]); // Added for repair flow
   const [isInspectionModalOpen, setInspectionModalOpen] = useState(false);
   const [isCustomerModalOpen, setCustomerModalOpen] = useState(false);
   const [isVehicleModalOpen, setVehicleModalOpen] = useState(false);
@@ -85,6 +93,7 @@ export default function JobCardForm({
     customerId: "",
     vehicleId: "",
     inspectionId: "",
+    estimateId: "",
     type: "regular",
     status: "pending",
     priority: "medium",
@@ -136,6 +145,7 @@ export default function JobCardForm({
           services: transformedServices,
           partsUsed: transformedParts,
           notes: jobCard.notes || "",
+          estimateId: jobCard.estimateId || "",
         });
       }
     } catch (error) {
@@ -177,24 +187,24 @@ export default function JobCardForm({
         vehiclesRes,
         servicesRes,
         partsRes,
+        estimatesRes,
       ] = await Promise.all([
         fetch("/api/appointments"),
         fetch("/api/customers"),
         fetch("/api/vehicles"),
         fetch("/api/services"),
         fetch("/api/parts"),
+        fetch("/api/estimates?status=pending"), // Fetch pending estimates
       ]);
       
       if (appointmentsRes.ok) {
         const data = await appointmentsRes.json();
-        // The appointments API returns { appointments: [...], pagination: {...} }
         const appointmentsArray = Array.isArray(data.appointments) ? data.appointments : (Array.isArray(data) ? data : []);
         setAppointments(appointmentsArray);
       }
       
       if (customersRes.ok) {
         const json = await customersRes.json();
-        // The customers API returns { customers: [...], pagination: {...} }
         const items = Array.isArray(json.customers) ? json.customers : (Array.isArray(json) ? json : []);
         setCustomers(items);
       } else {
@@ -203,7 +213,6 @@ export default function JobCardForm({
       
       if (vehiclesRes.ok) {
         const data = await vehiclesRes.json();
-        // The vehicles API returns { vehicles: [...], pagination: {...} }
         const vehiclesArray = Array.isArray(data.vehicles) ? data.vehicles : (Array.isArray(data) ? data : []);
         setVehicles(vehiclesArray);
       }
@@ -216,18 +225,28 @@ export default function JobCardForm({
       
       if (partsRes.ok) {
         const data = await partsRes.json();
-        // The parts API returns { parts: [...], pagination: {...} }
         const partsArray = Array.isArray(data.parts) ? data.parts : (Array.isArray(data) ? data : []);
         setParts(partsArray);
       }
+
+      if (estimatesRes.ok) {
+        const data = await estimatesRes.json();
+        const pendingEstimates = Array.isArray(data.estimates) ? data.estimates : [];
+        setEstimates(pendingEstimates.map((est: any) => ({
+            _id: est._id,
+            estimateNumber: est.estimateNumber,
+            customerName: `${est.customerId?.firstName || ''} ${est.customerId?.lastName || ''}`,
+            vehicleName: `${est.vehicleId?.make || ''} ${est.vehicleId?.model || ''}`,
+        })));
+      }
     } catch (error) {
       console.error("Failed to fetch initial data:", error);
-      // Set empty arrays on error to prevent runtime errors
       setAppointments([]);
       setCustomers([]);
       setVehicles([]);
       setServices([]);
       setParts([]);
+      setEstimates([]);
     }
   };
 
@@ -248,7 +267,38 @@ export default function JobCardForm({
     }
   };
 
+  const handleCreateFromEstimate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+        const response = await fetch('/api/job-cards/from-inspection', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ estimateId: formData.estimateId }),
+        });
+
+        if (response.ok) {
+            socketService.emitJobCreated();
+            router.push('/job-cards');
+        } else {
+            const error = await response.json();
+            alert(error.message || 'Failed to create job card from estimate.');
+        }
+    } catch (error) {
+        console.error("Failed to create job card from estimate:", error);
+        alert('An error occurred while creating the job card from the estimate.');
+    } finally {
+        setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
+    // If creating from an estimate, use the dedicated handler
+    if (formData.estimateId && !isEditing) {
+        await handleCreateFromEstimate(e);
+        return;
+    }
+
     e.preventDefault();
     setLoading(true);
 
@@ -276,6 +326,48 @@ export default function JobCardForm({
       alert(t("forms.failed_to_save_job_card"));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEstimateChange = async (estimateId: string) => {
+    if (!estimateId) {
+        setFormData(prev => ({
+            ...prev,
+            estimateId: '',
+            customerId: '',
+            vehicleId: '',
+            services: [],
+            partsUsed: [],
+            notes: '',
+        }));
+        return;
+    }
+    try {
+        const response = await fetch(`/api/estimates/${estimateId}`);
+        if (response.ok) {
+            const estimate = await response.json();
+            setFormData(prev => ({
+                ...prev,
+                estimateId: estimate._id,
+                customerId: estimate.customerId?._id || estimate.customerId,
+                vehicleId: estimate.vehicleId?._id || estimate.vehicleId,
+                notes: estimate.notes || '',
+                inspectionId: estimate.inspectionId || '',
+                services: (estimate.services || []).map((s: any) => ({
+                    serviceId: s.serviceId?._id || s.serviceId,
+                    quantity: s.quantity,
+                    laborHours: s.laborHours,
+                    laborRate: s.laborRate,
+                })),
+                partsUsed: (estimate.parts || []).map((p: any) => ({
+                    partId: p.partId?._id || p.partId,
+                    quantity: p.quantity,
+                    cost: p.unitCost, // Map unitCost from estimate to cost
+                })),
+            }));
+        }
+    } catch (error) {
+        console.error("Failed to fetch estimate details:", error);
     }
   };
 
@@ -451,7 +543,7 @@ export default function JobCardForm({
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => {
       const newFormData = { ...prev, [field]: value };
-      if (field === 'customerId') {
+      if (field === 'customerId' && !prev.estimateId) { // Only auto-select vehicle if not linked to an estimate
         newFormData.vehicleId = '';
         const customerVehicles = vehicles.filter(v => {
             const customerId = typeof v.customerId === 'object' ? v.customerId._id : v.customerId;
@@ -507,39 +599,7 @@ export default function JobCardForm({
     handleInputChange("partsUsed", updatedParts);
   };
 
-  // Convert customers to SearchableComboBox options
-  const customerOptions: SearchableComboBoxOption[] = customers.map(c => ({
-    value: c._id,
-    label: `${c.firstName} ${c.lastName}`,
-    searchText: `${c.firstName} ${c.lastName}`,
-  }));
 
-  // Convert vehicles to SearchableComboBox options (filtered by customer)
-  const vehicleOptions: SearchableComboBoxOption[] = vehicles
-    .filter((v) => {
-      if (!formData.customerId) return false;
-      const customerId = typeof v.customerId === 'object' ? v.customerId._id : v.customerId;
-      return customerId === formData.customerId;
-    })
-    .map(v => ({
-      value: v._id,
-      label: `${v.make} ${v.model} (${v.year})`,
-      searchText: `${v.make} ${v.model} ${v.year}`,
-    }));
-
-  // Convert parts to SearchableComboBox options
-  const partOptions: SearchableComboBoxOption[] = parts.map(p => ({
-    value: p._id,
-    label: p.name,
-    searchText: p.name,
-  }));
-
-  // Convert services to SearchableComboBox options
-  const serviceOptions: SearchableComboBoxOption[] = services.map(s => ({
-    value: s._id,
-    label: s.name,
-    searchText: s.name,
-  }));
 
   // Handler for customer creation
   const handleCustomerCreated = (customer: { _id: string; firstName: string; lastName: string }) => {
@@ -573,18 +633,54 @@ export default function JobCardForm({
   };
 
   // Handler for service creation
-  const handleServiceCreated = (service: { _id: string; name: string; laborHours: number; laborRate: number }) => {
-    const newService: ServiceMinimal = {
-      _id: service._id,
-      name: service.name,
-      laborHours: service.laborHours,
-      laborRate: service.laborRate,
+    const handleServiceCreated = (service: { _id: string; name: string; laborHours: number; laborRate: number }) => {
+      const newService: ServiceMinimal = {
+        _id: service._id,
+        name: service.name,
+        laborHours: service.laborHours,
+        laborRate: service.laborRate,
+      };
+      setServices(prev => [...prev, newService]);
+      fetchInitialData(); // Refresh data
     };
-    setServices(prev => [...prev, newService]);
-    fetchInitialData(); // Refresh data
-  };
-
-  return (
+  
+    const estimateOptions: SearchableComboBoxOption[] = estimates.map(e => ({
+      value: e._id,
+      label: `${e.estimateNumber} - ${e.customerName} (${e.vehicleName})`,
+      searchText: `${e.estimateNumber} ${e.customerName} ${e.vehicleName}`,
+    }));
+  
+    const customerOptions: SearchableComboBoxOption[] = customers.map(c => ({
+      value: c._id,
+      label: `${c.firstName} ${c.lastName}`,
+      searchText: `${c.firstName} ${c.lastName}`,
+    }));
+  
+    const vehicleOptions: SearchableComboBoxOption[] = vehicles
+      .filter((v) => {
+        if (!formData.customerId) return false;
+        const customerId = typeof v.customerId === 'object' ? v.customerId._id : v.customerId;
+        return customerId === formData.customerId;
+      })
+      .map(v => ({
+        value: v._id,
+        label: `${v.make} ${v.model} (${v.year})`,
+        searchText: `${v.make} ${v.model} ${v.year}`,
+      }));
+  
+    const partOptions: SearchableComboBoxOption[] = parts.map(p => ({
+      value: p._id,
+      label: p.name,
+      searchText: p.name,
+    }));
+  
+    const serviceOptions: SearchableComboBoxOption[] = services.map(s => ({
+      value: s._id,
+      label: s.name,
+      searchText: s.name,
+    }));
+  
+    return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <InlineInspectionCreator
         isOpen={isInspectionModalOpen}
@@ -693,38 +789,65 @@ export default function JobCardForm({
                 </h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
-                    {t("forms.customer")} <span className="text-red-500">*</span>
-                  </label>
-                  <SearchableComboBox
-                    value={formData.customerId}
-                    onChange={(value) => handleInputChange("customerId", value)}
-                    options={customerOptions}
-                    placeholder={t("forms.select_customer")}
-                    required={true}
-                    onCreateNew={() => setCustomerModalOpen(true)}
-                    createNewLabel={t("customers.create_new_customer")}
-                    emptyMessage={t("customers.no_customers_found")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
-                    {t("forms.vehicle")} <span className="text-red-500">*</span>
-                  </label>
-                  <SearchableComboBox
-                    value={formData.vehicleId}
-                    onChange={(value) => handleInputChange("vehicleId", value)}
-                    options={vehicleOptions}
-                    placeholder={t("forms.select_vehicle")}
-                    required={true}
-                    disabled={!formData.customerId}
-                    onCreateNew={() => setVehicleModalOpen(true)}
-                    createNewLabel={t("vehicles.create_new_vehicle")}
-                    emptyMessage={t("vehicles.no_vehicles_found")}
-                  />
-                  <div className="mt-3" />
-                </div>
+                
+                {/* START: Estimate Selector for Repair Job Cards */}
+                {formData.type === 'repair' && !isEditing && (
+                    <div className="space-y-2 md:col-span-2">
+                        <label className="block text-sm font-bold text-gray-700">
+                            Create from Estimate
+                        </label>
+                        <SearchableComboBox
+                            value={formData.estimateId ?? ''}
+                            onChange={(value) => handleEstimateChange(value)}
+                            options={estimateOptions}
+                            placeholder="Select an estimate to auto-fill form"
+                            emptyMessage="No pending estimates found"
+                        />
+                         <p className="text-xs text-gray-500 mt-1">
+                            Selecting an estimate will automatically fill customer, vehicle, and service details.
+                        </p>
+                    </div>
+                )}
+                {/* END: Estimate Selector */}
+
+                {/* Show Customer/Vehicle selectors if not creating a repair card from scratch, or after an estimate is selected */}
+                {(formData.type !== 'repair' || isEditing || formData.estimateId) && (
+                    <>
+                        <div className="space-y-2">
+                        <label className="block text-sm font-bold text-gray-700">
+                            {t("forms.customer")} <span className="text-red-500">*</span>
+                        </label>
+                        <SearchableComboBox
+                            value={formData.customerId}
+                            onChange={(value) => handleInputChange("customerId", value)}
+                            options={customerOptions}
+                            placeholder={t("forms.select_customer")}
+                            required={true}
+                            onCreateNew={() => setCustomerModalOpen(true)}
+                            createNewLabel={t("customers.create_new_customer")}
+                            emptyMessage={t("customers.no_customers_found")}
+                            disabled={!!formData.estimateId}
+                        />
+                        </div>
+                        <div className="space-y-2">
+                        <label className="block text-sm font-bold text-gray-700">
+                            {t("forms.vehicle")} <span className="text-red-500">*</span>
+                        </label>
+                        <SearchableComboBox
+                            value={formData.vehicleId}
+                            onChange={(value) => handleInputChange("vehicleId", value)}
+                            options={vehicleOptions}
+                            placeholder={t("forms.select_vehicle")}
+                            required={true}
+                            disabled={!formData.customerId || !!formData.estimateId}
+                            onCreateNew={() => setVehicleModalOpen(true)}
+                            createNewLabel={t("vehicles.create_new_vehicle")}
+                            emptyMessage={t("vehicles.no_vehicles_found")}
+                        />
+                        <div className="mt-3" />
+                        </div>
+                    </>
+                )}
 
                 {/* Job Type */}
                 <div className="space-y-2 md:col-span-2">
@@ -752,8 +875,28 @@ export default function JobCardForm({
           </div>
 
           {/* Services Section */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-            <div className="px-8 py-8">
+          {formData.type === 'inspection' ? (
+            <div className="bg-blue-50 border-2 border-dashed border-blue-200 rounded-3xl p-8 text-center">
+                <div className="flex items-center mb-4 justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
+                        <Wrench className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900">
+                        {t("forms.services")}
+                    </h3>
+                </div>
+                <p className="text-blue-800">
+                    This is an inspection job card. The services section is disabled.
+                </p>
+                <div className="mt-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-900">
+                    <p className="font-bold">Developer Reminder:</p>
+                    <p>Remember to add auto-filled/recommendations for the inspection services we have.</p>
+                </div>
+            </div>
+          ) : (
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+              {/* Existing Services Section Content */}
+              <div className="px-8 py-8">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mr-4">
                   <Wrench className="w-6 h-6 text-white" />
@@ -839,87 +982,90 @@ export default function JobCardForm({
                 {t("forms.add_service")}
               </button>
             </div>
-          </div>
+            </div>
+          )}
 
           {/* Parts Used Section */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-            <div className="px-8 py-8">
-              <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
-                  <Wrench className="w-6 h-6 text-white" />
+          {formData.type !== 'inspection' && (
+            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+                <div className="px-8 py-8">
+                <div className="flex items-center mb-8">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                    <Wrench className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900">
+                    {t("forms.parts_used")}
+                    </h3>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
-                  {t("forms.parts_used")}
-                </h3>
-              </div>
-              {formData.partsUsed.map((part, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-4 gap-4 items-center mb-4"
-                >
-                  <div className="col-span-2 space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">{t('job_cards.select_part')}</label>
-                    <SearchableComboBox
-                      value={part.partId}
-                      onChange={(value) => handlePartChange(index, "partId", value)}
-                      options={partOptions}
-                      placeholder={t("forms.select_part")}
-                      onCreateNew={() => setPartModalOpen(true)}
-                      createNewLabel={t("inventory.create_new_part")}
-                      emptyMessage={t("inventory.no_parts_found")}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">{t('forms.qty')}</label>
-                    <input
-                      type="number"
-                      value={part.quantity}
-                      onChange={(e) =>
-                        handlePartChange(index, "quantity", parseInt(e.target.value))
-                      }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                    />
-                  </div>
-                  {isAdmin ? (
+                {formData.partsUsed.map((part, index) => (
+                    <div
+                    key={index}
+                    className="grid grid-cols-4 gap-4 items-center mb-4"
+                    >
+                    <div className="col-span-2 space-y-2">
+                        <label className="block text-sm font-bold text-gray-700">{t('job_cards.select_part')}</label>
+                        <SearchableComboBox
+                        value={part.partId}
+                        onChange={(value) => handlePartChange(index, "partId", value)}
+                        options={partOptions}
+                        placeholder={t("forms.select_part")}
+                        onCreateNew={() => setPartModalOpen(true)}
+                        createNewLabel={t("inventory.create_new_part")}
+                        emptyMessage={t("inventory.no_parts_found")}
+                        />
+                    </div>
                     <div className="space-y-2">
-                      <label className="block text-sm font-bold text-gray-700">{t('forms.cost_placeholder')}</label>
-                      <input
+                        <label className="block text-sm font-bold text-gray-700">{t('forms.qty')}</label>
+                        <input
                         type="number"
-                        name="cost"
-                        value={part.cost}
+                        value={part.quantity}
                         onChange={(e) =>
-                          handlePartChange(index, "cost", parseFloat(e.target.value))
+                            handlePartChange(index, "quantity", parseInt(e.target.value))
                         }
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
-                      />
+                        />
                     </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <label className="block text-sm font-bold text-gray-700">{t('forms.cost_placeholder')}</label>
-                      <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
-                        {t("job_cards.admin_only")}
-                      </div>
+                    {isAdmin ? (
+                        <div className="space-y-2">
+                        <label className="block text-sm font-bold text-gray-700">{t('forms.cost_placeholder')}</label>
+                        <input
+                            type="number"
+                            name="cost"
+                            value={part.cost}
+                            onChange={(e) =>
+                            handlePartChange(index, "cost", parseFloat(e.target.value))
+                            }
+                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                        />
+                        </div>
+                    ) : (
+                        <div className="space-y-2">
+                        <label className="block text-sm font-bold text-gray-700">{t('forms.cost_placeholder')}</label>
+                        <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
+                            {t("job_cards.admin_only")}
+                        </div>
+                        </div>
+                    )}
+                    <button
+                        type="button"
+                        onClick={(e) => removePart(index, e)}
+                        className="text-red-500 hover:text-red-700"
+                    >
+                        <Trash2 className="h-5 w-5" />
+                    </button>
                     </div>
-                  )}
-                  <button
+                ))}
+                <button
                     type="button"
-                    onClick={(e) => removePart(index, e)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
+                    onClick={(e) => addPart(e)}
+                    className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                    <Package className="mr-2 h-4 w-4" />
+                    {t("forms.add_part")}
+                </button>
                 </div>
-              ))}
-              <button
-                type="button"
-                onClick={(e) => addPart(e)}
-                className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              >
-                <Package className="mr-2 h-4 w-4" />
-                {t("forms.add_part")}
-              </button>
             </div>
-          </div>
+          )}
 
           {/* Additional Job Card Details Section */}
           <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">

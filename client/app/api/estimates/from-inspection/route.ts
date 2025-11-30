@@ -1,143 +1,152 @@
-import { connectToDatabase } from '@/lib/db'
-import Estimate from '@/lib/models/Estimate'
-import VehicleInspection from '@/lib/models/VehicleInspection'
-import JobCard from '@/lib/models/JobCard'
-import Service from '@/lib/models/Service'
-import Part from '@/lib/models/Part'
+import { connectToDatabase } from '@/lib/db';
+import Estimate from '@/lib/models/Estimate';
+import VehicleInspection, { IVehicleInspection } from '@/lib/models/VehicleInspection';
 import { getServerSession } from "@/lib/auth-server";
+import { PartMatchingService } from '@/lib/services/PartMatchingService';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+type PopulatedInspection = Omit<IVehicleInspection, 'vehicleId' | 'customerId' | 'mechanicId'> & {
+    vehicleId: { _id: string; make: string; model: string; year: number } | null;
+    customerId: { _id: string; firstName: string; lastName: string } | null;
+    mechanicId: { _id: string; userId: string } | null;
+};
+
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession()
-    if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    const session = await getServerSession();
+    if (!session?.user || (session.user as any).role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
-    // Check if user is admin
-    const userRole = (session.user as any).role;
-    if (userRole !== 'admin') {
-      return Response.json({ error: 'Forbidden - Admin access required' }, { status: 403 })
-    }
+    await connectToDatabase();
+    
+    const body = await request.json();
+    const { inspectionId } = body;
 
-    await connectToDatabase()
+    if (!inspectionId) {
+        return NextResponse.json({ error: 'Inspection ID is required' }, { status: 400 });
+    }
     
-    const body = await request.json()
-    const { inspectionId, selectedItems } = body
-    
-    // Get the inspection
     const inspection = await VehicleInspection.findById(inspectionId)
-      .populate({
-        path: 'jobCardId',
-        populate: [
-          { path: 'customerId', select: 'firstName lastName' },
-          { path: 'vehicleId', select: 'make model year licensePlate' }
-        ]
-      })
+      .populate('vehicleId', 'make model year')
+      .populate('customerId', 'firstName lastName')
       .populate('mechanicId', 'userId')
+      .lean<PopulatedInspection>();
 
     if (!inspection) {
-      return Response.json({ error: 'Inspection not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Inspection not found' }, { status: 404 });
+    }
+    
+    if (!inspection.vehicleId || !inspection.customerId) {
+        return NextResponse.json({ error: 'Inspection is missing vehicle or customer information' }, { status: 400 });
     }
 
-    const jobCard = inspection.jobCardId as any
-    if (!jobCard) {
-      return Response.json({ error: 'Job card not found for inspection' }, { status: 404 })
-    }
+    // Use the PartMatchingService to get required parts and services
+    const partMatcher = new PartMatchingService();
+    const matchedItems = await partMatcher.matchInspectionItems(inspection.items, inspection.vehicleId);
 
-    // Get available services and parts
-    const services = await Service.find({ isActive: true })
-    const parts = await Part.find({ isActive: true })
+    const estimateServices: any[] = [];
+    const estimateParts: any[] = [];
+    
+    // Group by service to consolidate parts under one service entry
+    const serviceMap = new Map<string, any>();
 
-    // Convert inspection items to estimate services and parts
-    const estimateServices = []
-    const estimateParts = []
-    let subtotal = 0
-
-    for (const item of selectedItems) {
-      if (item.condition === 'fair' || item.condition === 'poor' || item.condition === 'critical') {
-        // Use inspection item data directly - don't try to match existing services
-        // This ensures the estimate shows exactly what was found in the inspection
-        const laborHours = 2 // Default labor hours for repair
-        const laborRate = 50 // Default labor rate
-        const laborCost = laborHours * laborRate
-        const partsCost = item.estimatedCost || 0
-        const totalCost = laborCost + partsCost
-
-        // Use uniqueCode if available, otherwise use itemId
-        const itemName = item.uniqueCode || item.itemId
-
-        estimateServices.push({
-          serviceId: null, // No service ID - this is inspection-based
-          quantity: 1,
-          laborHours,
-          laborRate,
-          laborCost,
-          partsCost,
-          totalCost,
-          name: itemName,
-          description: `${item.notes || 'Requires attention'} - Condition: ${item.condition}`
-        })
-
-        subtotal += totalCost
-
-        // Add parts if estimated cost is provided
-        if (item.estimatedCost > 0) {
-          const itemName = item.uniqueCode || item.itemId
-          estimateParts.push({
-            partId: null, // No part ID - this is inspection-based
-            quantity: 1,
-            unitCost: item.estimatedCost,
-            totalCost: item.estimatedCost,
-            name: `${itemName} - Parts`,
-            description: `Parts required for ${itemName} repair`
-          })
+    for (const item of matchedItems) {
+        if (item.service) {
+            if (!serviceMap.has(item.service._id)) {
+                serviceMap.set(item.service._id, {
+                    serviceId: item.service._id,
+                    name: item.service.name,
+                    description: `Service for: ${item.inspectionItem.name}`,
+                    quantity: 1, // Assume one service operation
+                    laborHours: item.service.laborHours,
+                    laborRate: item.service.laborRate,
+                    parts: [],
+                });
+            }
+            if (item.part) {
+                serviceMap.get(item.service._id).parts.push({
+                    partId: item.part._id,
+                    name: item.part.name,
+                    quantity: item.quantity,
+                    unitCost: item.part.sellingPrice,
+                    totalCost: item.part.sellingPrice * item.quantity,
+                });
+            }
+        } else if (item.part) {
+            // If a part is matched without a service, add it directly to estimate parts
+            estimateParts.push({
+                partId: item.part._id,
+                name: item.part.name,
+                description: `Part for: ${item.inspectionItem.name}`,
+                quantity: item.quantity,
+                unitCost: item.part.sellingPrice,
+                totalCost: item.part.sellingPrice * item.quantity,
+            });
         }
-      }
     }
 
-    console.log(`[Estimate from Inspection] Created ${estimateServices.length} services and ${estimateParts.length} parts from ${selectedItems.length} inspection items`);
+    // Convert map to estimate services array
+    for (const [, service] of serviceMap) {
+        const partsCost = service.parts.reduce((sum: number, p: any) => sum + p.totalCost, 0);
+        const laborCost = service.laborHours * service.laborRate;
+        estimateServices.push({
+            serviceId: service.serviceId,
+            name: service.name,
+            description: service.description,
+            quantity: service.quantity,
+            laborHours: service.laborHours,
+            laborRate: service.laborRate,
+            laborCost: laborCost,
+            partsCost: partsCost,
+            totalCost: laborCost + partsCost,
+        });
+        // Add parts from services to the main parts list for display
+        estimateParts.push(...service.parts);
+    }
 
-    // Calculate tax and total (tax only on parts)
-    const partsTotal = estimateParts.reduce((sum, part) => sum + part.totalCost, 0)
-    const tax = partsTotal * 0.15 // 15% tax ONLY on parts
-    const total = subtotal + tax
+    const servicesTotal = estimateServices.reduce((sum, s) => sum + s.totalCost, 0);
+    const partsTotalForTax = estimateParts.reduce((sum, p) => sum + p.totalCost, 0);
+    
+    const subtotal = servicesTotal; // Service total already includes parts cost
+    const tax = partsTotalForTax * 0.15; // 15% tax ONLY on parts
+    const total = subtotal + tax;
 
-    // Set valid until date (30 days from now)
-    const validUntil = new Date()
-    validUntil.setDate(validUntil.getDate() + 30)
+    const validUntil = new Date();
+    validUntil.setDate(validUntil.getDate() + 30);
 
-    // Create the estimate
     const estimate = new Estimate({
       inspectionId: inspection._id,
-      customerId: jobCard.customerId._id,
-      vehicleId: jobCard.vehicleId._id,
-      mechanicId: inspection.mechanicId._id,
+      customerId: inspection.customerId._id,
+      vehicleId: inspection.vehicleId._id,
+      mechanicId: inspection.mechanicId?._id,
       services: estimateServices,
       parts: estimateParts,
       subtotal,
       tax,
       total,
       validUntil,
-      notes: `Generated from inspection on ${inspection.inspectionDate.toLocaleDateString()}`
-    })
+      status: 'pending',
+      notes: `Generated from inspection on ${new Date(inspection.inspectionDate).toLocaleDateString()}`
+    });
 
-    await estimate.save()
+    await estimate.save();
 
-    // Populate the estimate for response
     const populatedEstimate = await Estimate.findById(estimate._id)
-      .populate('inspectionId', 'inspectionDate overallCondition')
       .populate('customerId', 'firstName lastName')
-      .populate('vehicleId', 'make model year licensePlate')
-      .populate('mechanicId', 'userId')
-      .populate('services.serviceId', 'name description')
-      .populate('parts.partId', 'name partNumber')
+      .populate('vehicleId', 'make model year')
+      .populate('services.serviceId', 'name')
+      .populate('parts.partId', 'name')
+      .lean();
 
-    return Response.json({ 
+    return NextResponse.json({ 
       success: true, 
       estimate: populatedEstimate
-    }, { status: 201 })
+    }, { status: 201 });
+
   } catch (error) {
-    console.error('Error creating estimate from inspection:', error)
-    return Response.json({ error: 'Failed to create estimate from inspection' }, { status: 500 })
+    console.error('Error creating estimate from inspection:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({ error: 'Failed to create estimate from inspection', details: errorMessage }, { status: 500 });
   }
 }

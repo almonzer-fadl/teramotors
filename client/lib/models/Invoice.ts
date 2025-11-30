@@ -1,4 +1,38 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema as MongooseSchema } from 'mongoose';
+
+export interface IInvoice extends Document {
+  jobCardId?: MongooseSchema.Types.ObjectId;
+  inspectionId?: MongooseSchema.Types.ObjectId;
+  isInspectionInvoice?: boolean;
+  customerId: MongooseSchema.Types.ObjectId;
+  vehicleId: MongooseSchema.Types.ObjectId;
+  mechanicId?: MongooseSchema.Types.ObjectId;
+  status: 'pending' | 'paid' | 'cancelled';
+  notes?: string;
+  totalAmount: number;
+  paidAmount?: number;
+  dueDate: Date;
+  paymentMethod?: 'cash' | 'card' | 'bank_transfer' | 'other';
+  paymentDate?: Date;
+  paidAt?: Date;
+  zatca?: {
+    qrCode?: string;
+    qrCodeImage?: string;
+    invoiceNumber?: string;
+    invoiceDate?: Date;
+    vatAmount?: number;
+    subtotal?: number;
+    compliance?: {
+      phase: number;
+      isCompliant: boolean;
+      errors: string[];
+      warnings: string[];
+    };
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const { Schema } = mongoose;
 
 const InvoiceSchema = new Schema({

@@ -1,4 +1,28 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema as MongooseSchema } from 'mongoose';
+
+export interface IVehicleInspection extends Document {
+  jobCardId: MongooseSchema.Types.ObjectId;
+  mechanicId: MongooseSchema.Types.ObjectId;
+  templateId?: MongooseSchema.Types.ObjectId;
+  inspectionDate: Date;
+  mileage: number;
+  items: {
+    itemId: string;
+    name: string;
+    category: string;
+    uniqueCode?: string;
+    condition: 'good' | 'fair' | 'poor';
+  }[];
+  recommendations?: string;
+  nextInspectionDate?: Date;
+  nextInspectionMonths: 3 | 6;
+  status: 'in-progress' | 'completed' | 'cancelled';
+  generatedEstimateId?: MongooseSchema.Types.ObjectId;
+  generatedInvoiceId?: MongooseSchema.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const { Schema } = mongoose;
 
 const VehicleInspectionSchema = new Schema({
