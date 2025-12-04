@@ -1,92 +1,62 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Asal Arabic ITF */
+/* AlJareeda Arabic Font */
 @font-face {
-  font-family: 'Asal Arabic ITF';
-  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF light.otf') format('opentype');
+  font-family: 'AlJareeda';
+  src: url('/alfont_com_AlFont_com_AlJareeda-Title.otf') format('opentype');
+  font-weight: 400 900;
+  font-style: normal;
+}
+
+/* TheSans English Font - Modern, clean sans-serif */
+@font-face {
+  font-family: 'TheSans';
+  src: url('/Font/TheMixTheSans/TheSans/TheSans-B2ExtraLight.otf') format('opentype');
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'TheSans';
+  src: url('/Font/TheMixTheSans/TheSans/TheSans-B3Light.otf') format('opentype');
   font-weight: 300;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Asal Arabic ITF';
-  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF Regular.otf') format('opentype');
+  font-family: 'TheSans';
+  src: url('/Font/TheMixTheSans/TheSans/TheSans-B4SemiLight.otf') format('opentype');
+  font-weight: 350;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'TheSans';
+  src: url('/Font/TheMixTheSans/TheSans/TheSans-B5Plain.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Asal Arabic ITF';
-  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF Medium.otf') format('opentype');
-  font-weight: 500;
+  font-family: 'TheSans';
+  src: url('/Font/TheMixTheSans/TheSans/TheSans-B6SemiBold.otf') format('opentype');
+  font-weight: 600;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Asal Arabic ITF';
-  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF Bold.otf') format('opentype');
+  font-family: 'TheSans';
+  src: url('/Font/TheMixTheSans/TheSans/TheSans-B7Bold.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Asal Arabic ITF';
-  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF Extra Bold.otf') format('opentype');
+  font-family: 'TheSans';
+  src: url('/Font/TheMixTheSans/TheSans/TheSans-B8ExtraBold.otf') format('opentype');
   font-weight: 800;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Asal Arabic ITF';
-  src: url('/Font/Asal Arabic ITF Bold/Asal Arabic ITF Black.otf') format('opentype');
+  font-family: 'TheSans';
+  src: url('/Font/TheMixTheSans/TheSans/TheSans-B9Black.otf') format('opentype');
   font-weight: 900;
   font-style: normal;
-}
-
-/* Franklin Gothic */
-@font-face {
-  font-family: 'Franklin Gothic';
-  src: url('/Font/FranklinGothic-Book.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Franklin Gothic';
-  src: url('/Font/FranklinGothic-BookItalic.ttf') format('truetype');
-  font-weight: 400;
-  font-style: italic;
-}
-@font-face {
-  font-family: 'Franklin Gothic';
-  src: url('/Font/FranklinGothic-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Franklin Gothic';
-  src: url('/Font/FranklinGothic-MediumItalic.ttf') format('truetype');
-  font-weight: 500;
-  font-style: italic;
-}
-@font-face {
-  font-family: 'Franklin Gothic';
-  src: url('/Font/FranklinGothic-Demi.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Franklin Gothic';
-  src: url('/Font/FranklinGothic-DemiItalic.ttf') format('truetype');
-  font-weight: 600;
-  font-style: italic;
-}
-@font-face {
-  font-family: 'Franklin Gothic';
-  src: url('/Font/FranklinGothic-Heavy.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Franklin Gothic';
-  src: url('/Font/FranklinGothic-HeavyItalic.ttf') format('truetype');
-  font-weight: 700;
-  font-style: italic;
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -252,11 +222,11 @@
   }
 
   .font-arabic {
-    font-family: 'Asal Arabic ITF', sans-serif;
+    font-family: 'AlJareeda', 'Asal Arabic ITF', serif;
   }
 
   .font-english {
-    font-family: 'Franklin Gothic', sans-serif;
+    font-family: 'TheSans', 'Franklin Gothic', 'Inter', sans-serif;
   }
 
   /* Smooth scrolling */

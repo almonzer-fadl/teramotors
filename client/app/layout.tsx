@@ -8,7 +8,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
+    <html lang="en" className="font-english">
       <head>
         <title>TeraMotors - Auto Repair Management</title>
         <link rel="icon" href="/icon.png" type="image/png" />
