@@ -13,11 +13,15 @@ export interface AuthUser {
   email: string
   name: string
   role: string
+  tenantId?: string
 }
 
 export interface AuthSession {
   user: AuthUser
 }
+
+// Alias for backward compatibility with code expecting 'Session' type
+export type Session = AuthSession
 
 export async function signIn(email: string, password: string): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
   try {
@@ -37,7 +41,8 @@ export async function signIn(email: string, password: string): Promise<{ success
       id: user._id.toString(),
       email: user.email,
       name: user.fullName,
-      role: user.role
+      role: user.role,
+      tenantId: user.tenantId?.toString()
     }
 
     // Create JWT token

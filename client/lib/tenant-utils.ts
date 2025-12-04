@@ -57,9 +57,9 @@ export async function validateTenantActive(
     if (!tenant.isActive()) return false;
     if (tenant.hasExpired()) return false;
 
-    // Check subscription status
-    const status = tenant.subscription?.plan;
-    if (status === 'cancelled') {
+    // Check tenant status (not subscription plan)
+    const tenantStatus = tenant.status;
+    if (tenantStatus === 'cancelled' || tenantStatus === 'suspended') {
       return false;
     }
 
