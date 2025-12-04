@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       const existingTenant = await Tenant.findOne({
         $or: [
           { slug },
-          { email: tenant.email.toLowerCase() }
+          { 'companyInfo.email': tenant.email.toLowerCase() }
         ]
       })
 
@@ -91,28 +91,37 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // Create new tenant
+      // Create new tenant with correct schema structure
       const newTenant = new Tenant({
         name: tenant.name,
         slug,
-        email: tenant.email.toLowerCase(),
-        phone: tenant.phone || '',
-        website: tenant.website || '',
-        subscription: {
-          tier: 'free',
-          status: 'active',
-          startDate: new Date(),
-          trialEndsAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days trial
+        status: 'trial', // Use trial status for new tenants
+        companyInfo: {
+          name: tenant.name, // REQUIRED field
+          email: tenant.email.toLowerCase(),
+          phone: tenant.phone || '',
+          website: tenant.website || '',
+          address: {
+            country: 'SA', // Default country
+          }
         },
-        branding: {
-          businessName: tenant.name,
+        subscription: {
+          plan: 'trial', // Correct field name (not 'tier')
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 day trial
+          maxUsers: 5,
+          maxVehicles: 100,
         },
         settings: {
-          currency: 'SAR',
-          language: 'en',
           timezone: 'Asia/Riyadh',
+          currency: 'SAR',
+          locale: 'ar-SA', // Correct field name (not 'language')
+          dateFormat: 'DD/MM/YYYY',
         },
-        isActive: true,
+        branding: {
+          primaryColor: '#3b82f6',
+          secondaryColor: '#10b981',
+        },
       })
 
       await newTenant.save()
