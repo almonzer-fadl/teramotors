@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import ResponsiveJobCardsGrid from "@/components/ui/ResponsiveJobCardsGrid";
 import { socketService } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
+import { fadeInUp } from "@/lib/dashboard-animations";
 
 interface JobCard {
   _id: string;
@@ -104,10 +106,12 @@ export default function JobCardsPage() {
       const response = await fetch("/api/job-cards");
       if (response.ok) {
         const data = await response.json();
-        setJobCards(data);
+        // API returns { jobCards: [], pagination: {} } format
+        setJobCards(Array.isArray(data) ? data : (data.jobCards || []));
       }
     } catch (error) {
       console.error("Failed to fetch job cards:", error);
+      setJobCards([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -190,20 +194,26 @@ export default function JobCardsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402] dark:border-[#F97402]"></div>
       </div>
     );
   }
 
   return (
-    <ResponsiveJobCardsGrid
-      jobCards={filteredJobCards}
-      onStatusChange={handleStatusChange}
-      onDeleteJobCard={handleDeleteJobCard}
-      searchTerm={searchTerm}
-      statusFilter={statusFilter}
-      onSearchChange={setSearchTerm}
-      onStatusFilterChange={setStatusFilter}
-    />
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={fadeInUp}
+    >
+      <ResponsiveJobCardsGrid
+        jobCards={filteredJobCards}
+        onStatusChange={handleStatusChange}
+        onDeleteJobCard={handleDeleteJobCard}
+        searchTerm={searchTerm}
+        statusFilter={statusFilter}
+        onSearchChange={setSearchTerm}
+        onStatusFilterChange={setStatusFilter}
+      />
+    </motion.div>
   );
 }

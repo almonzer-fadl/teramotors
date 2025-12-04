@@ -14,6 +14,11 @@ export async function GET(request: NextRequest) {
 
     await connectToDatabase();
 
+    const tenantId = (session.user as any).tenantId;
+    if (!tenantId) {
+      return new Response(JSON.stringify({ error: 'Tenant ID not found' }), { status: 400 });
+    }
+
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
     const sort = searchParams.get('sort') || 'name';
@@ -21,7 +26,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '1000'); // Increased default to show all parts
 
-    const query: any = { isActive: true };
+    const query: any = { isActive: true, tenantId };
 
     if (search) {
       const searchRegex = new RegExp(search, 'i');
@@ -88,6 +93,11 @@ export async function POST(request: Request) {
 
     await connectToDatabase();
 
+    const tenantId = (session.user as any).tenantId;
+    if (!tenantId) {
+      return new Response(JSON.stringify({ error: 'Tenant ID not found' }), { status: 400 });
+    }
+
     const body = await request.json();
 
     // Handle empty partNumber - remove it entirely if empty or null
@@ -95,7 +105,7 @@ export async function POST(request: Request) {
       delete body.partNumber;
     }
 
-    const part = new Part(body);
+    const part = new Part({ ...body, tenantId });
 
     await part.save();
 

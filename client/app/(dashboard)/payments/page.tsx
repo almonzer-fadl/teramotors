@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Plus,
   Search,
@@ -17,6 +17,7 @@ import {
 import Pagination from "@/components/ui/Pagination";
 import ResponsivePaymentsTable from "@/components/ui/ResponsivePaymentsTable";
 import { useTranslation } from "react-i18next";
+import { fadeInUp, staggerContainer } from "@/lib/dashboard-animations";
 
 interface Payment {
   _id: string;
@@ -232,118 +233,107 @@ export default function PaymentsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
-      <div className="space-y-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8 py-6">
+      <motion.div
+        className="space-y-6"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <motion.div
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          variants={fadeInUp}
+        >
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               {t("payments.title")}
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {t("payments.description")}
             </p>
           </div>
           <div className="flex-shrink-0">
             <button
               onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-[#F97402] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#F13F33] transition-colors"
             >
               <Plus className="me-2 h-4 w-4" />
               {t("payments.add_payment")}
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <DollarSign className="h-6 w-6 text-green-400" />
-                </div>
-                <div className="ms-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      {t("payments.total_payments")}
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      ${totalPayments.toFixed(2)}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <CheckCircle className="h-6 w-6 text-green-400" />
-                </div>
-                <div className="ms-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      {t("invoices.paid")}
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      ${completedPayments.toFixed(2)}
-                    </dd>
-                  </dl>
+        <motion.div
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          variants={fadeInUp}
+        >
+          {[
+            {
+              label: t("payments.total_payments"),
+              value: `$${totalPayments.toFixed(2)}`,
+              icon: <DollarSign className="h-6 w-6 text-green-500 dark:text-green-400" />,
+            },
+            {
+              label: t("invoices.paid"),
+              value: `$${completedPayments.toFixed(2)}`,
+              icon: <CheckCircle className="h-6 w-6 text-green-500 dark:text-green-400" />,
+            },
+            {
+              label: t("payments.status.pending"),
+              value: `$${pendingPayments.toFixed(2)}`,
+              icon: <Clock className="h-6 w-6 text-yellow-500 dark:text-yellow-400" />,
+            },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm"
+            >
+              <div className="p-5 flex items-center">
+                <div className="flex-shrink-0">{stat.icon}</div>
+                <div className="ms-4">
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {stat.label}
+                  </p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {stat.value}
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Clock className="h-6 w-6 text-yellow-400" />
-                </div>
-                <div className="ms-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      {t("payments.status.pending")}
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      ${pendingPayments.toFixed(2)}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          ))}
+        </motion.div>
 
         {/* Search and Filters */}
-        <div className="bg-white shadow rounded-lg">
+        <motion.div
+          className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm"
+          variants={fadeInUp}
+        >
           <div className="px-4 py-5 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="relative flex-1 sm:flex-none">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
+                <div className="relative flex-1">
                   <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
                     placeholder={t("payments.search_placeholder")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full ps-10 pe-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:ring-[#F97402] focus:border-[#F97402]"
                   />
                 </div>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2 focus:ring-[#F97402] focus:border-[#F97402]"
                 >
                   <option value="all">{t("payments.all_statuses")}</option>
                   <option value="pending">{t("payments.status.pending")}</option>
@@ -354,7 +344,7 @@ export default function PaymentsPage() {
                 <select
                   value={methodFilter}
                   onChange={(e) => setMethodFilter(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2 focus:ring-[#F97402] focus:border-[#F97402]"
                 >
                   <option value="all">{t("payments.all_methods")}</option>
                   <option value="cash">{t("payments.method.cash")}</option>
@@ -363,27 +353,32 @@ export default function PaymentsPage() {
                   <option value="check">{t("payments.method.check")}</option>
                 </select>
               </div>
-              <div className="text-sm text-gray-500 text-center sm:text-end">
+              <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-end">
                 {t(
-                  pagination.totalCount === 1
+                  filteredPayments.length === 1
                     ? "payments.payment_count"
                     : "payments.payment_count_plural",
-                  { count: pagination.totalCount }
+                  { count: filteredPayments.length }
                 )}
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Payments Table */}
-        <ResponsivePaymentsTable
-          payments={filteredPayments}
-          onStatusUpdate={handlePaymentStatusUpdate}
-        />
+        <motion.div variants={fadeInUp}>
+          <ResponsivePaymentsTable
+            payments={filteredPayments}
+            onStatusUpdate={handlePaymentStatusUpdate}
+          />
+        </motion.div>
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 rounded-lg shadow">
+          <motion.div
+            className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm px-4 py-3 sm:px-6"
+            variants={fadeInUp}
+          >
             <Pagination
               currentPage={pagination.currentPage}
               totalPages={pagination.totalPages}
@@ -394,17 +389,20 @@ export default function PaymentsPage() {
               itemsPerPageOptions={[10, 30, 50]}
               showItemsPerPage={true}
             />
-          </div>
+          </motion.div>
         )}
 
         {/* Empty State */}
         {filteredPayments.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <CreditCard className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium text-gray-900">
+          <motion.div
+            className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-8 text-center"
+            variants={fadeInUp}
+          >
+            <CreditCard className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+            <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
               {t("payments.no_payments_found")}
             </h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
               {searchTerm || statusFilter !== "all" || methodFilter !== "all"
                 ? t("payments.no_payments_match")
                 : t("payments.get_started")}
@@ -413,32 +411,35 @@ export default function PaymentsPage() {
               <div className="mt-6">
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+                  className="inline-flex items-center rounded-lg bg-[#F97402] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#F13F33] transition-colors"
                 >
                   <Plus className="me-2 h-4 w-4" />
                   {t("payments.add_payment")}
                 </button>
               </div>
             )}
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
 
       {/* Payment Creation Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center p-4">
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setShowCreateModal(false)}></div>
-            <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl">
+            <div
+              className="fixed inset-0 bg-gray-900/70"
+              onClick={() => setShowCreateModal(false)}
+            ></div>
+            <div className="relative w-full max-w-2xl rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl">
               <div className="px-6 py-4">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 flex items-center">
-                    <Plus className="me-3 h-6 w-6 text-blue-600" />
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+                    <Plus className="me-3 h-6 w-6 text-[#F97402]" />
                     {t("payments.create_payment")}
                   </h2>
                   <button
                     onClick={() => setShowCreateModal(false)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                   >
                     <X className="h-6 w-6" />
                   </button>
@@ -447,13 +448,13 @@ export default function PaymentsPage() {
                 <form onSubmit={handleCreatePayment} className="space-y-6">
                   {/* Invoice Selection */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {t("payments.select_invoice")} *
                     </label>
                     <select
                       value={selectedInvoiceId}
                       onChange={(e) => handleInvoiceChange(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402]"
                       required
                     >
                       <option value="">{t("payments.select_invoice_placeholder")}</option>
@@ -468,14 +469,14 @@ export default function PaymentsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Amount */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         {t("payments.payment_amount")} *
                       </label>
                       <input
                         type="number"
                         value={paymentForm.amount}
                         onChange={(e) => setPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402]"
                         placeholder="0.00"
                         step="0.01"
                         min="0"
@@ -485,13 +486,13 @@ export default function PaymentsPage() {
 
                     {/* Payment Method */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         {t("payments.payment_method")} *
                       </label>
                       <select
                         value={paymentForm.paymentMethod}
                         onChange={(e) => setPaymentForm(prev => ({ ...prev, paymentMethod: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402]"
                         required
                       >
                         <option value="cash">{t("payments.method.cash")}</option>
@@ -505,28 +506,28 @@ export default function PaymentsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Payment Date */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         {t("payments.payment_date")} *
                       </label>
                       <input
                         type="date"
                         value={paymentForm.paymentDate}
                         onChange={(e) => setPaymentForm(prev => ({ ...prev, paymentDate: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402]"
                         required
                       />
                     </div>
 
                     {/* Reference */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         {t("payments.reference_number")}
                       </label>
                       <input
                         type="text"
                         value={paymentForm.reference}
                         onChange={(e) => setPaymentForm(prev => ({ ...prev, reference: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402]"
                         placeholder={t("ui.enter_transaction_reference")}
                       />
                     </div>
@@ -534,13 +535,13 @@ export default function PaymentsPage() {
 
                   {/* Notes */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {t("payments.notes")}
                     </label>
                     <textarea
                       value={paymentForm.notes}
                       onChange={(e) => setPaymentForm(prev => ({ ...prev, notes: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 resize-none"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402] resize-none"
                       rows={3}
                       placeholder={t("payments.additional_notes")}
                     />
@@ -551,14 +552,14 @@ export default function PaymentsPage() {
                     <button
                       type="button"
                       onClick={() => setShowCreateModal(false)}
-                      className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                      className="px-4 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       {t("forms.cancel")}
                     </button>
                     <button
                       type="submit"
                       disabled={creating}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#F97402] hover:bg-[#F13F33] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {creating ? t('ui.creating') : t('payments.create_payment')}
                     </button>

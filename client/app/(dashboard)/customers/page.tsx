@@ -14,11 +14,13 @@ import {
   Users,
   ArrowUpDown,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Search from "@/components/dashboard/Search";
 import Pagination from "@/components/ui/Pagination";
 import ResponsiveTable from "@/components/ui/ResponsiveTable";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
+import { fadeInUp, staggerContainer, scaleIn } from "@/lib/dashboard-animations";
 
 interface Customer {
   _id: string;
@@ -220,37 +222,52 @@ export default function CustomersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402] dark:border-[#F97402]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
-      <div className="space-y-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8 py-6">
+      <motion.div
+        className="space-y-6"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <motion.div
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          variants={fadeInUp}
+        >
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               {t("customers.title")}
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {t("customers.description")}
             </p>
           </div>
-          <div className="flex-shrink-0">
+          <motion.div
+            className="flex-shrink-0"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
             <Link
               href="/customers/new"
-              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-[#F97402] hover:bg-[#F13F33] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300"
             >
               <Plus className="me-2 h-4 w-4" />
               {t("customers.add_customer")}
             </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Search and Stats */}
-        <div className="bg-white shadow rounded-lg">
+        <motion.div
+          className="bg-white dark:bg-gray-900 shadow-sm dark:shadow-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-800"
+          variants={scaleIn}
+        >
           <div className="px-4 py-5 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="w-full sm:w-1/2">
@@ -262,15 +279,15 @@ export default function CustomersPage() {
                   }
                   renderSuggestion={(customer: Customer) => (
                     <div>
-                      <p className="font-medium">
+                      <p className="font-medium text-gray-900 dark:text-white">
                         {customer.firstName} {customer.lastName}
                       </p>
-                      <p className="text-sm text-gray-500">{customer.email}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{customer.email}</p>
                     </div>
                   )}
                 />
               </div>
-              <div className="text-sm text-gray-500 text-center sm:text-end">
+              <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-end">
                 {t(
                   pagination.totalCount === 1
                     ? "customers.customer_count"
@@ -280,59 +297,81 @@ export default function CustomersPage() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Customers Table */}
-        <ResponsiveTable
-          customers={sortedCustomers}
-          onDelete={handleDelete}
-          onSort={handleSort}
-          sortKey={sortKey}
-          sortDirection={sortDirection}
-        />
+        <motion.div variants={fadeInUp}>
+          <ResponsiveTable
+            customers={sortedCustomers}
+            onDelete={handleDelete}
+            onSort={handleSort}
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+          />
+        </motion.div>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
-          <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 rounded-lg shadow">
-            <Pagination
-              currentPage={pagination.currentPage}
-              totalPages={pagination.totalPages}
-              totalItems={pagination.totalCount}
-              itemsPerPage={pagination.limit}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleItemsPerPageChange}
-              itemsPerPageOptions={[10, 30, 50]}
-              showItemsPerPage={true}
-            />
-          </div>
-        )}
+        <AnimatePresence>
+          {pagination.totalPages > 1 && (
+            <motion.div
+              className="bg-white dark:bg-gray-900 px-4 py-3 border-t border-gray-200 dark:border-gray-800 sm:px-6 rounded-lg shadow-sm dark:shadow-gray-800/50"
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, y: 20 }}
+            >
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                totalItems={pagination.totalCount}
+                itemsPerPage={pagination.limit}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={handleItemsPerPageChange}
+                itemsPerPageOptions={[10, 30, 50]}
+                showItemsPerPage={true}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Empty State */}
-        {sortedCustomers.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <Users className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium text-gray-900">
-              {t("customers.no_customers_found")}
-            </h3>
-            <p className="mt-2 text-sm text-gray-500">
-              {searchTerm
-                ? t("customers.adjust_search")
-                : t("customers.get_started")}
-            </p>
-            {!searchTerm && (
-              <div className="mt-6">
-                <Link
-                  href="/customers/new"
-                  className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+        <AnimatePresence>
+          {sortedCustomers.length === 0 && (
+            <motion.div
+              className="bg-white dark:bg-gray-900 rounded-lg shadow-sm dark:shadow-gray-800/50 border border-gray-200 dark:border-gray-800 p-8 text-center"
+              variants={scaleIn}
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, scale: 0.95 }}
+            >
+              <Users className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                {t("customers.no_customers_found")}
+              </h3>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {searchTerm
+                  ? t("customers.adjust_search")
+                  : t("customers.get_started")}
+              </p>
+              {!searchTerm && (
+                <motion.div
+                  className="mt-6"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <Plus className="me-2 h-4 w-4" />
-                  {t("customers.add_customer")}
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+                  <Link
+                    href="/customers/new"
+                    className="inline-flex items-center rounded-lg bg-[#F97402] hover:bg-[#F13F33] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300"
+                  >
+                    <Plus className="me-2 h-4 w-4" />
+                    {t("customers.add_customer")}
+                  </Link>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }
