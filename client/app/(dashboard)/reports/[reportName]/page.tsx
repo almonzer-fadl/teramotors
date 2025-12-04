@@ -91,11 +91,6 @@ export default function DetailedReportPage() {
         fetchData();
     }, [reportName, dateRange]);
 
-    const handleExport = () => {
-        // TODO: Implement CSV export
-        alert('Exporting to CSV is not yet implemented.');
-    }
-    
     const renderReport = () => {
         if (!data) {
             if (reportName === 'profit-and-loss') return <ProfitAndLossReport data={null} />;
@@ -156,13 +151,6 @@ export default function DetailedReportPage() {
                     </div>
                      <div className="flex items-center gap-2">
                         {reportName !== 'accounts-receivable' && reportName !== 'inventory-valuation' && <DateRangePicker date={dateRange} onDateChange={setDateRange} />}
-                        <button
-                            onClick={handleExport}
-                            className="inline-flex items-center justify-center px-4 py-2 rounded-xl font-semibold text-sm bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#F97402] hover:text-[#F97402] hover:bg-[#F97402]/5 active:scale-[0.98] transition-all duration-200"
-                        >
-                            <Download className="me-2 h-4 w-4" />
-                            {t('ui.export_as_csv')}
-                        </button>
                     </div>
                 </motion.div>
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react'; // ADDED useRef
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Loader2, Save, Building, Phone, Mail, Globe, Palette } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const FormInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
     <input {...props} className="w-full px-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200" />
@@ -16,6 +17,13 @@ export default function CompanyProfileSettings() {
     const { t } = useTranslation('common');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
+    
+    // State for the logo uploader
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [uploadingLogo, setUploadingLogo] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null); // ADDED useRef
+    
     const [formData, setFormData] = useState({
         companyInfo: {
             name: '',
@@ -46,9 +54,14 @@ export default function CompanyProfileSettings() {
                 if (response.ok) {
                     const data = await response.json();
                     setFormData(prev => ({
+                        ...prev,
                         companyInfo: { ...prev.companyInfo, ...data.companyInfo },
                         branding: { ...prev.branding, ...data.branding }
                     }));
+                    // Set initial preview URL if logo exists
+                    if (data.branding?.logoUrl) {
+                        setPreviewUrl(data.branding.logoUrl);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to fetch company profile", error);
@@ -78,13 +91,57 @@ export default function CompanyProfileSettings() {
         }));
     };
 
-    const handleBrandingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            branding: { ...prev.branding, [name]: value }
-        }));
+    // Handler for file input change
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+        } else {
+            setSelectedFile(null);
+            setPreviewUrl(formData.branding.logoUrl || null); // Revert to current saved logo or null
+        }
     };
+
+    // Handler for uploading the selected logo file
+    const handleUploadLogo = async () => {
+        if (!selectedFile) return;
+
+        setUploadingLogo(true);
+        try {
+            const data = new FormData();
+            data.append('logo', selectedFile);
+
+            const response = await fetch('/api/upload/logo', {
+                method: 'POST',
+                body: data,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to upload logo.');
+            }
+
+            const result = await response.json();
+            const newLogoUrl = result.url;
+
+            // Update local form data with new logo URL
+            setFormData(prev => ({
+                ...prev,
+                branding: { ...prev.branding, logoUrl: newLogoUrl }
+            }));
+            setSelectedFile(null); // Clear selected file after successful upload
+            
+            toast.success('Logo uploaded! Click "Save Changes" to apply it to your profile.');
+
+        } catch (error) {
+            console.error("Error uploading logo", error);
+            toast.error(`Logo upload failed: ${(error as Error).message}`);
+        } finally {
+            setUploadingLogo(false);
+        }
+    };
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -99,10 +156,10 @@ export default function CompanyProfileSettings() {
                  const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to save settings');
             }
-            // Add a success toast/message here
+            toast.success('Profile saved successfully!');
         } catch (error) {
             console.error("Error saving company profile", error);
-            // Add an error toast/message here
+            toast.error(`Failed to save profile: ${(error as Error).message}`);
         } finally {
             setSaving(false);
         }
@@ -179,15 +236,40 @@ export default function CompanyProfileSettings() {
                         <FormInput name="website" type="url" value={formData.companyInfo.website} onChange={handleInfoChange} placeholder="https://example.com" />
                     </div>
                      <div>
-                        <FormLabel>Logo URL</FormLabel>
-                        <FormInput name="logoUrl" value={formData.branding.logoUrl} onChange={handleBrandingChange} placeholder="https://path/to/logo.png" />
-                        {/* TODO: Add file upload component */}
+                        <FormLabel>Company Logo</FormLabel>
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
+                        <div className="flex items-center space-x-4">
+                            {previewUrl && (
+                                <img src={previewUrl} alt="Logo Preview" className="h-20 w-20 object-contain rounded-xl border border-gray-200 dark:border-gray-700" />
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+                                disabled={uploadingLogo}
+                            >
+                                {selectedFile ? 'Change File' : 'Select Logo'}
+                            </button>
+                            {selectedFile && (
+                                <button
+                                    type="button"
+                                    onClick={handleUploadLogo}
+                                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50"
+                                    disabled={uploadingLogo}
+                                >
+                                    {uploadingLogo ? <Loader2 className="me-2 h-5 w-5 animate-spin" /> : 'Upload'}
+                                </button>
+                            )}
+                            {!selectedFile && formData.branding.logoUrl && (
+                                <a href={formData.branding.logoUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline">View Current</a>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div className="flex justify-end">
-                 <button type="submit" disabled={saving} className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200">
+                 <button type="submit" disabled={saving || uploadingLogo} className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200">
                     {saving ? <><Loader2 className="me-2 h-5 w-5 animate-spin" />{t("forms.saving")}</> : <><Save className="me-2 h-5 w-5" /> Save Changes</>}
                 </button>
             </div>

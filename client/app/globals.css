@@ -1,3 +1,4 @@
+@import "../themes.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -265,16 +266,16 @@
 
   /* Gradient backgrounds */
   .gradient-brand {
-    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
   }
 
   .gradient-brand-subtle {
-    background: linear-gradient(135deg, rgba(249, 116, 2, 0.1) 0%, rgba(241, 63, 51, 0.1) 100%);
+    background: linear-gradient(135deg, oklch(from var(--primary) l c h / 0.1) 0%, oklch(from var(--accent) l c h / 0.1) 100%);
   }
 
   /* Text gradient */
   .text-gradient {
-    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
