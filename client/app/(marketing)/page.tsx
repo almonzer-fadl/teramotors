@@ -530,7 +530,7 @@ export default function LandingPage() {
                           {config.features.slice(0, 5).map((feature, i) => (
                             <li key={i} className="flex items-start text-sm">
                               <CheckCircle2 className="w-5 h-5 text-emerald-500 me-2 flex-shrink-0" />
-                              <span className="text-gray-600 dark:text-gray-300">{feature}</span>
+                              <span className="text-gray-600 dark:text-gray-300">{feature.name}</span>
                             </li>
                           ))}
                         </ul>

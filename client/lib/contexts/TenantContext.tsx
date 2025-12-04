@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { useSession } from 'next-auth/react'
+import { useSession } from '@/lib/hooks/useSession'
 
 // Subscription tier types
 export type SubscriptionTier = 'free' | 'basic' | 'pro' | 'enterprise'
@@ -64,7 +64,7 @@ interface TenantProviderProps {
 }
 
 export function TenantProvider({ children }: TenantProviderProps) {
-  const { data: session, status } = useSession()
+  const { user, isLoading: sessionLoading, isAuthenticated } = useSession()
   const [tenant, setTenant] = useState<Tenant | null>(null)
   const [branding, setBranding] = useState<TenantBranding>(defaultBranding)
   const [subscription, setSubscription] = useState<TenantSubscription>(defaultSubscription)
@@ -73,8 +73,8 @@ export function TenantProvider({ children }: TenantProviderProps) {
 
   // Fetch tenant data
   const fetchTenant = useCallback(async () => {
-    if (status === 'loading') return
-    if (status === 'unauthenticated') {
+    if (sessionLoading) return
+    if (!isAuthenticated) {
       setIsLoading(false)
       return
     }
@@ -117,7 +117,7 @@ export function TenantProvider({ children }: TenantProviderProps) {
     } finally {
       setIsLoading(false)
     }
-  }, [status])
+  }, [sessionLoading, isAuthenticated])
 
   // Refresh tenant data
   const refreshTenant = useCallback(async () => {
