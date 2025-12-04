@@ -15,6 +15,11 @@ export async function POST(
 
     await connectToDatabase()
 
+    const tenantId = (session.user as any).tenantId
+    if (!tenantId) {
+      return Response.json({ error: 'Tenant ID not found' }, { status: 400 })
+    }
+
     const { id } = await context.params
     const job = await JobCard.findById(id)
     if (!job) return Response.json({ error: 'Job card not found' }, { status: 404 })
@@ -23,10 +28,10 @@ export async function POST(
     const role = body?.role || session.user.role || 'mechanic'
 
     // Prevent duplicate active logs for this user on this job
-    const existing = await WorkLog.findOne({ jobCardId: id, userId: session.user.id, endedAt: { $exists: false } })
+    const existing = await WorkLog.findOne({ tenantId, jobCardId: id, userId: session.user.id, endedAt: { $exists: false } })
     if (existing) return Response.json({ success: true, workLog: existing })
 
-    const log = new WorkLog({ jobCardId: id, userId: session.user.id, role, startedAt: new Date() })
+    const log = new WorkLog({ tenantId, jobCardId: id, userId: session.user.id, role, startedAt: new Date() })
     await log.save()
 
     return Response.json({ success: true, workLog: log })

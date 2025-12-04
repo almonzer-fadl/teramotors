@@ -3,12 +3,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Parser } from 'json2csv';
 import Vehicle from '@/lib/models/Vehicle';
 import { connectToDatabase } from '@/lib/db';
+import { getServerSession } from "@/lib/auth-server";
 
 export async function GET(req: NextRequest) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     await connectToDatabase();
 
-    const vehicles = await Vehicle.find({}).populate('customerId', 'firstName lastName isActive');
+    const tenantId = (session.user as any).tenantId;
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant ID not found' }, { status: 400 });
+    }
+
+    const vehicles = await Vehicle.find({ tenantId }).populate('customerId', 'firstName lastName isActive');
 
     const fields = [
       { label: 'VIN', value: 'vin' },

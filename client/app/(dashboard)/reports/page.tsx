@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useCallback } from 'react'
 import Pagination from '@/components/ui/Pagination'
 import { useSession } from '@/lib/hooks/useSession'
 import { hasPermission } from '@/lib/roles'
-import { 
+import {
   DollarSign,
   TrendingUp,
   TrendingDown,
@@ -22,7 +21,6 @@ import {
   Banknote
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { fadeInUp, scaleIn, staggerContainer } from '@/lib/dashboard-animations'
 
 interface ReportData {
   // Financial Summary
@@ -89,9 +87,18 @@ export default function ReportsPage() {
   useEffect(() => {
     if (canAccessReports) {
       fetchReportData()
-      fetchWorkLogs()
     }
-  }, [canAccessReports, dateRange, logsPage, logsLimit])
+  }, [canAccessReports, dateRange])
+
+  useEffect(() => {
+    if (canAccessReports) {
+      // Debounce work logs fetching to avoid excessive calls
+      const timeoutId = setTimeout(() => {
+        fetchWorkLogs()
+      }, 300)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [canAccessReports, logsPage, logsLimit, filterRole, filterUserId, filterJobCardIdEnds, filterStartDate, filterEndDate, filterMinDuration, filterMaxDuration])
 
   const fetchReportData = async () => {
     try {
@@ -177,14 +184,9 @@ export default function ReportsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8 py-6">
-      <motion.div
-        className="space-y-6"
-        variants={staggerContainer}
-        initial="hidden"
-        animate="visible"
-      >
+      <div className="space-y-6">
         {/* Header */}
-        <motion.div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" variants={fadeInUp}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
               {t('reports.title')}
@@ -212,10 +214,10 @@ export default function ReportsPage() {
               {t('reports.export_excel')}
             </button>
           </div>
-        </motion.div>
+        </div>
 
         {/* Financial Summary Cards */}
-        <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" variants={fadeInUp}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0">
@@ -301,10 +303,10 @@ export default function ReportsPage() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Revenue Breakdown */}
-        <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-6" variants={fadeInUp}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.revenue_breakdown')}</h3>
@@ -356,10 +358,10 @@ export default function ReportsPage() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Top Revenue Sources */}
-        <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-6" variants={fadeInUp}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.top_services')}</h3>
@@ -453,10 +455,10 @@ export default function ReportsPage() {
               </table>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Financial Health Summary */}
-        <motion.div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm" variants={fadeInUp}>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.financial_health')}</h3>
           </div>
@@ -488,10 +490,10 @@ export default function ReportsPage() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Work Logs */}
-        <motion.div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm" variants={fadeInUp}>
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.work_logs')}</h3>
             <div className="text-sm text-gray-500 dark:text-gray-400">{t('reports.latest_n', { count: workLogs.length })}</div>
@@ -552,8 +554,8 @@ export default function ReportsPage() {
               </tbody>
             </table>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   )
 }

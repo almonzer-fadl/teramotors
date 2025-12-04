@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IWhatsAppMessage extends Document {
+  tenantId: mongoose.Types.ObjectId;
   customerId: mongoose.Types.ObjectId;
   messageType: 'welcome' | 'job_started' | 'job_completed' | 'invoice_ready' | 'advertisement';
   content: string;
@@ -17,6 +18,11 @@ export interface IWhatsAppMessage extends Document {
 }
 
 const WhatsAppMessageSchema = new Schema<IWhatsAppMessage>({
+  tenantId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Tenant',
+    required: true
+  },
   customerId: {
     type: Schema.Types.ObjectId,
     ref: 'Customer',
