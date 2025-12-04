@@ -1,53 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Vehicle from '@/lib/models/Vehicle';
-import { getServerSession } from "@/lib/auth-server";
+import Customer from '@/lib/models/Customer';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// GET /api/vehicles/[id] - Get single vehicle
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const vehicle = await Vehicle.findById(id)
+
+    // Filter by BOTH id AND tenantId
+    const vehicle = await Vehicle.findOne({
+      _id: params?.id,
+      tenantId,
+    })
       .populate('customerId', 'firstName lastName isActive')
       .populate('serviceHistory.serviceId', 'name');
-    
+
     if (!vehicle) {
-      return new Response(JSON.stringify({ error: 'Vehicle not found' }), { status: 404 });
+      return NextResponse.json(
+        { error: 'Vehicle not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify(vehicle));
-  } catch (error) {
-    console.error('Error fetching vehicle:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch vehicle' }), { status: 500 });
-  }
-}
+    return NextResponse.json(vehicle);
+  },
+  { requireTenant: true }
+);
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// PUT /api/vehicles/[id] - Update vehicle
+export const PUT = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const body = await request.json();
-    
-    const vehicle = await Vehicle.findByIdAndUpdate(
-      id,
+
+    const body = await req.json();
+
+    // Update only if belongs to tenant
+    const vehicle = await Vehicle.findOneAndUpdate(
+      { _id: params?.id, tenantId },
       {
         vin: body.vin,
         make: body.make,
@@ -60,44 +51,54 @@ export async function PUT(
         transmission: body.transmission,
         fuelType: body.fuelType,
         photos: body.photos,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!vehicle) {
-      return new Response(JSON.stringify({ error: 'Vehicle not found' }), { status: 404 });
+      return NextResponse.json(
+        { error: 'Vehicle not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify({ success: true, vehicle }));
-  } catch (error) {
-    console.error('Error updating vehicle:', error);
-    return new Response(JSON.stringify({ error: 'Failed to update vehicle' }), { status: 500 });
-  }
-}
+    return NextResponse.json({ success: true, vehicle });
+  },
+  { requireTenant: true }
+);
 
-export async function DELETE(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// DELETE /api/vehicles/[id] - Delete vehicle
+export const DELETE = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const deleted = await Vehicle.findByIdAndDelete(id);
 
-    if (!deleted) {
-      return new Response(JSON.stringify({ error: 'Vehicle not found' }), { status: 404 });
+    // First get the vehicle to find its customer
+    const vehicle = await Vehicle.findOne({
+      _id: params?.id,
+      tenantId,
+    });
+
+    if (!vehicle) {
+      return NextResponse.json(
+        { error: 'Vehicle not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify({ success: true }));
-  } catch (error) {
-    console.error('Error deleting vehicle:', error);
-    return new Response(JSON.stringify({ error: 'Failed to delete vehicle' }), { status: 500 });
-  }
-}
+    // Remove vehicle from customer's vehicles array
+    await Customer.findOneAndUpdate(
+      { _id: vehicle.customerId, tenantId },
+      { $pull: { vehicles: vehicle._id } }
+    );
+
+    // Delete the vehicle
+    await Vehicle.findOneAndDelete({
+      _id: params?.id,
+      tenantId,
+    });
+
+    return NextResponse.json({ success: true });
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);

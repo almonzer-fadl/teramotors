@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
-import { getServerSession } from "@/lib/auth-server";
-import { JobCard, Customer, Vehicle, Service, Part, Appointment } from '@/lib/models';
+import { JobCard } from '@/lib/models';
 import { WhatsAppEventListeners } from '@/lib/services/WhatsAppEventListeners';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
+// GET /api/job-cards/[id] - Get single job card
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
 
-    const jobCard = await JobCard.findById(id)
+    // Filter by BOTH id AND tenantId
+    const jobCard = await JobCard.findOne({
+      _id: params?.id,
+      tenantId,
+    })
       .populate('appointmentId')
-      .populate('inspectionId', 'inspectionDate items nextInspectionDate nextInspectionMonths')
+      .populate(
+        'inspectionId',
+        'inspectionDate items nextInspectionDate nextInspectionMonths'
+      )
       .populate('customerId', 'firstName lastName email phone')
       .populate('vehicleId', 'make model year licensePlate')
       .populate('mechanicId', 'userId')
@@ -27,44 +26,46 @@ export async function GET(
       .populate('partsUsed.partId', 'name partNumber cost');
 
     if (!jobCard) {
-      return NextResponse.json({ error: 'Job card not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Job card not found' },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(jobCard);
-  } catch (error) {
-    console.error('Error fetching job card:', error);
-    return NextResponse.json({ error: 'Failed to fetch job card' }, { status: 500 });
-  }
-}
+  },
+  { requireTenant: true }
+);
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
+// PUT /api/job-cards/[id] - Update job card
+export const PUT = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const body = await request.json();
-    
+
+    const body = await req.json();
+
     // Filter out empty appointmentId to prevent ObjectId casting error
     const updateData = { ...body };
-    if (updateData.appointmentId === '' || updateData.appointmentId === null || updateData.appointmentId === undefined) {
+    if (
+      updateData.appointmentId === '' ||
+      updateData.appointmentId === null ||
+      updateData.appointmentId === undefined
+    ) {
       delete updateData.appointmentId;
     }
-    if (updateData.inspectionId === '' || updateData.inspectionId === null || updateData.inspectionId === undefined) {
+    if (
+      updateData.inspectionId === '' ||
+      updateData.inspectionId === null ||
+      updateData.inspectionId === undefined
+    ) {
       delete updateData.inspectionId;
     }
-    
-    const jobCard = await JobCard.findByIdAndUpdate(
-      id,
+
+    // Update only if belongs to tenant
+    const jobCard = await JobCard.findOneAndUpdate(
+      { _id: params?.id, tenantId },
       updateData,
-      { new: true }
+      { new: true, runValidators: true }
     )
       .populate('appointmentId')
       .populate('customerId', 'firstName lastName email phone')
@@ -73,7 +74,10 @@ export async function PUT(
       .populate('partsUsed.partId', 'name partNumber cost');
 
     if (!jobCard) {
-      return NextResponse.json({ error: 'Job card not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Job card not found' },
+        { status: 404 }
+      );
     }
 
     // Check if job card status changed to completed
@@ -82,46 +86,37 @@ export async function PUT(
         const whatsappListeners = WhatsAppEventListeners.getInstance();
         await whatsappListeners.onJobCardClosed(jobCard.customerId.toString());
       } catch (whatsappError) {
-        console.error('Error sending job completed WhatsApp message:', whatsappError);
-        // Don't fail the job card update if WhatsApp fails
+        console.error(
+          'Error sending job completed WhatsApp message:',
+          whatsappError
+        );
       }
     }
 
     return NextResponse.json(jobCard);
-  } catch (error) {
-    console.error('Error updating job card:', error);
-    return NextResponse.json({ error: 'Failed to update job card' }, { status: 500 });
-  }
-}
+  },
+  { requireTenant: true }
+);
 
-export async function DELETE(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin
-    const userRole = (session.user as any).role;
-    if (userRole !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
-    }
-
+// DELETE /api/job-cards/[id] - Delete job card (admin only)
+export const DELETE = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const jobCard = await JobCard.findByIdAndDelete(id);
+
+    // Delete only if belongs to tenant
+    const jobCard = await JobCard.findOneAndDelete({
+      _id: params?.id,
+      tenantId,
+    });
 
     if (!jobCard) {
-      return NextResponse.json({ error: 'Job card not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Job card not found' },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({ message: 'Job card deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting job card:', error);
-    return NextResponse.json({ error: 'Failed to delete job card' }, { status: 500 });
-  }
-}
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);

@@ -1,23 +1,20 @@
 import { connectToDatabase } from '@/lib/db';
 import Service from '@/lib/models/Service';
-import { getServerSession } from "@/lib/auth-server";
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(request: NextRequest) {
-  try {
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// GET /api/services - List services for tenant
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
     await connectToDatabase();
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || '';
     const isTemplate = searchParams.get('isTemplate') === 'true';
 
-    const query: any = { isActive: true };
+    // Build query with tenant filter
+    const query: Record<string, unknown> = { tenantId, isActive: true };
 
     if (isTemplate) {
       query.isTemplate = true;
@@ -25,43 +22,49 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       const searchRegex = new RegExp(search, 'i');
-      query.$or = [
-        { name: searchRegex },
-        { description: searchRegex },
-      ];
+      query.$or = [{ name: searchRegex }, { description: searchRegex }];
     }
-    
+
     if (category) {
       query.category = category;
     }
 
     const services = await Service.find(query).sort({ name: 1 });
 
-    return new Response(JSON.stringify(services));
-  } catch (error) {
-    console.error('Error fetching services:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch services' }), { status: 500 });
-  }
-}
+    return NextResponse.json(services);
+  },
+  { requireTenant: true }
+);
 
-export async function POST(request: Request) {
-  try {
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+// POST /api/services - Create service for tenant
+export const POST = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
+    await connectToDatabase();
+
+    const body = await req.json();
+
+    // Check if service code already exists for this tenant
+    if (body.code) {
+      const existing = await Service.findOne({
+        tenantId,
+        code: body.code,
+      });
+      if (existing) {
+        return NextResponse.json(
+          { error: 'Service code already exists' },
+          { status: 400 }
+        );
+      }
     }
 
-    await connectToDatabase();
-    
-    const body = await request.json();
-    
-    const service = new Service(body);
+    const service = new Service({
+      ...body,
+      tenantId, // Always set tenantId from auth context
+    });
 
     await service.save();
 
-    return new Response(JSON.stringify({ success: true, service }), { status: 201 });
-  } catch (error) {
-    console.error('Error creating service:', error);
-    return new Response(JSON.stringify({ error: 'Failed to create service' }), { status: 500 });
-  }
-}
+    return NextResponse.json({ success: true, service }, { status: 201 });
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);
