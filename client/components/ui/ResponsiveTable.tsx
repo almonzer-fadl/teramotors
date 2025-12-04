@@ -122,8 +122,8 @@ export default function ResponsiveTable({
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
-                    {customer.vehicles} {t("customers.vehicles")}
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-50/80 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-800/30 backdrop-blur-sm">
+                    {typeof customer.vehicles === 'number' ? customer.vehicles : (Array.isArray(customer.vehicles) ? customer.vehicles.length : 0)} {t("customers.vehicles")}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -233,8 +233,8 @@ export default function ResponsiveTable({
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
-                      {customer.vehicles} {t("customers.vehicles")}
+                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-50/80 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200/50 dark:border-blue-800/30 backdrop-blur-sm">
+                      {typeof customer.vehicles === 'number' ? customer.vehicles : (Array.isArray(customer.vehicles) ? customer.vehicles.length : 0)} {t("customers.vehicles")}
                     </span>
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

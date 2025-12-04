@@ -32,6 +32,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/dashboard/LanguageSwitcher";
 import { NotificationBell } from "@/components/dashboard/NotificationBell";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { useReferenceData } from "@/lib/stores/referenceDataStore";
 
 // Icon mapping for dynamic navigation
 const iconMap = {
@@ -64,6 +65,14 @@ export default function DashboardLayout({
   const userRole = (user as any)?.role || "mechanic";
   const navigation = getNavigationItems(userRole);
 
+  // Initialize global reference data cache
+  const {
+    fetchCustomers,
+    fetchVehicles,
+    fetchServices,
+    fetchParts,
+  } = useReferenceData();
+
   // Auto-collapse sidebar on dashboard
   useEffect(() => {
     setSidebarCollapsed(pathname === '/dashboard');
@@ -78,6 +87,21 @@ export default function DashboardLayout({
       console.log("Disconnecting from socket...");
     };
   }, []);
+
+  // Pre-load reference data on mount (cache will prevent duplicate requests)
+  useEffect(() => {
+    if (user) {
+      // Fetch all reference data in parallel on dashboard load
+      Promise.all([
+        fetchCustomers(),
+        fetchVehicles(),
+        fetchServices(),
+        fetchParts(),
+      ]).catch((error) => {
+        console.error("Error pre-loading reference data:", error);
+      });
+    }
+  }, [user, fetchCustomers, fetchVehicles, fetchServices, fetchParts]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">

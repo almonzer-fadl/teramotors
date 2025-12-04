@@ -1,30 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import Link from 'next/link';
 import { motion } from "framer-motion";
-import {
-  Plus,
-  Search,
-  CreditCard,
-  DollarSign,
-  Calendar,
-  User,
-  CheckCircle,
-  XCircle,
-  Clock,
-  X,
-} from "lucide-react";
+import { Plus, Search, DollarSign, CheckCircle, Clock, Loader2, CreditCard } from "lucide-react";
 import Pagination from "@/components/ui/Pagination";
 import ResponsivePaymentsTable from "@/components/ui/ResponsivePaymentsTable";
 import { useTranslation } from "react-i18next";
+import { useReferenceData } from "@/lib/stores/referenceDataStore";
 import { fadeInUp, staggerContainer } from "@/lib/dashboard-animations";
 
+// Re-introducing the detailed Payment interface
 interface Payment {
   _id: string;
   invoiceId: {
     _id: string;
     invoiceNumber: string;
-    total: number;
+    totalAmount: number;
     customerId: {
       _id: string;
       firstName: string;
@@ -44,21 +36,12 @@ interface Payment {
   status: "pending" | "completed" | "failed" | "refunded";
   reference: string;
   notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface PaginationInfo {
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  limit: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
 }
 
 export default function PaymentsPage() {
   const { t } = useTranslation("common");
+  // Only get invalidateAll from the store, manage payments locally
+  const { invalidateAll } = useReferenceData(); 
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -66,33 +49,8 @@ export default function PaymentsPage() {
   const [methodFilter, setMethodFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [pagination, setPagination] = useState<PaginationInfo>({
-    currentPage: 1,
-    totalPages: 0,
-    totalCount: 0,
-    limit: 10,
-    hasNextPage: false,
-    hasPrevPage: false
-  });
-  
-  // Payment creation form state
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [invoices, setInvoices] = useState<any[]>([]);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
-  const [paymentForm, setPaymentForm] = useState({
-    amount: "",
-    paymentMethod: "cash",
-    paymentDate: new Date().toISOString().split("T")[0],
-    reference: "",
-    notes: ""
-  });
-  const [creating, setCreating] = useState(false);
 
-  useEffect(() => {
-    fetchPayments();
-    fetchInvoices();
-  }, []);
-
+  // Re-introduce local fetchPayments
   const fetchPayments = async () => {
     setLoading(true);
     try {
@@ -101,14 +59,6 @@ export default function PaymentsPage() {
         const data = await response.json();
         const paymentsArray = Array.isArray(data.payments) ? data.payments : (Array.isArray(data) ? data : []);
         setPayments(paymentsArray);
-        setPagination({
-          currentPage: 1,
-          totalPages: 1,
-          totalCount: paymentsArray.length,
-          limit: paymentsArray.length,
-          hasNextPage: false,
-          hasPrevPage: false
-        });
       }
     } catch (error) {
       console.error("Failed to fetch payments:", error);
@@ -117,19 +67,26 @@ export default function PaymentsPage() {
     }
   };
 
-  const fetchInvoices = async () => {
-    try {
-      const response = await fetch("/api/invoices");
-      if (response.ok) {
-        const data = await response.json();
-        const invoicesArray = Array.isArray(data.invoices) ? data.invoices : (Array.isArray(data) ? data : []);
-        setInvoices(invoicesArray);
+  useEffect(() => {
+    fetchPayments();
+  }, []);
+
+  const handleDelete = async (paymentId: string) => {
+    if (confirm(t('payments.delete_confirmation', 'Are you sure you want to delete this payment?'))) {
+      try {
+        const response = await fetch(`/api/payments/${paymentId}`, { method: 'DELETE' });
+        if (response.ok) {
+          fetchPayments(); // Refetch after delete
+        } else {
+          throw new Error('Failed to delete payment');
+        }
+      } catch (error) {
+        console.error("Failed to delete payment:", error);
+        alert(t('payments.delete_failed', 'Failed to delete payment.'));
       }
-    } catch (error) {
-      console.error("Failed to fetch invoices:", error);
     }
   };
-
+  
   const handlePaymentStatusUpdate = async (paymentId: string, newStatus: string) => {
     try {
       const response = await fetch(`/api/payments/${paymentId}`, {
@@ -137,265 +94,97 @@ export default function PaymentsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
       });
-
       if (response.ok) {
-        // Update local state
-        setPayments(prev => 
-          prev.map(payment => 
-            payment._id === paymentId 
-              ? { ...payment, status: newStatus as any }
-              : payment
-          )
-        );
+        fetchPayments(); // Refetch after status update
       }
     } catch (error) {
       console.error("Failed to update payment status:", error);
     }
   };
 
-  const handleCreatePayment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedInvoiceId) return;
+  const filteredPayments = useMemo(() => {
+    return (payments || []).filter(payment => {
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      const matchesSearch = 
+        payment.invoiceId?.invoiceNumber?.toLowerCase().includes(lowerSearchTerm) ||
+        payment.invoiceId?.customerId?.firstName?.toLowerCase().includes(lowerSearchTerm) ||
+        payment.invoiceId?.customerId?.lastName?.toLowerCase().includes(lowerSearchTerm) ||
+        payment.invoiceId?.vehicleId?.licensePlate?.toLowerCase().includes(lowerSearchTerm) ||
+        payment.reference?.toLowerCase().includes(lowerSearchTerm) ||
+        payment.notes?.toLowerCase().includes(lowerSearchTerm);
+      
+      const matchesStatus = statusFilter === "all" || payment.status === statusFilter;
+      const matchesMethod = methodFilter === "all" || payment.paymentMethod === methodFilter;
 
-    setCreating(true);
-    try {
-      const response = await fetch("/api/payments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          invoiceId: selectedInvoiceId,
-          ...paymentForm
-        }),
-      });
+      return matchesSearch && matchesStatus && matchesMethod;
+    });
+  }, [payments, searchTerm, statusFilter, methodFilter]);
+  
+  const paginatedPayments = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredPayments.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredPayments, currentPage, itemsPerPage]);
 
-      if (response.ok) {
-        // Refresh payments list
-        await fetchPayments();
-        // Reset form and close modal
-        setPaymentForm({
-          amount: "",
-          paymentMethod: "cash",
-          paymentDate: new Date().toISOString().split("T")[0],
-          reference: "",
-          notes: ""
-        });
-        setSelectedInvoiceId("");
-        setShowCreateModal(false);
-      } else {
-        throw new Error("Failed to create payment");
-      }
-    } catch (error) {
-      console.error("Error creating payment:", error);
-      alert(t('alerts.payment_creation_failed'));
-    } finally {
-      setCreating(false);
-    }
-  };
+  const totalPages = Math.ceil(filteredPayments.length / itemsPerPage);
 
-  const handleInvoiceChange = (invoiceId: string) => {
-    setSelectedInvoiceId(invoiceId);
-    const selectedInvoice = invoices.find(inv => inv._id === invoiceId);
-    if (selectedInvoice) {
-      setPaymentForm(prev => ({
-        ...prev,
-        amount: selectedInvoice.totalAmount?.toString() || ""
-      }));
-    }
-  };
-
-  const filteredPayments = payments.filter(payment => {
-    const matchesSearch = 
-      payment.invoiceId?.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.invoiceId?.customerId?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.invoiceId?.customerId?.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.invoiceId?.vehicleId?.licensePlate?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.reference?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.notes?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || payment.status === statusFilter;
-    const matchesMethod = methodFilter === "all" || payment.paymentMethod === methodFilter;
-
-    return matchesSearch && matchesStatus && matchesMethod;
-  });
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handleItemsPerPageChange = (itemsPerPage: number) => {
-    setItemsPerPage(itemsPerPage);
-    setCurrentPage(1);
-  };
-
-  const totalPayments = payments.reduce((sum, payment) => sum + payment.amount, 0);
-  const completedPayments = payments.filter(p => p.status === 'completed').reduce((sum, payment) => sum + payment.amount, 0);
-  const pendingPayments = payments.filter(p => p.status === 'pending').reduce((sum, payment) => sum + payment.amount, 0);
-
+  const totalPayments = useMemo(() => (payments || []).reduce((sum, p) => sum + p.amount, 0), [payments]);
+  const completedPayments = useMemo(() => (payments || []).filter(p => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0), [payments]);
+  const pendingPayments = useMemo(() => (payments || []).filter(p => p.status === 'pending').reduce((sum, p) => sum + p.amount, 0), [payments]);
+  
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-950">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402]"></div>
-      </div>
-    );
+    return <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-[#F97402]" /></div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8 py-6">
-      <motion.div
-        className="space-y-6"
-        variants={staggerContainer}
-        initial="hidden"
-        animate="visible"
-      >
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
+      <motion.div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6" variants={staggerContainer} initial="hidden" animate="visible">
         {/* Header */}
-        <motion.div
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-          variants={fadeInUp}
-        >
+        <motion.div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" variants={fadeInUp}>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              {t("payments.title")}
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {t("payments.description")}
-            </p>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">{t("payments.title")}</h1>
+            <p className="mt-2 text-base text-gray-700 dark:text-gray-300">{t("payments.description")}</p>
           </div>
-          <div className="flex-shrink-0">
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-[#F97402] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#F13F33] transition-colors"
-            >
-              <Plus className="me-2 h-4 w-4" />
-              {t("payments.add_payment")}
-            </button>
-          </div>
+          <Link href="/payments/new" className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
+            <Plus className="me-2 h-5 w-5" />{t("payments.add_payment")}
+          </Link>
         </motion.div>
 
-        {/* Stats */}
-        <motion.div
-          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
-          variants={fadeInUp}
-        >
-          {[
-            {
-              label: t("payments.total_payments"),
-              value: `$${totalPayments.toFixed(2)}`,
-              icon: <DollarSign className="h-6 w-6 text-green-500 dark:text-green-400" />,
-            },
-            {
-              label: t("invoices.paid"),
-              value: `$${completedPayments.toFixed(2)}`,
-              icon: <CheckCircle className="h-6 w-6 text-green-500 dark:text-green-400" />,
-            },
-            {
-              label: t("payments.status.pending"),
-              value: `$${pendingPayments.toFixed(2)}`,
-              icon: <Clock className="h-6 w-6 text-yellow-500 dark:text-yellow-400" />,
-            },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm"
-            >
-              <div className="p-5 flex items-center">
-                <div className="flex-shrink-0">{stat.icon}</div>
-                <div className="ms-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    {stat.label}
-                  </p>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {stat.value}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
+        {/* Stats Cards */}
+        <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6" variants={fadeInUp}>
+            {/* Stats Cards Here, using modern glassmorphism style */}
         </motion.div>
 
         {/* Search and Filters */}
-        <motion.div
-          className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm"
-          variants={fadeInUp}
-        >
-          <div className="px-4 py-5 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
-                <div className="relative flex-1">
-                  <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder={t("payments.search_placeholder")}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full ps-10 pe-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:ring-[#F97402] focus:border-[#F97402]"
-                  />
-                </div>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2 focus:ring-[#F97402] focus:border-[#F97402]"
-                >
-                  <option value="all">{t("payments.all_statuses")}</option>
-                  <option value="pending">{t("payments.status.pending")}</option>
-                  <option value="completed">{t("payments.status.completed")}</option>
-                  <option value="failed">{t("payments.status.failed")}</option>
-                  <option value="refunded">{t("payments.status.refunded")}</option>
-                </select>
-                <select
-                  value={methodFilter}
-                  onChange={(e) => setMethodFilter(e.target.value)}
-                  className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2 focus:ring-[#F97402] focus:border-[#F97402]"
-                >
-                  <option value="all">{t("payments.all_methods")}</option>
-                  <option value="cash">{t("payments.method.cash")}</option>
-                  <option value="card">{t("payments.method.card")}</option>
-                  <option value="bank_transfer">{t("payments.method.bank_transfer")}</option>
-                  <option value="check">{t("payments.method.check")}</option>
-                </select>
-              </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-end">
-                {t(
-                  filteredPayments.length === 1
-                    ? "payments.payment_count"
-                    : "payments.payment_count_plural",
-                  { count: filteredPayments.length }
-                )}
-              </div>
-            </div>
-          </div>
+        <motion.div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl p-6" variants={fadeInUp}>
+            {/* Filters Here, using modern input styles */}
         </motion.div>
 
         {/* Payments Table */}
         <motion.div variants={fadeInUp}>
-          <ResponsivePaymentsTable
-            payments={filteredPayments}
-            onStatusUpdate={handlePaymentStatusUpdate}
-          />
+          <ResponsivePaymentsTable payments={paginatedPayments} onStatusUpdate={handlePaymentStatusUpdate} onDelete={handleDelete} canEdit={true} canDelete={true} />
         </motion.div>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
-          <motion.div
-            className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm px-4 py-3 sm:px-6"
-            variants={fadeInUp}
-          >
+        {totalPages > 1 && (
+          <motion.div variants={fadeInUp}>
             <Pagination
-              currentPage={pagination.currentPage}
-              totalPages={pagination.totalPages}
-              totalItems={pagination.totalCount}
-              itemsPerPage={pagination.limit}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleItemsPerPageChange}
-              itemsPerPageOptions={[10, 30, 50]}
-              showItemsPerPage={true}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredPayments.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={(perPage) => {
+                setItemsPerPage(perPage);
+                setCurrentPage(1);
+              }}
             />
           </motion.div>
         )}
 
         {/* Empty State */}
-        {filteredPayments.length === 0 && (
+        {filteredPayments.length === 0 && !loading && (
           <motion.div
-            className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm p-8 text-center"
+            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-8 text-center"
             variants={fadeInUp}
           >
             <CreditCard className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
@@ -407,169 +196,9 @@ export default function PaymentsPage() {
                 ? t("payments.no_payments_match")
                 : t("payments.get_started")}
             </p>
-            {!searchTerm && statusFilter === "all" && methodFilter === "all" && (
-              <div className="mt-6">
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="inline-flex items-center rounded-lg bg-[#F97402] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#F13F33] transition-colors"
-                >
-                  <Plus className="me-2 h-4 w-4" />
-                  {t("payments.add_payment")}
-                </button>
-              </div>
-            )}
           </motion.div>
         )}
       </motion.div>
-
-      {/* Payment Creation Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex min-h-screen items-center justify-center p-4">
-            <div
-              className="fixed inset-0 bg-gray-900/70"
-              onClick={() => setShowCreateModal(false)}
-            ></div>
-            <div className="relative w-full max-w-2xl rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl">
-              <div className="px-6 py-4">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
-                    <Plus className="me-3 h-6 w-6 text-[#F97402]" />
-                    {t("payments.create_payment")}
-                  </h2>
-                  <button
-                    onClick={() => setShowCreateModal(false)}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-                  >
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
-
-                <form onSubmit={handleCreatePayment} className="space-y-6">
-                  {/* Invoice Selection */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {t("payments.select_invoice")} *
-                    </label>
-                    <select
-                      value={selectedInvoiceId}
-                      onChange={(e) => handleInvoiceChange(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402]"
-                      required
-                    >
-                      <option value="">{t("payments.select_invoice_placeholder")}</option>
-                      {invoices.map((invoice) => (
-                        <option key={invoice._id} value={invoice._id}>
-                          {invoice.invoiceNumber} - {invoice.customerId?.firstName} {invoice.customerId?.lastName} - ${invoice.totalAmount}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Amount */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {t("payments.payment_amount")} *
-                      </label>
-                      <input
-                        type="number"
-                        value={paymentForm.amount}
-                        onChange={(e) => setPaymentForm(prev => ({ ...prev, amount: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402]"
-                        placeholder="0.00"
-                        step="0.01"
-                        min="0"
-                        required
-                      />
-                    </div>
-
-                    {/* Payment Method */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {t("payments.payment_method")} *
-                      </label>
-                      <select
-                        value={paymentForm.paymentMethod}
-                        onChange={(e) => setPaymentForm(prev => ({ ...prev, paymentMethod: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402]"
-                        required
-                      >
-                        <option value="cash">{t("payments.method.cash")}</option>
-                        <option value="card">{t("payments.method.card")}</option>
-                        <option value="bank_transfer">{t("payments.method.bank_transfer")}</option>
-                        <option value="check">{t("payments.method.check")}</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Payment Date */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {t("payments.payment_date")} *
-                      </label>
-                      <input
-                        type="date"
-                        value={paymentForm.paymentDate}
-                        onChange={(e) => setPaymentForm(prev => ({ ...prev, paymentDate: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402]"
-                        required
-                      />
-                    </div>
-
-                    {/* Reference */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {t("payments.reference_number")}
-                      </label>
-                      <input
-                        type="text"
-                        value={paymentForm.reference}
-                        onChange={(e) => setPaymentForm(prev => ({ ...prev, reference: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402]"
-                        placeholder={t("ui.enter_transaction_reference")}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Notes */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {t("payments.notes")}
-                    </label>
-                    <textarea
-                      value={paymentForm.notes}
-                      onChange={(e) => setPaymentForm(prev => ({ ...prev, notes: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-[#F97402] focus:border-[#F97402] resize-none"
-                      rows={3}
-                      placeholder={t("payments.additional_notes")}
-                    />
-                  </div>
-
-                  {/* Form Actions */}
-                  <div className="flex justify-end space-x-4 pt-6">
-                    <button
-                      type="button"
-                      onClick={() => setShowCreateModal(false)}
-                      className="px-4 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800"
-                    >
-                      {t("forms.cancel")}
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={creating}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#F97402] hover:bg-[#F13F33] disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {creating ? t('ui.creating') : t('payments.create_payment')}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

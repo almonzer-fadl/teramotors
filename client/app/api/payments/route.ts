@@ -109,6 +109,8 @@ export const POST = withTenantAuth(
     const payment = new Payment({
       tenantId, // Always set tenantId from auth context
       invoiceId,
+      customerId: invoice.customerId, // Add customerId from the invoice
+      paymentNumber: `PAY-${Date.now()}`, // Generate a unique payment number
       amount: parseFloat(amount),
       paymentMethod,
       paymentDate: new Date(paymentDate),

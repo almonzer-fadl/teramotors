@@ -1,16 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, notFound } from 'next/navigation';
+import { useParams, useRouter, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Mail, Phone, MapPin, Edit, Car, User, FileText, Loader2, Building2, Hash, Languages } from 'lucide-react';
+import { fadeInUp, scaleIn } from '@/lib/dashboard-animations';
 
 interface Vehicle {
   _id: string;
   make: string;
   model: string;
   year: number;
-  licensePlate: string;
+  plateNumber?: string;
+  licensePlate?: string;
 }
 
 interface Address {
@@ -18,6 +22,7 @@ interface Address {
   city: string;
   state: string;
   zipCode: string;
+  country?: string;
 }
 
 interface Customer {
@@ -26,7 +31,13 @@ interface Customer {
   lastName: string;
   email: string;
   phone: string;
+  phoneNumber?: string;
+  whatsappEnabled?: boolean;
+  language?: 'ar' | 'en';
   address?: Address;
+  companyName?: string;
+  vatNumber?: string;
+  idNumber?: string;
   notes?: string;
   vehicles: Vehicle[];
 }
@@ -35,6 +46,7 @@ export default function CustomerDetailPage() {
   const { t } = useTranslation('common');
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const params = useParams();
   const { id } = params;
 
@@ -61,127 +73,276 @@ export default function CustomerDetailPage() {
   }, [id]);
 
   if (loading) {
-    return <div>{t('common.loading')}</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
+        <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.back()}
+                className="p-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#F97402] transition-all duration-200"
+              >
+                <ArrowLeft className="h-6 w-6" />
+              </button>
+              <div className="animate-pulse space-y-2">
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-96"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-[#F97402]" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!customer) {
     return notFound();
   }
 
+  const InfoCard = ({ icon: Icon, label, value, iconColor }: { icon: any; label: string; value: string; iconColor: string }) => (
+    <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50 hover:border-[#F97402]/30 transition-all duration-200">
+      <div className="flex items-start gap-4">
+        <div className={`p-3 ${iconColor} rounded-xl`}>
+          <Icon className="h-5 w-5 text-white" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{label}</p>
+          <p className="text-base font-semibold text-gray-900 dark:text-white break-words">{value || '-'}</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="py-8">
-            <div className="flex items-center">
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
               <button
-                onClick={() => window.history.back()}
-                className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
+                onClick={() => router.back()}
+                className="p-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#F97402] transition-all duration-200 group"
               >
-                <svg className="h-6 w-6 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
+                <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
               </button>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
                   {customer.firstName} {customer.lastName}
                 </h1>
-                <p className="mt-3 text-xl text-gray-600">
+                <p className="mt-2 text-base text-gray-700 dark:text-gray-300">
                   {t('customers.customer_details')}
                 </p>
               </div>
             </div>
+            <Link
+              href={`/customers/${id}/edit`}
+              className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
+              <Edit className="me-2 h-5 w-5" />
+              {t('customers.edit_customer')}
+            </Link>
           </div>
         </div>
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden mb-8">
-          <div className="px-8 py-8">
-            <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mr-4">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-6">
+          {/* Contact Information */}
+          <motion.div
+            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden"
+            variants={scaleIn}
+            initial="hidden"
+            animate="visible"
+          >
+            <div className="px-6 py-6">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-xl flex items-center justify-center shadow-lg shadow-[#F97402]/25">
+                  <User className="w-6 h-6 text-white" />
+                </div>
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+                  {t('customers.personal_information')}
+                </h2>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                {t('customers.personal_information')}
-              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <InfoCard icon={Mail} label={t('customers.email')} value={customer.email} iconColor="bg-blue-500" />
+                <InfoCard icon={Phone} label={t('customers.phone')} value={customer.phone} iconColor="bg-green-500" />
+                {customer.phoneNumber && customer.phoneNumber !== customer.phone && (
+                  <InfoCard icon={Phone} label="WhatsApp Number" value={customer.phoneNumber} iconColor="bg-emerald-500" />
+                )}
+                {customer.language && (
+                  <InfoCard
+                    icon={Languages}
+                    label="Language"
+                    value={customer.language === 'ar' ? 'العربية (Arabic)' : 'English'}
+                    iconColor="bg-purple-500"
+                  />
+                )}
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <div className="p-4 bg-gray-50/80 rounded-2xl">
-                  <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('customers.email')}</p>
-                  <p className="text-lg font-semibold text-gray-900">{customer.email}</p>
-                </div>
-                <div className="p-4 bg-gray-50/80 rounded-2xl">
-                  <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('customers.phone')}</p>
-                  <p className="text-lg font-semibold text-gray-900">{customer.phone}</p>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="p-4 bg-gray-50/80 rounded-2xl">
-                  <p className="text-sm font-bold text-gray-500 uppercase tracking-wider">{t('customers.address')}</p>
-                  <p className="text-lg font-semibold text-gray-900">{customer.address?.street}</p>
-                  <p className="text-sm text-gray-600">{customer.address?.city}, {customer.address?.state} {customer.address?.zipCode}</p>
-                </div>
-              </div>
-            </div>
-            {customer.notes && (
-              <div className="mt-8 p-4 bg-gray-50/80 rounded-2xl">
-                <p className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">{t('customers.notes')}</p>
-                <p className="text-lg text-gray-900">{customer.notes}</p>
-              </div>
-            )}
-          </div>
-        </div>
+          </motion.div>
 
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-          <div className="px-8 py-8">
-            <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mr-4">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1m-1-1V8a1 1 0 00-1-1H9m4 8V8a1 1 0 00-1-1H9" />
-                </svg>
+          {/* Address Information */}
+          {customer.address && (customer.address.street || customer.address.city) && (
+            <motion.div
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden"
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+            >
+              <div className="px-6 py-6">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                    <MapPin className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+                    {t('forms.address_information')}
+                  </h2>
+                </div>
+                <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50">
+                  <div className="space-y-3">
+                    {customer.address.street && (
+                      <p className="text-base text-gray-900 dark:text-white font-medium">{customer.address.street}</p>
+                    )}
+                    <p className="text-base text-gray-700 dark:text-gray-300">
+                      {[customer.address.city, customer.address.state, customer.address.zipCode].filter(Boolean).join(', ')}
+                    </p>
+                    {customer.address.country && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{customer.address.country}</p>
+                    )}
+                  </div>
+                </div>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">{t('customers.vehicles')}</h2>
-            </div>
-            <div className="overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50/80">
-                  <tr>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{t('vehicles.make')}</th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{t('vehicles.model')}</th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{t('vehicles.year')}</th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{t('vehicles.license_plate')}</th>
-                    <th scope="col" className="relative px-6 py-4">
-                      <span className="sr-only">View</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white/50 divide-y divide-gray-200">
-                  {customer.vehicles.map((vehicle: any) => (
-                    <tr key={vehicle._id} className="hover:bg-gray-50/80 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{vehicle.make}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{vehicle.model}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{vehicle.year}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{vehicle.licensePlate}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Link 
-                          href={`/vehicles/${vehicle._id}`} 
-                          className="inline-flex items-center px-4 py-2 text-sm font-bold text-[#F13F33] hover:text-[#d6352a] hover:bg-[#F13F33]/5 rounded-xl transition-all duration-300"
-                        >
-                          {t('customers.view_details')}
-                        </Link>
-                      </td>
-                    </tr>
+            </motion.div>
+          )}
+
+          {/* Business Information */}
+          {(customer.companyName || customer.vatNumber || customer.idNumber) && (
+            <motion.div
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden"
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+            >
+              <div className="px-6 py-6">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/25">
+                    <Building2 className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+                    Business Information
+                  </h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {customer.companyName && (
+                    <InfoCard icon={Building2} label="Company Name" value={customer.companyName} iconColor="bg-amber-500" />
+                  )}
+                  {customer.vatNumber && (
+                    <InfoCard icon={Hash} label="VAT Number" value={customer.vatNumber} iconColor="bg-violet-500" />
+                  )}
+                  {customer.idNumber && (
+                    <InfoCard icon={Hash} label="CR / License / ID No" value={customer.idNumber} iconColor="bg-cyan-500" />
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Notes */}
+          {customer.notes && (
+            <motion.div
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden"
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+            >
+              <div className="px-6 py-6">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
+                    <FileText className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+                    {t('forms.additional_notes')}
+                  </h2>
+                </div>
+                <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-200/50 dark:border-gray-700/50">
+                  <p className="text-base text-gray-900 dark:text-white whitespace-pre-wrap">{customer.notes}</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Vehicles */}
+          {customer.vehicles && customer.vehicles.length > 0 && (
+            <motion.div
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden"
+              variants={fadeInUp}
+              initial="hidden"
+              animate="visible"
+            >
+              <div className="px-6 py-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/25">
+                      <Car className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+                        {t('customers.vehicles')}
+                      </h2>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {customer.vehicles.length} {customer.vehicles.length === 1 ? 'vehicle' : 'vehicles'} registered
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href="/vehicles"
+                    className="inline-flex items-center px-4 py-2 rounded-xl font-semibold text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-[#F97402]/10 hover:text-[#F97402] transition-all duration-200"
+                  >
+                    View All
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {customer.vehicles.slice(0, 6).map((vehicle) => (
+                    <Link
+                      key={vehicle._id}
+                      href={`/vehicles/${vehicle._id}`}
+                      className="group bg-gray-50/50 dark:bg-gray-800/50 rounded-2xl p-5 border border-gray-200/50 dark:border-gray-700/50 hover:border-[#F97402] hover:bg-[#F97402]/5 dark:hover:bg-[#F97402]/10 transition-all duration-200"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="p-2.5 bg-red-500/10 rounded-xl flex-shrink-0">
+                          <Car className="h-5 w-5 text-red-600 dark:text-red-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-[#F97402] transition-colors truncate">
+                            {vehicle.make} {vehicle.model}
+                          </h3>
+                          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                            {vehicle.year} • {vehicle.plateNumber || vehicle.licensePlate || 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                </div>
+                {customer.vehicles.length > 6 && (
+                  <div className="mt-4 text-center">
+                    <Link
+                      href="/vehicles"
+                      className="inline-flex items-center text-sm font-medium text-[#F97402] hover:text-[#F13F33] transition-colors"
+                    >
+                      View {customer.vehicles.length - 6} more vehicles
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </div>
