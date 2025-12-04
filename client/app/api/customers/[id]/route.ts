@@ -2,109 +2,102 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Customer from '@/lib/models/Customer';
 import Vehicle from '@/lib/models/Vehicle';
-import { getServerSession } from "@/lib/auth-server";
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// GET /api/customers/[id] - Get single customer
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const customer = await Customer.findById(id)
-      .populate('vehicles');
-    
+
+    // Filter by BOTH id AND tenantId for security
+    const customer = await Customer.findOne({
+      _id: params?.id,
+      tenantId,
+    }).populate('vehicles');
+
     if (!customer) {
-      return new Response(JSON.stringify({ error: 'Customer not found' }), { status: 404 });
+      return NextResponse.json(
+        { error: 'Customer not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify(customer));
-  } catch (error) {
-    console.error('Error fetching customer:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch customer' }), { status: 500 });
-  }
-}
+    return NextResponse.json(customer);
+  },
+  { requireTenant: true }
+);
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// PUT /api/customers/[id] - Update customer
+export const PUT = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const body = await request.json();
-    
-    const customer = await Customer.findByIdAndUpdate(
-      id,
+
+    const body = await req.json();
+
+    // Update only if belongs to tenant
+    const customer = await Customer.findOneAndUpdate(
+      { _id: params?.id, tenantId },
       {
         firstName: body.firstName,
         lastName: body.lastName,
         email: body.email,
         phone: body.phone,
+        phoneNumber: body.phoneNumber,
+        whatsappEnabled: body.whatsappEnabled,
+        language: body.language,
         address: body.address,
         vatNumber: body.vatNumber,
         idNumber: body.idNumber,
         companyName: body.companyName,
         notes: body.notes,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!customer) {
-      return new Response(JSON.stringify({ error: 'Customer not found' }), { status: 404 });
+      return NextResponse.json(
+        { error: 'Customer not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify({ success: true, customer }));
-  } catch (error) {
-    console.error('Error updating customer:', error);
-    return new Response(JSON.stringify({ error: 'Failed to update customer' }), { status: 500 });
-  }
-}
+    return NextResponse.json({ success: true, customer });
+  },
+  { requireTenant: true }
+);
 
-export async function DELETE(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
-    // Check if user is admin
-    const userRole = (session.user as any).role;
-    if (userRole !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), { status: 403 });
-    }
-
+// DELETE /api/customers/[id] - Delete customer (admin only)
+export const DELETE = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
 
-    // Hard delete any vehicles belonging to this customer to avoid 400s
-    await Vehicle.deleteMany({ customerId: id });
+    // First verify customer belongs to tenant
+    const customer = await Customer.findOne({
+      _id: params?.id,
+      tenantId,
+    });
 
-    // Hard delete the customer
-    const deleted = await Customer.findByIdAndDelete(id);
-    if (!deleted) {
-      return new Response(JSON.stringify({ error: 'Customer not found' }), { status: 404 });
+    if (!customer) {
+      return NextResponse.json(
+        { error: 'Customer not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify({ success: true }));
-  } catch (error) {
-    console.error('Error deleting customer:', error);
-    return new Response(JSON.stringify({ error: 'Failed to delete customer' }), { status: 500 });
-  }
-}
+    // Delete vehicles belonging to this customer AND tenant
+    await Vehicle.deleteMany({
+      customerId: params?.id,
+      tenantId,
+    });
+
+    // Delete the customer
+    await Customer.findOneAndDelete({
+      _id: params?.id,
+      tenantId,
+    });
+
+    return NextResponse.json({ success: true });
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);

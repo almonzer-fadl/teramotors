@@ -1,63 +1,56 @@
-import { connectToDatabase } from '@/lib/db'
-import Appointment from '@/lib/models/Appointment'
-import Customer from '@/lib/models/Customer'
-import Vehicle from '@/lib/models/Vehicle'
-import Mechanic from '@/lib/models/Mechanic'
-import User from '@/lib/models/User'
-import Service from '@/lib/models/Service'
-import { getServerSession } from "@/lib/auth-server";
-import { NextRequest } from 'next/server'
+import { connectToDatabase } from '@/lib/db';
+import Appointment from '@/lib/models/Appointment';
+import Customer from '@/lib/models/Customer';
+import Vehicle from '@/lib/models/Vehicle';
+import Mechanic from '@/lib/models/Mechanic';
+import Service from '@/lib/models/Service';
+import { NextRequest, NextResponse } from 'next/server';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(request: NextRequest) {
-  try {
-    const session = await getServerSession()
-    if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+// GET /api/appointments - List appointments for tenant
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
+    await connectToDatabase();
 
-    await connectToDatabase()
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get('status');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const sortBy = searchParams.get('sortBy') || 'appointmentDate';
+    const sortOrder = searchParams.get('sortOrder') || 'asc';
 
-    const { searchParams } = new URL(request.url)
-    const status = searchParams.get('status')
-    const dateFrom = searchParams.get('dateFrom')
-    const dateTo = searchParams.get('dateTo')
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const sortBy = searchParams.get('sortBy') || 'appointmentDate'
-    const sortOrder = searchParams.get('sortOrder') || 'asc'
-
-    const query: any = {}
+    // Build query with tenant filter
+    const query: Record<string, unknown> = { tenantId };
 
     if (status) {
-      query.status = status
+      query.status = status;
     }
 
     if (dateFrom && dateTo) {
       query.appointmentDate = {
         $gte: new Date(dateFrom),
         $lte: new Date(dateTo),
-      }
+      };
     } else if (dateFrom) {
-      query.appointmentDate = { $gte: new Date(dateFrom) }
+      query.appointmentDate = { $gte: new Date(dateFrom) };
     } else if (dateTo) {
-      query.appointmentDate = { $lte: new Date(dateTo) }
+      query.appointmentDate = { $lte: new Date(dateTo) };
     }
 
-    // Calculate pagination
-    const skip = (page - 1) * limit
+    const skip = (page - 1) * limit;
+    const sort: Record<string, 1 | -1> = {};
 
-    // Build sort object
-    const sort: any = {}
     if (sortBy === 'appointmentDate') {
-      sort.appointmentDate = sortOrder === 'desc' ? -1 : 1
-      sort.startTime = sortOrder === 'desc' ? -1 : 1
+      sort.appointmentDate = sortOrder === 'desc' ? -1 : 1;
+      sort.startTime = sortOrder === 'desc' ? -1 : 1;
     } else {
-      sort[sortBy] = sortOrder === 'desc' ? -1 : 1
+      sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
     }
-    
-    // Get total count for pagination
-    const totalCount = await Appointment.countDocuments(query)
-    
+
+    const totalCount = await Appointment.countDocuments(query);
+
     const appointments = await Appointment.find(query)
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
@@ -65,20 +58,19 @@ export async function GET(request: NextRequest) {
         path: 'mechanicId',
         populate: {
           path: 'userId',
-          select: 'firstName lastName'
-        }
+          select: 'firstName lastName',
+        },
       })
       .populate('serviceId', 'name')
       .sort(sort)
       .skip(skip)
-      .limit(limit)
+      .limit(limit);
 
-    // Calculate pagination info
-    const totalPages = Math.ceil(totalCount / limit)
-    const hasNextPage = page < totalPages
-    const hasPrevPage = page > 1
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
 
-    return Response.json({
+    return NextResponse.json({
       appointments,
       pagination: {
         currentPage: page,
@@ -86,81 +78,91 @@ export async function GET(request: NextRequest) {
         totalCount,
         limit,
         hasNextPage,
-        hasPrevPage
-      }
-    })
-  } catch (error) {
-    console.error('Error fetching appointments:', error)
-    // Return empty array when database is unavailable
-    return Response.json({
-      appointments: [],
-      pagination: {
-        currentPage: 1,
-        totalPages: 0,
-        totalCount: 0,
-        limit: 10,
-        hasNextPage: false,
-        hasPrevPage: false
-      }
-    })
-  }
-}
+        hasPrevPage,
+      },
+    });
+  },
+  { requireTenant: true }
+);
 
-export async function POST(request: Request) {
-  try {
-    const session = await getServerSession()
-    if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+// POST /api/appointments - Create appointment for tenant
+export const POST = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
+    await connectToDatabase();
 
-    await connectToDatabase()
-    
-    const body = await request.json()
-    
-    // Validate that customer exists
-    const customer = await Customer.findById(body.customerId)
+    const body = await req.json();
+
+    // Validate customer belongs to tenant
+    const customer = await Customer.findOne({
+      _id: body.customerId,
+      tenantId,
+    });
     if (!customer) {
-      return Response.json({ error: 'Customer not found' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Customer not found' },
+        { status: 400 }
+      );
     }
 
-    // Validate that vehicle exists
-    const vehicle = await Vehicle.findById(body.vehicleId)
+    // Validate vehicle belongs to tenant
+    const vehicle = await Vehicle.findOne({
+      _id: body.vehicleId,
+      tenantId,
+    });
     if (!vehicle) {
-      return Response.json({ error: 'Vehicle not found' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Vehicle not found' },
+        { status: 400 }
+      );
     }
 
-    // Validate that mechanic exists
-    const mechanic = await Mechanic.findById(body.mechanicId)
+    // Validate mechanic exists
+    const mechanic = await Mechanic.findById(body.mechanicId);
     if (!mechanic) {
-      return Response.json({ error: 'Mechanic not found' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Mechanic not found' },
+        { status: 400 }
+      );
     }
 
-    // Validate that service exists
-    const service = await Service.findById(body.serviceId)
+    // Validate service belongs to tenant
+    const service = await Service.findOne({
+      _id: body.serviceId,
+      tenantId,
+    });
     if (!service) {
-      return Response.json({ error: 'Service not found' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Service not found' },
+        { status: 400 }
+      );
     }
 
-    // Check for time conflicts
+    // Check for time conflicts within tenant
     const conflictingAppointment = await Appointment.findOne({
+      tenantId,
       mechanicId: body.mechanicId,
       appointmentDate: body.appointmentDate,
       status: { $in: ['scheduled', 'in-progress'] },
       $or: [
         {
           startTime: { $lt: body.endTime },
-          endTime: { $gt: body.startTime }
-        }
-      ]
-    })
+          endTime: { $gt: body.startTime },
+        },
+      ],
+    });
 
     if (conflictingAppointment) {
-      return Response.json({ 
-        error: 'Time conflict: Mechanic already has an appointment during this time' 
-      }, { status: 400 })
+      return NextResponse.json(
+        {
+          error:
+            'Time conflict: Mechanic already has an appointment during this time',
+        },
+        { status: 400 }
+      );
     }
 
     const appointment = new Appointment({
+      tenantId, // Always set tenantId from auth context
       customerId: body.customerId,
       vehicleId: body.vehicleId,
       mechanicId: body.mechanicId,
@@ -171,23 +173,30 @@ export async function POST(request: Request) {
       status: body.status || 'scheduled',
       priority: body.priority || 'medium',
       notes: body.notes,
-      estimatedCost: body.estimatedCost
-    })
+      estimatedCost: body.estimatedCost,
+    });
 
-    await appointment.save()
+    await appointment.save();
 
     const populatedAppointment = await Appointment.findById(appointment._id)
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate({        path: 'mechanicId',        populate: {          path: 'userId',          select: 'firstName lastName'        }      })
-      .populate('serviceId', 'name')
+      .populate({
+        path: 'mechanicId',
+        populate: {
+          path: 'userId',
+          select: 'firstName lastName',
+        },
+      })
+      .populate('serviceId', 'name');
 
-    return Response.json({ 
-      success: true, 
-      appointment: populatedAppointment
-    }, { status: 201 })
-  } catch (error) {
-    console.error('Error creating appointment:', error)
-    return Response.json({ error: 'Failed to create appointment' }, { status: 500 })
-  }
-}
+    return NextResponse.json(
+      {
+        success: true,
+        appointment: populatedAppointment,
+      },
+      { status: 201 }
+    );
+  },
+  { requireTenant: true }
+);
