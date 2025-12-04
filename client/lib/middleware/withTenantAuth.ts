@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession, type Session } from '@/lib/simple-auth';
+import { getServerSession, type AuthSession } from '@/lib/simple-auth';
 import { validateTenantActive } from '@/lib/tenant-utils';
 
 export type TenantAuthOptions = {
@@ -8,8 +8,21 @@ export type TenantAuthOptions = {
   allowSuperAdmin?: boolean;
 };
 
+// Extend AuthSession to include tenantId on user
+interface ExtendedUser {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  tenantId?: string;
+}
+
+interface ExtendedSession {
+  user: ExtendedUser;
+}
+
 type HandlerContext = {
-  session: Session;
+  session: ExtendedSession;
   tenantId: string;
   params?: Record<string, string>;
 };
@@ -30,15 +43,17 @@ export function withTenantAuth(
       allowSuperAdmin = false,
     } = options;
 
-    const session = await getServerSession();
+    const authSession = await getServerSession();
 
-    if (!session?.user) {
+    if (!authSession?.user) {
       return NextResponse.json(
         { error: 'Unauthorized - Please login' },
         { status: 401 }
       );
     }
 
+    // Cast to extended session type
+    const session = authSession as unknown as ExtendedSession;
     const userRole = session.user.role;
 
     if (userRole === 'SUPER_ADMIN' && allowSuperAdmin) {
