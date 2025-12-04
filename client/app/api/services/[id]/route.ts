@@ -1,93 +1,77 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Service from '@/lib/models/Service';
-import { getServerSession } from "@/lib/auth-server";
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// GET /api/services/[id] - Get single service
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const service = await Service.findById(id);
-    
+
+    // Filter by BOTH id AND tenantId
+    const service = await Service.findOne({
+      _id: params?.id,
+      tenantId,
+    });
+
     if (!service) {
-      return new Response(JSON.stringify({ error: 'Service not found' }), { status: 404 });
+      return NextResponse.json(
+        { error: 'Service not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify(service));
-  } catch (error) {
-    console.error('Error fetching service:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch service' }), { status: 500 });
-  }
-}
+    return NextResponse.json(service);
+  },
+  { requireTenant: true }
+);
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// PUT /api/services/[id] - Update service
+export const PUT = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const body = await request.json();
-    
-    const service = await Service.findByIdAndUpdate(
-      id,
+
+    const body = await req.json();
+
+    // Update only if belongs to tenant
+    const service = await Service.findOneAndUpdate(
+      { _id: params?.id, tenantId },
       body,
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!service) {
-      return new Response(JSON.stringify({ error: 'Service not found' }), { status: 404 });
+      return NextResponse.json(
+        { error: 'Service not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify({ success: true, service }));
-  } catch (error) {
-    console.error('Error updating service:', error);
-    return new Response(JSON.stringify({ error: 'Failed to update service' }), { status: 500 });
-  }
-}
+    return NextResponse.json({ success: true, service });
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);
 
-export async function DELETE(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// DELETE /api/services/[id] - Soft delete service
+export const DELETE = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    // Perform soft deletion by setting isActive to false
-    const service = await Service.findByIdAndUpdate(
-      id,
+
+    // Soft delete by setting isActive to false
+    const service = await Service.findOneAndUpdate(
+      { _id: params?.id, tenantId },
       { isActive: false },
       { new: true }
     );
 
     if (!service) {
-      return new Response(JSON.stringify({ error: 'Service not found' }), { status: 404 });
+      return NextResponse.json(
+        { error: 'Service not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify({ success: true }));
-  } catch (error) {
-    console.error('Error deleting service:', error);
-    return new Response(JSON.stringify({ error: 'Failed to delete service' }), { status: 500 });
-  }
-}
+    return NextResponse.json({ success: true });
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);

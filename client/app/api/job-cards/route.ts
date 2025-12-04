@@ -1,82 +1,126 @@
-import { connectToDatabase } from '@/lib/db'
-import JobCard from '@/lib/models/JobCard'
-import Appointment from '@/lib/models/Appointment'
-import Customer from '@/lib/models/Customer'
-import Vehicle from '@/lib/models/Vehicle'
-import Service from '@/lib/models/Service'
-import { getServerSession } from "@/lib/auth-server";
+import { connectToDatabase } from '@/lib/db';
+import JobCard from '@/lib/models/JobCard';
+import Appointment from '@/lib/models/Appointment';
+import Customer from '@/lib/models/Customer';
+import Vehicle from '@/lib/models/Vehicle';
+import Service from '@/lib/models/Service';
+import { NextRequest, NextResponse } from 'next/server';
 import { WhatsAppEventListeners } from '@/lib/services/WhatsAppEventListeners';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET() {
-  try {
-    const session = await getServerSession()
-    if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+// GET /api/job-cards - List job cards for tenant
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
+    await connectToDatabase();
+
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get('status');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '50');
+
+    // Build query with tenant filter
+    const query: Record<string, unknown> = { tenantId };
+
+    if (status) {
+      query.status = status;
     }
 
-    await connectToDatabase()
-    
-    const jobCards = await JobCard.find({})
+    const skip = (page - 1) * limit;
+
+    const totalCount = await JobCard.countDocuments(query);
+
+    const jobCards = await JobCard.find(query)
       .populate('appointmentId', 'appointmentDate startTime endTime')
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
       .populate('services.serviceId', 'name laborHours laborRate')
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    return Response.json(jobCards)
-  } catch (error) {
-    console.error('Error fetching job cards:', error)
-    // Return empty array when database is unavailable
-    return Response.json([])
-  }
-}
+    const totalPages = Math.ceil(totalCount / limit);
 
-export async function POST(request: Request) {
-  try {
-    const session = await getServerSession()
-    if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    return NextResponse.json({
+      jobCards,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit,
+      },
+    });
+  },
+  { requireTenant: true }
+);
 
-    await connectToDatabase()
-    
-    const body = await request.json()
-    
+// POST /api/job-cards - Create job card for tenant
+export const POST = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
+    await connectToDatabase();
+
+    const body = await req.json();
+
+    // Validate appointment belongs to tenant (if provided)
     if (body.appointmentId) {
-      const appointment = await Appointment.findById(body.appointmentId)
+      const appointment = await Appointment.findOne({
+        _id: body.appointmentId,
+        tenantId,
+      });
       if (!appointment) {
-        return Response.json({ error: 'Appointment not found' }, { status: 400 })
+        return NextResponse.json(
+          { error: 'Appointment not found' },
+          { status: 400 }
+        );
       }
     }
 
-    // Validate that customer exists
-    const customer = await Customer.findById(body.customerId)
+    // Validate customer belongs to tenant
+    const customer = await Customer.findOne({
+      _id: body.customerId,
+      tenantId,
+    });
     if (!customer) {
-      return Response.json({ error: 'Customer not found' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Customer not found' },
+        { status: 400 }
+      );
     }
 
-    // Validate that vehicle exists
-    const vehicle = await Vehicle.findById(body.vehicleId)
+    // Validate vehicle belongs to tenant
+    const vehicle = await Vehicle.findOne({
+      _id: body.vehicleId,
+      tenantId,
+    });
     if (!vehicle) {
-      return Response.json({ error: 'Vehicle not found' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Vehicle not found' },
+        { status: 400 }
+      );
     }
 
-    // Validate that services exist
+    // Validate services belong to tenant
     if (body.services && body.services.length > 0) {
       for (const serviceItem of body.services) {
-        const service = await Service.findById(serviceItem.serviceId)
+        const service = await Service.findOne({
+          _id: serviceItem.serviceId,
+          tenantId,
+        });
         if (!service) {
-          return Response.json({ error: `Service ${serviceItem.serviceId} not found` }, { status: 400 })
+          return NextResponse.json(
+            { error: `Service ${serviceItem.serviceId} not found` },
+            { status: 400 }
+          );
         }
       }
     }
 
     // Filter out parts with empty or invalid partId
-    const validPartsUsed = (body.partsUsed || []).filter((part: any) => {
+    const validPartsUsed = (body.partsUsed || []).filter((part: { partId?: string }) => {
       return part.partId && part.partId.trim() !== '';
     });
 
-    const jobCardData: any = {
+    const jobCardData: Record<string, unknown> = {
+      tenantId, // Always set tenantId from auth context
       customerId: body.customerId,
       vehicleId: body.vehicleId,
       type: body.type || 'regular',
@@ -85,7 +129,7 @@ export async function POST(request: Request) {
       services: body.services || [],
       partsUsed: validPartsUsed,
       notes: body.notes,
-      discount: body.discount || 0
+      discount: body.discount || 0,
     };
 
     if (body.appointmentId) {
@@ -104,14 +148,15 @@ export async function POST(request: Request) {
       jobCardData.inspectionId = body.inspectionId;
     }
 
-    const jobCard = new JobCard(jobCardData)
+    const jobCard = new JobCard(jobCardData);
+    await jobCard.save();
 
-    await jobCard.save()
-
+    // Update appointment status if linked
     if (body.appointmentId) {
-      await Appointment.findByIdAndUpdate(body.appointmentId, {
-        status: 'in-progress'
-      })
+      await Appointment.findOneAndUpdate(
+        { _id: body.appointmentId, tenantId },
+        { status: 'in-progress' }
+      );
     }
 
     // Send job started WhatsApp message
@@ -120,21 +165,21 @@ export async function POST(request: Request) {
       await whatsappListeners.onJobCardOpened(body.customerId);
     } catch (whatsappError) {
       console.error('Error sending job started WhatsApp message:', whatsappError);
-      // Don't fail the job card creation if WhatsApp fails
     }
 
     const populatedJobCard = await JobCard.findById(jobCard._id)
       .populate('appointmentId', 'appointmentDate startTime endTime')
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate('services.serviceId', 'name laborHours laborRate')
+      .populate('services.serviceId', 'name laborHours laborRate');
 
-    return Response.json({ 
-      success: true, 
-      jobCard: populatedJobCard
-    }, { status: 201 })
-  } catch (error) {
-    console.error('Error creating job card:', error)
-    return Response.json({ error: 'Failed to create job card' }, { status: 500 })
-  }
-}
+    return NextResponse.json(
+      {
+        success: true,
+        jobCard: populatedJobCard,
+      },
+      { status: 201 }
+    );
+  },
+  { requireTenant: true }
+);
