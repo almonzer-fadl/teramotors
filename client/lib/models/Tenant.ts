@@ -86,13 +86,11 @@ const TenantSchema = new Schema<ITenant>(
       unique: true,
       lowercase: true,
       trim: true,
-      index: true,
     },
     status: {
       type: String,
       enum: ['active', 'suspended', 'trial', 'cancelled'],
       default: 'trial',
-      index: true,
     },
     companyInfo: {
       name: { type: String, required: true },

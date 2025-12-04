@@ -396,10 +396,10 @@ export default function JobCardDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F13F33] mx-auto"></div>
-          <p className="mt-4 text-lg text-gray-600">{t("job_cards.loading")}</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402] mx-auto"></div>
+          <p className="mt-4 text-base text-gray-700 dark:text-gray-300">{t("job_cards.loading")}</p>
         </div>
       </div>
     );
@@ -407,58 +407,56 @@ export default function JobCardDetailsPage() {
 
   if (!jobCard) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("job_cards.not_found")}</h2>
-          <p className="text-gray-600">{t("job_cards.not_found")}</p>
+          <AlertCircle className="h-16 w-16 text-red-500 dark:text-red-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t("job_cards.not_found")}</h2>
+          <p className="text-gray-700 dark:text-gray-300">{t("job_cards.not_found_description")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="py-8">
-            <div className="flex items-center">
-              <Link
-                href="/job-cards"
-                className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
-              >
-                <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
-              </Link>
-              <div className="flex-1">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  {t("job_cards.details_title")}
-                </h1>
-                <p className="mt-3 text-xl text-gray-600">
-                  Job Card #{jobCard._id.slice(-8).toUpperCase()}
-                </p>
-              </div>
-              <div className="flex space-x-2">
-                {isAdmin && (
-                  <button
-                    onClick={handleDeleteJobCard}
-                    disabled={deleting}
-                    className="group inline-flex items-center px-6 py-3 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-red-600 to-red-700 hover:shadow-xl hover:shadow-red-600/25 transition-all duration-300 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Trash2 className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                    {deleting ? t("job_cards.deleting") : t("job_cards.delete_job_card")}
-                  </button>
-                )}
-              </div>
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/job-cards"
+              className="p-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#F97402] transition-all duration-200 group"
+            >
+              <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
+            </Link>
+            <div className="flex-1">
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+                {t("job_cards.details_title")}
+              </h1>
+              <p className="mt-2 text-base text-gray-700 dark:text-gray-300">
+                Job Card #{jobCard._id.slice(-8).toUpperCase()}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              {isAdmin && (
+                <button
+                  onClick={handleDeleteJobCard}
+                  disabled={deleting}
+                  className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200"
+                >
+                  <Trash2 className="me-2 h-5 w-5" />
+                  {deleting ? t("job_cards.deleting") : t("job_cards.delete_job_card")}
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Job Card Overview */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-          <div className="px-8 py-8">
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+          <div className="px-6 py-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="space-y-2">
                 <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">
@@ -466,7 +464,7 @@ export default function JobCardDetailsPage() {
                 </h3>
                 <div className="flex items-center">
                   <User className="h-5 w-5 text-gray-400 mr-2" />
-                  <p className="text-lg font-bold text-gray-900">
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
                     {jobCard.customerId.firstName} {jobCard.customerId.lastName}
                   </p>
                 </div>
@@ -478,10 +476,10 @@ export default function JobCardDetailsPage() {
                 <div className="flex items-center">
                   <Car className="h-5 w-5 text-gray-400 mr-2" />
                   <div>
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">
                       {jobCard.vehicleId.make} {jobCard.vehicleId.model} ({jobCard.vehicleId.year})
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {t("job_cards.license_plate")}: {jobCard.vehicleId.licensePlate}
                     </p>
                   </div>
@@ -494,7 +492,7 @@ export default function JobCardDetailsPage() {
                   </h3>
                   <div className="flex items-center">
                     <User className="h-5 w-5 text-gray-400 mr-2" />
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">
                       {jobCard.mechanicId.fullName}
                     </p>
                   </div>
@@ -520,10 +518,10 @@ export default function JobCardDetailsPage() {
         {/* Invoice and Estimate Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Invoice Quick Actions */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-8 py-6 flex flex-col">
               <div className="mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">{t('invoices.title')}</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('invoices.title')}</h2>
                 <p className="text-gray-600 text-sm mt-1">
                   {linkedInvoiceId ? t('common.view') : t('invoices.create_invoice')}
                 </p>
@@ -544,10 +542,10 @@ export default function JobCardDetailsPage() {
           </div>
 
           {/* Estimate Quick Actions */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-8 py-6 flex flex-col">
               <div className="mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">{t('estimates.title')}</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('estimates.title')}</h2>
                 <p className="text-gray-600 text-sm mt-1">
                   {linkedEstimateId ? t('common.view') : t('estimates.create_estimate')}
                 </p>
@@ -570,10 +568,10 @@ export default function JobCardDetailsPage() {
 
         {/* Inspection Details Section */}
         {jobCard.inspectionId && (
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-8 py-8">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {t("job_cards.inspection_details")}
                 </h2>
                 <Link
@@ -591,7 +589,7 @@ export default function JobCardDetailsPage() {
                   </h3>
                   <div className="flex items-center">
                     <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                    <p className="text-lg font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">
                       {new Date(jobCard.inspectionId.inspectionDate).toLocaleDateString()}
                     </p>
                   </div>
@@ -660,7 +658,7 @@ export default function JobCardDetailsPage() {
                         </p>
                       )}
                       {item.estimatedCost > 0 && (
-                        <p className="text-sm font-bold text-gray-900">
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">
                           <strong>{t("forms.estimated_cost")}:</strong> ${item.estimatedCost.toFixed(2)}
                         </p>
                       )}
@@ -673,7 +671,7 @@ export default function JobCardDetailsPage() {
         )}
 
         {/* Services Section */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="px-8 py-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t("job_cards.services")}
@@ -693,7 +691,7 @@ export default function JobCardDetailsPage() {
                       {selectedService && selectedService.name ? selectedService.name : t("forms.no_service_selected")}
                     </div>
                     {selectedService && selectedService.name && (
-                      <p className="mt-2 text-sm text-gray-600">
+                      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                         <strong>{t("job_cards.selected")}</strong> {selectedService.name}
                       </p>
                     )}
@@ -729,7 +727,7 @@ export default function JobCardDetailsPage() {
         </div>
 
         {/* Parts Used Section */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="px-8 py-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t("job_cards.parts_used")}
@@ -749,7 +747,7 @@ export default function JobCardDetailsPage() {
                       {selectedPart && selectedPart.name ? selectedPart.name : t("forms.no_part_selected")}
                     </div>
                     {selectedPart && selectedPart.name && (
-                      <p className="mt-2 text-sm text-gray-600">
+                      <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                         <strong>{t("job_cards.selected")}</strong> {selectedPart.name}
                       </p>
                     )}
@@ -777,7 +775,7 @@ export default function JobCardDetailsPage() {
         </div>
 
         {/* Notes Section */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="px-8 py-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t("forms.notes")}
@@ -789,7 +787,7 @@ export default function JobCardDetailsPage() {
         </div>
 
         {/* Discount Section */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="px-8 py-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t("common.discount_percentage")}
@@ -801,7 +799,7 @@ export default function JobCardDetailsPage() {
         </div>
 
         {/* Progress Photos Section */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="px-8 py-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               {t("job_cards.progress_photos")}

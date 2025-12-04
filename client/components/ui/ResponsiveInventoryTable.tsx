@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   CheckCircle,
   ArrowUpDown,
+  Eye,
 } from 'lucide-react';
 import { tableRowHover } from '@/lib/dashboard-animations';
 
@@ -223,14 +224,23 @@ export default function ResponsiveInventoryTable({
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <Link
+                        href={`/inventory/${part._id}`}
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition-colors"
+                        title="View"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Link>
+                      <Link
                         href={`/inventory/${part._id}/edit`}
                         className="text-[#F97402] hover:text-[#F13F33] transition-colors"
+                        title="Edit"
                       >
                         <Edit className="h-4 w-4" />
                       </Link>
                       <button
                         onClick={() => onDelete(part._id)}
                         className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors"
+                        title="Delete"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -326,6 +336,13 @@ export default function ResponsiveInventoryTable({
               </div>
 
               <div className="flex justify-end space-x-2 border-t border-gray-200 dark:border-gray-800 pt-3">
+                <Link
+                  href={`/inventory/${part._id}`}
+                  className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                >
+                  <Eye className="h-3 w-3 me-1" />
+                  {t('common.view')}
+                </Link>
                 <Link
                   href={`/inventory/${part._id}/edit`}
                   className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-[#F97402] hover:bg-[#F13F33] transition-colors"

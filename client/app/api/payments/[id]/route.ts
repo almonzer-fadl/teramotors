@@ -1,184 +1,91 @@
 import { connectToDatabase } from '@/lib/db';
 import Payment from '@/lib/models/Payment';
-import Invoice from '@/lib/models/Invoice';
-import { getServerSession } from "@/lib/auth-server";
+import { Invoice } from '@/lib/models';
 import { NextRequest, NextResponse } from 'next/server';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin
-    const userRole = (session.user as any).role;
-    if (userRole !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
-    }
-
+// GET /api/payments/[id] - Get a single payment by ID
+export const GET = withTenantAuth(
+  async (req: NextRequest, { params, tenantId }) => {
+    const { id } = params;
     await connectToDatabase();
 
-    const { id } = await params;
-    const tenantId = (session.user as any).tenantId;
-
-    const payment = await Payment.findById(id)
+    const payment = await Payment.findOne({ _id: id, tenantId })
       .populate({
         path: 'invoiceId',
+        select: 'invoiceNumber totalAmount customerId vehicleId',
         populate: [
-          {
-            path: 'customerId',
-            select: 'firstName lastName'
-          },
-          {
-            path: 'vehicleId',
-            select: 'make model year licensePlate'
-          }
-        ]
+          { path: 'customerId', select: 'firstName lastName' },
+          { path: 'vehicleId', select: 'make model year licensePlate' },
+        ],
       });
 
     if (!payment) {
       return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
     }
 
-    // Verify the payment's invoice belongs to the tenant
-    if (payment.invoiceId && (payment.invoiceId as any).tenantId?.toString() !== tenantId) {
-      return NextResponse.json({ error: 'Forbidden - Payment does not belong to your tenant' }, { status: 403 });
-    }
+    return NextResponse.json({ payment });
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);
 
-    return NextResponse.json(payment);
-  } catch (error) {
-    console.error('Error fetching payment:', error);
-    return NextResponse.json({ error: 'Failed to fetch payment' }, { status: 500 });
-  }
-}
-
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin
-    const userRole = (session.user as any).role;
-    if (userRole !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
-    }
-
+// PUT /api/payments/[id] - Update a single payment
+export const PUT = withTenantAuth(
+  async (req: NextRequest, { params, tenantId }) => {
+    const { id } = params;
     await connectToDatabase();
 
-    const { id } = await params;
-    const tenantId = (session.user as any).tenantId;
-    const body = await request.json();
-    const { status, amount, paymentMethod, reference, notes } = body;
+    const body = await req.json();
+    const { invoiceId, amount, paymentMethod, paymentDate, reference, notes, status } = body;
 
-    const payment = await Payment.findById(id).populate('invoiceId');
-    if (!payment) {
-      return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
+    // Validate required fields
+    if (!invoiceId || !amount || !paymentMethod || !paymentDate || !status) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Verify the payment's invoice belongs to the tenant
-    if (payment.invoiceId && (payment.invoiceId as any).tenantId?.toString() !== tenantId) {
-      return NextResponse.json({ error: 'Forbidden - Payment does not belong to your tenant' }, { status: 403 });
+    // Validate invoice belongs to tenant
+    const invoice = await Invoice.findOne({ _id: invoiceId, tenantId });
+    if (!invoice) {
+      return NextResponse.json({ error: 'Invoice not found or does not belong to your organization' }, { status: 400 });
     }
 
-    // Update payment fields
-    if (status) payment.status = status;
-    if (amount !== undefined) payment.amount = parseFloat(amount);
-    if (paymentMethod) payment.paymentMethod = paymentMethod;
-    if (reference !== undefined) payment.reference = reference;
-    if (notes !== undefined) payment.notes = notes;
-
-    await payment.save();
-
-    // If payment is completed, update the invoice status
-    if (status === 'completed') {
-      await Invoice.findByIdAndUpdate(payment.invoiceId, { 
-        status: 'paid',
-        paidAt: new Date()
-      });
-    } else if (status === 'failed' || status === 'refunded') {
-      await Invoice.findByIdAndUpdate(payment.invoiceId, { 
-        status: 'pending',
-        paidAt: null
-      });
-    }
-
-    // Populate the response
-    await payment.populate([
+    const updatedPayment = await Payment.findOneAndUpdate(
+      { _id: id, tenantId },
       {
-        path: 'invoiceId',
-        populate: [
-          {
-            path: 'customerId',
-            select: 'firstName lastName'
-          },
-          {
-            path: 'vehicleId',
-            select: 'make model year licensePlate'
-          }
-        ]
-      }
-    ]);
+        invoiceId,
+        customerId: invoice.customerId,
+        amount: parseFloat(amount),
+        paymentMethod,
+        paymentDate: new Date(paymentDate),
+        reference: reference || '',
+        notes: notes || '',
+        status,
+      },
+      { new: true, runValidators: true }
+    );
 
-    return NextResponse.json(payment);
-  } catch (error) {
-    console.error('Error updating payment:', error);
-    return NextResponse.json({ error: 'Failed to update payment' }, { status: 500 });
-  }
-}
-
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin
-    const userRole = (session.user as any).role;
-    if (userRole !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
-    }
-
-    await connectToDatabase();
-
-    const { id } = await params;
-    const tenantId = (session.user as any).tenantId;
-
-    const payment = await Payment.findById(id).populate('invoiceId');
-    if (!payment) {
+    if (!updatedPayment) {
       return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
     }
 
-    // Verify the payment's invoice belongs to the tenant
-    if (payment.invoiceId && (payment.invoiceId as any).tenantId?.toString() !== tenantId) {
-      return NextResponse.json({ error: 'Forbidden - Payment does not belong to your tenant' }, { status: 403 });
-    }
+    return NextResponse.json({ payment: updatedPayment });
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);
 
-    // If payment was completed, reset the invoice status
-    if (payment.status === 'completed') {
-      await Invoice.findByIdAndUpdate(payment.invoiceId, { 
-        status: 'pending',
-        paidAt: null
-      });
-    }
+// DELETE /api/payments/[id] - Delete a single payment
+export const DELETE = withTenantAuth(
+  async (req: NextRequest, { params, tenantId }) => {
+    const { id } = params;
+    await connectToDatabase();
 
-    await Payment.findByIdAndDelete(id);
+    const deletedPayment = await Payment.findOneAndDelete({ _id: id, tenantId });
+
+    if (!deletedPayment) {
+      return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
+    }
 
     return NextResponse.json({ message: 'Payment deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting payment:', error);
-    return NextResponse.json({ error: 'Failed to delete payment' }, { status: 500 });
-  }
-}
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);
