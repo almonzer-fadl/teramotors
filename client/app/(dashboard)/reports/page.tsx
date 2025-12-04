@@ -1,561 +1,373 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useCallback } from 'react'
-import Pagination from '@/components/ui/Pagination'
-import { useSession } from '@/lib/hooks/useSession'
-import { hasPermission } from '@/lib/roles'
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import Link from "next/link";
 import {
+  BarChart2,
+  Users,
   DollarSign,
-  TrendingUp,
-  TrendingDown,
-  CreditCard,
   Receipt,
-  FileText,
-  Download,
-  Calendar,
-  ArrowUpRight,
-  ArrowDownRight,
-  PieChart,
-  BarChart3,
-  Calculator,
-  Banknote
-} from 'lucide-react'
-import { useTranslation } from 'react-i18next'
+  Package,
+  Wrench,
+  AlertTriangle,
+  Loader2,
+  HelpCircle,
+} from "lucide-react";
+import { PieChart, Pie, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts'; // Recharts imports
+import { fadeInUp, staggerContainer } from "@/lib/dashboard-animations";
 
-interface ReportData {
-  // Financial Summary
-  totalRevenue: number
-  totalExpenses: number
-  netProfit: number
-  grossProfit: number
-  profitMargin: number
-  
-  // Revenue Breakdown
-  serviceRevenue: number
-  partsRevenue: number
-  laborRevenue: number
-  otherRevenue: number
-  
-  // Payment Methods
-  cashPayments: number
-  cardPayments: number
-  bankTransferPayments: number
-  checkPayments: number
-  
-  // Monthly Data
-  monthlyRevenue: Array<{ month: string; revenue: number; expenses: number; profit: number }>
-  monthlyProfit: Array<{ month: string; profit: number; margin: number }>
-  
-  // Top Revenue Sources
-  topServices: Array<{ name: string; revenue: number; count: number; avgPrice: number }>
-  topCustomers: Array<{ name: string; revenue: number; jobs: number }>
-  
-  // Financial Health
-  outstandingInvoices: number
-  overdueInvoices: number
-  averageInvoiceValue: number
-  collectionRate: number
-  
-  // Growth Metrics
-  revenueGrowth: number
-  profitGrowth: number
-  customerGrowth: number
-}
+const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'SAR' }).format(value || 0);
 
-export default function ReportsPage() {
-  const { user } = useSession()
-  const [reportData, setReportData] = useState<ReportData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [dateRange, setDateRange] = useState('30')
-  const [reportType, setReportType] = useState('overview')
-  const { t } = useTranslation()
-  const [workLogs, setWorkLogs] = useState<any[]>([])
-  const [logsPage, setLogsPage] = useState(1)
-  const [logsLimit, setLogsLimit] = useState(30)
-  const [logsTotal, setLogsTotal] = useState(0)
-  const [filterRole, setFilterRole] = useState('')
-  const [filterUserId, setFilterUserId] = useState('')
-  const [filterJobCardIdEnds, setFilterJobCardIdEnds] = useState('')
-  const [filterStartDate, setFilterStartDate] = useState('')
-  const [filterEndDate, setFilterEndDate] = useState('')
-  const [filterMinDuration, setFilterMinDuration] = useState('')
-  const [filterMaxDuration, setFilterMaxDuration] = useState('')
-  // Check if user has admin permissions
-  const userRole = (user as any)?.role || 'mechanic'
-  const canAccessReports = hasPermission(userRole, 'canAccessReports')
+const reports = [
+  // Package 1: Financial Core
+  {
+    titleKey: "reports.pnl.title",
+    descriptionKey: "reports.pnl.description",
+    href: "/reports/profit-and-loss",
+    icon: BarChart2,
+    color: "from-blue-500 to-indigo-600",
+    summaryApi: "/api/reports/profit-and-loss/summary",
+    type: "pnl",
+  },
+  {
+    titleKey: "reports.sales.title",
+    descriptionKey: "reports.sales.description",
+    href: "/reports/sales",
+    icon: DollarSign,
+    color: "from-green-500 to-emerald-600",
+    summaryApi: "/api/reports/sales/summary",
+    type: "sales",
+  },
+  {
+    titleKey: "reports.ar_aging.title",
+    descriptionKey: "reports.ar_aging.description",
+    href: "/reports/accounts-receivable",
+    icon: Users,
+    color: "from-amber-500 to-orange-600",
+    summaryApi: "/api/reports/accounts-receivable/summary",
+    type: "ar",
+  },
+  {
+    titleKey: "reports.vat.title",
+    descriptionKey: "reports.vat.description",
+    href: "/reports/vat",
+    icon: Receipt,
+    color: "from-red-500 to-rose-600",
+    summaryApi: "/api/reports/vat/summary",
+    type: "vat",
+  },
+  {
+    titleKey: "reports.payments.title",
+    descriptionKey: "reports.payments.description",
+    href: "/reports/payments-received",
+    icon: Receipt,
+    color: "from-purple-500 to-violet-600",
+    summaryApi: "/api/reports/payments-received/summary",
+    type: "payments",
+  },
+  // Package 2: Operations & Assets
+  {
+    titleKey: "reports.inventory_valuation.title",
+    descriptionKey: "reports.inventory_valuation.description",
+    href: "/reports/inventory-valuation",
+    icon: Package,
+    color: "from-cyan-500 to-sky-600",
+    summaryApi: "/api/reports/inventory-valuation/summary",
+    type: "inventory",
+  },
+  {
+    titleKey: "reports.technician_performance.title",
+    descriptionKey: "reports.technician_performance.description",
+    href: "/reports/technician-performance",
+    icon: Wrench,
+    color: "from-gray-500 to-slate-600",
+    summaryApi: "/api/reports/technician-performance/summary",
+    type: "tech",
+  },
+];
+
+const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summaryApi, type }: (typeof reports)[0]) => {
+  const { t } = useTranslation("common");
+  const [summaryData, setSummaryData] = useState<any>(null);
+  const [loadingSummary, setLoadingSummary] = useState(true);
 
   useEffect(() => {
-    if (canAccessReports) {
-      fetchReportData()
+    if (summaryApi) {
+      const fetchSummary = async () => {
+        setLoadingSummary(true);
+        try {
+          const response = await fetch(summaryApi);
+          if (response.ok) {
+            const data = await response.json();
+            setSummaryData(data);
+          }
+        } catch (error) {
+          console.error(`Failed to fetch summary for ${titleKey}:`, error);
+        } finally {
+          setLoadingSummary(false);
+        }
+      };
+      fetchSummary();
+    } else {
+      setLoadingSummary(false);
     }
-  }, [canAccessReports, dateRange])
+  }, [summaryApi, titleKey]);
 
-  useEffect(() => {
-    if (canAccessReports) {
-      // Debounce work logs fetching to avoid excessive calls
-      const timeoutId = setTimeout(() => {
-        fetchWorkLogs()
-      }, 300)
-      return () => clearTimeout(timeoutId)
-    }
-  }, [canAccessReports, logsPage, logsLimit, filterRole, filterUserId, filterJobCardIdEnds, filterStartDate, filterEndDate, filterMinDuration, filterMaxDuration])
-
-  const fetchReportData = async () => {
-    try {
-      const response = await fetch(`/api/reports?range=${dateRange}`)
-      if (response.ok) {
-        const data = await response.json()
-        setReportData(data)
-      }
-    } catch (error) {
-      console.error('Error fetching report data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchWorkLogs = async () => {
-    try {
-      const params = new URLSearchParams()
-      params.set('page', String(logsPage))
-      params.set('limit', String(logsLimit))
-      if (filterRole) params.set('role', filterRole)
-      if (filterUserId) params.set('userId', filterUserId)
-      if (filterJobCardIdEnds) params.set('jobCardEndsWith', filterJobCardIdEnds)
-      if (filterStartDate) params.set('startDate', filterStartDate)
-      if (filterEndDate) params.set('endDate', filterEndDate)
-      if (filterMinDuration) params.set('minDurationMs', String(Number(filterMinDuration) * 60000))
-      if (filterMaxDuration) params.set('maxDurationMs', String(Number(filterMaxDuration) * 60000))
-      const response = await fetch(`/api/reports/work-logs?${params.toString()}`)
-      if (response.ok) {
-        const data = await response.json()
-        setWorkLogs(data.logs || [])
-        if (data.pagination) setLogsTotal(data.pagination.totalCount || 0)
-      }
-    } catch (e) {
-      // ignore
-    }
-  }
-
-  const handleExportReport = async () => {
-    try {
-      const response = await fetch(`/api/reports/export?format=excel&range=${dateRange}`, {
-        method: 'POST',
-      })
-      
-      if (response.ok) {
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `teramotors-report-${new Date().toISOString().split('T')[0]}.xlsx`
-        document.body.appendChild(a)
-        a.click()
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(a)
-      }
-    } catch (error) {
-      console.error('Error exporting report:', error)
-    }
-  }
-
-  if (!canAccessReports) {
-    return (
-      <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-950">
-        <div className="text-center">
-          <BarChart3 className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.access_denied')}</h3>
-          <p className="text-gray-500 dark:text-gray-400">{t('reports.access_denied_description')}</p>
+  const renderContent = () => {
+    if (loadingSummary) {
+      return (
+        <div className="flex items-center justify-center h-full min-h-[100px]">
+          <Loader2 className="h-6 w-6 animate-spin text-[#F97402]" />
         </div>
-      </div>
-    )
-  }
+      );
+    }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-950">
-        <div className="flex items-center gap-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402]"></div>
-          <p className="text-gray-600 dark:text-gray-400">{t('reports.loading')}</p>
+    if (!summaryData && summaryApi) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full min-h-[100px] text-gray-500 dark:text-gray-400 text-sm text-center">
+                <HelpCircle className="h-6 w-6 mb-1" />
+                No data for summary
+            </div>
+        );
+    }
+
+    if (type === "pnl" && summaryData) {
+      const { grossProfit, totalRevenue, totalCogs } = summaryData;
+      const data = [
+        { name: 'Gross Profit', value: grossProfit || 0 },
+        { name: 'COGS', value: totalCogs || 0 },
+      ];
+      const COLORS = ['#10b981', '#ef4444']; // Green for profit, Red for COGS
+
+      return (
+        <div className="flex flex-col h-full justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t(titleKey)}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(grossProfit)}</p>
+          </div>
+          <div className="relative w-full h-24">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={30}
+                  outerRadius={40}
+                  fill="#8884d8"
+                  paddingAngle={2}
+                  dataKey="value"
+                  animationDuration={500}
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Total Revenue: {formatCurrency(totalRevenue)}</p>
         </div>
+      );
+    }
+
+    if (type === "sales" && summaryData) {
+      const { totalSales, salesByServiceCategory } = summaryData;
+      const chartData = salesByServiceCategory.map((item: any) => ({
+        name: item.category,
+        Sales: item.amount,
+      }));
+
+      return (
+        <div className="flex flex-col h-full justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t(titleKey)}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalSales)}</p>
+          </div>
+          <div className="relative w-full h-24">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                <XAxis dataKey="name" hide />
+                <YAxis hide />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Bar dataKey="Sales" fill="#82ca9d" animationDuration={500} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Top services by sales</p>
+        </div>
+      );
+    }
+
+    if (type === "ar" && summaryData) {
+        const { totalOutstanding } = summaryData;
+        const buckets = [
+            { label: '1-30', value: summaryData['1-30'] },
+            { label: '31-60', value: summaryData['31-60'] },
+            { label: '61+', value: summaryData['61-90'] + summaryData['91+'] },
+        ];
+        return (
+            <div className="flex flex-col h-full justify-between">
+            <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t(titleKey)}</p>
+                <p className="text-2xl font-bold text-red-500 dark:text-red-400 mt-1">{formatCurrency(totalOutstanding)}</p>
+            </div>
+            <div className="space-y-1 mt-2">
+                {buckets.map(bucket => (
+                    <div key={bucket.label} className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                        <span>{bucket.label} Days</span>
+                        <span className="font-medium">{formatCurrency(bucket.value)}</span>
+                    </div>
+                ))}
+            </div>
+            </div>
+        );
+    }
+
+    if (type === "vat" && summaryData) {
+      const { totalVatCollected } = summaryData;
+      return (
+        <div className="flex flex-col h-full justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t(titleKey)}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalVatCollected)}</p>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Total VAT collected in last 30 days.</p>
+        </div>
+      );
+    }
+
+    if (type === "payments" && summaryData) {
+      const { totalPaymentsReceived } = summaryData;
+      return (
+        <div className="flex flex-col h-full justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t(titleKey)}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalPaymentsReceived)}</p>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Total payments received in last 30 days.</p>
+        </div>
+      );
+    }
+
+    if (type === "inventory" && summaryData) {
+      const { totalInventoryValue } = summaryData;
+      return (
+        <div className="flex flex-col h-full justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t(titleKey)}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalInventoryValue)}</p>
+          </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Total value of all parts in stock.</p>
+        </div>
+      );
+    }
+
+    if (type === "tech" && summaryData) {
+        const chartData = summaryData.map((item: any) => ({
+            name: item.mechanicName,
+            Revenue: item.totalRevenue,
+        }));
+        return (
+            <div className="flex flex-col h-full justify-between">
+            <div>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t(titleKey)}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{summaryData.length > 0 ? formatCurrency(summaryData[0].totalRevenue) : formatCurrency(0)}</p>
+            </div>
+            <div className="relative w-full h-24">
+                <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                    <XAxis dataKey="name" hide />
+                    <YAxis hide />
+                    <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                    <Bar dataKey="Revenue" fill="#8884d8" animationDuration={500} />
+                </BarChart>
+                </ResponsiveContainer>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Top technician by revenue (last 30 days).</p>
+            </div>
+        );
+    }
+
+    // Default content for reports without specific summary data/charts
+    return (
+      <div className="relative flex flex-col h-full">
+        <div className="mb-4">
+          <div className={`w-14 h-14 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center text-white shadow-lg`}>
+            <Icon className="w-7 h-7" />
+          </div>
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t(titleKey)}</h3>
+        <p className="text-gray-600 dark:text-gray-400 text-sm flex-grow">{t(descriptionKey)}</p>
       </div>
-    )
-  }
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8 py-6">
-      <div className="space-y-6">
+    <Link href={href}>
+      <motion.div
+        variants={fadeInUp}
+        className="relative group block w-full h-full bg-white dark:bg-gray-900/80 p-6 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800 hover:border-[#F97402] hover:shadow-[#F97402]/20 hover:shadow-2xl transition-all duration-300"
+      >
+        <div
+          className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+        ></div>
+        <div className="relative flex flex-col h-full">
+          {renderContent()}
+          <div className="mt-4 text-sm font-semibold text-[#F97402] text-right">
+            {t('reports.view_report')} &rarr;
+          </div>
+        </div>
+      </motion.div>
+    </Link>
+  );
+};
+
+export default function ReportsPage() {
+  const { t } = useTranslation("common");
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
+      <motion.div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-              {t('reports.title')}
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {t('reports.description')}
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <select
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2 focus:ring-[#F97402] focus:border-[#F97402]"
-            >
-              <option value="7">{t('reports.last_7_days')}</option>
-              <option value="30">{t('reports.last_30_days')}</option>
-              <option value="90">{t('reports.last_90_days')}</option>
-              <option value="365">{t('reports.last_year')}</option>
-            </select>
-            <button
-              onClick={handleExportReport}
-              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-[#F97402] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#F13F33] transition-colors"
-            >
-              <Download className="me-2 h-4 w-4" />
-              {t('reports.export_excel')}
-            </button>
-          </div>
+        <motion.div className="mb-8" variants={fadeInUp}>
+          <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+            {t("reports.title")}
+          </h1>
+          <p className="mt-2 text-base text-gray-700 dark:text-gray-300">
+            {t("reports.description")}
+          </p>
+        </motion.div>
+
+        {/* Report Widgets */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {reports.map((report) => (
+            <ReportCard key={report.href} {...report} />
+          ))}
         </div>
 
-        {/* Financial Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <DollarSign className="h-6 w-6 text-green-500" />
-              </div>
-              <div className="ms-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                    {t('reports.total_revenue')}
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    ${(reportData?.totalRevenue || 0).toLocaleString()}
-                  </dd>
-                  <dd className="text-sm text-green-600 dark:text-green-400 flex items-center">
-                    <ArrowUpRight className="h-3 w-3 me-1" />
-                    +{reportData?.revenueGrowth || 0}%
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <TrendingUp className="h-6 w-6 text-blue-500" />
-              </div>
-              <div className="ms-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                    {t('reports.net_profit')}
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    ${(reportData?.netProfit || 0).toLocaleString()}
-                  </dd>
-                  <dd className="text-sm text-blue-600 dark:text-blue-400 flex items-center">
-                    <ArrowUpRight className="h-3 w-3 me-1" />
-                    +{reportData?.profitGrowth || 0}%
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Calculator className="h-6 w-6 text-purple-500" />
-              </div>
-              <div className="ms-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                    {t('reports.profit_margin')}
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {(reportData?.profitMargin || 0).toFixed(1)}%
-                  </dd>
-                  <dd className="text-sm text-gray-500 dark:text-gray-400">
-                    {t('reports.margin')}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Receipt className="h-6 w-6 text-orange-500" />
-              </div>
-              <div className="ms-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                    {t('reports.outstanding_invoices')}
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    ${(reportData?.outstandingInvoices || 0).toLocaleString()}
-                  </dd>
-                  <dd className="text-sm text-red-600 dark:text-red-400">
-                    {reportData?.overdueInvoices || 0} {t('reports.overdue')}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Revenue Breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.revenue_breakdown')}</h3>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {[
-                  { color: 'bg-blue-500', label: t('reports.service_revenue'), value: reportData?.serviceRevenue },
-                  { color: 'bg-green-500', label: t('reports.parts_revenue'), value: reportData?.partsRevenue },
-                  { color: 'bg-purple-500', label: t('reports.labor_revenue'), value: reportData?.laborRevenue },
-                  { color: 'bg-orange-500', label: t('reports.other_revenue'), value: reportData?.otherRevenue },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className={`w-3 h-3 ${item.color} rounded-full me-3`}></div>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</span>
-                    </div>
-                    <span className="text-sm font-bold text-gray-900 dark:text-white">
-                      ${(item.value || 0).toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.payment_methods')}</h3>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {[
-                  { icon: <Banknote className="h-4 w-4 text-green-500" />, label: t('reports.cash_payments'), value: reportData?.cashPayments },
-                  { icon: <CreditCard className="h-4 w-4 text-blue-500" />, label: t('reports.card_payments'), value: reportData?.cardPayments },
-                  { icon: <Receipt className="h-4 w-4 text-purple-500" />, label: t('reports.bank_transfer'), value: reportData?.bankTransferPayments },
-                  { icon: <FileText className="h-4 w-4 text-orange-500" />, label: t('reports.check_payments'), value: reportData?.checkPayments },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      {item.icon}
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">{item.label}</span>
-                    </div>
-                    <span className="text-sm font-bold text-gray-900 dark:text-white">
-                      ${(item.value || 0).toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Top Revenue Sources */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.top_services')}</h3>
-            </div>
-            <div className="overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-                <thead className="bg-gray-50 dark:bg-gray-800/50">
-                  <tr>
-                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t('reports.service')}
-                    </th>
-                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t('reports.revenue')}
-                    </th>
-                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t('reports.count')}
-                    </th>
-                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t('reports.avg_price')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-                  {reportData?.topServices?.slice(0, 5).map((service, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                        {service.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        ${service.revenue.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        {service.count}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        ${(service.avgPrice || 0).toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-                <Pagination
-                  currentPage={logsPage}
-                  totalPages={Math.max(1, Math.ceil((logsTotal || 0) / logsLimit))}
-                  totalItems={logsTotal}
-                  itemsPerPage={logsLimit}
-                  onPageChange={(p) => setLogsPage(p)}
-                  onItemsPerPageChange={(n) => { setLogsLimit(n); setLogsPage(1) }}
-                  itemsPerPageOptions={[10, 30, 50, 100]}
-                  className="mt-2"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.top_customers')}</h3>
-            </div>
-            <div className="overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-                <thead className="bg-gray-50 dark:bg-gray-800/50">
-                  <tr>
-                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t('reports.customer')}
-                    </th>
-                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t('reports.revenue')}
-                    </th>
-                    <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      {t('reports.jobs')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-                  {reportData?.topCustomers?.slice(0, 5).map((customer, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                        {customer.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        ${customer.revenue.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                        {customer.jobs}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        {/* Financial Health Summary */}
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.financial_health')}</h3>
-          </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  ${(reportData?.averageInvoiceValue || 0).toLocaleString()}
+        {/* Disclaimer for data not tracked */}
+         <motion.div variants={fadeInUp} className="mt-12 bg-yellow-50/80 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-r-lg">
+            <div className="flex">
+                <div className="flex-shrink-0">
+                    <AlertTriangle className="h-5 w-5 text-yellow-400 dark:text-yellow-500" aria-hidden="true" />
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{t('reports.avg_invoice_value')}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {(reportData?.collectionRate || 0).toFixed(1)}%
+                <div className="ml-3">
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                        <span className="font-bold">{t('reports.disclaimer.title')}</span>: {t('reports.disclaimer.description')}
+                    </p>
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{t('reports.collection_rate')}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {typeof reportData?.customerGrowth === 'number' ? `${reportData.customerGrowth}%` : '0%'}
-                </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{t('reports.customer_growth')}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  ${(reportData?.grossProfit || 0).toLocaleString()}
-                </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{t('reports.gross_profit')}</div>
-              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Work Logs */}
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t('reports.work_logs')}</h3>
-            <div className="text-sm text-gray-500 dark:text-gray-400">{t('reports.latest_n', { count: workLogs.length })}</div>
-          </div>
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-            <input
-              value={filterJobCardIdEnds}
-              onChange={(e) => { setFilterJobCardIdEnds(e.target.value.toUpperCase()); setLogsPage(1) }}
-              placeholder={t('reports.jobcard_suffix') as string}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-            />
-            <input
-              value={filterUserId}
-              onChange={(e) => { setFilterUserId(e.target.value); setLogsPage(1) }}
-              placeholder={t('reports.user_id') as string}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-            />
-            <select
-              value={filterRole}
-              onChange={(e) => { setFilterRole(e.target.value); setLogsPage(1) }}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-            >
-              <option value="">{t('reports.any_role')}</option>
-              <option value="mechanic">{t('roles.mechanic')}</option>
-              <option value="inspector">{t('roles.inspector')}</option>
-              <option value="admin">{t('roles.admin')}</option>
-            </select>
-            <input type="date" value={filterStartDate} onChange={(e)=>{ setFilterStartDate(e.target.value); setLogsPage(1) }} className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
-            <input type="date" value={filterEndDate} onChange={(e)=>{ setFilterEndDate(e.target.value); setLogsPage(1) }} className="px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
-            <div className="flex items-center gap-2">
-              <input type="number" min="0" value={filterMinDuration} onChange={(e)=>{ setFilterMinDuration(e.target.value); setLogsPage(1) }} placeholder={t('reports.min_minutes') as string} className="w-1/2 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
-              <input type="number" min="0" value={filterMaxDuration} onChange={(e)=>{ setFilterMaxDuration(e.target.value); setLogsPage(1) }} placeholder={t('reports.max_minutes') as string} className="w-1/2 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white" />
-            </div>
-          </div>
-          <div className="overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-              <thead className="bg-gray-50 dark:bg-gray-800/50">
-                <tr>
-                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('reports.user')}</th>
-                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('reports.role')}</th>
-                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('reports.job')}</th>
-                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('reports.started')}</th>
-                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('reports.ended')}</th>
-                  <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('reports.duration')}</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-                {workLogs.map((log, idx) => (
-                  <tr key={idx}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{log.userId?.displayName || `${log.userId?.firstName || ''} ${log.userId?.lastName || ''}`}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{log.role}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">#{(log.jobCardId?._id || '').slice(-6)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(log.startedAt).toLocaleString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{log.endedAt ? new Date(log.endedAt).toLocaleString() : '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{typeof log.durationMs === 'number' ? `${Math.round(log.durationMs / 60000)} min` : '-'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
-  )
+  );
 }
