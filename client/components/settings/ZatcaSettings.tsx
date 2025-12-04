@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Loader2, Save, Key, Check, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const FormInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
     <input {...props} className="w-full px-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200" />
@@ -76,8 +77,10 @@ export default function ZatcaSettings() {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to save settings');
             }
+            toast.success('ZATCA settings saved!');
         } catch (error) {
             console.error("Error saving ZATCA settings", error);
+            toast.error(`Failed to save: ${(error as Error).message}`);
         } finally {
             setSaving(false);
         }

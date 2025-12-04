@@ -1,0 +1,143 @@
+/* 
+  TERAMOTORS - COLOR THEME DEFINITIONS & OVERRIDES
+*/
+
+@layer base {
+  /* Default Theme (Orange) - This is the fallback */
+  :root, [data-theme="default"] {
+    --primary: oklch(0.7 0.2 45); /* Orange */
+    --accent: oklch(0.6 0.2 25); /* Red-orange */
+    --ring: var(--primary);
+  }
+  [data-theme="default"].dark {
+    --primary: oklch(0.7 0.2 45); /* Orange */
+    --accent: oklch(0.7 0.2 45); /* Brighter orange for dark mode */
+    --ring: var(--primary);
+  }
+
+  /* Ocean Theme (Blue) */
+  [data-theme="ocean"] {
+    --primary: oklch(0.6 0.15 250); /* Blue */
+    --accent: oklch(0.7 0.15 210); /* Lighter Blue */
+    --ring: var(--primary);
+  }
+  [data-theme="ocean"].dark {
+    --primary: oklch(0.7 0.15 250);
+    --accent: oklch(0.7 0.15 210);
+    --ring: var(--primary);
+  }
+
+  /* Forest Theme (Green) */
+  [data-theme="forest"] {
+    --primary: oklch(0.6 0.18 150); /* Green */
+    --accent: oklch(0.7 0.15 130); /* Lighter Green */
+    --ring: var(--primary);
+  }
+  [data-theme="forest"].dark {
+    --primary: oklch(0.65 0.18 150);
+    --accent: oklch(0.7 0.15 130);
+    --ring: var(--primary);
+  }
+
+  /* Ruby Theme (Red) */
+  [data-theme="ruby"] {
+    --primary: oklch(0.6 0.2 15); /* Red */
+    --accent: oklch(0.65 0.18 5); /* Softer Red/Pink */
+    --ring: var(--primary);
+  }
+  [data-theme="ruby"].dark {
+    --primary: oklch(0.65 0.2 15);
+    --accent: oklch(0.65 0.18 5);
+    --ring: var(--primary);
+  }
+
+  /* Amethyst Theme (Purple) */
+  [data-theme="amethyst"] {
+    --primary: oklch(0.6 0.18 290); /* Purple */
+    --accent: oklch(0.7 0.22 320); /* Magenta */
+    --ring: var(--primary);
+  }
+  [data-theme="amethyst"].dark {
+    --primary: oklch(0.65 0.18 290);
+    --accent: oklch(0.7 0.22 320);
+    --ring: var(--primary);
+  }
+
+  /* NEW: Midnight Theme (Charcoal/Gray) */
+  [data-theme="midnight"] {
+    --primary: oklch(0.4 0.01 250); /* Dark Gray/Blue tint */
+    --accent: oklch(0.6 0.01 250); /* Lighter Gray */
+    --ring: var(--primary);
+  }
+  [data-theme="midnight"].dark {
+    --primary: oklch(0.5 0.01 250);
+    --accent: oklch(0.7 0.01 250);
+    --ring: var(--primary);
+  }
+
+  /* NEW: Cobalt Theme (Deep Blue/Silver) */
+  [data-theme="cobalt"] {
+    --primary: oklch(0.5 0.15 260); /* Deep Blue */
+    --accent: oklch(0.8 0.02 260); /* Silver/Light Gray */
+    --ring: var(--primary);
+  }
+  [data-theme="cobalt"].dark {
+    --primary: oklch(0.55 0.15 260);
+    --accent: oklch(0.85 0.02 260);
+    --ring: var(--primary);
+  }
+}
+
+/* 
+  GLOBAL OVERRIDES for hardcoded Tailwind classes.
+  Scoped to `.dashboard-panel` to avoid affecting public pages.
+*/
+@layer components {
+  /* Main Gradient */
+  .dashboard-panel .from-\[\#F97402\] { --tw-gradient-from: var(--primary) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, oklch(from var(--primary) l c h / 0)) !important; }
+  .dashboard-panel .to-\[\#F13F33\] { --tw-gradient-to: var(--accent) !important; }
+  
+  /* Subtle Gradients (like in settings tabs) */
+  .dashboard-panel .from-\[\#F97402\]\/10 { --tw-gradient-from: oklch(from var(--primary) l c h / 0.1) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, oklch(from var(--primary) l c h / 0)) !important; }
+  .dashboard-panel .to-\[\#F13F33\]\/10 { --tw-gradient-to: oklch(from var(--accent) l c h / 0.1) !important; }
+  .dashboard-panel .dark .dark\:from-\[\#F97402\]\/20 { --tw-gradient-from: oklch(from var(--primary) l c h / 0.2) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, oklch(from var(--primary) l c h / 0)) !important; }
+  .dashboard-panel .dark .dark\:to-\[\#F13F33\]\/20 { --tw-gradient-to: oklch(from var(--accent) l c h / 0.2) !important; }
+
+  /* Solid Backgrounds (including sidebar active state) */
+  .dashboard-panel .bg-\[\#F97402\] { background-color: var(--primary) !important; }
+  .dashboard-panel .dark .dark\:bg-\[\#F97402\] { background-color: var(--primary) !important; }
+  .dashboard-panel .bg-\[\#F13F33\] { background-color: var(--accent) !important; }
+  .dashboard-panel .hover\:bg-\[\#F13F33\]:hover { background-color: var(--accent) !important; }
+
+  /* Text Colors */
+  .dashboard-panel .text-\[\#F97402\] { color: var(--primary) !important; }
+  .dashboard-panel .dark .dark\:text-\[\#F97402\] { color: var(--primary) !important; }
+  .dashboard-panel .text-\[\#F13F33\] { color: var(--accent) !important; }
+
+  /* Hover Text Colors */
+  .dashboard-panel .hover\:text-\[\#F97402\]:hover { color: var(--primary) !important; }
+  .dashboard-panel .dark .dark\:hover\:text-\[\#F97402\]:hover { color: var(--primary) !important; }
+  .dashboard-panel .hover\:text-\[\#F13F33\]:hover { color: var(--accent) !important; }
+
+  /* Border & Ring Colors */
+  .dashboard-panel .border-\[\#F97402\] { border-color: var(--primary) !important; }
+  .dashboard-panel .border-\[\#F97402\]\/20 { border-color: oklch(from var(--primary) l c h / 0.2) !important; }
+  .dashboard-panel .border-\[\#F97402\]\/30 { border-color: oklch(from var(--primary) l c h / 0.3) !important; }
+  .dashboard-panel .hover\:border-\[\#F97402\]:hover { border-color: var(--primary) !important; }
+  .dashboard-panel .dark .dark\:hover\:border-\[\#F97402\]:hover { border-color: var(--primary) !important; }
+  .dashboard-panel .focus\:border-\[\#F97402\]:focus { border-color: var(--primary) !important; }
+  .dashboard-panel .focus\:ring-\[\#F97402\]\/20:focus { --tw-ring-color: oklch(from var(--primary) l c h / 0.2) !important; }
+  .dashboard-panel .focus\:border-\[\#F13F33\]:focus { border-color: var(--accent) !important; }
+  .dashboard-panel .focus\:ring-\[\#F13F33\]\/20:focus { --tw-ring-color: oklch(from var(--accent) l c h / 0.2) !important; }
+  
+  /* Shadow Colors */
+  .dashboard-panel .shadow-\[\#F97402\]\/25 { --tw-shadow-color: oklch(from var(--primary) l c h / 0.25) !important; }
+  .dashboard-panel .hover\:shadow-\[\#F97402\]\/25:hover { --tw-shadow-color: oklch(from var(--primary) l c h / 0.25) !important; }
+  .dashboard-panel .hover\:shadow-\[\#F97402\]\/30:hover { --tw-shadow-color: oklch(from var(--primary) l c h / 0.3) !important; }
+  .dashboard-panel .hover\:shadow-\[\#F97402\]\/40:hover { --tw-shadow-color: oklch(from var(--primary) l c h / 0.4) !important; }
+  
+  /* Semi-transparent Backgrounds */
+  .dashboard-panel .bg-\[\#F97402\]\/10 { background-color: oklch(from var(--primary) l c h / 0.1) !important; }
+  .dashboard-panel .dark .dark\:bg-\[\#F97402\]\/20 { background-color: oklch(from var(--primary) l c h / 0.2) !important; }
+  .dashboard-panel .hover\:bg-\[\#F97402\]\/5:hover { background-color: oklch(from var(--primary) l c h / 0.05) !important; }
+}

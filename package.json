@@ -48,6 +48,8 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6"
+    "@types/bcryptjs": "^2.4.6",
+    "@types/papaparse": "^5.5.1",
+    "papaparse": "^5.5.3"
   }
 }

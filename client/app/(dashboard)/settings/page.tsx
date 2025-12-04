@@ -10,7 +10,8 @@ import UserManagementSettings from '@/components/settings/UserManagementSettings
 import InvoicingSettings from '@/components/settings/InvoicingSettings';
 import LocalizationSettings from '@/components/settings/LocalizationSettings';
 import ZatcaSettings from '@/components/settings/ZatcaSettings';
-import IntegrationsSettings from '@/components/settings/IntegrationsSettings'; // Import the new component
+import IntegrationsSettings from '@/components/settings/IntegrationsSettings';
+import AppearanceSettings from '@/components/settings/AppearanceSettings'; // NEW: Import AppearanceSettings
 
 const tabs = [
     { name: 'Company Profile', icon: Building, component: <CompanyProfileSettings /> },
@@ -18,7 +19,8 @@ const tabs = [
     { name: 'Invoicing & Estimates', icon: FileText, component: <InvoicingSettings /> },
     { name: 'Localization', icon: Globe, component: <LocalizationSettings /> },
     { name: 'ZATCA', icon: Key, component: <ZatcaSettings /> },
-    { name: 'Integrations', icon: Share2, component: <IntegrationsSettings /> }, // Replaced placeholder
+    { name: 'Integrations', icon: Share2, component: <IntegrationsSettings /> },
+    { name: 'Appearance', icon: Palette, component: <AppearanceSettings /> }, // NEW: Add Appearance tab
 ];
 
 export default function SettingsPage() {
@@ -70,12 +72,12 @@ export default function SettingsPage() {
                     <motion.div className="lg:col-span-3" variants={fadeInUp}>
                        {tabs.find(tab => tab.name === activeTab)?.component}
 
-                       {/* "More customization" note */}
+                       {/* "More customization" note - updated to reflect theming is available */}
                        <div className="mt-8 bg-blue-50/80 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-200 dark:border-blue-800 text-center">
                            <div className="flex items-center justify-center text-blue-800 dark:text-blue-300">
                                <Palette className="w-5 h-5 mr-3" />
                                <p className="text-sm font-medium">
-                                   More customization options, including advanced workflow settings and theming, are coming soon!
+                                   More customization options, including advanced workflow settings, are coming soon! You can now customize your app's appearance in the new "Appearance" tab!
                                </p>
                            </div>
                        </div>

@@ -1,89 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 import { connectToDatabase } from '@/lib/db';
 import User from '@/lib/models/User';
-import { getServerSession } from "@/lib/auth-server";
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  const session = await getServerSession();
-  if (!session || (session.user as any).role !== 'admin') {
-    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-  }
+// GET /api/users/[id] - Get a single user's details
+export const GET = withTenantAuth(
+  async (req: NextRequest, { params, tenantId }) => {
+    const { id } = params;
+    await connectToDatabase();
+    try {
+      const user = await User.findOne({ _id: id, tenantId }).select('-password').lean();
+      if (!user) {
+        return NextResponse.json({ error: 'User not found or does not belong to your organization.' }, { status: 404 });
+      }
+      return NextResponse.json(user);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 });
+    }
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);
 
-  const { id } = await context.params;
-  const { role, isActive, displayName, firstName, lastName } = await request.json();
-
-  if (!id) {
-    return NextResponse.json({ message: 'User ID not provided' }, { status: 400 });
-  }
-
-  try {
+// DELETE /api/users/[id] - Delete a user
+export const DELETE = withTenantAuth(
+  async (req: NextRequest, { params, tenantId }) => {
+    const { id } = params;
     await connectToDatabase();
 
-    const user = await User.findById(id);
+    try {
+      const user = await User.findOneAndDelete({ _id: id, tenantId }); // Ensure user belongs to the tenant
 
-    if (!user) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      if (!user) {
+        return NextResponse.json({ error: 'User not found or does not belong to your organization.' }, { status: 404 });
+      }
+
+      return NextResponse.json({ message: 'User deleted successfully.' });
+
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
     }
-
-    if (role) {
-      user.role = role;
-    }
-
-    if (isActive !== undefined) {
-      user.isActive = isActive;
-    }
-
-    if (displayName) {
-      user.displayName = displayName;
-    }
-
-    if (firstName) {
-      user.firstName = firstName;
-    }
-
-    if (lastName) {
-      user.lastName = lastName;
-    }
-
-    await user.save();
-
-    return NextResponse.json(user, { status: 200 });
-  } catch (error) {
-    console.error('Error updating user:', error);
-    return NextResponse.json({ message: 'Error updating user' }, { status: 500 });
-  }
-}
-
-export async function DELETE(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  const session = await getServerSession();
-  if (!session || (session.user as any).role !== 'admin') {
-    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 });
-  }
-
-  const { id } = await context.params;
-
-  if (!id) {
-    return NextResponse.json({ message: 'User ID not provided' }, { status: 400 });
-  }
-
-  try {
-    await connectToDatabase();
-
-    const user = await User.findByIdAndDelete(id);
-
-    if (!user) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
-    }
-
-    return NextResponse.json({ message: 'User deleted successfully' }, { status: 200 });
-  } catch (error) {
-    console.error('Error deleting user:', error);
-    return NextResponse.json({ message: 'Error deleting user' }, { status: 500 });
-  }
-}
+  },
+  { requireTenant: true, allowedRoles: ['admin'] } // Only admins can delete users
+);

@@ -1,6 +1,7 @@
 import "./globals.css";
 import I18nProvider from "./i18n-provider";
 import { Toaster } from "react-hot-toast";
+import GlobalThemeHandler from "@/components/GlobalThemeHandler";
 
 export default function RootLayout({
   children,
@@ -15,10 +16,12 @@ export default function RootLayout({
         <meta name="description" content="Professional auto repair management system for TeraMotors" />
       </head>
       <body>
-        <I18nProvider>
-          <Toaster />
-          {children}
-        </I18nProvider>
+        <GlobalThemeHandler>
+          <I18nProvider>
+            <Toaster />
+            {children}
+          </I18nProvider>
+        </GlobalThemeHandler>
       </body>
     </html>
   );
