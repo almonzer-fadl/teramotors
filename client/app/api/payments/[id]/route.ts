@@ -23,6 +23,8 @@ export async function GET(
     await connectToDatabase();
 
     const { id } = await params;
+    const tenantId = (session.user as any).tenantId;
+
     const payment = await Payment.findById(id)
       .populate({
         path: 'invoiceId',
@@ -40,6 +42,11 @@ export async function GET(
 
     if (!payment) {
       return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
+    }
+
+    // Verify the payment's invoice belongs to the tenant
+    if (payment.invoiceId && (payment.invoiceId as any).tenantId?.toString() !== tenantId) {
+      return NextResponse.json({ error: 'Forbidden - Payment does not belong to your tenant' }, { status: 403 });
     }
 
     return NextResponse.json(payment);
@@ -68,12 +75,18 @@ export async function PUT(
     await connectToDatabase();
 
     const { id } = await params;
+    const tenantId = (session.user as any).tenantId;
     const body = await request.json();
     const { status, amount, paymentMethod, reference, notes } = body;
 
-    const payment = await Payment.findById(id);
+    const payment = await Payment.findById(id).populate('invoiceId');
     if (!payment) {
       return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
+    }
+
+    // Verify the payment's invoice belongs to the tenant
+    if (payment.invoiceId && (payment.invoiceId as any).tenantId?.toString() !== tenantId) {
+      return NextResponse.json({ error: 'Forbidden - Payment does not belong to your tenant' }, { status: 403 });
     }
 
     // Update payment fields
@@ -141,9 +154,16 @@ export async function DELETE(
     await connectToDatabase();
 
     const { id } = await params;
-    const payment = await Payment.findById(id);
+    const tenantId = (session.user as any).tenantId;
+
+    const payment = await Payment.findById(id).populate('invoiceId');
     if (!payment) {
       return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
+    }
+
+    // Verify the payment's invoice belongs to the tenant
+    if (payment.invoiceId && (payment.invoiceId as any).tenantId?.toString() !== tenantId) {
+      return NextResponse.json({ error: 'Forbidden - Payment does not belong to your tenant' }, { status: 403 });
     }
 
     // If payment was completed, reset the invoice status

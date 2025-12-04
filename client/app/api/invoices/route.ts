@@ -33,10 +33,11 @@ export async function GET(request: NextRequest) {
     const sort: any = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
-    // Get total count for pagination
-    const totalCount = await Invoice.countDocuments({});
+    // Get total count for pagination with tenant filter
+    const tenantId = (session.user as any).tenantId;
+    const totalCount = await Invoice.countDocuments({ tenantId });
 
-    const invoices = await Invoice.find({})
+    const invoices = await Invoice.find({ tenantId })
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
       .sort(sort)
@@ -249,6 +250,7 @@ export async function POST(request: Request) {
       dueDate: dueDate ? new Date(dueDate) : new Date(),
       paymentMethod,
       zatca: zatcaData,
+      tenantId: (session.user as any).tenantId,
     };
 
     // Debug logging
