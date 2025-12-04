@@ -25,8 +25,13 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const range = searchParams.get('range') || '30'
-    
+
     await connectToDatabase()
+
+    const tenantId = (session.user as any).tenantId
+    if (!tenantId) {
+      return new Response(JSON.stringify({ error: 'Tenant ID not found' }), { status: 400 })
+    }
 
     // Calculate date range
     const endDate = new Date()
@@ -43,14 +48,14 @@ export async function GET(request: NextRequest) {
       invoices,
       payments
     ] = await Promise.all([
-      Customer.countDocuments(),
-      Vehicle.countDocuments(),
-      Appointment.countDocuments(),
-      JobCard.countDocuments(),
-      Part.countDocuments(),
-      Invoice.find({ createdAt: { $gte: startDate, $lte: endDate } })
+      Customer.countDocuments({ tenantId }),
+      Vehicle.countDocuments({ tenantId }),
+      Appointment.countDocuments({ tenantId }),
+      JobCard.countDocuments({ tenantId }),
+      Part.countDocuments({ tenantId }),
+      Invoice.find({ tenantId, createdAt: { $gte: startDate, $lte: endDate } })
         .populate('customerId', 'firstName lastName'),
-      Payment.find({ paymentDate: { $gte: startDate, $lte: endDate } })
+      Payment.find({ tenantId, paymentDate: { $gte: startDate, $lte: endDate } })
     ])
 
     // Calculate total revenue - handle missing total values
@@ -69,6 +74,7 @@ export async function GET(request: NextRequest) {
       const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0)
       
       const monthInvoices = await Invoice.find({
+        tenantId,
         createdAt: { $gte: monthStart, $lte: monthEnd }
       })
       
@@ -85,6 +91,7 @@ export async function GET(request: NextRequest) {
 
     // Get top services from job cards
     const jobCards = await JobCard.find({
+      tenantId,
       createdAt: { $gte: startDate, $lte: endDate }
     }).populate({
       path: 'services.serviceId',
@@ -183,6 +190,7 @@ export async function GET(request: NextRequest) {
 
     // Get average job completion time
     const completedJobs = await JobCard.find({
+      tenantId,
       actualStartTime: { $exists: true },
       actualEndTime: { $exists: true },
       createdAt: { $gte: startDate, $lte: endDate }

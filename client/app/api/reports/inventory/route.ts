@@ -2,12 +2,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Part from '@/lib/models/Part';
 import { connectToDatabase } from '@/lib/db';
+import { getServerSession } from "@/lib/auth-server";
 
 export async function GET(req: NextRequest) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     await connectToDatabase();
 
-    const parts = await Part.find({});
+    const tenantId = (session.user as any).tenantId;
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant ID not found' }, { status: 400 });
+    }
+
+    const parts = await Part.find({ tenantId });
 
     const report = {
       totalParts: parts.length,
