@@ -1393,6 +1393,118 @@
   "meta": {
     "description": "Professional auto repair management system for TeraMotors"
   },
+  "marketing": {
+    "navigation": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "testimonials": "Testimonials",
+      "sign_in": "Sign In",
+      "start_trial": "Start Free Trial"
+    },
+    "hero": {
+      "zatca_badge": "Now with ZATCA E-Invoicing Compliance",
+      "title": "Run Your Workshop",
+      "title_highlight": "Like a Pro",
+      "subtitle": "The all-in-one workshop management system built for Saudi Arabia. Manage customers, vehicles, invoices, and grow your business.",
+      "cta_start_trial": "Start Free Trial",
+      "cta_watch_demo": "Watch Demo",
+      "trial_info": "14-day free trial • No credit card required • Cancel anytime",
+      "floating_invoice": "Invoice Sent",
+      "floating_just_now": "Just now",
+      "floating_vehicles": "+15 Vehicles",
+      "floating_this_week": "This week"
+    },
+    "stats": {
+      "workshops": "Auto Repair Shops",
+      "invoices": "Invoices Generated",
+      "uptime": "Uptime",
+      "support": "24/7 Support"
+    },
+    "features": {
+      "section_label": "FEATURES",
+      "section_title": "Everything You Need to",
+      "section_title_highlight": "Run Your Workshop",
+      "section_subtitle": "Powerful tools designed specifically for auto repair workshops in Saudi Arabia.",
+      "vehicle_management": {
+        "title": "Vehicle Management",
+        "description": "Track complete service history, maintenance schedules, and customer vehicles in SAR currency. Fully optimized for Saudi auto repair shops."
+      },
+      "smart_invoicing": {
+        "title": "ZATCA E-Invoicing",
+        "description": "Generate professional invoices with automatic ZATCA QR code generation and full compliance for Saudi Arabia. Arabic invoicing supported."
+      },
+      "customer_portal": {
+        "title": "Customer Communication",
+        "description": "Let customers view service history, estimates, track job progress, and communicate via WhatsApp with Arabic support included."
+      },
+      "analytics_dashboard": {
+        "title": "Business Analytics",
+        "description": "Real-time insights into revenue, job completion rates, mechanic productivity, and comprehensive workshop performance metrics in SAR."
+      },
+      "appointment_booking": {
+        "title": "Appointment Management",
+        "description": "Smart booking system with WhatsApp reminders, calendar sync, and Arabic customer notifications for higher conversion rates."
+      },
+      "inventory_control": {
+        "title": "Parts Inventory",
+        "description": "Track automotive parts inventory, set low-stock alerts, manage supplier details, and maintain cost tracking in SAR currency."
+      }
+    },
+    "pricing": {
+      "section_label": "PRICING",
+      "section_title": "Simple, Transparent Pricing",
+      "section_subtitle": "Choose the plan that fits your workshop",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "save_discount": "Save 17%",
+      "most_popular": "Most Popular",
+      "custom": "Custom",
+      "free": "Free",
+      "contact_sales": "Contact Sales",
+      "get_started": "Get Started"
+    },
+    "testimonials": {
+      "section_label": "TESTIMONIALS",
+      "section_title": "Trusted by Saudi Workshops",
+      "quote1": "TeraMotors transformed how we run our auto repair shop. The ZATCA compliance eliminated compliance headaches and saved us 10+ hours monthly on paperwork.",
+      "author1": "Ahmed Al-Rashid",
+      "role1": "Owner, Quick Fix Auto Repair",
+      "quote2": "The Arabic customer portal and WhatsApp notifications increased our repeat business by 40%. Customers now track repairs in real-time.",
+      "author2": "Fatima Al-Dosari",
+      "role2": "Manager, Elite Motors Workshop",
+      "quote3": "Finally, workshop management software built for Saudi Arabia! SAR pricing, Arabic invoices, and ZATCA ready out of the box.",
+      "author3": "Mohammed Al-Otaibi",
+      "role3": "Director, Professional Auto Care"
+    },
+    "cta": {
+      "title": "Ready to Transform",
+      "title_highlight": "Your Workshop?",
+      "description": "Join hundreds of workshops in Saudi Arabia already using TeraMotors. Start your free trial today.",
+      "cta_start_trial": "Start Free Trial",
+      "contact_sales": "Contact Sales",
+      "no_credit_card": "No credit card required • 14-day free trial"
+    },
+    "footer": {
+      "description": "The complete auto repair workshop management solution. ZATCA e-invoicing compliant. Built for Saudi Arabia.",
+      "product": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "integrations": "Integrations",
+      "api": "API",
+      "resources": "Resources",
+      "documentation": "Documentation",
+      "blog": "Blog",
+      "support": "Support",
+      "status": "Status",
+      "company": "Company",
+      "about": "About",
+      "careers": "Careers",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "copyright": "All rights reserved",
+      "made_in": "Built for Saudi Workshops with Arabic Support"
+    }
+  },
   "landing_missing": {
     "professional_service": "Professional Service",
     "trusted_by_thousands": "Trusted by thousands of customers in more than 5 countries", 

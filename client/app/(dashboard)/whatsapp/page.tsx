@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 import {
   MessageSquare,
   Send,
@@ -15,6 +15,7 @@ import {
   TestTube
 } from 'lucide-react';
 import { WahaConfigModal } from '@/components/modals/WahaConfigModal';
+import { fadeInUp, scaleIn, staggerContainer } from '@/lib/dashboard-animations';
 
 interface WhatsAppMessage {
   _id: string;
@@ -188,13 +189,13 @@ export default function WhatsAppPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'delivered':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400';
       case 'sent':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400';
       case 'failed':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400';
       default:
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400';
     }
   };
 
@@ -211,52 +212,58 @@ export default function WhatsAppPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402]"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8 py-6">
+      <motion.div
+        className="space-y-6"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
+      <motion.div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" variants={fadeInUp}>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('whatsapp.title')}</h1>
-          <p className="text-gray-600">{t('whatsapp.description')}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{t('whatsapp.title')}</h1>
+          <p className="text-gray-600 dark:text-gray-400">{t('whatsapp.description')}</p>
         </div>
         <button
           onClick={() => setShowWahaConfig(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#F97402] text-white shadow-sm hover:bg-[#F13F33] transition-colors"
         >
           <Settings className="h-5 w-5" />
-          <span>إعدادات Waha</span>
+          <span>{t('whatsapp.settings_button', { defaultValue: 'WAHA Settings' })}</span>
         </button>
-      </div>
+      </motion.div>
 
       <WahaConfigModal isOpen={showWahaConfig} onClose={() => setShowWahaConfig(false)} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <motion.div className="grid grid-cols-1 lg:grid-cols-2 gap-6" variants={fadeInUp}>
         {/* Send Test Message */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <TestTube className="h-5 w-5" />
               <span>{t('whatsapp.send_test_message')}</span>
             </h3>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Send a test WhatsApp message to any customer
             </p>
           </div>
           <div className="p-6 space-y-4">
             <div>
-              <label htmlFor="customer" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="customer" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('whatsapp.customer')}
               </label>
               <select
                 id="customer"
                 value={selectedCustomer}
                 onChange={(e) => handleCustomerChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F97402] focus:border-[#F97402]"
               >
                 <option value="">{t('whatsapp.select_customer')}</option>
                 {customers
@@ -270,14 +277,14 @@ export default function WhatsAppPage() {
             </div>
 
             <div>
-              <label htmlFor="messageType" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="messageType" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('whatsapp.message_type')}
               </label>
               <select
                 id="messageType"
                 value={messageType}
                 onChange={(e) => setMessageType(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#F97402] focus:border-[#F97402]"
               >
                 <option value="welcome">{t('whatsapp.message_templates.welcome')}</option>
                 <option value="job_started">{t('whatsapp.message_templates.job_started')}</option>
@@ -289,14 +296,14 @@ export default function WhatsAppPage() {
 
             {messageType === 'invoice_ready' && (
               <div>
-                <label htmlFor="invoice" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="invoice" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Select Invoice (Optional)
                 </label>
                 <select
                   id="invoice"
                   value={selectedInvoice}
                   onChange={(e) => setSelectedInvoice(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#F97402] focus:border-[#F97402]"
                   disabled={!selectedCustomer || invoices.length === 0}
                 >
                   <option value="">No invoice link (template only)</option>
@@ -307,20 +314,20 @@ export default function WhatsAppPage() {
                   ))}
                 </select>
                 {selectedCustomer && invoices.length === 0 && (
-                  <p className="text-sm text-gray-500 mt-1">No invoices found for this customer</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">No invoices found for this customer</p>
                 )}
               </div>
             )}
 
             <div>
-              <label htmlFor="language" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="language" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('whatsapp.language')}
               </label>
               <select
                 id="language"
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#F97402] focus:border-[#F97402]"
               >
                 <option value="ar">العربية</option>
                 <option value="en">English</option>
@@ -328,7 +335,7 @@ export default function WhatsAppPage() {
             </div>
 
             <div>
-              <label htmlFor="customMessage" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="customMessage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 {t('whatsapp.custom_message')}
               </label>
               <textarea
@@ -337,13 +344,13 @@ export default function WhatsAppPage() {
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#F97402] focus:border-[#F97402]"
               />
             </div>
 
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <label className="text-sm font-medium text-gray-700">{t('whatsapp.preview')}</label>
-              <p className="text-sm text-gray-700 mt-1 whitespace-pre-line">
+            <div className="bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800 p-3 rounded-lg">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('whatsapp.preview')}</label>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 whitespace-pre-line">
                 {customMessage || messageTemplates[messageType as keyof typeof messageTemplates][language as 'ar' | 'en']}
               </p>
             </div>
@@ -351,7 +358,7 @@ export default function WhatsAppPage() {
             <button 
               onClick={sendTestMessage} 
               disabled={!selectedCustomer || sending}
-              className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-[#F97402] text-white px-4 py-2 rounded-md hover:bg-[#F13F33] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
             >
               {sending ? (
                 <>
@@ -369,9 +376,9 @@ export default function WhatsAppPage() {
         </div>
 
         {/* Message Statistics */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
               <span>{t('whatsapp.message_statistics')}</span>
             </h3>
@@ -379,90 +386,97 @@ export default function WhatsAppPage() {
           <div className="p-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {messages.filter(m => m.status === 'delivered').length}
                 </div>
-                <div className="text-sm text-gray-600">{t('whatsapp.delivered')}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">{t('whatsapp.delivered')}</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-600">
+                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
                   {messages.filter(m => m.status === 'sent').length}
                 </div>
-                <div className="text-sm text-gray-600">{t('whatsapp.sent')}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">{t('whatsapp.sent')}</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">
+                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                   {messages.filter(m => m.status === 'failed').length}
                 </div>
-                <div className="text-sm text-gray-600">{t('whatsapp.failed')}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">{t('whatsapp.failed')}</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-600">
+                <div className="text-2xl font-bold text-gray-600 dark:text-gray-300">
                   {messages.length}
                 </div>
-                <div className="text-sm text-gray-600">{t('whatsapp.total')}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">{t('whatsapp.total')}</div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Message History */}
-      <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">{t('whatsapp.message_history')}</h3>
-          <p className="text-sm text-gray-600 mt-1">
+      <motion.div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800" variants={fadeInUp}>
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('whatsapp.message_history')}</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             {t('whatsapp.recent_messages')}
           </p>
         </div>
         <div className="p-6">
           <div className="space-y-4">
             {messages.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 {t('whatsapp.no_messages')}
               </div>
             ) : (
               messages.map((message) => (
-                <div key={message._id} className="border rounded-lg p-4">
+                <motion.div
+                  key={message._id}
+                  className="border border-gray-200 dark:border-gray-800 rounded-xl p-4 bg-white dark:bg-gray-900/60"
+                  variants={scaleIn}
+                  initial="hidden"
+                  animate="visible"
+                >
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium text-gray-900 dark:text-white">
                         {message.customerId ? `${message.customerId.firstName} ${message.customerId.lastName}` : 'Unknown Customer'}
                       </span>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
                         {getMessageTypeLabel(message.messageType)}
                       </span>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(message.status)}`}>
                         {t(`whatsapp.status.${message.status}`)}
                       </span>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2">
                       {getStatusIcon(message.status)}
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {new Date(message.createdAt).toLocaleString()}
                       </span>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-700 mb-2">
+                  <div className="text-sm text-gray-700 dark:text-gray-300 mb-2">
                     <strong>{t('whatsapp.phone')}</strong> {message.customerId?.phoneNumber || 'N/A'}
                   </div>
-                  <div className="text-sm text-gray-700 mb-2">
+                  <div className="text-sm text-gray-700 dark:text-gray-300 mb-2">
                     <strong>Language:</strong> {message.language === 'ar' ? 'العربية' : 'English'}
                   </div>
-                  <div className="text-sm text-gray-700 whitespace-pre-line">
+                  <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
                     {message.content}
                   </div>
                   {message.errorMessage && (
-                    <div className="mt-2 text-sm text-red-600">
+                    <div className="mt-2 text-sm text-red-600 dark:text-red-400">
                       <strong>{t('whatsapp.error')}</strong> {message.errorMessage}
                     </div>
                   )}
-                </div>
+                </motion.div>
               ))
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
+      </motion.div>
     </div>
   );
 }
