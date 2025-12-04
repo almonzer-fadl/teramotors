@@ -28,6 +28,7 @@ export interface TierConfig {
   features: TierFeature[]
   limits: TierLimits
   badge?: string
+  color: string // Tailwind gradient classes for tier styling
 }
 
 export interface TierLimits {
@@ -44,6 +45,7 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     id: 'free',
     name: 'Free',
     description: 'Perfect for getting started',
+    color: 'from-gray-500 to-gray-600',
     pricing: {
       monthly: 0,
       annual: 0,
@@ -75,6 +77,7 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     id: 'basic',
     name: 'Basic',
     description: 'For growing workshops',
+    color: 'from-blue-500 to-blue-600',
     pricing: {
       monthly: 199,
       annual: 166, // ~17% discount
@@ -106,6 +109,7 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     id: 'pro',
     name: 'Pro',
     description: 'For professional workshops',
+    color: 'from-[#F97402] to-[#F13F33]',
     pricing: {
       monthly: 499,
       annual: 416, // ~17% discount
@@ -139,6 +143,7 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     id: 'enterprise',
     name: 'Enterprise',
     description: 'For large operations',
+    color: 'from-purple-600 to-indigo-600',
     pricing: {
       monthly: -1, // Contact sales
       annual: -1,
@@ -234,4 +239,8 @@ export function getUpgradePath(currentTier: SubscriptionTier): SubscriptionTier[
   const order: SubscriptionTier[] = ['free', 'basic', 'pro', 'enterprise']
   const currentIndex = order.indexOf(currentTier)
   return order.slice(currentIndex + 1)
+}
+
+export function getTierConfig(tier: SubscriptionTier): TierConfig {
+  return SUBSCRIPTION_TIERS[tier]
 }

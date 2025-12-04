@@ -478,7 +478,7 @@ export default function SubscriptionPage() {
                           {config.features.slice(0, 5).map((feature, i) => (
                             <li key={i} className="flex items-start text-sm">
                               <Check className="w-4 h-4 text-emerald-500 me-2 mt-0.5 flex-shrink-0" />
-                              <span className="text-gray-600 dark:text-gray-300">{feature}</span>
+                              <span className="text-gray-600 dark:text-gray-300">{feature.name}</span>
                             </li>
                           ))}
                         </ul>
@@ -591,7 +591,7 @@ export default function SubscriptionPage() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
             >
               <div className="text-center">
                 <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${getTierConfig(selectedTier).color} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
