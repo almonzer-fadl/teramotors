@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import connectDB from '@/lib/db';
+import { connectToDatabase } from '@/lib/db';
 import { Tenant } from '@/lib/models/Tenant';
 import Customer from '@/lib/models/Customer';
 import Vehicle from '@/lib/models/Vehicle';
@@ -20,7 +20,7 @@ import User from '@/lib/models/User';
  */
 async function migrateExistingDataToTenant() {
   try {
-    await connectDB();
+    await connectToDatabase();
 
     console.log('🚀 Starting migration...');
 

@@ -1,4 +1,4 @@
-import mongoose, { Document } from 'mongoose';
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 interface IServiceHistory {
@@ -9,8 +9,8 @@ interface IServiceHistory {
   notes?: string;
 }
 
-// TypeScript interface for Vehicle
-export interface IVehicle extends Document {
+// TypeScript interface for Vehicle data (without Document to avoid conflict with 'model' property)
+export interface IVehicleData {
   tenantId: mongoose.Types.ObjectId;
   customerId: mongoose.Types.ObjectId;
   vin?: string;
@@ -30,6 +30,9 @@ export interface IVehicle extends Document {
   updatedAt: Date;
 }
 
+// Full Vehicle document type
+export type IVehicle = mongoose.Document & IVehicleData;
+
 const ServiceHistorySchema = new Schema({
   serviceId: { type: Schema.Types.ObjectId, ref: 'Service' },
   date: { type: Date, required: true },
@@ -38,7 +41,7 @@ const ServiceHistorySchema = new Schema({
   notes: { type: String }
 });
 
-const VehicleSchema = new Schema<IVehicle>({
+const VehicleSchema = new Schema({
   tenantId: {
     type: Schema.Types.ObjectId,
     ref: 'Tenant',
@@ -87,6 +90,6 @@ VehicleSchema.statics.findByTenant = function(
   return this.find({ tenantId, ...filter });
 };
 
-const Vehicle = (mongoose.models && mongoose.models.Vehicle) || mongoose.model<IVehicle>('Vehicle', VehicleSchema);
+const Vehicle = (mongoose.models && mongoose.models.Vehicle) || mongoose.model('Vehicle', VehicleSchema);
 
 export default Vehicle;

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import connectDB from '@/lib/db';
+import { connectToDatabase } from '@/lib/db';
 import { Tenant } from '@/lib/models/Tenant';
 import User from '@/lib/models/User';
 import InspectionTemplate from '@/lib/models/InspectionTemplate';
@@ -22,7 +22,7 @@ interface SeedTenantOptions {
  */
 async function seedNewTenant(options: SeedTenantOptions) {
   try {
-    await connectDB();
+    await connectToDatabase();
 
     console.log(`🚀 Seeding new tenant: ${options.name}`);
 
