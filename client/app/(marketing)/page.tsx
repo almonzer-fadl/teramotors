@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   Wrench,
   Car,
@@ -148,7 +149,7 @@ export default function LandingPage() {
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-gray-950">
       {/* Navigation */}
       <motion.nav
         className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50"
@@ -180,6 +181,7 @@ export default function LandingPage() {
             </div>
 
             <div className="flex items-center gap-4">
+              <ThemeToggle />
               <Link href="/login">
                 <motion.button
                   className="text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -205,7 +207,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section ref={heroRef} className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
         {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-orange-50/30 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-orange-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950" />
 
         {/* Animated blobs */}
         <motion.div
@@ -369,7 +371,7 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-800/50">
+      <section className="py-16 bg-gray-50 dark:bg-gray-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
@@ -389,7 +391,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24">
+      <section id="features" className="py-24 bg-white dark:bg-gray-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection className="text-center mb-16">
             <motion.p variants={fadeInUp} className="text-[#F97402] font-semibold mb-4">
@@ -412,7 +414,7 @@ export default function LandingPage() {
                   <motion.div
                     key={index}
                     variants={fadeInUp}
-                    className="group bg-white dark:bg-gray-800 rounded-3xl p-8 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all hover:shadow-xl"
+                    className="group bg-white dark:bg-gray-800/50 rounded-3xl p-8 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all hover:shadow-xl dark:hover:shadow-lg dark:hover:shadow-gray-900/50"
                   >
                     <div className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center shadow-lg mb-6 group-hover:scale-110 transition-transform`}>
                       <Icon className="w-7 h-7 text-white" />
@@ -432,7 +434,7 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 bg-gray-50 dark:bg-gray-800/50">
+      <section id="pricing" className="py-24 bg-gray-50 dark:bg-gray-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection className="text-center mb-16">
             <motion.p variants={fadeInUp} className="text-[#F97402] font-semibold mb-4">
@@ -487,7 +489,7 @@ export default function LandingPage() {
                       variants={scaleIn}
                       className={`relative bg-white dark:bg-gray-800 rounded-3xl p-6 border-2 ${
                         config.popular
-                          ? 'border-[#F97402] shadow-xl shadow-[#F97402]/10'
+                          ? 'border-[#F97402] shadow-xl shadow-[#F97402]/10 dark:shadow-[#F97402]/20'
                           : 'border-gray-200 dark:border-gray-700'
                       }`}
                     >
@@ -559,7 +561,7 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="py-24">
+      <section id="testimonials" className="py-24 bg-white dark:bg-gray-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection className="text-center mb-16">
             <motion.p variants={fadeInUp} className="text-[#F97402] font-semibold mb-4">
@@ -646,7 +648,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 bg-gray-900 text-gray-400">
+      <footer className="py-16 bg-gray-900 dark:bg-gray-950 text-gray-400 dark:text-gray-300 border-t border-gray-800 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
@@ -656,43 +658,43 @@ export default function LandingPage() {
                 </div>
                 <span className="ms-3 text-xl font-bold text-white">TeraMotors</span>
               </div>
-              <p className="text-sm">
+              <p className="text-sm dark:text-gray-300">
                 The complete workshop management solution for Saudi Arabia.
               </p>
             </div>
 
             <div>
-              <h4 className="text-white font-semibold mb-4">Product</h4>
+              <h4 className="text-white font-semibold mb-4 dark:text-white">Product</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Integrations</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API</a></li>
+                <li><a href="#features" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">Features</a></li>
+                <li><a href="#pricing" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="#" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">Integrations</a></li>
+                <li><a href="#" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">API</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-semibold mb-4">Resources</h4>
+              <h4 className="text-white font-semibold mb-4 dark:text-white">Resources</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Status</a></li>
+                <li><a href="#" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="#" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">Support</a></li>
+                <li><a href="#" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">Status</a></li>
               </ul>
             </div>
 
             <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <h4 className="text-white font-semibold mb-4 dark:text-white">Company</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
+                <li><a href="#" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">Privacy</a></li>
+                <li><a href="#" className="dark:text-gray-300 dark:hover:text-[#F97402] hover:text-white transition-colors">Terms</a></li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between">
+          <div className="border-t border-gray-800 dark:border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between">
             <p className="text-sm">
               © {new Date().getFullYear()} TeraMotors. All rights reserved.
             </p>

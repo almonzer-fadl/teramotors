@@ -31,6 +31,7 @@ import {
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/dashboard/LanguageSwitcher";
 import { NotificationBell } from "@/components/dashboard/NotificationBell";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 // Icon mapping for dynamic navigation
 const iconMap = {
@@ -79,7 +80,7 @@ export default function DashboardLayout({
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Mobile sidebar */}
       <div
         className={`fixed inset-0 z-50 lg:hidden ${
@@ -87,10 +88,10 @@ export default function DashboardLayout({
         }`}
       >
         <div
-          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          className="fixed inset-0 bg-gray-600 bg-opacity-75 dark:bg-gray-900/90"
           onClick={() => setSidebarOpen(false)}
         />
-        <div className="fixed inset-y-0 start-0 flex w-72 flex-col bg-white shadow-2xl">
+        <div className="fixed inset-y-0 start-0 flex w-72 flex-col bg-white dark:bg-gray-900 shadow-2xl">
           <div className="flex h-20 items-center justify-between px-6 bg-gradient-to-r from-[#063479] to-[#052a5f]">
             <div className="flex items-center">
               <img 
@@ -128,8 +129,8 @@ export default function DashboardLayout({
                       href={item.href}
                       className={`flex items-center rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${
                         pathname === item.href
-                          ? "bg-[#F13F33] text-white shadow-lg"
-                          : "text-gray-700 hover:bg-gray-100 hover:text-[#F13F33]"
+                          ? "bg-[#F13F33] text-white shadow-lg dark:bg-[#F97402]"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-[#F13F33] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#F97402]"
                       }`}
                       onClick={() => setSidebarOpen(false)}
                     >
@@ -143,16 +144,16 @@ export default function DashboardLayout({
           </nav>
           
           {/* User profile and sign out at bottom */}
-          <div className="border-t border-gray-200 p-6">
+          <div className="border-t border-gray-200 dark:border-gray-800 p-6">
             <div className="flex items-center gap-x-3 mb-4">
               <div className="w-10 h-10 bg-[#F13F33] rounded-xl flex items-center justify-center">
                 <Users className="h-5 w-5 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-gray-900">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">
                   {user?.name}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   {t(`roles.${userRole}.name`)}
                 </span>
               </div>
@@ -162,7 +163,7 @@ export default function DashboardLayout({
                 signOut();
                 setSidebarOpen(false);
               }}
-              className="flex items-center gap-x-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium w-full"
+              className="flex items-center gap-x-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium w-full dark:text-gray-400 dark:hover:text-[#F97402]"
             >
               <LogOut className="h-4 w-4" />
               {t("header.sign_out")}
@@ -175,7 +176,7 @@ export default function DashboardLayout({
       <div className={`hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-all duration-300 ${
         sidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:pointer-events-none' : 'lg:w-72'
       }`}>
-        <div className="flex flex-grow flex-col overflow-y-auto bg-white shadow-2xl">
+        <div className="flex flex-grow flex-col overflow-y-auto bg-white dark:bg-gray-900 shadow-2xl">
           <div className="flex h-20 items-center px-6 bg-gradient-to-r from-[#063479] to-[#052a5f]">
             <div className="flex items-center">
               <img 
@@ -208,8 +209,8 @@ export default function DashboardLayout({
                       href={item.href}
                       className={`flex items-center rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${
                         pathname === item.href
-                          ? "bg-[#F13F33] text-white shadow-lg"
-                          : "text-gray-700 hover:bg-gray-100 hover:text-[#F13F33]"
+                          ? "bg-[#F13F33] text-white shadow-lg dark:bg-[#F97402]"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-[#F13F33] dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-[#F97402]"
                       } ${sidebarCollapsed ? 'justify-center' : ''}`}
                       title={sidebarCollapsed ? t(item.tKey) : undefined}
                     >
@@ -224,23 +225,23 @@ export default function DashboardLayout({
 
           {/* Desktop user profile at bottom of sidebar - only show when sidebar is expanded */}
           {!sidebarCollapsed && (
-            <div className="hidden lg:block mt-auto p-4 border-t border-gray-200">
+            <div className="hidden lg:block mt-auto p-4 border-t border-gray-200 dark:border-gray-800">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-10 h-10 bg-[#F13F33] rounded-xl flex items-center justify-center">
                   <Users className="h-5 w-5 text-white" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-gray-900">
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
                     {user?.name}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
                     {t(`roles.${userRole}.name`)}
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => signOut()}
-                className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium w-full"
+                className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium w-full dark:text-gray-400 dark:hover:text-[#F97402]"
               >
                 <LogOut className="h-4 w-4" />
                 {t("header.sign_out")}
@@ -254,10 +255,10 @@ export default function DashboardLayout({
       <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ps-0' : 'lg:ps-72'}`}>
         <ToastProvider />
         {/* Top bar */}
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
           <button
             type="button"
-            className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
+            className="-m-2.5 p-2.5 text-gray-700 dark:text-gray-300 lg:hidden"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="h-6 w-6" />
@@ -266,7 +267,7 @@ export default function DashboardLayout({
           {/* Desktop sidebar toggle */}
           <button
             type="button"
-            className="hidden lg:block -m-2.5 p-2.5 text-gray-700 hover:text-[#F13F33] transition-colors"
+            className="hidden lg:block -m-2.5 p-2.5 text-gray-700 hover:text-[#F13F33] transition-colors dark:text-gray-300 dark:hover:text-[#F97402]"
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           >
             <Menu className="h-6 w-6" />
@@ -276,6 +277,7 @@ export default function DashboardLayout({
             <div className="flex flex-1"></div>
             <div className="flex items-center gap-x-4 lg:gap-x-6">
               <LanguageSwitcher />
+              <ThemeToggle />
               <NotificationBell />
 
               {/* Desktop user profile - only show when sidebar is collapsed */}
@@ -286,17 +288,17 @@ export default function DashboardLayout({
                       <Users className="h-5 w-5 text-white" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-gray-900">
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
                         {user?.name}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {t(`roles.${userRole}.name`)}
                       </span>
                     </div>
                   </div>
                   <button
                     onClick={() => signOut()}
-                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium"
+                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium dark:text-gray-400 dark:hover:text-[#F97402]"
                   >
                     <LogOut className="h-4 w-4" />
                     {t("header.sign_out")}
@@ -308,7 +310,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Page content */}
-        <main>
+        <main className="dark:bg-gray-950">
           <div className="mx-auto max-w-7xl">
             <Breadcrumbs />
             {children}

@@ -20,6 +20,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 // Step configuration
 const STEPS = [
@@ -206,7 +207,7 @@ function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-[#063479] to-[#052a5f] flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-[#063479] to-[#052a5f] dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#F97402]/20 to-transparent rounded-full blur-3xl"></div>
@@ -224,11 +225,16 @@ function RegisterForm() {
         </Link>
 
         <motion.div
-          className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20"
+          className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20 dark:border-gray-700 relative"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
         >
+          {/* Theme Toggle */}
+          <div className="absolute top-6 right-6">
+            <ThemeToggle />
+          </div>
+
           {/* Header */}
           <div className="text-center mb-8">
             <motion.div
@@ -239,10 +245,10 @@ function RegisterForm() {
             >
               <Building2 className="w-10 h-10 text-white" />
             </motion.div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Create Your Workshop
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-300">
               Start your free trial today
             </p>
           </div>
@@ -256,7 +262,7 @@ function RegisterForm() {
                     w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
                     ${currentStep >= step.id
                       ? "bg-gradient-to-br from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25"
-                      : "bg-gray-100 text-gray-400"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500"
                     }
                   `}
                   initial={false}
@@ -274,7 +280,7 @@ function RegisterForm() {
                 {index < STEPS.length - 1 && (
                   <div
                     className={`w-12 sm:w-20 h-1 mx-2 rounded-full transition-colors duration-300 ${
-                      currentStep > step.id ? "bg-[#F97402]" : "bg-gray-200"
+                      currentStep > step.id ? "bg-[#F97402]" : "bg-gray-200 dark:bg-gray-700"
                     }`}
                   />
                 )}
@@ -289,7 +295,7 @@ function RegisterForm() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="mb-6 p-4 bg-red-50/90 border border-red-200 rounded-2xl text-red-700 text-sm backdrop-blur-sm"
+                className="mb-6 p-4 bg-red-50/90 dark:bg-red-900/50 border border-red-200 dark:border-red-700 rounded-2xl text-red-700 dark:text-red-300 text-sm backdrop-blur-sm"
               >
                 {error}
               </motion.div>
@@ -309,7 +315,7 @@ function RegisterForm() {
                 className="space-y-5"
               >
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Building2 className="w-4 h-4 inline-block mr-2" />
                     Workshop Name *
                   </label>
@@ -319,13 +325,13 @@ function RegisterForm() {
                     onChange={handleInputChange}
                     type="text"
                     required
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80"
+                    className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
                     placeholder="e.g. Quick Fix Auto Repairs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Mail className="w-4 h-4 inline-block mr-2" />
                     Business Email *
                   </label>
@@ -335,13 +341,13 @@ function RegisterForm() {
                     onChange={handleInputChange}
                     type="email"
                     required
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80"
+                    className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
                     placeholder="contact@yourworkshop.com"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Phone className="w-4 h-4 inline-block mr-2" />
                     Phone Number
                   </label>
@@ -350,13 +356,13 @@ function RegisterForm() {
                     value={formData.businessPhone}
                     onChange={handleInputChange}
                     type="tel"
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80"
+                    className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
                     placeholder="+966 50 123 4567"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Globe className="w-4 h-4 inline-block mr-2" />
                     Website (Optional)
                   </label>
@@ -365,7 +371,7 @@ function RegisterForm() {
                     value={formData.website}
                     onChange={handleInputChange}
                     type="url"
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80"
+                    className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
                     placeholder="https://yourworkshop.com"
                   />
                 </div>
@@ -384,7 +390,7 @@ function RegisterForm() {
               >
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                       First Name *
                     </label>
                     <input
@@ -393,12 +399,12 @@ function RegisterForm() {
                       onChange={handleInputChange}
                       type="text"
                       required
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80"
+                      className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
                       placeholder="John"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                       Last Name *
                     </label>
                     <input
@@ -407,14 +413,14 @@ function RegisterForm() {
                       onChange={handleInputChange}
                       type="text"
                       required
-                      className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80"
+                      className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
                       placeholder="Doe"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Mail className="w-4 h-4 inline-block mr-2" />
                     Your Email *
                   </label>
@@ -424,13 +430,13 @@ function RegisterForm() {
                     onChange={handleInputChange}
                     type="email"
                     required
-                    className="w-full px-4 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80"
+                    className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
                     placeholder="you@email.com"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Lock className="w-4 h-4 inline-block mr-2" />
                     Password *
                   </label>
@@ -441,13 +447,13 @@ function RegisterForm() {
                       onChange={handleInputChange}
                       type={showPassword ? "text" : "password"}
                       required
-                      className="w-full px-4 py-4 pr-12 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80"
+                      className="w-full px-4 py-4 pr-12 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
                       placeholder="Min. 8 characters"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -455,7 +461,7 @@ function RegisterForm() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Lock className="w-4 h-4 inline-block mr-2" />
                     Confirm Password *
                   </label>
@@ -466,13 +472,13 @@ function RegisterForm() {
                       onChange={handleInputChange}
                       type={showConfirmPassword ? "text" : "password"}
                       required
-                      className="w-full px-4 py-4 pr-12 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80"
+                      className="w-full px-4 py-4 pr-12 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
                       placeholder="Confirm your password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
                     >
                       {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -504,13 +510,13 @@ function RegisterForm() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                     Welcome to TeraMotors!
                   </h2>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
                     Your workshop <span className="font-semibold text-[#F97402]">{formData.businessName}</span> has been created.
                   </p>
-                  <div className="flex items-center justify-center text-sm text-gray-500">
+                  <div className="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
                     <Sparkles className="w-4 h-4 mr-2 text-[#F97402]" />
                     Redirecting to login...
                   </div>
@@ -521,15 +527,15 @@ function RegisterForm() {
 
           {/* Navigation Buttons */}
           {currentStep < 3 && (
-            <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100">
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
               <button
                 type="button"
                 onClick={prevStep}
                 disabled={currentStep === 1}
                 className={`flex items-center px-5 py-3 rounded-xl font-semibold transition-all duration-300 ${
                   currentStep === 1
-                    ? "text-gray-300 cursor-not-allowed"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                    : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -574,9 +580,9 @@ function RegisterForm() {
 
           {/* Footer */}
           {currentStep < 3 && (
-            <p className="mt-6 text-center text-sm text-gray-500">
+            <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
               Already have an account?{" "}
-              <Link href="/login" className="text-[#F97402] font-semibold hover:text-[#F13F33] transition-colors">
+              <Link href="/login" className="text-[#F97402] dark:text-[#F97402] font-semibold hover:text-[#F13F33] dark:hover:text-[#F13F33] transition-colors">
                 Sign in
               </Link>
             </p>
@@ -614,7 +620,7 @@ export default function RegisterPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-[#063479] to-[#052a5f] flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-[#063479] to-[#052a5f] dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 flex items-center justify-center">
           <div className="w-12 h-12 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
         </div>
       }
