@@ -19,14 +19,14 @@ export async function POST(request: NextRequest) {
     }
 
     await connectToDatabase();
-    
+
     const body = await request.json();
-    const { inspectionId } = body;
+    const { inspectionId, selectedItems } = body;
 
     if (!inspectionId) {
         return NextResponse.json({ error: 'Inspection ID is required' }, { status: 400 });
     }
-    
+
     const inspection = await VehicleInspection.findById(inspectionId)
       .populate('vehicleId', 'make model year')
       .populate('customerId', 'firstName lastName')
@@ -36,14 +36,36 @@ export async function POST(request: NextRequest) {
     if (!inspection) {
       return NextResponse.json({ error: 'Inspection not found' }, { status: 404 });
     }
-    
+
     if (!inspection.vehicleId || !inspection.customerId) {
         return NextResponse.json({ error: 'Inspection is missing vehicle or customer information' }, { status: 400 });
     }
 
+    // Filter inspection items based on selectedItems if provided
+    // Otherwise, use all items that need repair (fair, poor, critical)
+    let itemsToProcess = inspection.items;
+    if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
+      const selectedItemIds = new Set(selectedItems.map((item: any) => item.itemId));
+      itemsToProcess = inspection.items.filter((item: any) => selectedItemIds.has(item.itemId));
+      console.log(`[Estimate API] Using ${itemsToProcess.length} selected items from ${inspection.items.length} total items`);
+    } else {
+      // Auto-select items that need repair
+      itemsToProcess = inspection.items.filter((item: any) =>
+        item.condition === 'fair' || item.condition === 'poor' || item.condition === 'critical'
+      );
+      console.log(`[Estimate API] Auto-selected ${itemsToProcess.length} items needing repair from ${inspection.items.length} total items`);
+    }
+
+    if (itemsToProcess.length === 0) {
+      return NextResponse.json({
+        error: 'No items to process',
+        message: 'No items selected or needing repair found in the inspection'
+      }, { status: 400 });
+    }
+
     // Use the PartMatchingService to get required parts and services
     const partMatcher = new PartMatchingService();
-    const matchedItems = await partMatcher.matchInspectionItems(inspection.items, inspection.vehicleId);
+    const matchedItems = await partMatcher.matchInspectionItems(itemsToProcess, inspection.vehicleId);
 
     const estimateServices: any[] = [];
     const estimateParts: any[] = [];
@@ -115,7 +137,10 @@ export async function POST(request: NextRequest) {
     const validUntil = new Date();
     validUntil.setDate(validUntil.getDate() + 30);
 
+    const tenantId = (session.user as any).tenantId;
+
     const estimate = new Estimate({
+      tenantId,
       inspectionId: inspection._id,
       customerId: inspection.customerId._id,
       vehicleId: inspection.vehicleId._id,
@@ -127,7 +152,7 @@ export async function POST(request: NextRequest) {
       total,
       validUntil,
       status: 'pending',
-      notes: `Generated from inspection on ${new Date(inspection.inspectionDate).toLocaleDateString()}`
+      notes: `Generated from inspection on ${new Date(inspection.inspectionDate).toLocaleDateString()}. ${itemsToProcess.length} items included.`
     });
 
     await estimate.save();

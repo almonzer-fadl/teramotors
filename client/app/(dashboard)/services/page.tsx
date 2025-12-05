@@ -215,7 +215,7 @@ export default function ServicesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 py-6">
       <motion.div
         className="space-y-6"
         variants={staggerContainer}
@@ -225,7 +225,7 @@ export default function ServicesPage() {
         {/* Header */}
         <motion.div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" variants={fadeInUp}>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
               {t('services.title')}
             </h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -272,7 +272,7 @@ export default function ServicesPage() {
           ].map((stat, idx) => (
             <motion.div
               key={stat.label}
-              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm"
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-gray-100 dark:border-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30"
               variants={scaleIn}
             >
               <div className="p-5">
@@ -295,7 +295,7 @@ export default function ServicesPage() {
         </motion.div>
 
         {/* Search and Filters */}
-        <motion.div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm" variants={fadeInUp}>
+        <motion.div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-gray-100 dark:border-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30" variants={fadeInUp}>
           <div className="px-4 py-5 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
@@ -356,7 +356,7 @@ export default function ServicesPage() {
         <AnimatePresence>
           {sortedServices.length === 0 && (
             <motion.div
-              className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm p-8 text-center"
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 p-8 text-center"
               variants={scaleIn}
               initial="hidden"
               animate="visible"

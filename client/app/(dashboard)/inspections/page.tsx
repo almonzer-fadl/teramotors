@@ -212,7 +212,7 @@ export default function InspectionsPage() {
   const inProgressInspections = filteredInspections.filter(i => i.status === 'in-progress').length;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 py-6">
       <motion.div
         className="space-y-6"
         variants={staggerContainer}
@@ -225,7 +225,7 @@ export default function InspectionsPage() {
           variants={fadeInUp}
         >
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
               {t('inspections.title')}
             </h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -257,13 +257,13 @@ export default function InspectionsPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <motion.div
-            className="bg-white dark:bg-gray-900 overflow-hidden shadow-sm dark:shadow-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-800"
+            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl overflow-hidden shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800"
             variants={scaleIn}
           >
             <div className="p-5">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <CheckCircle className="h-6 w-6 text-blue-400 dark:text-blue-500" />
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="h-6 w-6 text-white" />
                 </div>
                 <div className="ms-5 w-0 flex-1">
                   <dl>
@@ -280,13 +280,13 @@ export default function InspectionsPage() {
           </motion.div>
 
           <motion.div
-            className="bg-white dark:bg-gray-900 overflow-hidden shadow-sm dark:shadow-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-800"
+            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl overflow-hidden shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800"
             variants={scaleIn}
           >
             <div className="p-5">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <CheckCircle className="h-6 w-6 text-green-400 dark:text-green-500" />
+                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="h-6 w-6 text-white" />
                 </div>
                 <div className="ms-5 w-0 flex-1">
                   <dl>
@@ -303,13 +303,13 @@ export default function InspectionsPage() {
           </motion.div>
 
           <motion.div
-            className="bg-white dark:bg-gray-900 overflow-hidden shadow-sm dark:shadow-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-800"
+            className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl overflow-hidden shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800"
             variants={scaleIn}
           >
             <div className="p-5">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <AlertTriangle className="h-6 w-6 text-yellow-400 dark:text-yellow-500" />
+                <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-yellow-600 dark:from-yellow-600 dark:to-yellow-700 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-6 w-6 text-white" />
                 </div>
                 <div className="ms-5 w-0 flex-1">
                   <dl>
@@ -328,7 +328,7 @@ export default function InspectionsPage() {
 
         {/* Search and Filters */}
         <motion.div
-          className="bg-white dark:bg-gray-900 shadow-sm dark:shadow-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-800"
+          className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800"
           variants={scaleIn}
         >
           <div className="px-4 py-5 sm:p-6">
@@ -377,7 +377,7 @@ export default function InspectionsPage() {
         <AnimatePresence>
           {filteredInspections.length === 0 && (
             <motion.div
-              className="bg-white dark:bg-gray-900 rounded-lg shadow-sm dark:shadow-gray-800/50 border border-gray-200 dark:border-gray-800 p-8 text-center"
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-8 text-center"
               variants={scaleIn}
               initial="hidden"
               animate="visible"
