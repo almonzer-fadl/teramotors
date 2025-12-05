@@ -40,6 +40,15 @@ export interface ITenantConfig extends Document {
     autoCloseInspections: boolean;
     notifyOnLowStock: boolean;
   };
+  inspectionSettings?: {
+    defaultFee: number;
+    invoiceDueDays: number;
+    estimateValidityDays: number;
+    autoCloseInspectionJobCard: boolean;
+    autoGenerateEstimate: boolean;
+    autoGenerateInvoice: boolean;
+    whatsappNotifications: boolean;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -98,6 +107,15 @@ const TenantConfigSchema = new Schema<ITenantConfig>(
       autoAssignJobs: { type: Boolean, default: false },
       autoCloseInspections: { type: Boolean, default: false },
       notifyOnLowStock: { type: Boolean, default: true },
+    },
+    inspectionSettings: {
+      defaultFee: { type: Number, default: 150 },
+      invoiceDueDays: { type: Number, default: 7 },
+      estimateValidityDays: { type: Number, default: 30 },
+      autoCloseInspectionJobCard: { type: Boolean, default: true },
+      autoGenerateEstimate: { type: Boolean, default: true },
+      autoGenerateInvoice: { type: Boolean, default: true },
+      whatsappNotifications: { type: Boolean, default: true },
     },
   },
   {

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Building, Users, FileText, Globe, Key, Share2, Palette } from 'lucide-react';
+import { Building, Users, FileText, Globe, Key, Share2, Palette, Clipboard } from 'lucide-react';
 import { fadeInUp, staggerContainer } from '@/lib/dashboard-animations';
 import CompanyProfileSettings from '@/components/settings/CompanyProfileSettings';
 import UserManagementSettings from '@/components/settings/UserManagementSettings';
@@ -11,16 +11,18 @@ import InvoicingSettings from '@/components/settings/InvoicingSettings';
 import LocalizationSettings from '@/components/settings/LocalizationSettings';
 import ZatcaSettings from '@/components/settings/ZatcaSettings';
 import IntegrationsSettings from '@/components/settings/IntegrationsSettings';
-import AppearanceSettings from '@/components/settings/AppearanceSettings'; // NEW: Import AppearanceSettings
+import AppearanceSettings from '@/components/settings/AppearanceSettings';
+import InspectionSettings from '@/components/settings/InspectionSettings';
 
 const tabs = [
     { name: 'Company Profile', icon: Building, component: <CompanyProfileSettings /> },
-    { name: 'User Management', icon: Users, component: <UserManagementSettings /> }, 
+    { name: 'User Management', icon: Users, component: <UserManagementSettings /> },
     { name: 'Invoicing & Estimates', icon: FileText, component: <InvoicingSettings /> },
+    { name: 'Inspections', icon: Clipboard, component: <InspectionSettings /> },
     { name: 'Localization', icon: Globe, component: <LocalizationSettings /> },
     { name: 'ZATCA', icon: Key, component: <ZatcaSettings /> },
     { name: 'Integrations', icon: Share2, component: <IntegrationsSettings /> },
-    { name: 'Appearance', icon: Palette, component: <AppearanceSettings /> }, // NEW: Add Appearance tab
+    { name: 'Appearance', icon: Palette, component: <AppearanceSettings /> },
 ];
 
 export default function SettingsPage() {

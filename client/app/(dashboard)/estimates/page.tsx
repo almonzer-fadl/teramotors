@@ -113,7 +113,7 @@ export default function EstimatesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 py-6">
       <motion.div
         className="space-y-6"
         variants={staggerContainer}
@@ -122,7 +122,7 @@ export default function EstimatesPage() {
       >
         <motion.div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4" variants={fadeInUp}>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{t('estimates.title')}</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">{t('estimates.title')}</h1>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {t('estimates.description')}
             </p>

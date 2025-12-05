@@ -67,5 +67,50 @@ export class WhatsAppEventListeners {
     const message = `Your invoice #${invoice.invoiceNumber} for a total of ${invoice.totalAmount} SAR is ready. You can view it here: ${process.env.NEXT_PUBLIC_BASE_URL}/invoices/${invoiceId}`;
     await this.sendMessage(customerId, message);
   }
+
+  // Inspection completed - Send completion message with estimate and invoice details
+  public async onInspectionCompleted(params: {
+    customerId: string;
+    vehicleMake: string;
+    vehicleModel: string;
+    itemsChecked: number;
+    itemsNeedingAttention: number;
+    inspectionFee: number;
+    invoiceNumber: string;
+    estimateTotal: number;
+    serviceCount: number;
+  }): Promise<void> {
+    const {
+      customerId,
+      vehicleMake,
+      vehicleModel,
+      itemsChecked,
+      itemsNeedingAttention,
+      inspectionFee,
+      invoiceNumber,
+      estimateTotal,
+      serviceCount
+    } = params;
+
+    const message = `✅ Inspection Completed - ${vehicleMake} ${vehicleModel}
+
+Your vehicle inspection is complete!
+
+📋 Inspection Results:
+- Items checked: ${itemsChecked}
+- Items needing attention: ${itemsNeedingAttention}
+
+💰 Inspection Fee: ${inspectionFee.toFixed(2)} SAR
+📄 Invoice #${invoiceNumber}
+
+📊 Repair Estimate: ${estimateTotal.toFixed(2)} SAR
+🔧 Recommended services: ${serviceCount}
+
+You can view the full inspection report and estimate at our workshop.
+
+Thank you for choosing our service!`;
+
+    await this.sendMessage(customerId, message);
+  }
 }
 
