@@ -124,6 +124,10 @@ const TenantSchema = new Schema<ITenant>(
       currency: { type: String, default: 'SAR' },
       locale: { type: String, default: 'ar-SA' },
       dateFormat: { type: String, default: 'DD/MM/YYYY' },
+      onboardingState: {
+        step: { type: Number, default: 1 },
+        completed: { type: Boolean, default: false }
+      }
     },
     branding: {
       logoUrl: String,
