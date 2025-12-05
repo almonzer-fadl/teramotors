@@ -191,11 +191,23 @@ function RegisterForm() {
       const data = await response.json();
 
       if (response.ok) {
-        setCurrentStep(3);
-        // Redirect after showing success
-        setTimeout(() => {
-          router.push("/login?registered=true");
-        }, 3000);
+        // After successful creation, immediately log the user in to start the onboarding
+        // This requires a separate login API call
+        const loginResponse = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: formData.email, password: formData.password }),
+        });
+
+        if (loginResponse.ok && data.needsOnboarding) {
+            router.push("/onboarding");
+        } else if (loginResponse.ok) {
+            router.push("/dashboard");
+        }
+        else {
+            // If login fails, redirect to login page with a success message
+            router.push("/login?registered=true");
+        }
       } else {
         setError(data.error || "Registration failed. Please try again.");
       }

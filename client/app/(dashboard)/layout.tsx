@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/dashboard/Breadcrumbs";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/dashboard/LanguageSwitcher";
@@ -12,6 +13,8 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import TopBarLogo from "@/components/dashboard/TopBarLogo"; 
 import DraggableSidebarToggle from "@/components/dashboard/DraggableSidebarToggle";
 import Portal from "@/components/dashboard/Portal";
+import { useSession } from "@/lib/hooks/useSession";
+import Tour from "@/components/dashboard/Tour";
 
 
 export default function DashboardLayout({
@@ -20,14 +23,15 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  // This state now just holds the position reported by the button
   const [buttonPosition, setButtonPosition] = useState<{x: number, y: number} | null>(null);
+  const [onboardingState, setOnboardingState] = useState<{completed: boolean, step: number} | null>(null);
   const { t } = useTranslation("common");
+  const router = useRouter();
+  const pathname = usePathname();
+  const { user } = useSession();
 
   useEffect(() => {
-    // This effect runs once on mount to set the initial position and run the discovery animation
-    
-    // 1. Set initial button position
+    // Fetch initial state for button position and onboarding
     const savedPos = localStorage.getItem('sidebar-toggle-pos');
     let initialPos;
     if (savedPos) {
@@ -41,19 +45,50 @@ export default function DashboardLayout({
     }
     setButtonPosition(initialPos);
 
-    // 2. Run one-time discovery animation
-    if (!sessionStorage.getItem('hasSeenNavAnimation')) {
+    const fetchOnboardingStatus = async () => {
+        try {
+            const response = await fetch('/api/settings/company-profile');
+            if (response.ok) {
+                const data = await response.json();
+                const onboarding = data.settings?.onboardingState;
+                if(onboarding) {
+                    setOnboardingState(onboarding);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch onboarding status", error);
+        }
+    };
+
+    if(user) {
+        fetchOnboardingStatus();
+    }
+    
+  }, [user]);
+
+  useEffect(() => {
+    // Redirect logic for onboarding
+    if (onboardingState && !onboardingState.completed && pathname !== '/onboarding') {
+        router.replace('/onboarding');
+    }
+    
+    // One-time discovery animation logic
+    if (onboardingState?.completed && !sessionStorage.getItem('hasSeenNavAnimation')) {
         const timer1 = setTimeout(() => {
             setSidebarOpen(true);
             const timer2 = setTimeout(() => {
                 setSidebarOpen(false);
                 sessionStorage.setItem('hasSeenNavAnimation', 'true');
-            }, 1500); // How long the menu stays open
+            }, 1500);
             return () => clearTimeout(timer2);
-        }, 1500); // How long before it opens
+        }, 1500);
       return () => clearTimeout(timer1);
     }
-  }, []);
+  }, [onboardingState, pathname, router]);
+
+  const handleButtonDrag = (event: MouseEvent | TouchEvent | PointerEvent, info: any) => {
+    setButtonPosition({ x: info.point.x, y: info.point.y });
+  };
 
   return (
     <DashboardThemeProvider>
@@ -62,7 +97,7 @@ export default function DashboardLayout({
         <Portal>
             {buttonPosition && <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} position={buttonPosition} />}
             
-            {!sidebarOpen && <DraggableSidebarToggle 
+            {!sidebarOpen && buttonPosition && <DraggableSidebarToggle 
                 onOpen={() => setSidebarOpen(true)}
                 onPositionChange={setButtonPosition}
             />}
@@ -71,13 +106,16 @@ export default function DashboardLayout({
         <div className="flex flex-col min-h-screen">
           <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200/80 dark:border-white/10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg px-4 sm:gap-x-6 sm:px-6 lg:px-8">
             <div className="flex h-16 flex-1 items-center gap-x-4 self-stretch lg:gap-x-6">
-                <div className="pl-4">
+                <div id="tour-step-1-logo" className="pl-4">
                     <TopBarLogo />
                 </div>
                 <div className="flex-1"></div>
                 <div className="flex items-center gap-x-4 lg:gap-x-6">
+                    <Tour />
                     <LanguageSwitcher />
-                    <ThemeToggle />
+                    <div id="tour-step-2-theme-toggle">
+                        <ThemeToggle />
+                    </div>
                     <NotificationBell />
                 </div>
             </div>

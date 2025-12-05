@@ -57,6 +57,7 @@ export default function DraggableSidebarToggle({ onOpen, onPositionChange }: Dra
   return (
     <div ref={constraintsRef} className="fixed inset-0 pointer-events-none z-50">
         <motion.div
+            id="tour-step-3-nav-button"
             className="absolute pointer-events-auto"
             style={{ x: position.x, y: position.y }}
             onTap={onOpen}

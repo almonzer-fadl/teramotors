@@ -145,6 +145,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Workshop created successfully",
+      needsOnboarding: true, // Add this flag
       data: {
         tenantId: tenantId?.toString(),
         userId: newUser._id.toString(),

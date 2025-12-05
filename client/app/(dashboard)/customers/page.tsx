@@ -260,6 +260,7 @@ export default function CustomersPage() {
             </p>
           </div>
           <Link
+            id="tour-step-4-add-customer"
             href="/customers/new"
             className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
           >
