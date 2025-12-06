@@ -71,6 +71,13 @@ export interface ITenant extends Document {
   createdBy?: mongoose.Types.ObjectId;
   isActive(): boolean;
   hasExpired(): boolean;
+  stats: {
+    currentUsers: number;
+    currentVehicles: number;
+    currentCustomers: number;
+    storageUsed: number;
+    lastUpdated: Date;
+  };
 }
 
 const TenantSchema = new Schema<ITenant>(
@@ -165,6 +172,13 @@ const TenantSchema = new Schema<ITenant>(
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
+    stats: {
+      currentUsers: { type: Number, default: 0 },
+      currentVehicles: { type: Number, default: 0 },
+      currentCustomers: { type: Number, default: 0 },
+      storageUsed: { type: Number, default: 0 }, // in MB
+      lastUpdated: { type: Date, default: Date.now },
+    },
   },
   {
     timestamps: true,
@@ -174,6 +188,8 @@ const TenantSchema = new Schema<ITenant>(
 TenantSchema.index({ slug: 1 }, { unique: true });
 TenantSchema.index({ status: 1 });
 TenantSchema.index({ 'subscription.plan': 1 });
+TenantSchema.index({ 'stats.currentUsers': 1 });
+TenantSchema.index({ 'stats.currentVehicles': 1 });
 
 TenantSchema.methods.isActive = function (): boolean {
   return this.status === 'active' || this.status === 'trial';

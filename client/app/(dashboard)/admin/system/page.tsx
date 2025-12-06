@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Building, ScrollText, Users, Icon } from 'lucide-react';
+import { Building, ScrollText, Users, BarChart, DatabaseBackup } from 'lucide-react';
 import { fadeInUp, staggerContainer } from '@/lib/dashboard-animations';
 import TenantManagementTable from '@/components/admin/TenantManagementTable';
 import SystemLogsViewer from '@/components/admin/SystemLogsViewer';
 import GlobalUsersTable from '@/components/admin/GlobalUsersTable';
+import UsageMonitoringDashboard from '@/components/admin/UsageMonitoringDashboard';
+import BackupManager from '@/components/admin/BackupManager';
 import { RoleGuard } from '@/components/RoleGuard';
 
 // Define the structure for each tab
@@ -22,6 +24,8 @@ const tabs: AdminSystemTab[] = [
   { name: 'Tenant Management', icon: Building, component: <TenantManagementTable /> },
   { name: 'System Logs', icon: ScrollText, component: <SystemLogsViewer /> },
   { name: 'Global User Management', icon: Users, component: <GlobalUsersTable /> },
+  { name: 'Usage Monitoring', icon: BarChart, component: <UsageMonitoringDashboard /> },
+  { name: 'Backup & Recovery', icon: DatabaseBackup, component: <BackupManager /> },
 ];
 
 export default function AdminSystemPage() {

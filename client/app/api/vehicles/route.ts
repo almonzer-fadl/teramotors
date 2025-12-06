@@ -3,6 +3,8 @@ import Vehicle from '@/lib/models/Vehicle';
 import Customer from '@/lib/models/Customer';
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
+import { checkUsageLimit } from '@/lib/middleware/usage-enforcement';
+import { updateTenantStats } from '@/lib/utils/usage-tracker';
 
 // GET /api/vehicles - List vehicles for tenant
 export const GET = withTenantAuth(
@@ -80,6 +82,16 @@ export const POST = withTenantAuth(
       body.licensePlate = null;
     }
 
+    // Check usage limits before creating a new vehicle
+    const usageCheck = await checkUsageLimit(tenantId.toString(), 'vehicle', 'create');
+    if (!usageCheck.allowed) {
+      return NextResponse.json({
+        error: usageCheck.reason,
+        current: usageCheck.current,
+        limit: usageCheck.limit,
+      }, { status: 403 });
+    }
+
     // CRITICAL: Validate customer belongs to same tenant
     const customer = await Customer.findOne({
       _id: body.customerId,
@@ -144,6 +156,9 @@ export const POST = withTenantAuth(
       { _id: body.customerId, tenantId },
       { $push: { vehicles: vehicle._id } }
     );
+    
+    // Update tenant stats after successful creation
+    await updateTenantStats(tenantId.toString());
 
     const populatedVehicle = await Vehicle.findById(vehicle._id).populate(
       'customerId',

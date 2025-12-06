@@ -51,6 +51,13 @@ export default function AdminPage() {
       href: '/admin/migrate',
       available: true,
     },
+    {
+      title: 'Advanced Analytics',
+      description: 'View platform performance, revenue trends, and growth metrics',
+      icon: TrendingUp,
+      href: '/admin/analytics',
+      available: true,
+    },
   ];
 
   return (
