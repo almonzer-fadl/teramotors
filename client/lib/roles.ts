@@ -8,8 +8,9 @@ export const getNavigationItems = (userRole: string) => {
   if (userRole === 'SUPER_ADMIN') {
     return [
       { tKey: 'sidebar.admin', href: '/admin', icon: 'Shield', roles: ['SUPER_ADMIN'] },
+      { tKey: 'sidebar.system', href: '/admin/system', icon: 'Settings', roles: ['SUPER_ADMIN'] },
       { tKey: 'sidebar.migration', href: '/admin/migrate', icon: 'Database', roles: ['SUPER_ADMIN'] },
-      { tKey: 'sidebar.settings', href: '/settings', icon: 'Settings', roles: ['SUPER_ADMIN'] },
+      { tKey: 'sidebar.admin_settings', href: '/admin/settings', icon: 'Settings', roles: ['SUPER_ADMIN'] },
     ]
   }
 

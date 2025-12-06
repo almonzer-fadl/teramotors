@@ -856,8 +856,9 @@
     "services": "Services",
     "whatsapp": "WhatsApp",
     "users": "User Management",
-    "reports": "Reports",
-    "settings": "Settings"
+    "settings": "Settings",
+    "system": "System Administration",
+    "admin_settings": "Super Admin Settings"
   },
   "roles": {
     "admin": {

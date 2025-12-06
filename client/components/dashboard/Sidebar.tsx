@@ -10,6 +10,7 @@ import {
   LayoutDashboard, Users, Car, ClipboardList, FileText, Package, Search, CreditCard,
   BarChart3, Settings, Wrench, MessageSquare, Shield, Database,
 } from "lucide-react";
+import { useSidebar } from "@/lib/contexts/SidebarContext";
 
 const iconMap = { LayoutDashboard, Users, Car, ClipboardList, FileText, Package, Search, CreditCard, BarChart3, Settings, Wrench, MessageSquare, Shield, Database };
 
@@ -18,7 +19,7 @@ const containerVariants = {
     opacity: 1,
     transition: {
       when: "beforeChildren",
-      staggerChildren: 0.05, // Subtle stagger for "imperfect" feel
+      staggerChildren: 0.05,
     },
   },
   closed: {
@@ -32,63 +33,33 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  open: (i: number) => ({ // Custom prop 'i' for index
+  open: (i: number) => ({
     y: 0,
-    x: (i % 2) * 10 - 5, // Small alternating x-offset for "imperfect" line
+    x: (i % 2) * 10 - 5,
     opacity: 1,
     transition: { type: "spring", stiffness: 300, damping: 24 } 
   }),
   closed: { 
-    y: 20, // Animate slightly down on close
+    y: 20,
     x: 0,
     opacity: 0
   },
 };
 
-export default function Sidebar({ isOpen, onClose, position }: { isOpen: boolean; onClose: () => void; position: {x: number, y: number} }) {
+export default function Sidebar() {
     const { user } = useSession();
     const { t } = useTranslation("common");
+    const { isSidebarOpen, setSidebarOpen } = useSidebar();
     const userRole = (user as any)?.role || "mechanic";
     const navigation = getNavigationItems(userRole).map(item => ({...item, icon: iconMap[item.icon as keyof typeof iconMap], tKey: t(item.tKey) }));
 
     const getPositionStyles = () => {
-        if (typeof window === 'undefined' || !position) return { top: '50%', left: '50%' };
-
-        const { innerWidth, innerHeight } = window;
-        const listWidth = 192; // w-48, approx width of the list container
-        const listHeight = navigation.length * 52; // approx height of all pills
-        const margin = 16; // 1rem
-        const buttonSize = 56;
-
-        // Default to opening above and to the left of the button
-        let top = position.y - listHeight;
-        let left = position.x - listWidth;
-
-        // If opening ABOVE would go off-screen, open BELOW
-        if (top < margin) {
-            top = position.y + buttonSize + margin;
-        }
-
-        // If opening to the LEFT would go off-screen, open to the RIGHT
-        if (left < margin) {
-            left = position.x + buttonSize;
-        }
-
-        // Final boundary checks to pull the panel back into view
-        if (top < margin) top = margin;
-        if (top + listHeight > innerHeight - margin) top = innerHeight - listHeight - margin;
-        if (left < margin) left = margin;
-        if (left + listWidth > innerWidth - margin) left = innerWidth - listWidth - margin;
-
-        // Add a small vertical offset to move it down slightly as requested
-        top += 10; 
-
-        return { top: `${top}px`, left: `${left}px` };
+        return { top: '80px', left: '20px' };
     };
     
     return (
         <AnimatePresence>
-            {isOpen && (
+            {isSidebarOpen && (
                 <Fragment>
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -96,7 +67,7 @@ export default function Sidebar({ isOpen, onClose, position }: { isOpen: boolean
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
                         className="fixed inset-0 z-40 bg-black/40"
-                        onClick={onClose} 
+                        onClick={() => setSidebarOpen(false)} 
                     />
                     <motion.div
                         variants={containerVariants}
@@ -104,15 +75,15 @@ export default function Sidebar({ isOpen, onClose, position }: { isOpen: boolean
                         animate="open"
                         exit="closed"
                         style={getPositionStyles()}
-                        className="fixed z-50 flex flex-col items-center gap-3 p-2 rounded-xl bg-white/20 dark:bg-gray-800/20 shadow-xl backdrop-blur-md border border-white/30 dark:border-white/10"
+                        className="fixed z-50 flex flex-col items-center gap-3 p-4 max-h-[calc(100vh-100px)] overflow-y-auto scrollbar-glassy"
                     >
                         {navigation.map((item, index) => (
                            <NavItemPill 
                                 key={item.tKey} 
                                 item={item} 
-                                onClick={onClose} 
+                                onClick={() => setSidebarOpen(false)} 
                                 variants={itemVariants} 
-                                custom={index} // Pass index as custom prop
+                                custom={index}
                            />
                         ))}
                     </motion.div>

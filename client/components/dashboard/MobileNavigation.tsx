@@ -20,8 +20,40 @@ import {
   Bell,
   Search,
   Plus,
-  CreditCard
+  CreditCard,
+  Shield, // Added for admin icon
+  Database, // Added for migration icon
+  LayoutDashboard, // Added for dashboard icon
+  ClipboardList, // Added for job cards icon
+  MessageSquare, // Added for WhatsApp icon
+  BarChart3, // Added for reports icon
+  Icon // Import the Icon type
 } from 'lucide-react';
+
+import { getNavigationItems } from '@/lib/roles';
+
+// Map string icon names to Lucide React components
+const iconMap: { [key: string]: Icon } = {
+  Home: Home,
+  Users: Users,
+  Car: Car,
+  Calendar: Calendar,
+  Wrench: Wrench,
+  FileText: FileText,
+  Receipt: Receipt,
+  Package: Package,
+  Settings: Settings,
+  Bell: Bell,
+  Search: Search,
+  Plus: Plus,
+  CreditCard: CreditCard,
+  Shield: Shield,
+  Database: Database,
+  LayoutDashboard: LayoutDashboard,
+  ClipboardList: ClipboardList,
+  MessageSquare: MessageSquare,
+  BarChart3: BarChart3,
+};
 
 interface MobileNavigationProps {
   className?: string;
@@ -32,25 +64,8 @@ export default function MobileNavigation({ className = "" }: MobileNavigationPro
   const pathname = usePathname();
   const { t } = useTranslation();
   const { user } = useSession();
-  const isAdmin = user?.role === 'admin';
 
-  const baseNavigationItems = [
-    { href: '/dashboard', icon: Home, label: t('nav.dashboard') },
-    { href: '/customers', icon: Users, label: t('nav.customers') },
-    { href: '/vehicles', icon: Car, label: t('nav.vehicles') },
-    { href: '/appointments', icon: Calendar, label: t('nav.appointments') },
-    { href: '/job-cards', icon: Wrench, label: t('nav.job_cards') },
-    { href: '/inventory', icon: Package, label: t('nav.inventory') },
-  ];
-
-  const adminOnlyItems = [
-    { href: '/estimates', icon: FileText, label: t('nav.estimates') },
-    { href: '/invoices', icon: Receipt, label: t('nav.invoices') },
-    { href: '/payments', icon: CreditCard, label: t('nav.payments') },
-    { href: '/settings', icon: Settings, label: t('nav.settings') },
-  ];
-
-  const navigationItems = isAdmin ? [...baseNavigationItems, ...adminOnlyItems] : baseNavigationItems;
+  const navigationItems = getNavigationItems(user?.role || '');
 
   const quickActions = [
     { href: '/customers/new', icon: Plus, label: t('nav.new_customer') },
@@ -60,7 +75,7 @@ export default function MobileNavigation({ className = "" }: MobileNavigationPro
 
   const isActive = (href: string) => {
     if (href === '/dashboard') {
-      return pathname === '/dashboard';
+      return pathname === '/dashboard' || pathname === '/'; // Also consider root as dashboard
     }
     return pathname.startsWith(href);
   };
@@ -97,7 +112,8 @@ export default function MobileNavigation({ className = "" }: MobileNavigationPro
               <div className="p-4">
                 <div className="space-y-1">
                   {navigationItems.map((item) => {
-                    const Icon = item.icon;
+                    const IconComponent = iconMap[item.icon as keyof typeof iconMap];
+                    if (!IconComponent) return null; // Handle case where icon name is not found
                     return (
                       <Link
                         key={item.href}
@@ -109,8 +125,8 @@ export default function MobileNavigation({ className = "" }: MobileNavigationPro
                             : 'text-gray-700 hover:bg-gray-100'
                         }`}
                       >
-                        <Icon className="mr-3 h-5 w-5" />
-                        {item.label}
+                        <IconComponent className="mr-3 h-5 w-5" />
+                        {t(item.tKey)}
                       </Link>
                     );
                   })}
