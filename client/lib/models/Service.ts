@@ -21,6 +21,8 @@ export interface IService extends Document {
   partsRequired: IPartRequired[];
   isActive: boolean;
   isTemplate: boolean;
+  estimatedDuration?: number; // in minutes
+  bookingEnabled?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,6 +57,8 @@ const ServiceSchema = new Schema<IService>({
   }],
   isActive: { type: Boolean, default: true },
   isTemplate: { type: Boolean, default: false },
+  estimatedDuration: { type: Number, min: 0 },
+  bookingEnabled: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 }, {

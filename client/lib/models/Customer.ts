@@ -24,6 +24,21 @@ export interface ICustomer extends Document {
   companyName?: string;
   notes?: string;
   isActive: boolean;
+  portalAccess?: {
+    enabled: boolean;
+    lastLogin?: Date;
+    otpSecret?: string;
+    sessionToken?: string;
+    sessionExpiry?: Date;
+  };
+  preferences?: {
+    notifications: {
+      email: boolean;
+      sms: boolean;
+      whatsapp: boolean;
+    };
+    preferredChannel: 'email' | 'sms' | 'whatsapp';
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,6 +75,21 @@ const CustomerSchema = new Schema<ICustomer>({
   companyName: { type: String },
   notes: String,
   isActive: { type: Boolean, default: true },
+  portalAccess: {
+    enabled: { type: Boolean, default: false },
+    lastLogin: Date,
+    otpSecret: String,
+    sessionToken: String,
+    sessionExpiry: Date
+  },
+  preferences: {
+    notifications: {
+      email: { type: Boolean, default: true },
+      sms: { type: Boolean, default: true },
+      whatsapp: { type: Boolean, default: true }
+    },
+    preferredChannel: { type: String, enum: ['email', 'sms', 'whatsapp'], default: 'email' }
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 }, {

@@ -34,6 +34,22 @@ export interface ITenant extends Document {
     locale: string;
     dateFormat: string;
   };
+  bookingSettings?: {
+    enabled: boolean;
+    workingHours: {
+      monday: { start: string; end: string; closed: boolean };
+      tuesday: { start: string; end: string; closed: boolean };
+      wednesday: { start: string; end: string; closed: boolean };
+      thursday: { start: string; end: string; closed: boolean };
+      friday: { start: string; end: string; closed: boolean };
+      saturday: { start: string; end: string; closed: boolean };
+      sunday: { start: string; end: string; closed: boolean };
+    };
+    appointmentDuration: number; // in minutes
+    bufferTime: number; // in minutes
+    advanceBookingDays: number;
+    requireApproval: boolean;
+  };
   branding: {
     logoUrl?: string;
     primaryColor?: string;
@@ -135,6 +151,50 @@ const TenantSchema = new Schema<ITenant>(
         step: { type: Number, default: 1 },
         completed: { type: Boolean, default: false }
       }
+    },
+    bookingSettings: {
+      enabled: { type: Boolean, default: false },
+      workingHours: {
+        monday: {
+          start: { type: String, default: '08:00' },
+          end: { type: String, default: '17:00' },
+          closed: { type: Boolean, default: false }
+        },
+        tuesday: {
+          start: { type: String, default: '08:00' },
+          end: { type: String, default: '17:00' },
+          closed: { type: Boolean, default: false }
+        },
+        wednesday: {
+          start: { type: String, default: '08:00' },
+          end: { type: String, default: '17:00' },
+          closed: { type: Boolean, default: false }
+        },
+        thursday: {
+          start: { type: String, default: '08:00' },
+          end: { type: String, default: '17:00' },
+          closed: { type: Boolean, default: false }
+        },
+        friday: {
+          start: { type: String, default: '08:00' },
+          end: { type: String, default: '17:00' },
+          closed: { type: Boolean, default: true }
+        },
+        saturday: {
+          start: { type: String, default: '08:00' },
+          end: { type: String, default: '17:00' },
+          closed: { type: Boolean, default: false }
+        },
+        sunday: {
+          start: { type: String, default: '08:00' },
+          end: { type: String, default: '17:00' },
+          closed: { type: Boolean, default: false }
+        }
+      },
+      appointmentDuration: { type: Number, default: 60 },
+      bufferTime: { type: Number, default: 15 },
+      advanceBookingDays: { type: Number, default: 30 },
+      requireApproval: { type: Boolean, default: false }
     },
     branding: {
       logoUrl: String,

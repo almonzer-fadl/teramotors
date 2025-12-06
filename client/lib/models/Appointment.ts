@@ -16,6 +16,9 @@ export interface IAppointment extends Document {
   actualCost?: number;
   mechanicId: mongoose.Types.ObjectId;
   priority: 'low' | 'medium' | 'high' | 'urgent';
+  source: 'admin' | 'customer' | 'api' | 'phone';
+  confirmationNumber: string;
+  requiresApproval?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,6 +51,9 @@ const AppointmentSchema = new Schema<IAppointment>({
   actualCost: { type: Number, required: false, min: 0 },
   mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: true },
   priority: { type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium' },
+  source: { type: String, enum: ['admin', 'customer', 'api', 'phone'], default: 'admin', required: true },
+  confirmationNumber: { type: String, required: true, unique: true },
+  requiresApproval: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 }, {
@@ -63,6 +69,8 @@ AppointmentSchema.index({ tenantId: 1, status: 1 });
 AppointmentSchema.index({ tenantId: 1, priority: 1 });
 AppointmentSchema.index({ tenantId: 1, createdAt: -1 });
 AppointmentSchema.index({ tenantId: 1, status: 1, appointmentDate: 1 });
+AppointmentSchema.index({ confirmationNumber: 1 }, { unique: true });
+AppointmentSchema.index({ tenantId: 1, source: 1 });
 
 // Helper method to find appointments by tenant
 AppointmentSchema.statics.findByTenant = function(
