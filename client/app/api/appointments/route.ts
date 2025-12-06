@@ -6,6 +6,7 @@ import Mechanic from '@/lib/models/Mechanic';
 import Service from '@/lib/models/Service';
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
+import { SlotCalculator } from '@/lib/services/SlotCalculator';
 
 // GET /api/appointments - List appointments for tenant
 export const GET = withTenantAuth(
@@ -161,6 +162,9 @@ export const POST = withTenantAuth(
       );
     }
 
+    // Generate confirmation number
+    const confirmationNumber = await SlotCalculator.generateConfirmationNumber();
+
     const appointment = new Appointment({
       tenantId, // Always set tenantId from auth context
       customerId: body.customerId,
@@ -172,6 +176,9 @@ export const POST = withTenantAuth(
       endTime: body.endTime,
       status: body.status || 'scheduled',
       priority: body.priority || 'medium',
+      source: body.source || 'admin',
+      confirmationNumber,
+      requiresApproval: false,
       notes: body.notes,
       estimatedCost: body.estimatedCost,
     });
