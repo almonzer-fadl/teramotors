@@ -21,15 +21,16 @@ export default function RootLayout({
           {children}
         </I18nProvider>
         {/* Google Ads Scripts */}
-        <Script async src="https://www.googletagmanager.com/gtag/js?id=AW-17031322868" />
-        <Script id="google-ads-init">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'AW-17031322868');
-          `}
-        </Script>
+                <Script async src="https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}" />
+                <Script id="google-ads-init">
+                  {`
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+        
+                    gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}');
+                  `}
+                </Script>
       </body>
     </html>
   );
