@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
+import { checkUsageLimit } from '@/lib/middleware/usage-enforcement';
+import { updateTenantStats } from '@/lib/utils/usage-tracker';
 import { connectToDatabase } from '@/lib/db';
 import User from '@/lib/models/User';
 import bcrypt from 'bcryptjs';
@@ -38,6 +40,16 @@ export const POST = withTenantAuth(
         return NextResponse.json({ error: 'A user with this email already exists in your organization.' }, { status: 409 });
       }
 
+      // Check usage limits before creating a new user
+      const usageCheck = await checkUsageLimit(tenantId.toString(), 'user', 'create');
+      if (!usageCheck.allowed) {
+        return NextResponse.json({
+          error: usageCheck.reason,
+          current: usageCheck.current,
+          limit: usageCheck.limit
+        }, { status: 403 });
+      }
+
       // Generate and hash a temporary password
       const temporaryPassword = "TempPass123!"; // This could be randomized and emailed
       const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
@@ -51,6 +63,9 @@ export const POST = withTenantAuth(
         tenantId,
         status: 'active', // New users are active by default
       });
+      
+      // Update tenant stats after successful creation
+      await updateTenantStats(tenantId.toString());
 
       // Return the new user without the password
       const userResponse = newUser.toObject();
