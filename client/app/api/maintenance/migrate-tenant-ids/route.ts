@@ -10,8 +10,8 @@ import { getServerSession } from "@/lib/auth-server";
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
-    if (!session || (session.user as any).role !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
+    if (!session || (session.user as any).role !== 'SUPER_ADMIN') {
+      return NextResponse.json({ error: 'Forbidden - Super Admin access required' }, { status: 403 });
     }
 
     await connectToDatabase();

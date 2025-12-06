@@ -12,6 +12,8 @@ export interface AuthUser {
   id: string
   email: string
   name: string
+  firstName?: string
+  lastName?: string
   role: string
   tenantId?: string
 }
@@ -26,13 +28,30 @@ export type Session = AuthSession
 export async function signIn(email: string, password: string): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
   try {
     await connectToDatabase()
-    const user = await User.findOne({ email })
-    
+    console.log('[AUTH] Looking up user:', email)
+
+    // Try exact match first
+    let user = await User.findOne({ email })
+    console.log('[AUTH] Exact match result:', user ? 'Found' : 'Not found')
+
+    // If not found, try case-insensitive
     if (!user) {
+      user = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } })
+      console.log('[AUTH] Case-insensitive result:', user ? 'Found' : 'Not found')
+    }
+
+    if (!user) {
+      // List all users to debug
+      const allUsers = await User.find({}).select('email role').limit(5)
+      console.log('[AUTH] All users in DB:', allUsers)
       return { success: false, error: "Invalid email or password" }
     }
 
+    console.log('[AUTH] User found:', { email: user.email, role: user.role, hasPassword: !!user.password })
+
     const isValidPassword = await bcrypt.compare(password, user.password)
+    console.log('[AUTH] Password valid:', isValidPassword)
+
     if (!isValidPassword) {
       return { success: false, error: "Invalid email or password" }
     }
@@ -40,7 +59,9 @@ export async function signIn(email: string, password: string): Promise<{ success
     const authUser: AuthUser = {
       id: user._id.toString(),
       email: user.email,
-      name: user.fullName,
+      name: user.fullName || `${user.firstName} ${user.lastName}`,
+      firstName: user.firstName,
+      lastName: user.lastName,
       role: user.role,
       tenantId: user.tenantId?.toString()
     }

@@ -65,7 +65,11 @@ function LoginForm() {
       const result = await signIn(email, password);
 
       if (result.success) {
-        router.push(callbackUrl);
+        // Redirect SUPER_ADMIN to admin panel, others to dashboard or callback
+        const redirectUrl = result.user?.role === 'SUPER_ADMIN'
+          ? '/admin'
+          : callbackUrl;
+        router.push(redirectUrl);
       } else {
         setError(result.error || t('ui.invalid_email_or_password'));
       }

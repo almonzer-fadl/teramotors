@@ -8,10 +8,10 @@ import { useTranslation } from "react-i18next";
 import NavItemPill from "./NavItemPill"; 
 import {
   LayoutDashboard, Users, Car, ClipboardList, FileText, Package, Search, CreditCard,
-  BarChart3, Settings, Wrench, MessageSquare,
+  BarChart3, Settings, Wrench, MessageSquare, Shield, Database,
 } from "lucide-react";
 
-const iconMap = { LayoutDashboard, Users, Car, ClipboardList, FileText, Package, Search, CreditCard, BarChart3, Settings, Wrench, MessageSquare };
+const iconMap = { LayoutDashboard, Users, Car, ClipboardList, FileText, Package, Search, CreditCard, BarChart3, Settings, Wrench, MessageSquare, Shield, Database };
 
 const containerVariants = {
   open: {
