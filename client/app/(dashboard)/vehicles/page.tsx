@@ -215,13 +215,27 @@ export default function VehiclesPage() {
         
         {/* Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-6 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Vehicles</h3>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{pagination.totalCount}</p>
+            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-6 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Vehicles</h3>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{pagination.totalCount}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                    <Car className="h-6 w-6 text-white" />
+                  </div>
+                </div>
             </div>
-            <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-6 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Vehicles</h3>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{vehicles.filter(v => v.isActive).length}</p>
+            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-6 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Vehicles</h3>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{vehicles.filter(v => v.isActive).length}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center">
+                    <Car className="h-6 w-6 text-white" />
+                  </div>
+                </div>
             </div>
         </div>
 

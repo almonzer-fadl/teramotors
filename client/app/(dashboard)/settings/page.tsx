@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Building, Users, FileText, Globe, Key, Share2, Palette, Clipboard } from 'lucide-react';
+import { Building, Users, FileText, Globe, Key, Share2, Palette, Clipboard, UserCircle } from 'lucide-react';
 import { fadeInUp, staggerContainer } from '@/lib/dashboard-animations';
 import CompanyProfileSettings from '@/components/settings/CompanyProfileSettings';
 import UserManagementSettings from '@/components/settings/UserManagementSettings';
@@ -13,8 +13,10 @@ import ZatcaSettings from '@/components/settings/ZatcaSettings';
 import IntegrationsSettings from '@/components/settings/IntegrationsSettings';
 import AppearanceSettings from '@/components/settings/AppearanceSettings';
 import InspectionSettings from '@/components/settings/InspectionSettings';
+import AccountSettings from '@/components/settings/AccountSettings';
 
 const tabs = [
+    { name: 'Account', icon: UserCircle, component: <AccountSettings /> },
     { name: 'Company Profile', icon: Building, component: <CompanyProfileSettings /> },
     { name: 'User Management', icon: Users, component: <UserManagementSettings /> },
     { name: 'Invoicing & Estimates', icon: FileText, component: <InvoicingSettings /> },

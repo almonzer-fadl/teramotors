@@ -2,6 +2,8 @@
 import { useSession } from '@/lib/hooks/useSession'
 import { hasPermission } from '@/lib/roles'
 import { Shield, Lock } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 interface RoleGuardProps {
   allowedRoles?: string[]
@@ -9,25 +11,66 @@ interface RoleGuardProps {
   children: React.ReactNode
   fallback?: React.ReactNode
   showAccessDenied?: boolean
+  redirectToLogin?: boolean
 }
 
-export function RoleGuard({ 
-  allowedRoles, 
-  permission, 
-  children, 
-  fallback, 
-  showAccessDenied = true 
+export function RoleGuard({
+  allowedRoles,
+  permission,
+  children,
+  fallback,
+  showAccessDenied = true,
+  redirectToLogin = false
 }: RoleGuardProps) {
-  const { user } = useSession()
-  
+  const { user, isLoading } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && !user && redirectToLogin) {
+      router.push('/login')
+    }
+  }, [user, isLoading, redirectToLogin, router])
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402]"></div>
+      </div>
+    )
+  }
+
   if (!user) {
+    if (redirectToLogin) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402]"></div>
+        </div>
+      )
+    }
     return fallback || <div>Please log in</div>
   }
 
   const userRole = (user as any).role || 'inspector'
-  
+
   // Check role-based access
   if (allowedRoles && !allowedRoles.includes(userRole)) {
+    if (redirectToLogin) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <Shield className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">Access Denied</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">You don't have permission to access this page</p>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="mt-4 px-6 py-2 bg-[#F97402] text-white rounded-xl hover:bg-[#F13F33] transition-colors"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        </div>
+      )
+    }
     if (showAccessDenied) {
       return (
         <div className="flex items-center justify-center h-32">

@@ -50,7 +50,7 @@ export default function AdminPage() {
   ]
 
   return (
-    <RoleGuard allowedRoles={['admin']}>
+    <RoleGuard allowedRoles={['SUPER_ADMIN']} redirectToLogin={true}>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 py-6">
         <motion.div
           className="space-y-8"
@@ -61,10 +61,10 @@ export default function AdminPage() {
           {/* Header */}
           <motion.div variants={fadeInUp}>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
-              Admin Panel
+              Super Admin Panel
             </h1>
             <p className="mt-2 text-base text-gray-700 dark:text-gray-300">
-              Manage system settings, tenants, and monitor activity
+              System-wide management panel - Super Admin access only
             </p>
           </motion.div>
 

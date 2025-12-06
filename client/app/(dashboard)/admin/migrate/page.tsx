@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Database, ArrowLeft } from 'lucide-react';
 import { fadeInUp } from '@/lib/dashboard-animations';
+import { RoleGuard } from '@/components/RoleGuard';
 
 export default function MigratePage() {
   const [loading, setLoading] = useState(false);
@@ -40,16 +41,17 @@ export default function MigratePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 py-6">
-      <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeInUp}
-          className="space-y-8"
-        >
-          {/* Header */}
-          <div>
+    <RoleGuard allowedRoles={['SUPER_ADMIN']} redirectToLogin={true}>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
+            className="space-y-8"
+          >
+            {/* Header */}
+            <div>
             <button
               onClick={() => router.back()}
               className="mb-4 p-3 text-gray-600 dark:text-gray-400 hover:text-[#F97402] transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 group inline-flex items-center"
@@ -159,5 +161,6 @@ export default function MigratePage() {
         </motion.div>
       </div>
     </div>
+    </RoleGuard>
   );
 }

@@ -54,6 +54,8 @@ UserSchema.pre('save', function(next) {
   next();
 });
 
-const User = (mongoose.models && mongoose.models.User) || mongoose.model('User', UserSchema);
+// Export the User model, reusing existing model if available
+// This prevents "OverwriteModelError" in development with hot reloading
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
 
 export default User;
