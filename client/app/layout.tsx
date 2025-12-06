@@ -14,6 +14,12 @@ export default function RootLayout({
         <title>TeraMotors - Auto Repair Management</title>
         <link rel="icon" href="/icon.png" type="image/png" />
         <meta name="description" content="Professional auto repair management system for TeraMotors" />
+        {/* Google Ads Conversion Tracking */}
+        <Script id="google-ads-conversion" strategy="afterInteractive">
+          {`
+            gtag('event', 'conversion', {'send_to': 'AW-17031322868/Lml7CMyC9sUaEPS5lbk_'});
+          `}
+        </Script>
       </head>
       <body>
         <I18nProvider>
