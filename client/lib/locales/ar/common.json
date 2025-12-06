@@ -848,8 +848,8 @@
     "inventory": " المخزن",
     "inspections": "الفحص",
     "services": "الخدمات",
-    "reports": "التقارير",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "system": "إدارة النظام"
   },
   "roles": {
     "admin": {

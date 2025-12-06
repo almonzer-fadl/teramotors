@@ -1,3 +1,4 @@
+import { logActivity } from "@/lib/services/loggingService";
 import { connectToDatabase } from "@/lib/db"
 import User from "@/lib/models/User"
 import bcrypt from "bcryptjs"
@@ -41,9 +42,14 @@ export async function signIn(email: string, password: string): Promise<{ success
     }
 
     if (!user) {
-      // List all users to debug
-      const allUsers = await User.find({}).select('email role').limit(5)
-      console.log('[AUTH] All users in DB:', allUsers)
+      // Log failed login attempt (user not found)
+      await logActivity({
+        level: 'warn',
+        message: `Failed login attempt: User not found for email "${email}".`,
+        resource: { type: 'authentication' },
+        action: 'login_fail',
+        details: { emailAttempted: email },
+      });
       return { success: false, error: "Invalid email or password" }
     }
 
@@ -53,6 +59,16 @@ export async function signIn(email: string, password: string): Promise<{ success
     console.log('[AUTH] Password valid:', isValidPassword)
 
     if (!isValidPassword) {
+      // Log failed login attempt (invalid password)
+      await logActivity({
+        level: 'warn',
+        message: `Failed login attempt: Invalid password for user "${email}".`,
+        userId: user._id,
+        tenantId: user.tenantId,
+        resource: { type: 'authentication', id: user._id.toString() },
+        action: 'login_fail',
+        details: { email: user.email },
+      });
       return { success: false, error: "Invalid email or password" }
     }
 
@@ -82,9 +98,27 @@ export async function signIn(email: string, password: string): Promise<{ success
       maxAge: 60 * 60 * 24 * 7 // 7 days
     })
 
+    // Log successful login
+    await logActivity({
+      level: 'audit',
+      message: `User "${authUser.email}" logged in successfully.`,
+      userId: authUser.id,
+      tenantId: authUser.tenantId,
+      resource: { type: 'authentication', id: authUser.id },
+      action: 'login_success',
+    });
+
     return { success: true, user: authUser }
   } catch (error) {
     console.error("Sign in error:", error)
+    // Log generic sign-in error
+    await logActivity({
+      level: 'error',
+      message: `An unexpected error occurred during sign-in for email "${email}".`,
+      resource: { type: 'authentication' },
+      action: 'login_error',
+      details: { error: (error as Error).message },
+    });
     return { success: false, error: "An error occurred" }
   }
 }
