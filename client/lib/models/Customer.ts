@@ -28,6 +28,7 @@ export interface ICustomer extends Document {
     enabled: boolean;
     lastLogin?: Date;
     otpSecret?: string;
+    otpCreatedAt?: Date;
     sessionToken?: string;
     sessionExpiry?: Date;
   };
@@ -79,6 +80,7 @@ const CustomerSchema = new Schema<ICustomer>({
     enabled: { type: Boolean, default: false },
     lastLogin: Date,
     otpSecret: String,
+    otpCreatedAt: Date,
     sessionToken: String,
     sessionExpiry: Date
   },

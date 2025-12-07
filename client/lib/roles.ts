@@ -16,6 +16,7 @@ export const getNavigationItems = (userRole: string) => {
 
   const baseItems = [
     { tKey: 'sidebar.dashboard', href: '/dashboard', icon: 'LayoutDashboard', roles: ['admin', 'mechanic', 'inspector'] },
+    { tKey: 'sidebar.appointments', href: '/appointments', icon: 'Calendar', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.customers', href: '/customers', icon: 'Users', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.vehicles', href: '/vehicles', icon: 'Car', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.job_cards', href: '/job-cards', icon: 'ClipboardList', roles: ['admin', 'mechanic', 'inspector'] },

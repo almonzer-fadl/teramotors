@@ -1,5 +1,8 @@
 'use client';
 
+import { motion } from 'framer-motion';
+import { CheckCircle2, Calendar, Clock, Wrench, Printer, Home, AlertCircle, Sparkles } from 'lucide-react';
+
 interface BookingConfirmationProps {
   confirmationNumber: string;
   appointmentDate: Date;
@@ -9,6 +12,51 @@ interface BookingConfirmationProps {
   tenantName: string;
   language?: 'ar' | 'en';
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 300, damping: 24 },
+  },
+};
+
+const iconVariants = {
+  hidden: { scale: 0, rotate: -180 },
+  visible: {
+    scale: 1,
+    rotate: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 200,
+      damping: 15,
+      delay: 0.2,
+    },
+  },
+};
+
+const sparkleVariants = {
+  initial: { scale: 0, opacity: 0 },
+  animate: (i: number) => ({
+    scale: [0, 1, 0],
+    opacity: [0, 1, 0],
+    transition: {
+      duration: 2,
+      delay: i * 0.2,
+      repeat: Infinity,
+      repeatDelay: 1,
+    },
+  }),
+};
 
 export function BookingConfirmation({
   confirmationNumber,
@@ -34,25 +82,62 @@ export function BookingConfirmation({
   });
 
   return (
-    <div className="text-center">
-      {/* Success Icon */}
-      <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
-        <svg
-          className="w-12 h-12 text-green-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      </div>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="text-center max-w-2xl mx-auto"
+    >
+      {/* Success Icon with Sparkles */}
+      <motion.div variants={itemVariants} className="relative mb-8">
+        <div className="relative inline-block">
+          {/* Sparkles */}
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              custom={i}
+              variants={sparkleVariants}
+              initial="initial"
+              animate="animate"
+              className="absolute"
+              style={{
+                top: `${Math.sin((i * Math.PI) / 3) * 80 + 40}px`,
+                left: `${Math.cos((i * Math.PI) / 3) * 80 + 40}px`,
+              }}
+            >
+              <Sparkles className="w-6 h-6 text-[#F97402]" />
+            </motion.div>
+          ))}
 
-      <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          {/* Main Icon */}
+          <motion.div
+            variants={iconVariants}
+            className="relative w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center shadow-xl shadow-green-500/30"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
+            >
+              <CheckCircle2 className="w-14 h-14 text-white" strokeWidth={3} />
+            </motion.div>
+
+            {/* Pulse Ring */}
+            <motion.div
+              className="absolute inset-0 rounded-full border-4 border-green-400"
+              initial={{ scale: 1, opacity: 1 }}
+              animate={{ scale: 1.5, opacity: 0 }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Title */}
+      <motion.h2
+        variants={itemVariants}
+        className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent mb-4"
+      >
         {requiresApproval
           ? isArabic
             ? 'تم استلام طلب الحجز!'
@@ -60,116 +145,149 @@ export function BookingConfirmation({
           : isArabic
           ? 'تم تأكيد الحجز!'
           : 'Booking Confirmed!'}
-      </h2>
+      </motion.h2>
 
-      {requiresApproval ? (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-          <p className="text-yellow-800">
-            {isArabic
-              ? 'موعدك قيد المراجعة. سنرسل لك بريدًا إلكترونيًا عند تأكيد الموعد.'
-              : 'Your appointment is pending approval. We will send you an email once confirmed.'}
-          </p>
-        </div>
-      ) : (
-        <p className="text-gray-600 mb-6">
-          {isArabic
-            ? 'تم تأكيد موعدك بنجاح. لقد أرسلنا رسالة تأكيد إلى بريدك الإلكتروني.'
-            : 'Your appointment has been confirmed. We have sent a confirmation email to your inbox.'}
-        </p>
-      )}
-
-      {/* Confirmation Details */}
-      <div className="bg-blue-50 rounded-lg p-6 mb-8">
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <p className="text-sm text-gray-600 mb-1">
-              {isArabic ? 'رقم التأكيد' : 'Confirmation Number'}
+      {/* Approval Status */}
+      <motion.div variants={itemVariants} className="mb-8">
+        {requiresApproval ? (
+          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-200 dark:border-yellow-800 rounded-2xl p-5 flex items-start gap-3">
+            <AlertCircle className="w-6 h-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+            <p className="text-yellow-800 dark:text-yellow-200 font-medium text-left">
+              {isArabic
+                ? 'موعدك قيد المراجعة. سنرسل لك بريدًا إلكترونيًا عند تأكيد الموعد.'
+                : 'Your appointment is pending approval. We will send you an email once confirmed.'}
             </p>
-            <p className="text-2xl font-bold text-blue-600">{confirmationNumber}</p>
           </div>
+        ) : (
+          <p className="text-gray-600 dark:text-gray-400 text-lg font-medium">
+            {isArabic
+              ? 'تم تأكيد موعدك بنجاح. لقد أرسلنا رسالة تأكيد إلى بريدك الإلكتروني.'
+              : 'Your appointment has been confirmed. We have sent a confirmation email to your inbox.'}
+          </p>
+        )}
+      </motion.div>
 
-          <div className="border-t border-blue-200 pt-4">
-            <p className="text-sm text-gray-600 mb-1">{isArabic ? 'الخدمة' : 'Service'}</p>
-            <p className="text-lg font-semibold">{serviceName}</p>
+      {/* Confirmation Details Card */}
+      <motion.div
+        variants={itemVariants}
+        className="bg-gradient-to-br from-[#F97402]/5 to-[#F13F33]/5 dark:from-[#F97402]/10 dark:to-[#F13F33]/10 border-2 border-[#F97402]/20 rounded-3xl p-8 mb-8 shadow-xl"
+      >
+        {/* Confirmation Number */}
+        <div className="mb-6 pb-6 border-b-2 border-[#F97402]/20">
+          <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2 uppercase tracking-wider">
+            {isArabic ? 'رقم التأكيد' : 'Confirmation Number'}
+          </p>
+          <motion.p
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.6, type: 'spring' }}
+            className="text-4xl font-bold bg-gradient-to-r from-[#F97402] to-[#F13F33] bg-clip-text text-transparent"
+          >
+            {confirmationNumber}
+          </motion.p>
+        </div>
+
+        {/* Service */}
+        <div className="mb-6 pb-6 border-b-2 border-[#F97402]/20">
+          <div className="flex items-center gap-2 mb-2">
+            <Wrench className="w-5 h-5 text-[#F97402]" />
+            <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+              {isArabic ? 'الخدمة' : 'Service'}
+            </p>
           </div>
+          <p className="text-xl font-bold text-gray-900 dark:text-white">{serviceName}</p>
+        </div>
 
-          <div className="grid grid-cols-2 gap-4 border-t border-blue-200 pt-4">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">{isArabic ? 'التاريخ' : 'Date'}</p>
-              <p className="font-semibold">{formattedDate}</p>
+        {/* Date & Time */}
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="w-5 h-5 text-[#F97402]" />
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                {isArabic ? 'التاريخ' : 'Date'}
+              </p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600 mb-1">{isArabic ? 'الوقت' : 'Time'}</p>
-              <p className="font-semibold">{formattedTime}</p>
+            <p className="text-lg font-bold text-gray-900 dark:text-white">{formattedDate}</p>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="w-5 h-5 text-[#F97402]" />
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                {isArabic ? 'الوقت' : 'Time'}
+              </p>
             </div>
+            <p className="text-lg font-bold text-gray-900 dark:text-white">{formattedTime}</p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Important Information */}
-      <div className="bg-gray-50 rounded-lg p-6 mb-8 text-left">
-        <h3 className="font-semibold text-lg mb-3">
+      <motion.div
+        variants={itemVariants}
+        className="bg-white dark:bg-gray-800/50 rounded-2xl p-6 mb-8 text-left border-2 border-gray-200 dark:border-gray-700"
+      >
+        <h3 className="font-bold text-xl mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+          <div className="w-1.5 h-6 bg-gradient-to-b from-[#F97402] to-[#F13F33] rounded-full" />
           {isArabic ? 'معلومات مهمة:' : 'Important Information:'}
         </h3>
-        <ul className="space-y-2 text-gray-700">
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600 mt-1">•</span>
-            <span>
+        <ul className="space-y-3 text-gray-700 dark:text-gray-300">
+          <li className="flex items-start gap-3">
+            <span className="w-2 h-2 bg-[#F97402] rounded-full mt-2 flex-shrink-0" />
+            <span className="font-medium">
               {isArabic
                 ? 'يرجى الاحتفاظ برقم التأكيد للرجوع إليه'
                 : 'Please keep your confirmation number for reference'}
             </span>
           </li>
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600 mt-1">•</span>
-            <span>
+          <li className="flex items-start gap-3">
+            <span className="w-2 h-2 bg-[#F97402] rounded-full mt-2 flex-shrink-0" />
+            <span className="font-medium">
               {isArabic
                 ? 'يرجى الوصول قبل 10 دقائق من موعدك'
                 : 'Please arrive 10 minutes before your appointment time'}
             </span>
           </li>
-          <li className="flex items-start gap-2">
-            <span className="text-blue-600 mt-1">•</span>
-            <span>
+          <li className="flex items-start gap-3">
+            <span className="w-2 h-2 bg-[#F97402] rounded-full mt-2 flex-shrink-0" />
+            <span className="font-medium">
               {isArabic
                 ? 'إذا كنت بحاجة إلى إلغاء أو إعادة جدولة، يرجى الاتصال بنا مسبقًا'
                 : 'If you need to cancel or reschedule, please contact us in advance'}
             </span>
           </li>
         </ul>
-      </div>
+      </motion.div>
 
-      {/* Print/Share Buttons */}
-      <div className="flex gap-4 justify-center">
-        <button
+      {/* Action Buttons */}
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
+        <motion.button
           onClick={() => window.print()}
-          className="px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center gap-2"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="px-8 py-4 border-2 border-[#F97402] text-[#F97402] rounded-xl font-semibold hover:bg-[#F97402]/5 transition-all flex items-center justify-center gap-3"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-            />
-          </svg>
+          <Printer className="w-5 h-5" />
           {isArabic ? 'طباعة' : 'Print'}
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
           onClick={() => (window.location.href = '/')}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="px-8 py-4 bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-3 shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/30"
         >
+          <Home className="w-5 h-5" />
           {isArabic ? 'العودة إلى الصفحة الرئيسية' : 'Back to Home'}
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
-      {/* Contact Info */}
-      <p className="mt-8 text-gray-600 text-sm">
-        {isArabic
-          ? `شكراً لاختيارك ${tenantName}`
-          : `Thank you for choosing ${tenantName}`}
-      </p>
-    </div>
+      {/* Thank You Message */}
+      <motion.p
+        variants={itemVariants}
+        className="mt-10 text-gray-600 dark:text-gray-400 text-lg font-medium"
+      >
+        {isArabic ? `شكراً لاختيارك ${tenantName}` : `Thank you for choosing ${tenantName}`}
+      </motion.p>
+    </motion.div>
   );
 }
