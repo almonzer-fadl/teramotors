@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, Mail, Phone, Car, Calendar, Hash, FileText, ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import type { BookingCustomerInput, BookingVehicleInput } from '@/lib/validation/booking';
 
 interface CustomerFormProps {
@@ -9,6 +11,23 @@ interface CustomerFormProps {
   isSubmitting: boolean;
   language?: 'ar' | 'en';
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 300, damping: 24 },
+  },
+};
 
 export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }: CustomerFormProps) {
   const isArabic = language === 'ar';
@@ -27,6 +46,7 @@ export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [focused, setFocused] = useState<Record<string, boolean>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -35,6 +55,14 @@ export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
+  };
+
+  const handleFocus = (fieldName: string) => {
+    setFocused({ ...focused, [fieldName]: true });
+  };
+
+  const handleBlur = (fieldName: string) => {
+    setFocused({ ...focused, [fieldName]: false });
   };
 
   const validate = () => {
@@ -106,200 +134,232 @@ export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }
     onSubmit(customer, vehicle);
   };
 
-  const inputClass = (fieldName: string) =>
-    `w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-      errors[fieldName]
-        ? 'border-red-500 focus:ring-red-500'
-        : 'border-gray-300 focus:ring-blue-600'
-    }`;
+  const InputField = ({
+    name,
+    label,
+    icon: Icon,
+    type = 'text',
+    placeholder,
+    required = false,
+    colSpan = 1,
+  }: {
+    name: string;
+    label: string;
+    icon: any;
+    type?: string;
+    placeholder?: string;
+    required?: boolean;
+    colSpan?: number;
+  }) => {
+    const hasValue = formData[name as keyof typeof formData]?.toString().length > 0;
+    const isFocused = focused[name];
+    const hasError = errors[name];
+
+    return (
+      <motion.div variants={itemVariants} className={colSpan === 2 ? 'md:col-span-2' : ''}>
+        <div className="relative">
+          <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all ${hasError ? 'text-red-600 dark:text-red-400' : isFocused ? 'text-[#F97402]' : 'text-gray-400 dark:text-gray-500'}`}>
+            <Icon className="w-5 h-5" />
+          </div>
+          <input
+            type={type}
+            name={name}
+            value={formData[name as keyof typeof formData]}
+            onChange={handleChange}
+            onFocus={() => handleFocus(name)}
+            onBlur={() => handleBlur(name)}
+            placeholder={placeholder}
+            required={required}
+            min={name === 'vehicleYear' ? '1900' : undefined}
+            max={name === 'vehicleYear' ? new Date().getFullYear() + 1 : undefined}
+            className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none transition-all bg-white dark:bg-gray-800/50 text-gray-900 dark:text-white placeholder-transparent ${
+              hasError
+                ? 'border-red-500 focus:border-red-600 focus:ring-2 focus:ring-red-500/20'
+                : isFocused
+                ? 'border-[#F97402] ring-2 ring-[#F97402]/20'
+                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+            }`}
+          />
+          <label
+            className={`absolute left-12 transition-all pointer-events-none ${
+              hasValue || isFocused
+                ? '-top-2.5 text-xs font-semibold px-2 bg-white dark:bg-gray-900 rounded'
+                : 'top-1/2 -translate-y-1/2 text-base'
+            } ${
+              hasError
+                ? 'text-red-600 dark:text-red-400'
+                : hasValue || isFocused
+                ? 'text-[#F97402]'
+                : 'text-gray-500 dark:text-gray-400'
+            }`}
+          >
+            {label}
+            {required && ' *'}
+          </label>
+        </div>
+        <AnimatePresence>
+          {hasError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="flex items-center gap-1.5 mt-2 text-red-600 dark:text-red-400 text-sm font-medium"
+            >
+              <AlertCircle className="w-4 h-4" />
+              {hasError}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    );
+  };
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-6">
+      <motion.h2
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent mb-8"
+      >
         {isArabic ? 'معلوماتك' : 'Your Information'}
-      </h2>
+      </motion.h2>
 
       <form onSubmit={handleSubmit}>
         {/* Customer Information */}
-        <div className="mb-8">
-          <h3 className="text-lg font-medium mb-4">
-            {isArabic ? 'المعلومات الشخصية' : 'Personal Information'}
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {isArabic ? 'الاسم الأول' : 'First Name'} *
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                className={inputClass('firstName')}
-                required
-              />
-              {errors.firstName && (
-                <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
-              )}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-10"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <div className="p-2 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-lg">
+              <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {isArabic ? 'اسم العائلة' : 'Last Name'} *
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                className={inputClass('lastName')}
-                required
-              />
-              {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {isArabic ? 'البريد الإلكتروني' : 'Email'} *
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={inputClass('email')}
-                required
-              />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {isArabic ? 'رقم الهاتف' : 'Phone Number'} *
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className={inputClass('phone')}
-                placeholder="+966xxxxxxxxx"
-                required
-              />
-              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {isArabic ? 'المعلومات الشخصية' : 'Personal Information'}
+            </h3>
           </div>
-        </div>
+
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            <InputField
+              name="firstName"
+              label={isArabic ? 'الاسم الأول' : 'First Name'}
+              icon={User}
+              required
+            />
+            <InputField
+              name="lastName"
+              label={isArabic ? 'اسم العائلة' : 'Last Name'}
+              icon={User}
+              required
+            />
+            <InputField
+              name="email"
+              label={isArabic ? 'البريد الإلكتروني' : 'Email'}
+              icon={Mail}
+              type="email"
+              required
+            />
+            <InputField
+              name="phone"
+              label={isArabic ? 'رقم الهاتف' : 'Phone Number'}
+              icon={Phone}
+              type="tel"
+              placeholder="+966xxxxxxxxx"
+              required
+            />
+          </motion.div>
+        </motion.div>
 
         {/* Vehicle Information */}
-        <div className="mb-8">
-          <h3 className="text-lg font-medium mb-4">
-            {isArabic ? 'معلومات السيارة' : 'Vehicle Information'}
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {isArabic ? 'الماركة' : 'Make'} *
-              </label>
-              <input
-                type="text"
-                name="vehicleMake"
-                value={formData.vehicleMake}
-                onChange={handleChange}
-                className={inputClass('vehicleMake')}
-                placeholder={isArabic ? 'مثال: تويوتا' : 'e.g., Toyota'}
-                required
-              />
-              {errors.vehicleMake && (
-                <p className="text-red-500 text-sm mt-1">{errors.vehicleMake}</p>
-              )}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-10"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <div className="p-2 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg">
+              <Car className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {isArabic ? 'الموديل' : 'Model'} *
-              </label>
-              <input
-                type="text"
-                name="vehicleModel"
-                value={formData.vehicleModel}
-                onChange={handleChange}
-                className={inputClass('vehicleModel')}
-                placeholder={isArabic ? 'مثال: كامري' : 'e.g., Camry'}
-                required
-              />
-              {errors.vehicleModel && (
-                <p className="text-red-500 text-sm mt-1">{errors.vehicleModel}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {isArabic ? 'سنة الصنع' : 'Year'} *
-              </label>
-              <input
-                type="number"
-                name="vehicleYear"
-                value={formData.vehicleYear}
-                onChange={handleChange}
-                className={inputClass('vehicleYear')}
-                min="1900"
-                max={new Date().getFullYear() + 1}
-                required
-              />
-              {errors.vehicleYear && (
-                <p className="text-red-500 text-sm mt-1">{errors.vehicleYear}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                {isArabic ? 'رقم اللوحة' : 'License Plate'} ({isArabic ? 'اختياري' : 'Optional'})
-              </label>
-              <input
-                type="text"
-                name="licensePlate"
-                value={formData.licensePlate}
-                onChange={handleChange}
-                className={inputClass('licensePlate')}
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium mb-2">
-                {isArabic ? 'رقم الهيكل (VIN)' : 'VIN'} ({isArabic ? 'اختياري' : 'Optional'})
-              </label>
-              <input
-                type="text"
-                name="vin"
-                value={formData.vin}
-                onChange={handleChange}
-                className={inputClass('vin')}
-              />
-            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {isArabic ? 'معلومات السيارة' : 'Vehicle Information'}
+            </h3>
           </div>
-        </div>
+
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            <InputField
+              name="vehicleMake"
+              label={isArabic ? 'الماركة' : 'Make'}
+              icon={Car}
+              placeholder={isArabic ? 'مثال: تويوتا' : 'e.g., Toyota'}
+              required
+            />
+            <InputField
+              name="vehicleModel"
+              label={isArabic ? 'الموديل' : 'Model'}
+              icon={FileText}
+              placeholder={isArabic ? 'مثال: كامري' : 'e.g., Camry'}
+              required
+            />
+            <InputField
+              name="vehicleYear"
+              label={isArabic ? 'سنة الصنع' : 'Year'}
+              icon={Calendar}
+              type="number"
+              required
+            />
+            <InputField
+              name="licensePlate"
+              label={`${isArabic ? 'رقم اللوحة' : 'License Plate'} (${isArabic ? 'اختياري' : 'Optional'})`}
+              icon={Hash}
+            />
+            <InputField
+              name="vin"
+              label={`${isArabic ? 'رقم الهيكل (VIN)' : 'VIN'} (${isArabic ? 'اختياري' : 'Optional'})`}
+              icon={Hash}
+              colSpan={2}
+            />
+          </motion.div>
+        </motion.div>
 
         {/* Navigation */}
-        <div className="flex justify-between">
-          <button
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex justify-between gap-4"
+        >
+          <motion.button
             type="button"
             onClick={onBack}
             disabled={isSubmitting}
-            className="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50"
+            whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+            whileTap={!isSubmitting ? { scale: 0.98 } : {}}
+            className="px-8 py-4 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all disabled:opacity-50 flex items-center gap-2"
           >
+            <ArrowLeft className={`w-5 h-5 ${isArabic ? 'rotate-180' : ''}`} />
             {isArabic ? 'رجوع' : 'Back'}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="submit"
             disabled={isSubmitting}
-            className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold disabled:opacity-50 hover:bg-blue-700 transition-colors flex items-center gap-2"
+            whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+            whileTap={!isSubmitting ? { scale: 0.98 } : {}}
+            className="px-8 py-4 bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white rounded-xl font-semibold text-lg transition-all disabled:opacity-70 flex items-center gap-3 shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/30"
           >
-            {isSubmitting && (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-            )}
+            {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
             {isSubmitting
               ? isArabic
                 ? 'جاري الحجز...'
@@ -307,8 +367,9 @@ export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }
               : isArabic
               ? 'تأكيد الحجز'
               : 'Confirm Booking'}
-          </button>
-        </div>
+            {!isSubmitting && <ArrowRight className={`w-5 h-5 ${isArabic ? 'rotate-180' : ''}`} />}
+          </motion.button>
+        </motion.div>
       </form>
     </div>
   );

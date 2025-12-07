@@ -8,11 +8,11 @@ import { useTranslation } from "react-i18next";
 import NavItemPill from "./NavItemPill"; 
 import {
   LayoutDashboard, Users, Car, ClipboardList, FileText, Package, Search, CreditCard,
-  BarChart3, Settings, Wrench, MessageSquare, Shield, Database,
+  BarChart3, Settings, Wrench, MessageSquare, Shield, Database, Calendar,
 } from "lucide-react";
 import { useSidebar } from "@/lib/contexts/SidebarContext";
 
-const iconMap = { LayoutDashboard, Users, Car, ClipboardList, FileText, Package, Search, CreditCard, BarChart3, Settings, Wrench, MessageSquare, Shield, Database };
+const iconMap = { LayoutDashboard, Users, Car, ClipboardList, FileText, Package, Search, CreditCard, BarChart3, Settings, Wrench, MessageSquare, Shield, Database, Calendar };
 
 const containerVariants = {
   open: {

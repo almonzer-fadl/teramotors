@@ -21,7 +21,8 @@
     "puppeteer:install": "npx puppeteer browsers install chrome",
     "puppeteer:install-chromium": "npx puppeteer browsers install chromium",
     "docker:build": "docker build -f Dockerfile.puppeteer -t teramotors-pdf .",
-    "docker:run": "docker run -p 3000:3000 teramotors-pdf"
+    "docker:run": "docker run -p 3000:3000 teramotors-pdf",
+    "demo:create-customer": "node scripts/create-demo-customer.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
