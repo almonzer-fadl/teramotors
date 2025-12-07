@@ -4,8 +4,10 @@ import Customer from '@/lib/models/Customer';
 import Tenant from '@/lib/models/Tenant';
 import Vehicle from '@/lib/models/Vehicle';
 import Appointment from '@/lib/models/Appointment';
+import Service from '@/lib/models/Service';
 import { CustomerPortalAuth } from '@/lib/services/CustomerPortalAuth';
 
+// Customer Portal Dashboard API
 export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();
@@ -75,6 +77,9 @@ export async function GET(req: NextRequest) {
     // Get upcoming appointments (future appointments only)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
+    // Ensure Service model is registered before populate
+    Service.modelName;
 
     const upcomingAppointments = await Appointment.find({
       customerId: customer._id,

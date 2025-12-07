@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { connectToDatabase } from '@/lib/db';
 import Tenant from '@/lib/models/Tenant';
-import Service from '@/lib/models/Service';
+import InspectionTemplate from '@/lib/models/InspectionTemplate';
 import { BookingWizard } from '@/components/booking/BookingWizardModern';
 
 interface BookingPageProps {
@@ -65,16 +65,15 @@ export default async function BookingPage({ params }: BookingPageProps) {
     );
   }
 
-  // Get active services for booking
-  const services = await Service.find({
+  // Get active inspection templates for booking
+  const inspectionTemplates = await InspectionTemplate.find({
     tenantId: tenant._id,
     isActive: true,
-    bookingEnabled: true,
   })
-    .select('name description category laborRate laborHours estimatedDuration')
+    .select('name description vehicleType items')
     .lean();
 
-  if (services.length === 0) {
+  if (inspectionTemplates.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
         <div className="max-w-md mx-auto bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 p-10 text-center">
@@ -94,10 +93,10 @@ export default async function BookingPage({ params }: BookingPageProps) {
             </svg>
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent mb-3">
-            No Services Available
+            No Inspection Templates Available
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
-            There are currently no services available for online booking.
+            There are currently no inspection templates available for online booking.
           </p>
         </div>
       </div>
@@ -105,17 +104,17 @@ export default async function BookingPage({ params }: BookingPageProps) {
   }
 
   // Convert MongoDB objects to plain objects
-  const plainServices = services.map((service) => ({
-    ...service,
-    _id: service._id?.toString(),
-    tenantId: service.tenantId?.toString(),
+  const plainInspectionTemplates = inspectionTemplates.map((template) => ({
+    ...template,
+    _id: template._id?.toString(),
+    tenantId: template.tenantId?.toString(),
   }));
 
   return (
     <BookingWizard
       tenantSlug={slug}
       tenantName={tenant.companyInfo.name}
-      services={plainServices as any}
+      inspectionTemplates={plainInspectionTemplates as any}
       bookingSettings={{
         workingHours: tenant.bookingSettings.workingHours,
         appointmentDuration: tenant.bookingSettings.appointmentDuration,

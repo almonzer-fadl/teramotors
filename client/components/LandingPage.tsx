@@ -278,7 +278,7 @@ export default function LandingPage() {
               <a href="#subscriptions" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.subscriptions.title")}</a>
               <a href="#about" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.about.title")}</a>
               <a href="#contact" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.contact.title")}</a>
-              <Link href="/portal/teramotors/login" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors flex items-center gap-1">
+              <Link href="/portal/teramotors-default/login" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors flex items-center gap-1">
                 <User className="w-4 h-4" />
                 Customer Portal
               </Link>
@@ -333,7 +333,7 @@ export default function LandingPage() {
               {t("landing.contact.title")}
             </a>
             <Link
-              href="/portal/teramotors/login"
+              href="/portal/teramotors-default/login"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-2 py-2 text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors font-medium"
             >
@@ -409,7 +409,7 @@ export default function LandingPage() {
                 </motion.a>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
-                    href="/portal/teramotors/login"
+                    href="/portal/teramotors-default/login"
                     className="group relative inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white font-semibold rounded-2xl hover:bg-white/20 transition-all duration-300 hover:-translate-y-1"
                   >
                     <User className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
@@ -860,7 +860,7 @@ export default function LandingPage() {
                 <p>{t("landing.contact.email")}</p>
                 <div className="pt-2 space-y-1">
                   <Link
-                    href="/portal/teramotors/login"
+                    href="/portal/teramotors-default/login"
                     className="flex items-center gap-1 text-blue-400 hover:text-white dark:hover:text-gray-300 transition-colors font-medium text-sm"
                   >
                     <User className="w-4 h-4" />
