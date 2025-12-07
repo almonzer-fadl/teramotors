@@ -145,3 +145,20 @@ export async function getSession(): Promise<AuthSession | null> {
 export async function getServerSession(): Promise<AuthSession | null> {
   return getSession()
 }
+
+export async function updateSession(session: AuthSession): Promise<void> {
+  const token = await new SignJWT({ user: session.user })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("7d")
+    .sign(JWT_SECRET);
+
+  const cookieStore = await cookies();
+  cookieStore.set("auth-token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7 // 7 days
+  });
+}
+

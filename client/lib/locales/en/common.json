@@ -2,6 +2,21 @@
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome back! Here's what's happening in your workshop today.",
+    "customer_portal_dashboard": "Customer Portal",
+    "welcome_back": "Welcome back",
+    "portal_subtitle": "Here's a quick overview of your account.",
+    "profile": {
+      "title": "My Profile",
+      "description": "View and edit your personal information."
+    },
+    "vehicles": {
+      "title": "My Vehicles",
+      "description": "Manage your registered vehicles."
+    },
+    "appointments": {
+      "title": "My Appointments",
+      "description": "View your upcoming and past appointments."
+    },
     "total_customers": "Total Customers",
     "total_vehicles": "Total Vehicles",
     "pending_appointments": "Pending Appointments",

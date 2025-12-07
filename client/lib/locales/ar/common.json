@@ -2,6 +2,21 @@
   "dashboard": {
     "title": "لوحة التحكم",
     "welcome": "مرحبًا بعودتك! إليك ما يحدث في ورشتك اليوم.",
+    "customer_portal_dashboard": "بوابة العميل",
+    "welcome_back": "مرحبا بعودتك",
+    "portal_subtitle": "هنا نظرة سريعة على حسابك.",
+    "profile": {
+      "title": "ملفي الشخصي",
+      "description": "عرض وتعديل معلوماتك الشخصية."
+    },
+    "vehicles": {
+      "title": "مركباتي",
+      "description": "إدارة المركبات المسجلة الخاصة بك."
+    },
+    "appointments": {
+      "title": "مواعيدي",
+      "description": "عرض مواعيدك القادمة والسابقة."
+    },
     "total_customers": "إجمالي العملاء",
     "total_vehicles": "إجمالي المركبات",
     "pending_appointments": "المواعيد المعلقة",
