@@ -1,19 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ServiceSelector } from './ServiceSelector';
+import { InspectionTypeSelector } from './InspectionTypeSelector';
 import { DateTimePicker } from './DateTimePicker';
 import { CustomerForm } from './CustomerForm';
 import { BookingConfirmation } from './BookingConfirmation';
-import type { IService } from '@/lib/models/Service';
+import type { IInspectionTemplate } from '@/lib/models/InspectionTemplate';
 import type { BookingCustomerInput, BookingVehicleInput } from '@/lib/validation/booking';
-import { Check } from 'lucide-react';
+import { Check, Languages } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 interface BookingWizardProps {
   tenantSlug: string;
   tenantName: string;
-  services: IService[];
+  inspectionTemplates: IInspectionTemplate[];
   bookingSettings: {
     workingHours: any;
     appointmentDuration: number;
@@ -23,16 +24,50 @@ interface BookingWizardProps {
   language?: 'ar' | 'en';
 }
 
-export type WizardStep = 'service' | 'datetime' | 'customer' | 'confirmation';
+export type WizardStep = 'inspection' | 'datetime' | 'customer' | 'confirmation';
 
 interface BookingState {
-  serviceId?: string;
+  inspectionTemplateId?: string;
   appointmentDate?: Date;
   startTime?: Date;
   notes?: string;
   customer?: BookingCustomerInput;
   vehicle?: BookingVehicleInput;
   confirmationNumber?: string;
+}
+
+// Language Switcher Component
+function LanguageSwitcher({ currentLang, onToggle }: { currentLang: string; onToggle: () => void }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-gray-800/50" />;
+  }
+
+  return (
+    <motion.button
+      onClick={onToggle}
+      className="relative w-10 h-10 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-md flex items-center justify-center overflow-hidden hover:bg-white/70 dark:hover:bg-gray-700/50 transition-colors border border-gray-200/50 dark:border-gray-700/50"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      aria-label={`Switch to ${currentLang === 'en' ? 'Arabic' : 'English'}`}
+    >
+      <motion.span
+        key={currentLang}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -20, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="text-sm font-bold bg-gradient-to-r from-[#F97402] to-[#F13F33] bg-clip-text text-transparent"
+      >
+        {currentLang === 'en' ? 'EN' : 'ع'}
+      </motion.span>
+    </motion.button>
+  );
 }
 
 const fadeInUp = {
@@ -45,22 +80,33 @@ const fadeInUp = {
 export function BookingWizard({
   tenantSlug,
   tenantName,
-  services,
+  inspectionTemplates,
   bookingSettings,
   language = 'en',
 }: BookingWizardProps) {
-  const [currentStep, setCurrentStep] = useState<WizardStep>('service');
+  const [currentStep, setCurrentStep] = useState<WizardStep>('inspection');
   const [bookingData, setBookingData] = useState<BookingState>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentLanguage, setCurrentLanguage] = useState<'ar' | 'en'>(language);
 
-  const isArabic = language === 'ar';
+  const isArabic = currentLanguage === 'ar';
 
-  const steps: WizardStep[] = ['service', 'datetime', 'customer', 'confirmation'];
+  const steps: WizardStep[] = ['inspection', 'datetime', 'customer', 'confirmation'];
   const currentStepIndex = steps.indexOf(currentStep);
 
-  const handleServiceSelect = (serviceId: string) => {
-    setBookingData({ ...bookingData, serviceId });
+  const toggleLanguage = () => {
+    const newLang = currentLanguage === 'en' ? 'ar' : 'en';
+    setCurrentLanguage(newLang);
+    // Update document direction for RTL/LTR support
+    if (typeof document !== 'undefined') {
+      document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.lang = newLang;
+    }
+  };
+
+  const handleInspectionSelect = (inspectionTemplateId: string) => {
+    setBookingData({ ...bookingData, inspectionTemplateId });
     setCurrentStep('datetime');
   };
 
@@ -82,7 +128,7 @@ export function BookingWizard({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          serviceId: bookingData.serviceId,
+          inspectionTemplateId: bookingData.inspectionTemplateId,
           appointmentDate: bookingData.appointmentDate,
           startTime: bookingData.startTime,
           notes: bookingData.notes,
@@ -114,7 +160,7 @@ export function BookingWizard({
   };
 
   const stepLabels = {
-    service: isArabic ? 'اختر الخدمة' : 'Select Service',
+    inspection: isArabic ? 'اختر نوع الفحص' : 'Select Inspection',
     datetime: isArabic ? 'اختر التاريخ والوقت' : 'Choose Date & Time',
     customer: isArabic ? 'معلوماتك' : 'Your Information',
     confirmation: isArabic ? 'التأكيد' : 'Confirmation',
@@ -193,22 +239,36 @@ export function BookingWizard({
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 py-12 px-4">
       <div className="max-w-5xl mx-auto">
+        {/* Header with Theme and Language Controls */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="flex justify-between items-start mb-8"
         >
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-[#F97402] to-[#F13F33] bg-clip-text text-transparent mb-4">
-            {isArabic ? `حجز موعد` : `Book Appointment`}
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            {tenantName}
-          </p>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
-            {isArabic
-              ? 'احجز موعدك عبر الإنترنت في بضع خطوات سهلة'
-              : 'Book your appointment online in a few easy steps'}
-          </p>
+          <div className="text-center flex-1">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-[#F97402] to-[#F13F33] bg-clip-text text-transparent mb-4">
+              {isArabic ? `حجز موعد فحص` : `Book Inspection`}
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              {tenantName}
+            </p>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">
+              {isArabic
+                ? 'احجز موعد فحص السيارة عبر الإنترنت في بضع خطوات سهلة'
+                : 'Book your vehicle inspection online in a few easy steps'}
+            </p>
+          </div>
+
+          {/* Theme and Language Controls */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex gap-2 items-start"
+          >
+            <ThemeToggle />
+            <LanguageSwitcher currentLang={currentLanguage} onToggle={toggleLanguage} />
+          </motion.div>
         </motion.div>
 
         {renderProgressBar()}
@@ -229,22 +289,22 @@ export function BookingWizard({
             {...fadeInUp}
             className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 p-8 md:p-12"
           >
-            {currentStep === 'service' && (
-              <ServiceSelector
-                services={services}
-                onSelect={handleServiceSelect}
-                language={language}
+            {currentStep === 'inspection' && (
+              <InspectionTypeSelector
+                inspectionTemplates={inspectionTemplates}
+                onSelect={handleInspectionSelect}
+                language={currentLanguage}
               />
             )}
 
-            {currentStep === 'datetime' && bookingData.serviceId && (
+            {currentStep === 'datetime' && bookingData.inspectionTemplateId && (
               <DateTimePicker
                 tenantSlug={tenantSlug}
-                serviceId={bookingData.serviceId}
+                inspectionTemplateId={bookingData.inspectionTemplateId}
                 advanceBookingDays={bookingSettings.advanceBookingDays}
                 onSelect={handleDateTimeSelect}
                 onBack={handleBack}
-                language={language}
+                language={currentLanguage}
               />
             )}
 
@@ -253,7 +313,7 @@ export function BookingWizard({
                 onSubmit={handleCustomerSubmit}
                 onBack={handleBack}
                 isSubmitting={isSubmitting}
-                language={language}
+                language={currentLanguage}
               />
             )}
 
@@ -262,10 +322,10 @@ export function BookingWizard({
                 confirmationNumber={bookingData.confirmationNumber}
                 appointmentDate={bookingData.appointmentDate!}
                 startTime={bookingData.startTime!}
-                serviceName={services.find(s => s._id?.toString() === bookingData.serviceId)?.name || ''}
+                serviceName={inspectionTemplates.find(t => t._id?.toString() === bookingData.inspectionTemplateId)?.name || ''}
                 requiresApproval={bookingSettings.requireApproval}
                 tenantName={tenantName}
-                language={language}
+                language={currentLanguage}
               />
             )}
           </motion.div>

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
+require('dotenv').config({ path: '.env.local' });
 
 /**
  * Create a demo customer for testing the customer portal
@@ -14,26 +14,35 @@ async function createDemoCustomer() {
   try {
     // Connect to MongoDB
     const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/teramotors';
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(mongoUri, {
+      dbName: 'teramotors'
+    });
 
     console.log('🚀 Creating demo customer for portal testing...\n');
 
-    // Get models
-    const Tenant = mongoose.model('Tenant') || require('../lib/models/Tenant').default;
-    const Customer = mongoose.model('Customer') || require('../lib/models/Customer').default;
-    const Vehicle = mongoose.model('Vehicle') || require('../lib/models/Vehicle').default;
-    const Appointment = mongoose.model('Appointment') || require('../lib/models/Appointment').default;
-    const Service = mongoose.model('Service') || require('../lib/models/Service').default;
+    // Define schemas
+    const TenantSchema = new mongoose.Schema({}, { strict: false });
+    const CustomerSchema = new mongoose.Schema({}, { strict: false });
+    const VehicleSchema = new mongoose.Schema({}, { strict: false });
+    const AppointmentSchema = new mongoose.Schema({}, { strict: false });
+    const ServiceSchema = new mongoose.Schema({}, { strict: false });
+
+    // Get or create models
+    const Tenant = mongoose.models.Tenant || mongoose.model('Tenant', TenantSchema, 'tenants');
+    const Customer = mongoose.models.Customer || mongoose.model('Customer', CustomerSchema, 'customers');
+    const Vehicle = mongoose.models.Vehicle || mongoose.model('Vehicle', VehicleSchema, 'vehicles');
+    const Appointment = mongoose.models.Appointment || mongoose.model('Appointment', AppointmentSchema, 'appointments');
+    const Service = mongoose.models.Service || mongoose.model('Service', ServiceSchema, 'services');
 
     // Find the teramotors tenant
-    const tenant = await Tenant.findOne({ slug: 'teramotors' });
+    const tenant = await Tenant.findOne({ slug: 'teramotors-default' });
 
     if (!tenant) {
-      console.log('❌ TeraMotors tenant not found!');
+      console.log('❌ Default tenant not found!');
       console.log('📝 Available tenants:');
       const tenants = await Tenant.find({}).select('slug name');
       tenants.forEach(t => console.log(`   - ${t.slug} (${t.name})`));
-      throw new Error('TeraMotors tenant not found');
+      throw new Error('Default tenant not found');
     }
 
     console.log(`✅ Found tenant: ${tenant.name} (${tenant.slug})`);
@@ -195,7 +204,7 @@ async function createDemoCustomer() {
     console.log('🎉 Demo Customer Setup Complete!');
     console.log('═══════════════════════════════════════════════════════');
     console.log('\n📋 TESTING INSTRUCTIONS:\n');
-    console.log('1. Go to: http://localhost:3000/portal/teramotors/login');
+    console.log('1. Go to: http://localhost:3000/portal/teramotors-default/login');
     console.log('2. Enter email: demo@customer.com');
     console.log('3. Click "Continue"');
     console.log('\n⚠️  IMPORTANT - OTP Code:');

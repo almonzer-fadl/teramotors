@@ -18,11 +18,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Find tenant
-    const tenant = await Tenant.findOne({ slug: tenantSlug, status: 'active' });
+    const tenant = await Tenant.findOne({ slug: tenantSlug });
     if (!tenant) {
       return NextResponse.json(
         { error: 'Tenant not found' },
         { status: 404 }
+      );
+    }
+
+    // Check if tenant is active (if status field exists)
+    if (tenant.status && tenant.status !== 'active') {
+      return NextResponse.json(
+        { error: 'Tenant is not active' },
+        { status: 403 }
       );
     }
 

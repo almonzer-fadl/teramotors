@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar as CalendarIcon, Clock, AlertCircle, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, AlertCircle, ArrowRight, ArrowLeft, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface DateTimePickerProps {
   tenantSlug: string;
-  serviceId: string;
+  inspectionTemplateId: string;
   advanceBookingDays: number;
   onSelect: (appointmentDate: Date, startTime: Date, notes?: string) => void;
   onBack: () => void;
@@ -52,7 +52,7 @@ const slotVariants = {
 
 export function DateTimePicker({
   tenantSlug,
-  serviceId,
+  inspectionTemplateId,
   advanceBookingDays,
   onSelect,
   onBack,
@@ -64,25 +64,67 @@ export function DateTimePicker({
   const [notes, setNotes] = useState('');
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const isArabic = language === 'ar';
 
-  // Generate available dates (from tomorrow to advanceBookingDays)
-  const getAvailableDates = () => {
-    const dates: Date[] = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  // Generate calendar grid for current month
+  const getCalendarDays = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
 
-    for (let i = 1; i <= advanceBookingDays; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() + i);
-      dates.push(date);
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days: (Date | null)[] = [];
+
+    // Add empty cells for days before month starts
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
     }
 
-    return dates;
+    // Add actual days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+
+    return days;
   };
 
-  const availableDates = getAvailableDates();
+  const isDateAvailable = (date: Date | null) => {
+    if (!date) return false;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const maxDate = new Date(today);
+    maxDate.setDate(maxDate.getDate() + advanceBookingDays);
+
+    date.setHours(0, 0, 0, 0);
+
+    return date >= tomorrow && date <= maxDate;
+  };
+
+  const isToday = (date: Date | null) => {
+    if (!date) return false;
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newMonth = new Date(currentMonth);
+    newMonth.setMonth(newMonth.getMonth() + (direction === 'next' ? 1 : -1));
+    setCurrentMonth(newMonth);
+  };
+
+  const calendarDays = getCalendarDays();
+  const weekDays = isArabic
+    ? ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س']
+    : ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   // Fetch available slots when date is selected
   useEffect(() => {
@@ -98,17 +140,22 @@ export function DateTimePicker({
 
     try {
       const dateStr = date.toISOString().split('T')[0];
-      const response = await fetch(
-        `/api/public/tenants/${tenantSlug}/available-slots?date=${dateStr}`
-      );
+      const url = `/api/public/tenants/${tenantSlug}/available-slots?date=${dateStr}`;
+      console.log('Fetching slots from:', url);
+
+      const response = await fetch(url);
 
       if (!response.ok) {
-        throw new Error('Failed to fetch available slots');
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch available slots');
       }
 
       const data = await response.json();
+      console.log('Received slots data:', data);
       setAvailableSlots(data.slots || []);
     } catch (err: any) {
+      console.error('Error fetching slots:', err);
       setError(err.message || 'Failed to load available time slots');
       setAvailableSlots([]);
     } finally {
@@ -147,166 +194,229 @@ export function DateTimePicker({
         {isArabic ? 'اختر التاريخ والوقت' : 'Choose Date & Time'}
       </motion.h2>
 
-      {/* Date Selection */}
+      {/* Calendar */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="mb-10"
       >
-        <div className="flex items-center gap-2 mb-5">
-          <div className="p-2 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg">
-            <CalendarIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg">
+              <CalendarIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {isArabic ? 'اختر التاريخ' : 'Select Date'}
+            </h3>
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {isArabic ? 'اختر التاريخ' : 'Select Date'}
-          </h3>
+
+          {/* Month/Year Navigation */}
+          <div className="flex items-center gap-3">
+            <motion.button
+              onClick={() => navigateMonth('prev')}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-2 rounded-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-200 dark:border-gray-700 hover:bg-gradient-to-br hover:from-[#F97402]/10 hover:to-[#F13F33]/10"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            </motion.button>
+
+            <div className="text-center min-w-[160px]">
+              <h4 className="text-lg font-bold bg-gradient-to-r from-[#F97402] to-[#F13F33] bg-clip-text text-transparent">
+                {currentMonth.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', {
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </h4>
+            </div>
+
+            <motion.button
+              onClick={() => navigateMonth('next')}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-2 rounded-lg bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border border-gray-200 dark:border-gray-700 hover:bg-gradient-to-br hover:from-[#F97402]/10 hover:to-[#F13F33]/10"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            </motion.button>
+          </div>
         </div>
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3"
-        >
-          {availableDates.map((date, index) => {
-            const isSelected = selectedDate?.toDateString() === date.toDateString();
-            return (
-              <motion.button
+
+        {/* Calendar Grid */}
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 border-2 border-gray-200 dark:border-gray-700 shadow-lg">
+          {/* Week days header */}
+          <div className="grid grid-cols-7 gap-2 mb-3">
+            {weekDays.map((day, index) => (
+              <div
                 key={index}
-                variants={itemVariants}
-                onClick={() => setSelectedDate(date)}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className={`relative p-4 rounded-xl border-2 text-center transition-all overflow-hidden ${
-                  isSelected
-                    ? 'border-[#F97402] bg-gradient-to-br from-[#F97402]/10 to-[#F13F33]/10 shadow-lg shadow-[#F97402]/20'
-                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-[#F97402]/30'
-                }`}
+                className="text-center text-sm font-bold text-gray-500 dark:text-gray-400 py-2"
               >
-                {isSelected && (
-                  <motion.div
-                    layoutId="selectedDate"
-                    className="absolute inset-0 bg-gradient-to-br from-[#F97402]/5 to-[#F13F33]/5"
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                  />
-                )}
-                <div className="relative z-10">
-                  <div className={`text-xs font-medium ${isSelected ? 'text-[#F97402]' : 'text-gray-600 dark:text-gray-400'}`}>
-                    {date.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { weekday: 'short' })}
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar days */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-7 gap-2"
+          >
+            {calendarDays.map((date, index) => {
+              if (!date) {
+                return <div key={`empty-${index}`} className="aspect-square" />;
+              }
+
+              const isSelected = selectedDate?.toDateString() === date.toDateString();
+              const isAvailable = isDateAvailable(date);
+              const isTodayDate = isToday(date);
+
+              return (
+                <motion.button
+                  key={index}
+                  variants={itemVariants}
+                  onClick={() => isAvailable && setSelectedDate(date)}
+                  disabled={!isAvailable}
+                  whileHover={isAvailable ? { scale: 1.1, y: -2 } : {}}
+                  whileTap={isAvailable ? { scale: 0.95 } : {}}
+                  className={`relative aspect-square rounded-xl text-center overflow-hidden flex items-center justify-center ${
+                    isSelected
+                      ? 'bg-gradient-to-br from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/30 border-2 border-[#F97402]'
+                      : isAvailable
+                      ? 'bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 hover:border-[#F97402] hover:bg-gradient-to-br hover:from-[#F97402]/10 hover:to-[#F13F33]/10'
+                      : isTodayDate
+                      ? 'bg-gray-100 dark:bg-gray-800 border-2 border-blue-400 text-blue-600 dark:text-blue-400'
+                      : 'bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 text-gray-300 dark:text-gray-700 cursor-not-allowed'
+                  }`}
+                >
+                  {isSelected && (
+                    <motion.div
+                      layoutId="selectedDateBg"
+                      className="absolute inset-0 bg-gradient-to-br from-[#F97402] to-[#F13F33]"
+                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                  <div className="relative z-10">
+                    <div className={`text-lg font-bold ${
+                      isSelected
+                        ? 'text-white'
+                        : isAvailable
+                        ? 'text-gray-900 dark:text-white'
+                        : isTodayDate
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-gray-300 dark:text-gray-700'
+                    }`}>
+                      {date.getDate()}
+                    </div>
+                    {isTodayDate && !isSelected && (
+                      <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-600 dark:bg-blue-400 rounded-full" />
+                    )}
                   </div>
-                  <div className={`text-2xl font-bold mt-1 ${isSelected ? 'text-[#F97402]' : 'text-gray-900 dark:text-white'}`}>
-                    {date.getDate()}
-                  </div>
-                  <div className={`text-xs font-medium mt-1 ${isSelected ? 'text-[#F13F33]' : 'text-gray-600 dark:text-gray-400'}`}>
-                    {date.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { month: 'short' })}
-                  </div>
-                </div>
-              </motion.button>
-            );
-          })}
-        </motion.div>
+                </motion.button>
+              );
+            })}
+          </motion.div>
+        </div>
       </motion.div>
 
       {/* Time Slot Selection */}
-      <AnimatePresence mode="wait">
-        {selectedDate && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="mb-10"
-          >
-            <div className="flex items-center gap-2 mb-5">
-              <div className="p-2 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-lg">
-                <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {isArabic ? 'اختر الوقت' : 'Select Time'}
-              </h3>
+      {selectedDate && (
+        <div className="mb-10">
+          <div className="flex items-center gap-2 mb-5">
+            <div className="p-2 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-lg">
+              <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              {isArabic ? 'اختر الوقت' : 'Select Time'}
+            </h3>
+          </div>
 
-            {isLoadingSlots ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center py-16"
-              >
-                <Loader2 className="w-12 h-12 text-[#F97402] animate-spin mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 font-medium">
-                  {isArabic ? 'جاري تحميل الأوقات المتاحة...' : 'Loading available times...'}
-                </p>
-              </motion.div>
-            ) : error ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center justify-center py-16 bg-red-50 dark:bg-red-900/20 rounded-2xl border-2 border-red-200 dark:border-red-800"
-              >
-                <AlertCircle className="w-12 h-12 text-red-600 dark:text-red-400 mb-4" />
-                <p className="text-red-600 dark:text-red-400 font-medium">{error}</p>
-              </motion.div>
-            ) : availableSlots.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center justify-center py-16 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border-2 border-gray-200 dark:border-gray-700"
-              >
-                <CalendarIcon className="w-12 h-12 text-gray-400 mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 font-medium">
-                  {isArabic ? 'لا توجد أوقات متاحة في هذا التاريخ' : 'No available times on this date'}
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3"
-              >
-                {availableSlots.map((slot, index) => {
-                  const isSelected = selectedTimeSlot === slot.start;
-                  return (
-                    <motion.button
-                      key={index}
-                      custom={index}
-                      variants={slotVariants}
-                      onClick={() => slot.available && setSelectedTimeSlot(slot.start)}
-                      disabled={!slot.available}
-                      whileHover={slot.available ? { scale: 1.05, y: -2 } : {}}
-                      whileTap={slot.available ? { scale: 0.95 } : {}}
-                      className={`relative p-4 rounded-xl border-2 text-center transition-all overflow-hidden ${
+          {isLoadingSlots ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex flex-col items-center justify-center py-16"
+            >
+              <Loader2 className="w-12 h-12 text-[#F97402] animate-spin mb-4" />
+              <p className="text-gray-600 dark:text-gray-400 font-medium">
+                {isArabic ? 'جاري تحميل الأوقات المتاحة...' : 'Loading available times...'}
+              </p>
+            </motion.div>
+          ) : error ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center justify-center py-16 bg-red-50 dark:bg-red-900/20 rounded-2xl border-2 border-red-200 dark:border-red-800"
+            >
+              <AlertCircle className="w-12 h-12 text-red-600 dark:text-red-400 mb-4" />
+              <p className="text-red-600 dark:text-red-400 font-medium">{error}</p>
+            </motion.div>
+          ) : availableSlots.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center justify-center py-16 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border-2 border-gray-200 dark:border-gray-700"
+            >
+              <CalendarIcon className="w-12 h-12 text-gray-400 mb-4" />
+              <p className="text-gray-600 dark:text-gray-400 font-medium">
+                {isArabic ? 'لا توجد أوقات متاحة في هذا التاريخ' : 'No available times on this date'}
+              </p>
+            </motion.div>
+          ) : (
+            <div
+              className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3"
+            >
+              {availableSlots.map((slot, index) => {
+                const isSelected = selectedTimeSlot === slot.start;
+
+                const handleTimeSlotClick = () => {
+                  if (slot.available) {
+                    setSelectedTimeSlot(slot.start);
+                  }
+                };
+
+                return (
+                  <button
+                    key={`${slot.start}-${index}`}
+                    onClick={handleTimeSlotClick}
+                    disabled={!slot.available}
+                    className={`relative p-4 rounded-xl border-2 text-center overflow-hidden transition-all ${
+                      isSelected
+                        ? 'border-[#F97402] bg-gradient-to-br from-[#F97402]/20 to-[#F13F33]/20 shadow-lg shadow-[#F97402]/30'
+                        : slot.available
+                        ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-[#F97402]/50 hover:bg-gradient-to-br hover:from-[#F97402]/10 hover:to-[#F13F33]/10'
+                        : 'border-gray-100 dark:border-gray-800 bg-gray-100 dark:bg-gray-900 opacity-60 cursor-not-allowed'
+                    }`}
+                  >
+                    {isSelected && (
+                      <div
+                        className="absolute inset-0 bg-gradient-to-br from-[#F97402]/10 to-[#F13F33]/10"
+                      />
+                    )}
+                    <div className="relative z-10">
+                      <div className={`text-lg font-bold leading-tight ${
                         isSelected
-                          ? 'border-[#F97402] bg-gradient-to-br from-[#F97402]/10 to-[#F13F33]/10 shadow-lg shadow-[#F97402]/20'
+                          ? 'text-[#F97402]'
                           : slot.available
-                          ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 hover:border-[#F97402]/30'
-                          : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 opacity-50 cursor-not-allowed'
-                      }`}
-                    >
-                      {isSelected && (
-                        <motion.div
-                          layoutId="selectedTime"
-                          className="absolute inset-0 bg-gradient-to-br from-[#F97402]/5 to-[#F13F33]/5"
-                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                        />
-                      )}
-                      <div className="relative z-10">
-                        <div className={`text-lg font-bold ${isSelected ? 'text-[#F97402]' : slot.available ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-600'}`}>
-                          {formatTime(slot.start)}
-                        </div>
-                        {!slot.available && (
-                          <div className="text-xs text-red-600 dark:text-red-400 mt-1 font-medium">
-                            {isArabic ? 'محجوز' : 'Booked'}
-                          </div>
-                        )}
+                          ? 'text-gray-900 dark:text-gray-100'
+                          : 'text-gray-500'
+                      }`}>
+                        {formatTime(slot.start)}
                       </div>
-                    </motion.button>
-                  );
-                })}
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+                      {!slot.available && (
+                        <div className="text-xs text-red-600 dark:text-red-400 mt-1 font-medium">
+                          {isArabic ? 'محجوز' : 'Booked'}
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Notes */}
       <AnimatePresence>
@@ -323,12 +433,12 @@ export function DateTimePicker({
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-5 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F97402] focus:border-transparent bg-white dark:bg-gray-800/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all"
+              className="w-full px-5 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F97402] focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 transition-all shadow-md resize-none"
               rows={4}
               placeholder={
                 isArabic
-                  ? 'أخبرنا بأي تفاصيل إضافية عن السيارة أو الخدمة المطلوبة'
-                  : 'Tell us any additional details about your vehicle or service needed'
+                  ? 'أخبرنا بأي تفاصيل إضافية عن السيارة أو الفحص المطلوب'
+                  : 'Tell us any additional details about your vehicle or inspection needed'
               }
             />
           </motion.div>
@@ -344,9 +454,9 @@ export function DateTimePicker({
       >
         <motion.button
           onClick={onBack}
-          whileHover={{ scale: 1.02 }}
+          whileHover={{ scale: 1.02, x: -3 }}
           whileTap={{ scale: 0.98 }}
-          className="px-8 py-4 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center gap-2"
+          className="px-8 py-4 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl hover:bg-gradient-to-br hover:from-gray-100/80 hover:to-gray-200/80 dark:hover:from-gray-700/80 dark:hover:to-gray-800/80 flex items-center gap-2 shadow-lg"
         >
           <ArrowLeft className={`w-5 h-5 ${isArabic ? 'rotate-180' : ''}`} />
           {isArabic ? 'رجوع' : 'Back'}
@@ -354,12 +464,12 @@ export function DateTimePicker({
         <motion.button
           onClick={handleContinue}
           disabled={!selectedDate || !selectedTimeSlot}
-          whileHover={selectedDate && selectedTimeSlot ? { scale: 1.02 } : {}}
+          whileHover={selectedDate && selectedTimeSlot ? { scale: 1.02, x: 3 } : {}}
           whileTap={selectedDate && selectedTimeSlot ? { scale: 0.98 } : {}}
-          className={`px-8 py-4 rounded-xl font-semibold text-lg transition-all flex items-center gap-3 shadow-lg ${
+          className={`px-8 py-4 rounded-xl font-semibold text-lg flex items-center gap-3 shadow-lg backdrop-blur-xl ${
             selectedDate && selectedTimeSlot
-              ? 'bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white hover:shadow-xl hover:shadow-[#F97402]/25'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+              ? 'bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white hover:shadow-xl hover:shadow-[#F97402]/30'
+              : 'bg-gray-200/80 dark:bg-gray-700/80 text-gray-400 dark:text-gray-500 cursor-not-allowed'
           }`}
         >
           {isArabic ? 'التالي' : 'Continue'}

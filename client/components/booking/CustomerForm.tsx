@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm, FieldValues, UseFormRegister, FormState } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Mail, Phone, Car, Calendar, Hash, FileText, ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import type { BookingCustomerInput, BookingVehicleInput } from '@/lib/validation/booking';
@@ -29,189 +32,156 @@ const itemVariants = {
   },
 };
 
-export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }: CustomerFormProps) {
-  const isArabic = language === 'ar';
+const formSchema = (isArabic: boolean) => z.object({
+  firstName: z.string().min(2, { message: isArabic ? 'الاسم الأول يجب أن يكون حرفين على الأقل' : 'First name must be at least 2 characters' }),
+  lastName: z.string().min(2, { message: isArabic ? 'اسم العائلة يجب أن يكون حرفين على الأقل' : 'Last name must be at least 2 characters' }),
+  email: z.string().email({ message: isArabic ? 'البريد الإلكتروني غير صحيح' : 'Invalid email address' }),
+  phone: z.string().min(10, { message: isArabic ? 'رقم الهاتف يجب أن يكون 10 أرقام على الأقل' : 'Phone number must be at least 10 digits' }),
+  language: z.enum(['en', 'ar']),
+  vehicleMake: z.string().min(2, { message: isArabic ? 'ماركة السيارة مطلوبة' : 'Vehicle make is required' }),
+  vehicleModel: z.string().min(1, { message: isArabic ? 'موديل السيارة مطلوب' : 'Vehicle model is required' }),
+  vehicleYear: z.preprocess(
+    (a) => parseInt(z.string().parse(a), 10),
+    z.number().min(1900, { message: isArabic ? 'سنة الصنع غير صحيحة' : 'Invalid vehicle year' }).max(new Date().getFullYear() + 1, { message: isArabic ? 'سنة الصنع غير صحيحة' : 'Invalid vehicle year' })
+  ),
+  licensePlate: z.string().optional(),
+  vin: z.string().optional(),
+});
 
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    language: language,
-    vehicleMake: '',
-    vehicleModel: '',
-    vehicleYear: new Date().getFullYear(),
-    licensePlate: '',
-    vin: '',
-  });
+type FormData = z.infer<ReturnType<typeof formSchema>>;
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [focused, setFocused] = useState<Record<string, boolean>>({});
+const InputField = ({
+  name,
+  label,
+  icon: Icon,
+  register,
+  errors,
+  watchedValue,
+  type = 'text',
+  placeholder,
+  required = false,
+  colSpan = 1,
+}: {
+  name: keyof FormData;
+  label: string;
+  icon: any;
+  register: UseFormRegister<FormData>;
+  errors: FormState<FormData>['errors'];
+  watchedValue: string | number;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+  colSpan?: number;
+}) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const hasValue = watchedValue?.toString().length > 0;
+  const hasError = !!errors[name];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: '' });
-    }
-  };
-
-  const handleFocus = (fieldName: string) => {
-    setFocused({ ...focused, [fieldName]: true });
-  };
-
-  const handleBlur = (fieldName: string) => {
-    setFocused({ ...focused, [fieldName]: false });
-  };
-
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (formData.firstName.trim().length < 2) {
-      newErrors.firstName = isArabic
-        ? 'الاسم الأول يجب أن يكون حرفين على الأقل'
-        : 'First name must be at least 2 characters';
-    }
-
-    if (formData.lastName.trim().length < 2) {
-      newErrors.lastName = isArabic
-        ? 'اسم العائلة يجب أن يكون حرفين على الأقل'
-        : 'Last name must be at least 2 characters';
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      newErrors.email = isArabic ? 'البريد الإلكتروني غير صحيح' : 'Invalid email address';
-    }
-
-    if (formData.phone.length < 10) {
-      newErrors.phone = isArabic
-        ? 'رقم الهاتف يجب أن يكون 10 أرقام على الأقل'
-        : 'Phone number must be at least 10 digits';
-    }
-
-    if (formData.vehicleMake.trim().length < 2) {
-      newErrors.vehicleMake = isArabic ? 'ماركة السيارة مطلوبة' : 'Vehicle make is required';
-    }
-
-    if (formData.vehicleModel.trim().length < 1) {
-      newErrors.vehicleModel = isArabic ? 'موديل السيارة مطلوب' : 'Vehicle model is required';
-    }
-
-    const currentYear = new Date().getFullYear();
-    if (formData.vehicleYear < 1900 || formData.vehicleYear > currentYear + 1) {
-      newErrors.vehicleYear = isArabic ? 'سنة الصنع غير صحيحة' : 'Invalid vehicle year';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validate()) {
-      return;
-    }
-
-    const customer: BookingCustomerInput = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
-      language: formData.language as 'ar' | 'en',
-    };
-
-    const vehicle: BookingVehicleInput = {
-      make: formData.vehicleMake,
-      model: formData.vehicleModel,
-      year: Number(formData.vehicleYear),
-      licensePlate: formData.licensePlate || undefined,
-      vin: formData.vin || undefined,
-    };
-
-    onSubmit(customer, vehicle);
-  };
-
-  const InputField = ({
-    name,
-    label,
-    icon: Icon,
-    type = 'text',
-    placeholder,
-    required = false,
-    colSpan = 1,
-  }: {
-    name: string;
-    label: string;
-    icon: any;
-    type?: string;
-    placeholder?: string;
-    required?: boolean;
-    colSpan?: number;
-  }) => {
-    const hasValue = formData[name as keyof typeof formData]?.toString().length > 0;
-    const isFocused = focused[name];
-    const hasError = errors[name];
-
-    return (
-      <motion.div variants={itemVariants} className={colSpan === 2 ? 'md:col-span-2' : ''}>
-        <div className="relative">
-          <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all ${hasError ? 'text-red-600 dark:text-red-400' : isFocused ? 'text-[#F97402]' : 'text-gray-400 dark:text-gray-500'}`}>
-            <Icon className="w-5 h-5" />
-          </div>
-          <input
-            type={type}
-            name={name}
-            value={formData[name as keyof typeof formData]}
-            onChange={handleChange}
-            onFocus={() => handleFocus(name)}
-            onBlur={() => handleBlur(name)}
-            placeholder={placeholder}
-            required={required}
-            min={name === 'vehicleYear' ? '1900' : undefined}
-            max={name === 'vehicleYear' ? new Date().getFullYear() + 1 : undefined}
-            className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none transition-all bg-white dark:bg-gray-800/50 text-gray-900 dark:text-white placeholder-transparent ${
-              hasError
-                ? 'border-red-500 focus:border-red-600 focus:ring-2 focus:ring-red-500/20'
-                : isFocused
-                ? 'border-[#F97402] ring-2 ring-[#F97402]/20'
-                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-            }`}
-          />
-          <label
-            className={`absolute left-12 transition-all pointer-events-none ${
+  return (
+    <motion.div variants={itemVariants} className={colSpan === 2 ? 'md:col-span-2' : ''}>
+      <div className="relative">
+        <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all ${hasError ? 'text-red-600 dark:text-red-400' : isFocused ? 'text-[#F97402]' : 'text-gray-400 dark:text-gray-500'}`}>
+          <Icon className="w-5 h-5" />
+        </div>
+        <input
+          {...register(name, {
+            valueAsNumber: type === 'number',
+          })}
+          type={type}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder={placeholder}
+          min={name === 'vehicleYear' ? '1900' : undefined}
+          max={name === 'vehicleYear' ? new Date().getFullYear() + 1 : undefined}
+          className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl focus:outline-none transition-all bg-white dark:bg-gray-800/50 text-gray-900 dark:text-white placeholder-transparent ${
+            hasError
+              ? 'border-red-500 focus:border-red-600 focus:ring-2 focus:ring-red-500/20'
+              : isFocused
+              ? 'border-[#F97402] ring-2 ring-[#F97402]/20'
+              : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+          }`}
+        />
+        <label
+          className={`absolute left-12 transition-all pointer-events-none bg-white dark:bg-gray-800/50
+            ${
               hasValue || isFocused
-                ? '-top-2.5 text-xs font-semibold px-2 bg-white dark:bg-gray-900 rounded'
+                ? '-top-2.5 text-xs font-semibold px-2'
                 : 'top-1/2 -translate-y-1/2 text-base'
-            } ${
+            } 
+            ${
               hasError
                 ? 'text-red-600 dark:text-red-400'
-                : hasValue || isFocused
+                : isFocused
                 ? 'text-[#F97402]'
                 : 'text-gray-500 dark:text-gray-400'
             }`}
+        >
+          {label}
+          {required && ' *'}
+        </label>
+      </div>
+      <AnimatePresence>
+        {hasError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex items-center gap-1.5 mt-2 text-red-600 dark:text-red-400 text-sm font-medium"
           >
-            {label}
-            {required && ' *'}
-          </label>
-        </div>
-        <AnimatePresence>
-          {hasError && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="flex items-center gap-1.5 mt-2 text-red-600 dark:text-red-400 text-sm font-medium"
-            >
-              <AlertCircle className="w-4 h-4" />
-              {hasError}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    );
+            <AlertCircle className="w-4 h-4" />
+            {errors[name]?.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
+
+export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }: CustomerFormProps) {
+  const isArabic = language === 'ar';
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema(isArabic)),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      language: language,
+      vehicleMake: '',
+      vehicleModel: '',
+      vehicleYear: new Date().getFullYear(),
+      licensePlate: '',
+      vin: '',
+    },
+  });
+
+  const watchedFields = watch();
+
+  const processSubmit = (data: FormData) => {
+    const customer: BookingCustomerInput = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      language: data.language,
+    };
+
+    const vehicle: BookingVehicleInput = {
+      make: data.vehicleMake,
+      model: data.vehicleModel,
+      year: data.vehicleYear,
+      licensePlate: data.licensePlate || undefined,
+      vin: data.vin || undefined,
+    };
+
+    onSubmit(customer, vehicle);
   };
 
   return (
@@ -224,7 +194,7 @@ export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }
         {isArabic ? 'معلوماتك' : 'Your Information'}
       </motion.h2>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(processSubmit)}>
         {/* Customer Information */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -247,33 +217,10 @@ export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }
             animate="visible"
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
-            <InputField
-              name="firstName"
-              label={isArabic ? 'الاسم الأول' : 'First Name'}
-              icon={User}
-              required
-            />
-            <InputField
-              name="lastName"
-              label={isArabic ? 'اسم العائلة' : 'Last Name'}
-              icon={User}
-              required
-            />
-            <InputField
-              name="email"
-              label={isArabic ? 'البريد الإلكتروني' : 'Email'}
-              icon={Mail}
-              type="email"
-              required
-            />
-            <InputField
-              name="phone"
-              label={isArabic ? 'رقم الهاتف' : 'Phone Number'}
-              icon={Phone}
-              type="tel"
-              placeholder="+966xxxxxxxxx"
-              required
-            />
+            <InputField name="firstName" label={isArabic ? 'الاسم الأول' : 'First Name'} icon={User} required register={register} errors={errors} watchedValue={watchedFields.firstName} />
+            <InputField name="lastName" label={isArabic ? 'اسم العائلة' : 'Last Name'} icon={User} required register={register} errors={errors} watchedValue={watchedFields.lastName} />
+            <InputField name="email" label={isArabic ? 'البريد الإلكتروني' : 'Email'} icon={Mail} type="email" required register={register} errors={errors} watchedValue={watchedFields.email} />
+            <InputField name="phone" label={isArabic ? 'رقم الهاتف' : 'Phone Number'} icon={Phone} type="tel" placeholder="+966xxxxxxxxx" required register={register} errors={errors} watchedValue={watchedFields.phone} />
           </motion.div>
         </motion.div>
 
@@ -299,38 +246,11 @@ export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }
             animate="visible"
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
-            <InputField
-              name="vehicleMake"
-              label={isArabic ? 'الماركة' : 'Make'}
-              icon={Car}
-              placeholder={isArabic ? 'مثال: تويوتا' : 'e.g., Toyota'}
-              required
-            />
-            <InputField
-              name="vehicleModel"
-              label={isArabic ? 'الموديل' : 'Model'}
-              icon={FileText}
-              placeholder={isArabic ? 'مثال: كامري' : 'e.g., Camry'}
-              required
-            />
-            <InputField
-              name="vehicleYear"
-              label={isArabic ? 'سنة الصنع' : 'Year'}
-              icon={Calendar}
-              type="number"
-              required
-            />
-            <InputField
-              name="licensePlate"
-              label={`${isArabic ? 'رقم اللوحة' : 'License Plate'} (${isArabic ? 'اختياري' : 'Optional'})`}
-              icon={Hash}
-            />
-            <InputField
-              name="vin"
-              label={`${isArabic ? 'رقم الهيكل (VIN)' : 'VIN'} (${isArabic ? 'اختياري' : 'Optional'})`}
-              icon={Hash}
-              colSpan={2}
-            />
+            <InputField name="vehicleMake" label={isArabic ? 'الماركة' : 'Make'} icon={Car} placeholder={isArabic ? 'مثال: تويوتا' : 'e.g., Toyota'} required register={register} errors={errors} watchedValue={watchedFields.vehicleMake} />
+            <InputField name="vehicleModel" label={isArabic ? 'الموديل' : 'Model'} icon={FileText} placeholder={isArabic ? 'مثال: كامري' : 'e.g., Camry'} required register={register} errors={errors} watchedValue={watchedFields.vehicleModel} />
+            <InputField name="vehicleYear" label={isArabic ? 'سنة الصنع' : 'Year'} icon={Calendar} type="number" required register={register} errors={errors} watchedValue={watchedFields.vehicleYear} />
+            <InputField name="licensePlate" label={`${isArabic ? 'رقم اللوحة' : 'License Plate'} (${isArabic ? 'اختياري' : 'Optional'})`} icon={Hash} register={register} errors={errors} watchedValue={watchedFields.licensePlate} />
+            <InputField name="vin" label={`${isArabic ? 'رقم الهيكل (VIN)' : 'VIN'} (${isArabic ? 'اختياري' : 'Optional'})`} icon={Hash} colSpan={2} register={register} errors={errors} watchedValue={watchedFields.vin} />
           </motion.div>
         </motion.div>
 
