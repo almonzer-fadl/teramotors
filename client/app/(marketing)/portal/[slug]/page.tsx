@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Calendar,
   Car,
-  FileText,
   User,
   LogOut,
   Clock,
@@ -14,14 +13,14 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
-  Phone,
-  Mail,
-  Settings,
   Sparkles
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useTranslation } from 'react-i18next';
-import Image from 'next/image';
+import Modal from '@/components/portal/Modal';
+import { AppointmentsContent } from '@/components/portal/AppointmentsContent';
+import { VehiclesContent } from '@/components/portal/VehiclesContent';
+import { ProfileContent } from '@/components/portal/ProfileContent';
 
 interface Customer {
   _id: string;
@@ -113,11 +112,16 @@ export default function CustomerPortalDashboard() {
   const params = useParams();
   const router = useRouter();
   const tenantSlug = params.slug as string;
-  const { t, i18n } = useTranslation('common');
+  const { i18n } = useTranslation('common');
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState('');
+
+  // Modal states
+  const [appointmentsModalOpen, setAppointmentsModalOpen] = useState(false);
+  const [vehiclesModalOpen, setVehiclesModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   // Set initial language and direction
   useEffect(() => {
@@ -391,7 +395,7 @@ export default function CustomerPortalDashboard() {
                   {i18n.language === 'ar' ? 'المواعيد القادمة' : 'Upcoming Appointments'}
                 </h2>
                 <motion.button
-                  onClick={() => router.push(`/portal/${tenantSlug}/appointments`)}
+                  onClick={() => setAppointmentsModalOpen(true)}
                   whileHover={{ scale: 1.05, x: i18n.language === 'ar' ? -3 : 3 }}
                   whileTap={{ scale: 0.95 }}
                   className="text-[#F97402] hover:text-[#F13F33] font-medium text-sm flex items-center gap-1"
@@ -478,7 +482,7 @@ export default function CustomerPortalDashboard() {
                   {i18n.language === 'ar' ? 'سياراتي' : 'My Vehicles'}
                 </h2>
                 <motion.button
-                  onClick={() => router.push(`/portal/${tenantSlug}/vehicles`)}
+                  onClick={() => setVehiclesModalOpen(true)}
                   whileHover={{ scale: 1.05, x: i18n.language === 'ar' ? -3 : 3 }}
                   whileTap={{ scale: 0.95 }}
                   className="text-[#F97402] hover:text-[#F13F33] font-medium text-sm flex items-center gap-1"
@@ -580,7 +584,7 @@ export default function CustomerPortalDashboard() {
             </motion.button>
 
             <motion.button
-              onClick={() => router.push(`/portal/${tenantSlug}/appointments`)}
+              onClick={() => setAppointmentsModalOpen(true)}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 1.1, type: "spring", stiffness: 200 }}
@@ -595,7 +599,7 @@ export default function CustomerPortalDashboard() {
             </motion.button>
 
             <motion.button
-              onClick={() => router.push(`/portal/${tenantSlug}/vehicles`)}
+              onClick={() => setVehiclesModalOpen(true)}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 1.2, type: "spring", stiffness: 200 }}
@@ -610,7 +614,7 @@ export default function CustomerPortalDashboard() {
             </motion.button>
 
             <motion.button
-              onClick={() => router.push(`/portal/${tenantSlug}/profile`)}
+              onClick={() => setProfileModalOpen(true)}
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 1.3, type: "spring", stiffness: 200 }}
@@ -626,6 +630,31 @@ export default function CustomerPortalDashboard() {
           </div>
         </motion.div>
       </div>
+
+      {/* Modals */}
+      <Modal
+        open={appointmentsModalOpen}
+        onClose={() => setAppointmentsModalOpen(false)}
+        title={i18n.language === 'ar' ? 'مواعيدي' : 'My Appointments'}
+      >
+        <AppointmentsContent />
+      </Modal>
+
+      <Modal
+        open={vehiclesModalOpen}
+        onClose={() => setVehiclesModalOpen(false)}
+        title={i18n.language === 'ar' ? 'سياراتي' : 'My Vehicles'}
+      >
+        <VehiclesContent />
+      </Modal>
+
+      <Modal
+        open={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        title={i18n.language === 'ar' ? 'ملفي الشخصي' : 'My Profile'}
+      >
+        <ProfileContent />
+      </Modal>
     </div>
   );
 }
