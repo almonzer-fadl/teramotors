@@ -87,14 +87,75 @@ export class SafariCompatibility {
   // Apply Safari-specific CSS fixes
   applySafariFixes(): void {
     const browserInfo = this.detectBrowser();
-    
+
     if (browserInfo.isSafari) {
       this.addSafariStyles();
       this.fixFlexboxIssues();
       this.fixGridIssues();
       this.fixCustomProperties();
       this.fixIntersectionObserver();
+      this.optimizeAnimations();
     }
+  }
+
+  // Optimize animations for Safari
+  private optimizeAnimations(): void {
+    // Target all animated elements and force GPU acceleration
+    const animatedSelectors = [
+      '[class*="animate"]',
+      '[class*="transition"]',
+      '[class*="transform"]',
+      '[style*="transition"]',
+      '[style*="animation"]',
+      '.hover\\:',
+      '[class*="fade"]',
+      '[class*="slide"]',
+      '[class*="scale"]',
+      '[class*="rotate"]',
+    ];
+
+    const animatedElements = document.querySelectorAll(animatedSelectors.join(','));
+
+    animatedElements.forEach(element => {
+      const htmlElement = element as HTMLElement;
+
+      // Force hardware acceleration
+      htmlElement.style.transform = htmlElement.style.transform || 'translateZ(0)';
+      htmlElement.style.webkitTransform = htmlElement.style.webkitTransform || 'translateZ(0)';
+      htmlElement.style.backfaceVisibility = 'hidden';
+      htmlElement.style.webkitBackfaceVisibility = 'hidden';
+      htmlElement.style.perspective = '1000px';
+      htmlElement.style.webkitPerspective = '1000px';
+    });
+
+    // Use MutationObserver to apply fixes to dynamically added elements
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const element = node as HTMLElement;
+
+            // Check if element has animation classes
+            const hasAnimation = animatedSelectors.some(selector => {
+              const cleanSelector = selector.replace(/[\[\]'":*\\]/g, '');
+              return element.className.includes(cleanSelector);
+            });
+
+            if (hasAnimation) {
+              element.style.transform = element.style.transform || 'translateZ(0)';
+              element.style.webkitTransform = element.style.webkitTransform || 'translateZ(0)';
+              element.style.backfaceVisibility = 'hidden';
+              element.style.webkitBackfaceVisibility = 'hidden';
+            }
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
   }
 
   private addSafariStyles(): void {
@@ -102,6 +163,50 @@ export class SafariCompatibility {
     style.textContent = `
       /* Safari-specific fixes */
       .safari-fix {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+      }
+
+      /* Critical: Safari Animation Performance Fixes */
+      * {
+        /* Force hardware acceleration for all animations */
+        -webkit-transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        -webkit-perspective: 1000;
+      }
+
+      /* Optimize animated elements */
+      [class*="animate"],
+      [class*="transition"],
+      [class*="hover"],
+      [class*="fade"],
+      [class*="slide"] {
+        /* Force GPU acceleration */
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        -webkit-perspective: 1000px;
+        perspective: 1000px;
+        /* Improve compositing */
+        will-change: transform, opacity;
+        /* Reduce paint operations */
+        -webkit-font-smoothing: subpixel-antialiased;
+      }
+
+      /* Fix for Safari transition performance */
+      .safari-animation-fix {
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        -webkit-perspective: 1000px;
+        perspective: 1000px;
+        will-change: transform, opacity;
+      }
+
+      /* Optimize opacity transitions */
+      [style*="opacity"] {
         -webkit-transform: translateZ(0);
         transform: translateZ(0);
       }
