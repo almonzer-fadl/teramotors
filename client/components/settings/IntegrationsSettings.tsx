@@ -91,7 +91,7 @@ export default function IntegrationsSettings() {
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Mail className="w-6 h-6 mr-3 text-[#F97402]" /> SMTP (Email) Settings</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Mail className="w-6 h-6 me-3 text-[#F97402]" /> SMTP (Email) Settings</h2>
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -121,7 +121,7 @@ export default function IntegrationsSettings() {
             </div>
 
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><MessageSquare className="w-6 h-6 mr-3 text-[#F97402]" /> WhatsApp (Ultramsg) Settings</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><MessageSquare className="w-6 h-6 me-3 text-[#F97402]" /> WhatsApp (Ultramsg) Settings</h2>
                 <div className="space-y-6">
                     <div>
                         <FormLabel>Ultramsg Instance ID</FormLabel>

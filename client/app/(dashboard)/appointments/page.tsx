@@ -216,7 +216,7 @@ export default function AppointmentsPage() {
               href="/appointments/new"
               className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white rounded-xl font-semibold shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/30 transition-all"
             >
-              <Plus className="mr-2 h-5 w-5" />
+              <Plus className="me-2 h-5 w-5" />
               {t('appointments.schedule_appointment')}
             </Link>
           </motion.div>
@@ -349,7 +349,7 @@ export default function AppointmentsPage() {
                 href="/appointments/new"
                 className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white rounded-xl font-semibold shadow-lg shadow-[#F97402]/25"
               >
-                <Plus className="mr-2 h-5 w-5" />
+                <Plus className="me-2 h-5 w-5" />
                 {t('appointments.schedule_appointment')}
               </Link>
             </motion.div>

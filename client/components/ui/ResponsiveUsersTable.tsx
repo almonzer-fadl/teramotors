@@ -106,7 +106,7 @@ export default function ResponsiveUsersTable({
                     <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
                       <Users className="h-5 w-5 text-gray-600 dark:text-gray-300" />
                     </div>
-                    <div className="ml-4 space-y-1">
+                    <div className="ms-4 space-y-1">
                       <div className="text-sm font-semibold text-gray-900 dark:text-white">
                         {user.displayName || user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown User'}
                       </div>

@@ -66,7 +66,7 @@ export default function SettingsPage() {
                                                 : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                                         }`}
                                     >
-                                        <tab.icon className="w-5 h-5 mr-3" />
+                                        <tab.icon className="w-5 h-5 me-3" />
                                         <span>{tab.name}</span>
                                     </button>
                                 ))}
@@ -81,7 +81,7 @@ export default function SettingsPage() {
                        {/* "More customization" note - updated to reflect theming is available */}
                        <div className="mt-8 bg-blue-50/80 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-200 dark:border-blue-800 text-center">
                            <div className="flex items-center justify-center text-blue-800 dark:text-blue-300">
-                               <Palette className="w-5 h-5 mr-3" />
+                               <Palette className="w-5 h-5 me-3" />
                                <p className="text-sm font-medium">
                                    More customization options, including advanced workflow settings, are coming soon! You can now customize your app's appearance in the new "Appearance" tab!
                                </p>

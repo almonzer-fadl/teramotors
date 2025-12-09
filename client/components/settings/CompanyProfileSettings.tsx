@@ -173,7 +173,7 @@ export default function CompanyProfileSettings() {
         <form onSubmit={handleSubmit} className="space-y-8">
             {/* Business Details */}
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Building className="w-6 h-6 mr-3 text-[#F97402]" /> Business Details</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Building className="w-6 h-6 me-3 text-[#F97402]" /> Business Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <FormLabel>Company Name (English)</FormLabel>
@@ -196,7 +196,7 @@ export default function CompanyProfileSettings() {
 
              {/* Address Details */}
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Mail className="w-6 h-6 mr-3 text-[#F97402]" /> Address Details</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Mail className="w-6 h-6 me-3 text-[#F97402]" /> Address Details</h2>
                  <div className="space-y-6">
                      <div>
                         <FormLabel>Street Address</FormLabel>
@@ -221,7 +221,7 @@ export default function CompanyProfileSettings() {
 
              {/* Contact & Branding */}
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Palette className="w-6 h-6 mr-3 text-[#F97402]" /> Contact & Branding</h2>
+                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Palette className="w-6 h-6 me-3 text-[#F97402]" /> Contact & Branding</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <FormLabel>Phone Number</FormLabel>

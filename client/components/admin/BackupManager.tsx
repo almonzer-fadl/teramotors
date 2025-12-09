@@ -116,7 +116,7 @@ export default function BackupManager() {
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Backup & Recovery</CardTitle>
         <Button onClick={handleCreateBackup} disabled={isCreating}>
-          <PlusCircle className="mr-2 h-4 w-4" />
+          <PlusCircle className="me-2 h-4 w-4" />
           {isCreating ? 'Creating Backup...' : 'Create Full Backup'}
         </Button>
       </CardHeader>
@@ -143,13 +143,13 @@ export default function BackupManager() {
                 <TableCell className="space-x-2">
                   <Button variant="outline" size="sm" asChild>
                     <a href={`/api/admin/backup/${backup._id}/download`} download>
-                      <Download className="mr-2 h-4 w-4" /> Download
+                      <Download className="me-2 h-4 w-4" /> Download
                     </a>
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" size="sm">
-                        <HardDriveRestore className="mr-2 h-4 w-4" /> Restore
+                        <HardDriveRestore className="me-2 h-4 w-4" /> Restore
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>

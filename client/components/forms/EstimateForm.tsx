@@ -411,7 +411,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
             <div className="flex items-center">
               <button
                 onClick={() => router.back()}
-                className="mr-4 p-3 text-gray-600 dark:text-gray-400 hover:text-[#F97402] hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group"
+                className="me-4 p-3 text-gray-600 dark:text-gray-400 hover:text-[#F97402] hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-all duration-200 group"
               >
                 <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
               </button>
@@ -452,7 +452,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-6 sm:px-8 py-8">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center me-4">
                   <AlertTriangle className="w-6 h-6 text-white" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">{t('forms.inspection_details')}</h2>
@@ -501,7 +501,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
             <div className="px-6 sm:px-8 py-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mr-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center me-4">
                     <Wrench className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">{t('forms.services')}</h2>
@@ -620,7 +620,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
             <div className="px-6 sm:px-8 py-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mr-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center me-4">
                     <Settings className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">{t('forms.parts')}</h2>
@@ -724,7 +724,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-6 sm:px-8 py-8">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center me-4">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">{t('forms.additional_notes')}</h2>
@@ -744,7 +744,7 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-6 sm:px-8 py-8">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-2xl flex items-center justify-center me-4">
                   <Calculator className="w-6 h-6 text-white" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">{t('forms.estimate_summary')}</h2>

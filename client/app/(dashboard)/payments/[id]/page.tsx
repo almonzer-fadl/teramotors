@@ -148,7 +148,7 @@ export default function PaymentDetailPage() {
               {payment.notes && (
                  <div className="mt-6">
                     <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center mb-2">
-                        <Book className="w-4 h-4 mr-2 text-gray-400"/>
+                        <Book className="w-4 h-4 me-2 text-gray-400"/>
                         {t('common.notes')}
                     </h3>
                     <p className="text-gray-800 dark:text-gray-200 bg-gray-50/50 dark:bg-gray-800/50 rounded-xl p-4 border border-gray-200/50 dark:border-gray-700/50 whitespace-pre-wrap">{payment.notes}</p>

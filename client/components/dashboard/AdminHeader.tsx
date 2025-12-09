@@ -12,7 +12,7 @@ export default function AdminHeader() {
       <div className="flex h-16 flex-1 items-center gap-x-4 self-stretch lg:gap-x-6">
         <div className="flex items-center">
         <StaticSidebarToggle />
-        <div className="ml-4">
+        <div className="ms-4">
           <StaticAdminLogo />
         </div>
       </div>

@@ -329,7 +329,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
         return (
           <li
             className={cx(
-              'flex-none mr-[var(--logoloop-gap)] text-[length:var(--logoloop-logoHeight)] leading-[1]',
+              'flex-none me-[var(--logoloop-gap)] text-[length:var(--logoloop-logoHeight)] leading-[1]',
               scaleOnHover && 'overflow-visible group/item'
             )}
             key={key}

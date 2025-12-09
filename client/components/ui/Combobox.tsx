@@ -51,7 +51,7 @@ export function Combobox({
             console.log('Combobox display:', { value, selectedOption, allOptions: options });
             return value ? selectedOption?.label : placeholder;
           })()}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-xl">
@@ -74,7 +74,7 @@ export function Combobox({
               >
                 <Check
                   className={cn(
-                    'mr-2 h-4 w-4',
+                    'me-2 h-4 w-4',
                     value === option.value ? 'opacity-100' : 'opacity-0'
                   )}
                 />

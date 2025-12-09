@@ -174,7 +174,7 @@ export default function SubscriptionPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Link href="/settings" className="mr-4">
+              <Link href="/settings" className="me-4">
                 <motion.button
                   className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   whileHover={{ x: -3 }}

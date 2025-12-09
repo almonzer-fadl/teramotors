@@ -56,7 +56,7 @@ export default function ResponsiveTable({
                 onClick={() => onSort("name")}
               >
                 {t("customers.name")}
-                <span className="ml-1">
+                <span className="ms-1">
                   {sortKey === "name" && (sortDirection === "asc" ? "↑" : "↓")}
                 </span>
               </th>
@@ -93,7 +93,7 @@ export default function ResponsiveTable({
                         <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
                     </div>
-                    <div className="ml-4">
+                    <div className="ms-4">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {customer.firstName} {customer.lastName}
                       </div>

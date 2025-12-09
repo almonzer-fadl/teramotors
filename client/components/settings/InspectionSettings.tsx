@@ -91,7 +91,7 @@ export default function InspectionSettings() {
       {/* Header */}
       <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-6">
         <div className="flex items-center mb-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center me-4">
             <Clipboard className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -110,7 +110,7 @@ export default function InspectionSettings() {
       {/* Pricing Section */}
       <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-6">
         <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center me-3">
             <DollarSign className="w-5 h-5 text-white" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Pricing & Validity</h3>
@@ -171,7 +171,7 @@ export default function InspectionSettings() {
       {/* Automation Section */}
       <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-6">
         <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mr-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center me-3">
             <CheckCircle className="w-5 h-5 text-white" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Automation Options</h3>
@@ -237,7 +237,7 @@ export default function InspectionSettings() {
       {/* Notifications Section */}
       <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-6">
         <div className="flex items-center mb-6">
-          <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mr-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center me-3">
             <MessageSquare className="w-5 h-5 text-white" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Notifications</h3>
@@ -280,12 +280,12 @@ export default function InspectionSettings() {
         >
           {saving ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
               Saving...
             </>
           ) : (
             <>
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="w-4 h-4 me-2" />
               Save Settings
             </>
           )}

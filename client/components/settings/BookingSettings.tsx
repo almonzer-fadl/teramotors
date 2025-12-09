@@ -174,7 +174,7 @@ export default function BookingSettings() {
 
       {success && (
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 rounded-xl flex items-center">
-          <Check className="w-5 h-5 mr-2" />
+          <Check className="w-5 h-5 me-2" />
           Settings saved successfully!
         </div>
       )}
@@ -305,7 +305,7 @@ export default function BookingSettings() {
                   }
                   className="w-5 h-5 text-[#F97402] border-gray-300 rounded focus:ring-[#F97402]"
                 />
-                <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span className="ms-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                   Require Manual Approval
                 </span>
               </label>
@@ -335,7 +335,7 @@ export default function BookingSettings() {
                       }
                       className="w-4 h-4 text-[#F97402] border-gray-300 rounded focus:ring-[#F97402]"
                     />
-                    <span className="ml-2 font-medium text-gray-700 dark:text-gray-300">{label}</span>
+                    <span className="ms-2 font-medium text-gray-700 dark:text-gray-300">{label}</span>
                   </label>
                 </div>
 

@@ -9,7 +9,7 @@ import { fadeInUp, staggerContainer } from '@/lib/dashboard-animations';
 const StatCard = ({ title, value, icon }: { title: string; value: string; icon: React.ReactNode }) => (
     <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-6 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
         <div className="flex items-center">
-            <div className="mr-4">{icon}</div>
+            <div className="me-4">{icon}</div>
             <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
@@ -127,7 +127,7 @@ export default function WhatsAppPage() {
                 {/* Composer */}
                 <motion.div variants={fadeInUp}>
                     <form onSubmit={handleSendMessage} className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><MessageSquare className="w-6 h-6 mr-3 text-[#F97402]" /> Send Manual Message</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><MessageSquare className="w-6 h-6 me-3 text-[#F97402]" /> Send Manual Message</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="md:col-span-1">
                                 <label htmlFor="customer" className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Customer</label>
@@ -174,9 +174,9 @@ export default function WhatsAppPage() {
                                 </div>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{msg.body}</p>
                                 <div className={`mt-2 text-xs inline-flex items-center font-semibold px-2 py-1 rounded-full ${msg.status === 'sent' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}`}>
-                                    {msg.status === 'sent' ? <CheckCircle className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
+                                    {msg.status === 'sent' ? <CheckCircle className="w-3 h-3 me-1" /> : <XCircle className="w-3 h-3 me-1" />}
                                     {msg.status}
-                                    {msg.status === 'failed' && <span className="ml-2 truncate">: {msg.errorMessage}</span>}
+                                    {msg.status === 'failed' && <span className="ms-2 truncate">: {msg.errorMessage}</span>}
                                 </div>
                             </div>
                         ))}

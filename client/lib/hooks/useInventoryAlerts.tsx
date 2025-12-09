@@ -207,7 +207,7 @@ export function InventoryAlertsPanel() {
     return (
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-center text-gray-500">
-          <CheckCircle className="h-8 w-8 mr-2 text-green-500" />
+          <CheckCircle className="h-8 w-8 me-2 text-green-500" />
           <span>No inventory alerts</span>
         </div>
       </div>

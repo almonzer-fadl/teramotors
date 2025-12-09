@@ -138,7 +138,7 @@ export default function ServiceForm({
             <div className="flex items-center">
               <button
                 onClick={() => router.back()}
-                className="mr-6 p-3 text-gray-600 dark:text-gray-400 hover:text-[#F97402] transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 group"
+                className="me-6 p-3 text-gray-600 dark:text-gray-400 hover:text-[#F97402] transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 group"
               >
                 <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
               </button>
@@ -162,7 +162,7 @@ export default function ServiceForm({
             <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
               <div className="px-6 sm:px-8 py-8">
                 <div className="flex items-center mb-8">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center me-4">
                     <FileText className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
@@ -188,7 +188,7 @@ export default function ServiceForm({
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-6 sm:px-8 py-8">
               <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-2xl flex items-center justify-center me-4">
                   <Wrench className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">

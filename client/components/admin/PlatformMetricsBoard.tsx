@@ -14,7 +14,7 @@ interface PlatformStats {
 
 const StatCard = ({ label, value, icon: Icon, color }: { label: string, value: string | number, icon: React.ElementType, color: string }) => (
   <div className="flex items-center p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl shadow-sm">
-    <div className={`mr-4 p-3 rounded-full ${color} bg-opacity-10 dark:bg-opacity-20`}>
+    <div className={`me-4 p-3 rounded-full ${color} bg-opacity-10 dark:bg-opacity-20`}>
       <Icon className="w-6 h-6" />
     </div>
     <div>

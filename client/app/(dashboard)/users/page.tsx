@@ -126,11 +126,11 @@ export default function UsersPage() {
           <div className="flex items-center mb-6">
             <Link
               href="/dashboard"
-              className="mr-4 p-2 rounded-xl bg-white/80 backdrop-blur-sm border border-white/50 hover:bg-white transition-all duration-300"
+              className="me-4 p-2 rounded-xl bg-white/80 backdrop-blur-sm border border-white/50 hover:bg-white transition-all duration-300"
             >
               <ArrowLeft className="w-6 h-6 text-gray-700" />
             </Link>
-            <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mr-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center me-4">
               <User className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -207,7 +207,7 @@ export default function UsersPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <Mail className="w-4 h-4 text-gray-400 mr-2" />
+                          <Mail className="w-4 h-4 text-gray-400 me-2" />
                           <span className="text-sm text-gray-900">{user.email}</span>
                         </div>
                       </td>
@@ -224,7 +224,7 @@ export default function UsersPage() {
                           </select>
                         ) : (
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
-                            <Shield className="w-3 h-3 mr-1" />
+                            <Shield className="w-3 h-3 me-1" />
                             {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                           </span>
                         )}

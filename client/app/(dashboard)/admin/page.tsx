@@ -123,7 +123,7 @@ export default function AdminPage() {
                       <action.icon className="w-8 h-8 mb-3 text-gray-400 dark:text-gray-500" />
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         {action.title}
-                        <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">(Coming Soon)</span>
+                        <span className="ms-2 text-xs font-normal text-gray-500 dark:text-gray-400">(Coming Soon)</span>
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 flex-grow">
                         {action.description}

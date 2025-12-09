@@ -109,7 +109,7 @@ export default function UsageMonitoringDashboard() {
                     <div className="w-24">
                       <span>{tenant.users.current} / {tenant.users.limit}</span>
                     </div>
-                    <Progress value={tenant.users.percentage} className={`w-48 h-2 ml-4 ${getProgressColor(tenant.users.percentage)}`} />
+                    <Progress value={tenant.users.percentage} className={`w-48 h-2 ms-4 ${getProgressColor(tenant.users.percentage)}`} />
                   </div>
                 </TableCell>
                 <TableCell>
@@ -117,7 +117,7 @@ export default function UsageMonitoringDashboard() {
                     <div className="w-24">
                       <span>{tenant.vehicles.current} / {tenant.vehicles.limit}</span>
                     </div>
-                    <Progress value={tenant.vehicles.percentage} className={`w-48 h-2 ml-4 ${getProgressColor(tenant.vehicles.percentage)}`} />
+                    <Progress value={tenant.vehicles.percentage} className={`w-48 h-2 ms-4 ${getProgressColor(tenant.vehicles.percentage)}`} />
                   </div>
                 </TableCell>
               </TableRow>

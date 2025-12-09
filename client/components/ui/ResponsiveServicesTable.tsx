@@ -54,10 +54,10 @@ export default function ResponsiveServicesTable({
   const renderSortIcon = (key: SortKey) => {
     const active = sortKey === key;
     return (
-      <span className="ml-2 inline-flex items-center text-xs text-gray-400 dark:text-gray-500">
+      <span className="ms-2 inline-flex items-center text-xs text-gray-400 dark:text-gray-500">
         <ArrowUpDown className={`h-4 w-4 ${active ? 'text-[#F97402]' : ''}`} />
         {active && (
-          <span className="ml-1 text-[#F97402]">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+          <span className="ms-1 text-[#F97402]">{sortDirection === 'asc' ? '↑' : '↓'}</span>
         )}
       </span>
     );
@@ -136,7 +136,7 @@ export default function ResponsiveServicesTable({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusClasses(service.isActive)}`}>
                     {getStatusIcon(service.isActive)}
-                    <span className="ml-1">{service.isActive ? t('services.active') : t('services.inactive')}</span>
+                    <span className="ms-1">{service.isActive ? t('services.active') : t('services.inactive')}</span>
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
@@ -200,13 +200,13 @@ export default function ResponsiveServicesTable({
 
             <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300 mb-4">
               <div className="flex items-center">
-                <DollarSign className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                <DollarSign className="h-4 w-4 me-2 text-gray-500 dark:text-gray-400" />
                 <span>
                   ${service.laborRate.toFixed(2)} · {service.laborHours} {t('services.hours')}
                 </span>
               </div>
               <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                <Calendar className="h-4 w-4 me-2 text-gray-500 dark:text-gray-400" />
                 <span>
                   {t('services.created_on', { date: new Date(service.createdAt).toLocaleDateString() })}
                 </span>
@@ -218,14 +218,14 @@ export default function ResponsiveServicesTable({
                 href={`/services/${service._id}`}
                 className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
               >
-                <Eye className="h-3 w-3 mr-1" />
+                <Eye className="h-3 w-3 me-1" />
                 {t('common.view')}
               </Link>
               <Link
                 href={`/services/${service._id}/edit`}
                 className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-[#F97402] hover:bg-[#F13F33] transition-colors"
               >
-                <Edit className="h-3 w-3 mr-1" />
+                <Edit className="h-3 w-3 me-1" />
                 {t('common.edit')}
               </Link>
               {canDelete && (
@@ -233,7 +233,7 @@ export default function ResponsiveServicesTable({
                   onClick={() => onDelete(service._id)}
                   className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors"
                 >
-                  <Trash2 className="h-3 w-3 mr-1" />
+                  <Trash2 className="h-3 w-3 me-1" />
                   {t('common.delete')}
                 </button>
               )}

@@ -234,7 +234,7 @@ export default function AppointmentForm({
             <div className="flex items-center">
               <button
                 onClick={() => router.back()}
-                className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
+                className="me-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
               >
                 <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
               </button>
@@ -255,11 +255,11 @@ export default function AppointmentForm({
 
       <div className="px-4 sm:px-6 lg:px-8 py-12">
 
-        <form onSubmit={handleSubmit} className="space-y-10">
+        <form onSubmit={handleSubmit} className="space-y-10 me-5 ms-5">
           <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
             <div className="px-8 py-8">
               <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center me-4">
                   <ArrowLeft className="w-6 h-6 text-white" />
                 </div>
                 </div>
@@ -268,7 +268,7 @@ export default function AppointmentForm({
                 </h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-2">
+                <div className="space-y-2 me-5 ms-5">
                   <label className="block text-sm font-bold text-gray-700">
                     {t('forms.customer')}
                   </label>
@@ -288,7 +288,7 @@ export default function AppointmentForm({
                 ))}
               </select>
             </div>
-                <div className="space-y-2">
+                <div className="space-y-2 me-5 ms-5">
                   <label className="block text-sm font-bold text-gray-700">
                     {t('forms.vehicle')}
                   </label>
@@ -313,7 +313,7 @@ export default function AppointmentForm({
                   ))}
               </select>
             </div>
-                <div className="space-y-2">
+                <div className="space-y-2 me-5 ms-5">
                   <label className="block text-sm font-bold text-gray-700">
                     {t('forms.service')}
                   </label>
@@ -331,7 +331,7 @@ export default function AppointmentForm({
                 ))}
               </select>
             </div>
-                <div className="space-y-2">
+                <div className="space-y-2 me-5 ms-5">
                   <label className="block text-sm font-bold text-gray-700">
                     {t('forms.mechanic')}
                   </label>
@@ -351,7 +351,7 @@ export default function AppointmentForm({
                 ))}
               </select>
             </div>
-                <div className="space-y-2">
+                <div className="space-y-2 me-5 ms-5">
                   <label className="block text-sm font-bold text-gray-700">
                     {t('forms.appointment_date')}
                   </label>
@@ -366,7 +366,7 @@ export default function AppointmentForm({
                   />
                 </div>
             <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
+                  <div className="space-y-2 me-5 ms-5">
                     <label className="block text-sm font-bold text-gray-700">
                       {t('forms.start_time')}
                     </label>
@@ -386,7 +386,7 @@ export default function AppointmentForm({
                   ))}
                 </select>
               </div>
-                  <div className="space-y-2">
+                  <div className="space-y-2 me-5 ms-5">
                     <label className="block text-sm font-bold text-gray-700">
                       {t('forms.end_time')}
                     </label>
@@ -399,7 +399,7 @@ export default function AppointmentForm({
                     />
                   </div>
             </div>
-                <div className="space-y-2">
+                <div className="space-y-2 me-5 ms-5">
                   <label className="block text-sm font-bold text-gray-700">
                     {t('forms.priority')}
                   </label>
@@ -414,7 +414,7 @@ export default function AppointmentForm({
                 <option value="urgent">{t('forms.urgent')}</option>
               </select>
             </div>
-                <div className="space-y-2">
+                <div className="space-y-2 me-5 ms-5">
                   <label className="block text-sm font-bold text-gray-700">
                     {t('forms.status')}
                   </label>
@@ -429,7 +429,7 @@ export default function AppointmentForm({
                 <option value="cancelled">{t('forms.cancelled')}</option>
               </select>
             </div>
-                <div className="md:col-span-2 space-y-2">
+                <div className="md:col-span-2 space-y-2 me-5 ms-5">
                   <label className="block text-sm font-bold text-gray-700">
                     {t('forms.estimated_cost')}
                   </label>
@@ -444,7 +444,7 @@ export default function AppointmentForm({
                     placeholder={t('ui.enter_estimated_cost')}
                   />
                 </div>
-                <div className="md:col-span-2 space-y-2">
+                <div className="md:col-span-2 space-y-2 me-5 ms-5">
                   <label className="block text-sm font-bold text-gray-700">
                     {t('forms.notes')}
                   </label>
@@ -466,7 +466,7 @@ export default function AppointmentForm({
               onClick={() => router.back()}
               className="group inline-flex items-center px-8 py-4 border-2 border-gray-300 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:border-[#F13F33] hover:text-[#F13F33] hover:bg-[#F13F33]/5 transition-all duration-300"
             >
-              <X className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              <X className="me-3 h-5 w-5 group-hover:scale-110 transition-transform" />
               {t('forms.cancel')}
             </button>
             <button
@@ -474,7 +474,7 @@ export default function AppointmentForm({
               disabled={loading}
               className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
             >
-              <Save className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              <Save className="me-3 h-5 w-5 group-hover:scale-110 transition-transform" />
               {loading
                 ? t('forms.saving')
                 : isEditing

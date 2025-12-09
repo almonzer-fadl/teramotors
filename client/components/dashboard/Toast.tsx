@@ -36,10 +36,10 @@ export default function Toast({ id, message, type, onDismiss }: ToastProps) {
           <div className="flex-shrink-0">
             {icons[type]}
           </div>
-          <div className="ml-3 w-0 flex-1 pt-0.5">
+          <div className="ms-3 w-0 flex-1 pt-0.5">
             <p className="text-sm font-medium text-gray-900">{message}</p>
           </div>
-          <div className="ml-4 flex-shrink-0 flex">
+          <div className="ms-4 flex-shrink-0 flex">
             <button
               onClick={() => onDismiss(id)}
               className="bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

@@ -32,12 +32,12 @@ export default function LogoutButton() {
     >
       {loading ? (
         <>
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+          <Loader2 className="me-2 h-5 w-5 animate-spin" />
           <span>Logging out...</span>
         </>
       ) : (
         <>
-          <LogOut className="mr-2 h-5 w-5" />
+          <LogOut className="me-2 h-5 w-5" />
           <span>Log Out Super Admin</span>
         </>
       )}

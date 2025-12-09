@@ -258,7 +258,7 @@ export default function LandingPage() {
                 <img
                   src="/icon.png"
                   alt="TeraMotors Logo"
-                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl mr-2 sm:mr-3 object-contain"
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl me-2 sm:me-3 object-contain"
                 />
                 <div className="flex flex-col">
                   <span className="flex items-center space-x-2">
@@ -285,7 +285,7 @@ export default function LandingPage() {
               <LanguageSwitch />
               <ThemeToggle />
               <a href="tel:+966590090612" className="text-[#F97402] font-semibold flex items-center">
-                <Phone className="w-4 h-4 mr-1" />
+                <Phone className="w-4 h-4 me-1" />
                 +966590090612
               </a>
             </div>
@@ -347,7 +347,7 @@ export default function LandingPage() {
               href="tel:+966590090612"
               className="flex items-center py-3 px-4 bg-[#F97402] text-white rounded-lg font-semibold hover:bg-[#d6352a] transition-colors"
             >
-              <Phone className="w-5 h-5 mr-2" />
+              <Phone className="w-5 h-5 me-2" />
               +966590090612
             </a>
           </div>
@@ -375,7 +375,7 @@ export default function LandingPage() {
                   variants={fadeInUp}
                   className="inline-flex items-center px-3 py-2 sm:px-4 rounded-full bg-[#F97402]/20 border border-[#F97402]/30 text-[#F97402] text-xs sm:text-sm font-medium"
                 >
-                  <Wrench className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                  <Wrench className="w-3 h-3 sm:w-4 sm:h-4 me-2" />
                   {t('landing_missing.professional_auto_repair')}
                 </motion.div>
                 <motion.h1
@@ -404,7 +404,7 @@ export default function LandingPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Phone className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  <Phone className="w-5 h-5 me-2 group-hover:scale-110 transition-transform" />
                   {t("landing.hero.call_now")}
                 </motion.a>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -412,7 +412,7 @@ export default function LandingPage() {
                     href="/portal/teramotors-default/login"
                     className="group relative inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white font-semibold rounded-2xl hover:bg-white/20 transition-all duration-300 hover:-translate-y-1"
                   >
-                    <User className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                    <User className="w-5 h-5 me-2 group-hover:scale-110 transition-transform" />
                     Customer Portal
                   </Link>
                 </motion.div>
@@ -501,7 +501,7 @@ export default function LandingPage() {
               variants={floatingAnimation}
               animate="animate"
             >
-              <Award className="w-4 h-4 mr-2" />
+              <Award className="w-4 h-4 me-2" />
               {t('landing_missing.our_subscriptions')}
             </motion.div>
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
@@ -552,7 +552,7 @@ export default function LandingPage() {
                         transition={{ delay: featureIndex * 0.05 }}
                         viewport={{ once: true }}
                       >
-                        <CheckCircle className="w-5 h-5 text-[#F97402] mr-2 flex-shrink-0" />
+                        <CheckCircle className="w-5 h-5 text-[#F97402] me-2 flex-shrink-0" />
                         <span>{feature}</span>
                       </motion.li>
                     ))}
@@ -665,7 +665,7 @@ export default function LandingPage() {
               variants={floatingAnimation}
               animate="animate"
             >
-              <Star className="w-4 h-4 mr-2" />
+              <Star className="w-4 h-4 me-2" />
               {t('landing_missing.trusted_by_thousands')}
             </motion.div>
             <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
@@ -817,7 +817,7 @@ export default function LandingPage() {
                 <img
                   src="/icon.png"
                   alt="TeraMotors Logo"
-                  className="w-10 h-10 rounded-lg mr-3 object-contain"
+                  className="w-10 h-10 rounded-lg me-3 object-contain"
                 />
                 <div className="flex flex-col">
                   <span className="flex items-center space-x-2">

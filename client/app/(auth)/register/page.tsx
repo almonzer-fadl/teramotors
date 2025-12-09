@@ -232,7 +232,7 @@ function RegisterForm() {
           href="/login"
           className="absolute -top-12 left-0 flex items-center text-white/80 hover:text-white transition-colors group"
         >
-          <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="w-5 h-5 me-2 group-hover:-translate-x-1 transition-transform" />
           Back to login
         </Link>
 
@@ -328,7 +328,7 @@ function RegisterForm() {
               >
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                    <Building2 className="w-4 h-4 inline-block mr-2" />
+                    <Building2 className="w-4 h-4 inline-block me-2" />
                     Workshop Name *
                   </label>
                   <input
@@ -344,7 +344,7 @@ function RegisterForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                    <Mail className="w-4 h-4 inline-block mr-2" />
+                    <Mail className="w-4 h-4 inline-block me-2" />
                     Business Email *
                   </label>
                   <input
@@ -360,7 +360,7 @@ function RegisterForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                    <Phone className="w-4 h-4 inline-block mr-2" />
+                    <Phone className="w-4 h-4 inline-block me-2" />
                     Phone Number
                   </label>
                   <input
@@ -375,7 +375,7 @@ function RegisterForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                    <Globe className="w-4 h-4 inline-block mr-2" />
+                    <Globe className="w-4 h-4 inline-block me-2" />
                     Website (Optional)
                   </label>
                   <input
@@ -433,7 +433,7 @@ function RegisterForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                    <Mail className="w-4 h-4 inline-block mr-2" />
+                    <Mail className="w-4 h-4 inline-block me-2" />
                     Your Email *
                   </label>
                   <input
@@ -449,7 +449,7 @@ function RegisterForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                    <Lock className="w-4 h-4 inline-block mr-2" />
+                    <Lock className="w-4 h-4 inline-block me-2" />
                     Password *
                   </label>
                   <div className="relative">
@@ -474,7 +474,7 @@ function RegisterForm() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                    <Lock className="w-4 h-4 inline-block mr-2" />
+                    <Lock className="w-4 h-4 inline-block me-2" />
                     Confirm Password *
                   </label>
                   <div className="relative">
@@ -529,7 +529,7 @@ function RegisterForm() {
                     Your workshop <span className="font-semibold text-[#F97402]">{formData.businessName}</span> has been created.
                   </p>
                   <div className="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
-                    <Sparkles className="w-4 h-4 mr-2 text-[#F97402]" />
+                    <Sparkles className="w-4 h-4 me-2 text-[#F97402]" />
                     Redirecting to login...
                   </div>
                 </motion.div>
@@ -550,7 +550,7 @@ function RegisterForm() {
                     : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
                 }`}
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className="w-4 h-4 me-2" />
                 Back
               </button>
 
@@ -565,13 +565,13 @@ function RegisterForm() {
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <Loader2 className="w-4 h-4 me-2 animate-spin" />
                       Creating...
                     </>
                   ) : (
                     <>
                       Create Workshop
-                      <Sparkles className="w-4 h-4 ml-2" />
+                      <Sparkles className="w-4 h-4 ms-2" />
                     </>
                   )}
                 </motion.button>
@@ -584,7 +584,7 @@ function RegisterForm() {
                   whileTap={{ scale: 0.98 }}
                 >
                   Continue
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <ArrowRight className="w-4 h-4 ms-2" />
                 </motion.button>
               )}
             </div>

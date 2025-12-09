@@ -315,7 +315,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                       onChange={(e) => handleInputChange("whatsappEnabled", e.target.checked)}
                       className="h-4 w-4 text-[#F13F33] focus:ring-[#F13F33] border-gray-300 rounded"
                     />
-                    <label htmlFor="whatsappEnabled" className="ml-2 block text-sm font-bold text-gray-700">
+                    <label htmlFor="whatsappEnabled" className="ms-2 block text-sm font-bold text-gray-700">
                       Enable WhatsApp Messages
                     </label>
                   </div>
@@ -330,7 +330,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-6 py-6">
               <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center me-4">
                   <MapPin className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
@@ -403,7 +403,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-6 py-6">
               <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center me-4">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
@@ -462,7 +462,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-6 py-6">
               <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center me-4">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">

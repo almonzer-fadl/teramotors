@@ -360,7 +360,7 @@ export default function ReportsPage() {
                 <div className="flex-shrink-0">
                     <AlertTriangle className="h-5 w-5 text-yellow-400 dark:text-yellow-500" aria-hidden="true" />
                 </div>
-                <div className="ml-3">
+                <div className="ms-3">
                     <p className="text-sm text-yellow-700 dark:text-yellow-300">
                         <span className="font-bold">{t('reports.disclaimer.title')}</span>: {t('reports.disclaimer.description')}
                     </p>

@@ -29,7 +29,7 @@ export default function AccountSettings() {
       {/* Account Info */}
       <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-6">
         <div className="flex items-center mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center me-4">
             <User className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -70,7 +70,7 @@ export default function AccountSettings() {
       {/* Sign Out Section */}
       <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-6">
         <div className="flex items-center mb-6">
-          <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mr-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center me-4">
             <LogOut className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -92,12 +92,12 @@ export default function AccountSettings() {
         >
           {isSigningOut ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
               Signing Out...
             </>
           ) : (
             <>
-              <LogOut className="w-4 h-4 mr-2" />
+              <LogOut className="w-4 h-4 me-2" />
               Sign Out
             </>
           )}

@@ -70,7 +70,7 @@ export default function MigratePage() {
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-6 sm:px-8 py-8">
               <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center me-4">
                   <Database className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
@@ -84,7 +84,7 @@ export default function MigratePage() {
                 </p>
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
                   <p className="text-sm text-yellow-800 dark:text-yellow-400 flex items-start">
-                    <span className="text-xl mr-2">⚠️</span>
+                    <span className="text-xl me-2">⚠️</span>
                     <span>This should only be run once to fix existing data. Running it multiple times is safe but unnecessary.</span>
                   </p>
                 </div>
@@ -97,12 +97,12 @@ export default function MigratePage() {
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
                     Running Migration...
                   </>
                 ) : (
                   <>
-                    <Database className="mr-2 h-5 w-5" />
+                    <Database className="me-2 h-5 w-5" />
                     Run Migration
                   </>
                 )}
@@ -115,7 +115,7 @@ export default function MigratePage() {
                   className="mt-8 p-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl"
                 >
                   <h3 className="text-red-800 dark:text-red-400 font-semibold text-lg mb-3 flex items-center">
-                    <span className="text-2xl mr-2">❌</span>
+                    <span className="text-2xl me-2">❌</span>
                     Migration Error
                   </h3>
                   <p className="text-red-600 dark:text-red-300 text-base">{error}</p>
@@ -129,19 +129,19 @@ export default function MigratePage() {
                   className="mt-8 p-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl"
                 >
                   <h3 className="text-green-800 dark:text-green-400 font-semibold text-lg mb-4 flex items-center">
-                    <span className="text-2xl mr-2">✅</span>
+                    <span className="text-2xl me-2">✅</span>
                     Migration Complete
                   </h3>
                   <div className="text-green-700 dark:text-green-300 space-y-3 text-base">
                     <p className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
+                      <span className="text-green-500 me-2">✓</span>
                       <span className="font-medium">WorkLogs updated:</span>
-                      <span className="ml-2 font-semibold">{result.workLogsUpdated}</span>
+                      <span className="ms-2 font-semibold">{result.workLogsUpdated}</span>
                     </p>
                     <p className="flex items-center">
-                      <span className="text-green-500 mr-2">✓</span>
+                      <span className="text-green-500 me-2">✓</span>
                       <span className="font-medium">WhatsApp messages updated:</span>
-                      <span className="ml-2 font-semibold">{result.whatsappMessagesUpdated}</span>
+                      <span className="ms-2 font-semibold">{result.whatsappMessagesUpdated}</span>
                     </p>
                     {result.errors && result.errors.length > 0 && (
                       <div className="mt-4 pt-4 border-t border-green-200 dark:border-green-800">

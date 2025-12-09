@@ -22,7 +22,7 @@ const CustomerRow = ({ customer }: { customer: any }) => {
             <tr onClick={() => setIsOpen(!isOpen)} className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     <div className="flex items-center">
-                        {isOpen ? <ChevronDown className="h-4 w-4 mr-2" /> : <ChevronRight className="h-4 w-4 mr-2" />}
+                        {isOpen ? <ChevronDown className="h-4 w-4 me-2" /> : <ChevronRight className="h-4 w-4 me-2" />}
                         {customer.customerName}
                     </div>
                 </td>

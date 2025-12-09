@@ -125,7 +125,7 @@ export default function MobileNavigation({ className = "" }: MobileNavigationPro
                             : 'text-gray-700 hover:bg-gray-100'
                         }`}
                       >
-                        <IconComponent className="mr-3 h-5 w-5" />
+                        <IconComponent className="me-3 h-5 w-5" />
                         {t(item.tKey)}
                       </Link>
                     );
@@ -147,7 +147,7 @@ export default function MobileNavigation({ className = "" }: MobileNavigationPro
                           onClick={() => setIsOpen(false)}
                           className="flex items-center px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
                         >
-                          <Icon className="mr-3 h-5 w-5" />
+                          <Icon className="me-3 h-5 w-5" />
                           {action.label}
                         </Link>
                       );

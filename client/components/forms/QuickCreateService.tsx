@@ -195,7 +195,7 @@ export default function QuickCreateService({ isOpen, onClose, onCreated }: Quick
                 onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
                 className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="ml-3 text-sm text-gray-700">
+              <span className="ms-3 text-sm text-gray-700">
                 {t('forms.service_active')}
               </span>
             </div>

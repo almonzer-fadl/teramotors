@@ -74,7 +74,7 @@ export default function SystemStatusBoard() {
     <div>
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center">
-          <Activity className="w-6 h-6 mr-3 text-primary" />
+          <Activity className="w-6 h-6 me-3 text-primary" />
           Live System Status
         </h2>
         <motion.button
@@ -85,9 +85,9 @@ export default function SystemStatusBoard() {
           className="flex items-center px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-medium hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 transition-all"
         >
           {isPolling || loading ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            <Loader2 className="w-4 h-4 me-2 animate-spin" />
           ) : (
-            <RefreshCw className="w-4 h-4 mr-2" />
+            <RefreshCw className="w-4 h-4 me-2" />
           )}
           <span>{isPolling || loading ? 'Checking...' : 'Refresh'}</span>
         </motion.button>
@@ -117,7 +117,7 @@ export default function SystemStatusBoard() {
 
       <div className="mt-4 pt-4 border-t border-dashed border-gray-200 dark:border-gray-700 flex justify-between items-center">
         <div className={`flex items-center text-sm font-semibold ${overallTextColor}`}>
-          <OverAllIcon className="w-5 h-5 mr-2" />
+          <OverAllIcon className="w-5 h-5 me-2" />
           {health ? overallStatusConfig[health.overallStatus].text : "Loading Status..."}
         </div>
         <p className="text-sm text-gray-500 dark:text-gray-400">

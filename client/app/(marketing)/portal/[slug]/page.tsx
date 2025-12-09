@@ -460,7 +460,7 @@ export default function CustomerPortalDashboard() {
                         </div>
                       </div>
                       <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        <Car className="w-4 h-4 inline mr-1" />
+                        <Car className="w-4 h-4 inline me-1" />
                         {appointment.vehicleId.make} {appointment.vehicleId.model}
                       </div>
                     </motion.div>

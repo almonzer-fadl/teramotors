@@ -345,7 +345,7 @@ export default function InlineEstimateCreator({ isOpen, onClose, jobCardId, onCr
               onClick={addService}
               className="inline-flex items-center px-4 py-2 border-2 border-dashed border-gray-300 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('estimates.add_service')}
             </button>
           </div>
@@ -435,7 +435,7 @@ export default function InlineEstimateCreator({ isOpen, onClose, jobCardId, onCr
               onClick={addPart}
               className="inline-flex items-center px-4 py-2 border-2 border-dashed border-gray-300 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('estimates.add_part')}
             </button>
           </div>
@@ -537,7 +537,7 @@ export default function InlineEstimateCreator({ isOpen, onClose, jobCardId, onCr
             disabled={loading || (form.services.length === 0 && form.parts.length === 0)}
             className="inline-flex items-center px-5 py-3 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-[#F13F33] to-[#E63946] hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Calculator className="h-4 w-4 mr-2" />
+            <Calculator className="h-4 w-4 me-2" />
             {loading ? t('forms.saving') : t('estimates.create_estimate')}
           </button>
         </div>
