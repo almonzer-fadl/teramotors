@@ -1,56 +1,51 @@
-import { connectToDatabase } from '@/lib/db'
-import VehicleInspection from '@/lib/models/VehicleInspection'
-import InspectionTemplate from '@/lib/models/InspectionTemplate'
-import JobCard from '@/lib/models/JobCard'
-import User from '@/lib/models/User'
-import { getServerSession } from "@/lib/auth-server";
-import { NextRequest } from 'next/server';
+import { connectToDatabase } from '@/lib/db';
+import VehicleInspection from '@/lib/models/VehicleInspection';
+import InspectionTemplate from '@/lib/models/InspectionTemplate';
+import JobCard from '@/lib/models/JobCard';
+import User from '@/lib/models/User';
+import { NextRequest, NextResponse } from 'next/server';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(request: NextRequest) {
-  try {
-    const session = await getServerSession()
-    if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+// GET /api/inspections - List inspections for tenant
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
+    await connectToDatabase();
 
-    await connectToDatabase()
-
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
-    // Calculate pagination
     const skip = (page - 1) * limit;
 
-    // Build sort object
-    const sort: any = {};
+    const sort: Record<string, 1 | -1> = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
-    
-    // Get total count for pagination
-    const totalCount = await VehicleInspection.countDocuments({});
-    
-    const inspections = await VehicleInspection.find({})
+
+    // Build query with tenant filter
+    const query = { tenantId };
+
+    const totalCount = await VehicleInspection.countDocuments(query);
+
+    const inspections = await VehicleInspection.find(query)
       .populate({
         path: 'jobCardId',
         populate: [
           { path: 'vehicleId', select: 'make model year licensePlate' },
-          { path: 'customerId', select: 'firstName lastName' }
-        ]
+          { path: 'customerId', select: 'firstName lastName' },
+        ],
       })
       .populate('mechanicId', 'firstName lastName displayName')
       .populate('templateId', 'name')
       .sort(sort)
       .skip(skip)
-      .limit(limit)
+      .limit(limit);
 
-    // Calculate pagination info
     const totalPages = Math.ceil(totalCount / limit);
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
 
-    return Response.json({
+    return NextResponse.json({
       inspections,
       pagination: {
         currentPage: page,
@@ -58,58 +53,54 @@ export async function GET(request: NextRequest) {
         totalCount,
         limit,
         hasNextPage,
-        hasPrevPage
-      }
-    })
-  } catch (error) {
-    console.error('Error fetching inspections:', error)
-    // Return empty array when database is unavailable
-    return Response.json({
-      inspections: [],
-      pagination: {
-        currentPage: 1,
-        totalPages: 0,
-        totalCount: 0,
-        limit: 10,
-        hasNextPage: false,
-        hasPrevPage: false
-      }
-    })
-  }
-}
+        hasPrevPage,
+      },
+    });
+  },
+  { requireTenant: true }
+);
 
-export async function POST(request: Request) {
-  try {
-    const session = await getServerSession()
-    if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+// POST /api/inspections - Create inspection for tenant
+export const POST = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
+    await connectToDatabase();
 
-    await connectToDatabase()
-    
-    const body = await request.json()
+    const body = await req.json();
 
-    // Validate that job card exists
-    const jobCard = await JobCard.findById(body.jobCardId)
+    // Validate that job card exists and belongs to tenant
+    const jobCard = await JobCard.findOne({ _id: body.jobCardId, tenantId });
     if (!jobCard) {
-      return Response.json({ error: 'Job card not found' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Job card not found' },
+        { status: 400 }
+      );
     }
 
     // Validate that user exists
-    const user = await User.findById(body.mechanicId)
+    const user = await User.findById(body.mechanicId);
     if (!user) {
-      return Response.json({ error: 'User not found' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 400 }
+      );
     }
 
-    // Validate that template exists (only if provided and not empty)
-    if (body.templateId && body.templateId !== "") {
-      const template = await InspectionTemplate.findById(body.templateId)
+    // Validate that template exists and belongs to tenant (only if provided and not empty)
+    if (body.templateId && body.templateId !== '') {
+      const template = await InspectionTemplate.findOne({
+        _id: body.templateId,
+        tenantId,
+      });
       if (!template) {
-        return Response.json({ error: 'Inspection template not found' }, { status: 400 })
+        return NextResponse.json(
+          { error: 'Inspection template not found' },
+          { status: 400 }
+        );
       }
     }
 
     const inspectionData: any = {
+      tenantId, // Always set tenantId from auth context
       jobCardId: body.jobCardId,
       mechanicId: body.mechanicId,
       inspectionDate: body.inspectionDate,
@@ -117,40 +108,41 @@ export async function POST(request: Request) {
       items: body.items,
       recommendations: body.recommendations,
       nextInspectionMonths: body.nextInspectionMonths || 3,
-      status: body.status || 'in-progress'
-    }
+      status: body.status || 'in-progress',
+    };
 
     // Only add templateId if it's provided and not empty
-    if (body.templateId && body.templateId !== "") {
-      inspectionData.templateId = body.templateId
+    if (body.templateId && body.templateId !== '') {
+      inspectionData.templateId = body.templateId;
     }
 
     // Only add nextInspectionDate if it's provided and not empty
-    if (body.nextInspectionDate && body.nextInspectionDate !== "") {
-      inspectionData.nextInspectionDate = body.nextInspectionDate
+    if (body.nextInspectionDate && body.nextInspectionDate !== '') {
+      inspectionData.nextInspectionDate = body.nextInspectionDate;
     }
 
-    const inspection = new VehicleInspection(inspectionData)
+    const inspection = new VehicleInspection(inspectionData);
 
-    await inspection.save()
+    await inspection.save();
 
     const populatedInspection = await VehicleInspection.findById(inspection._id)
       .populate({
         path: 'jobCardId',
         populate: [
           { path: 'vehicleId', select: 'make model year licensePlate' },
-          { path: 'customerId', select: 'firstName lastName' }
-        ]
+          { path: 'customerId', select: 'firstName lastName' },
+        ],
       })
       .populate('mechanicId', 'firstName lastName displayName')
-      .populate('templateId', 'name')
+      .populate('templateId', 'name');
 
-    return Response.json({ 
-      success: true, 
-      inspection: populatedInspection
-    }, { status: 201 })
-  } catch (error) {
-    console.error('Error creating inspection:', error)
-    return Response.json({ error: 'Failed to create inspection' }, { status: 500 })
-  }
-}
+    return NextResponse.json(
+      {
+        success: true,
+        inspection: populatedInspection,
+      },
+      { status: 201 }
+    );
+  },
+  { requireTenant: true }
+);

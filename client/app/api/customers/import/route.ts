@@ -91,6 +91,7 @@ export async function POST(req: NextRequest) {
           zipCode: row['address.zipCode'] ? row['address.zipCode'].trim() : '',
           country: row['address.country'] ? row['address.country'].trim() : '',
         },
+        tenantId: (session.user as any).tenantId,
       };
     });
 

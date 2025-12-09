@@ -4,8 +4,19 @@ import { useSession } from '@/lib/hooks/useSession'
 
 // Define role-based navigation items
 export const getNavigationItems = (userRole: string) => {
+  // Super Admin gets special navigation
+  if (userRole === 'SUPER_ADMIN') {
+    return [
+      { tKey: 'sidebar.admin', href: '/admin', icon: 'Shield', roles: ['SUPER_ADMIN'] },
+      { tKey: 'sidebar.system', href: '/admin/system', icon: 'Settings', roles: ['SUPER_ADMIN'] },
+      { tKey: 'sidebar.migration', href: '/admin/migrate', icon: 'Database', roles: ['SUPER_ADMIN'] },
+      { tKey: 'sidebar.admin_settings', href: '/admin/settings', icon: 'Settings', roles: ['SUPER_ADMIN'] },
+    ]
+  }
+
   const baseItems = [
     { tKey: 'sidebar.dashboard', href: '/dashboard', icon: 'LayoutDashboard', roles: ['admin', 'mechanic', 'inspector'] },
+    { tKey: 'sidebar.appointments', href: '/appointments', icon: 'Calendar', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.customers', href: '/customers', icon: 'Users', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.vehicles', href: '/vehicles', icon: 'Car', roles: ['admin', 'mechanic', 'inspector'] },
     { tKey: 'sidebar.job_cards', href: '/job-cards', icon: 'ClipboardList', roles: ['admin', 'mechanic', 'inspector'] },
@@ -26,12 +37,25 @@ export const getNavigationItems = (userRole: string) => {
 
   // Combine all items and filter by role
   const allItems = [...baseItems, ...adminOnlyItems]
-  
+
   return allItems.filter(item => item.roles.includes(userRole))
 }
 
 // Role-based permissions
 export const permissions = {
+  SUPER_ADMIN: {
+    canDelete: true,
+    canManageUsers: true,
+    canAccessSettings: true,
+    canAccessReports: true,
+    canCreateUsers: true,
+    canEditUsers: true,
+    canDeleteUsers: true,
+    canViewAllData: true,
+    canManageSystem: true,
+    canAccessAdminPanel: true,
+    canManageTenants: true,
+  },
   admin: {
     canDelete: true,
     canManageUsers: true,
@@ -42,6 +66,8 @@ export const permissions = {
     canDeleteUsers: true,
     canViewAllData: true,
     canManageSystem: true,
+    canAccessAdminPanel: false,
+    canManageTenants: false,
   },
   mechanic: {
     canDelete: false,
@@ -53,6 +79,8 @@ export const permissions = {
     canDeleteUsers: false,
     canViewAllData: true,
     canManageSystem: false,
+    canAccessAdminPanel: false,
+    canManageTenants: false,
   },
   inspector: {
     canDelete: false,
@@ -64,6 +92,8 @@ export const permissions = {
     canDeleteUsers: false,
     canViewAllData: true,
     canManageSystem: false,
+    canAccessAdminPanel: false,
+    canManageTenants: false,
   }
 }
 
@@ -74,6 +104,7 @@ export const hasPermission = (userRole: string, permission: keyof typeof permiss
 
 // Role display names
 export const roleDisplayNames = {
+  SUPER_ADMIN: 'Super Administrator',
   admin: 'Administrator',
   mechanic: 'Mechanic',
   inspector: 'Inspector',
@@ -81,7 +112,8 @@ export const roleDisplayNames = {
 
 // Role descriptions
 export const roleDescriptions = {
-  admin: 'Full system access including user management, settings, and reports. Can delete any data.',
+  SUPER_ADMIN: 'System-wide access. Can manage all tenants, run migrations, and access admin panel. Reserved for platform administrators.',
+  admin: 'Full tenant access including user management, settings, and reports. Can delete any data within their workshop.',
   mechanic: 'Can manage customers, vehicles, appointments, jobs, and estimates. Cannot delete data or access admin features.',
   inspector: 'Can perform vehicle inspections and create estimates. Cannot delete data or access admin features.',
 }

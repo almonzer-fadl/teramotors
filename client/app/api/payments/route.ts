@@ -1,24 +1,15 @@
 import { connectToDatabase } from '@/lib/db';
 import Payment from '../../../lib/models/Payment';
-import { getServerSession } from "@/lib/auth-server";
+import { Invoice } from '@/lib/models';
 import { NextRequest, NextResponse } from 'next/server';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(request: NextRequest) {
-  try {
-    const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin
-    const userRole = (session.user as any).role;
-    if (userRole !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
-    }
-
+// GET /api/payments - List payments for tenant
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
     await connectToDatabase();
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const status = searchParams.get('status') || '';
     const method = searchParams.get('method') || '';
@@ -27,13 +18,13 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get('sortBy') || 'paymentDate';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
-    // Build query
-    const query: any = {};
-    
+    // Build query with tenant filter
+    const query: Record<string, unknown> = { tenantId };
+
     if (status) {
       query.status = status;
     }
-    
+
     if (method) {
       query.paymentMethod = method;
     }
@@ -41,40 +32,35 @@ export async function GET(request: NextRequest) {
     if (search) {
       query.$or = [
         { reference: { $regex: search, $options: 'i' } },
-        { notes: { $regex: search, $options: 'i' } }
+        { notes: { $regex: search, $options: 'i' } },
       ];
     }
 
-    // Calculate pagination
     const skip = (page - 1) * limit;
 
-    // Build sort object
-    const sort: any = {};
+    const sort: Record<string, 1 | -1> = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
-    // Get total count for pagination
     const totalCount = await Payment.countDocuments(query);
 
-    // Get payments with pagination
     const payments = await Payment.find(query)
       .populate({
         path: 'invoiceId',
         populate: [
           {
             path: 'customerId',
-            select: 'firstName lastName'
+            select: 'firstName lastName',
           },
           {
             path: 'vehicleId',
-            select: 'make model year licensePlate'
-          }
-        ]
+            select: 'make model year licensePlate',
+          },
+        ],
       })
       .sort(sort)
       .skip(skip)
       .limit(limit);
 
-    // Calculate pagination info
     const totalPages = Math.ceil(totalCount / limit);
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
@@ -87,80 +73,71 @@ export async function GET(request: NextRequest) {
         totalCount,
         limit,
         hasNextPage,
-        hasPrevPage
-      }
+        hasPrevPage,
+      },
     });
-  } catch (error) {
-    console.error('Error fetching payments:', error);
-    return NextResponse.json({ error: 'Failed to fetch payments' }, { status: 500 });
-  }
-}
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);
 
-export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check if user is admin
-    const userRole = (session.user as any).role;
-    if (userRole !== 'admin') {
-      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
-    }
-
+// POST /api/payments - Create payment for tenant
+export const POST = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
     await connectToDatabase();
 
-    const body = await request.json();
-    const {
-      invoiceId,
-      amount,
-      paymentMethod,
-      paymentDate,
-      reference,
-      notes
-    } = body;
+    const body = await req.json();
+    const { invoiceId, amount, paymentMethod, paymentDate, reference, notes } = body;
 
     // Validate required fields
     if (!invoiceId || !amount || !paymentMethod || !paymentDate) {
-      return NextResponse.json({ 
-        error: 'Missing required fields: invoiceId, amount, paymentMethod, paymentDate' 
-      }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Missing required fields: invoiceId, amount, paymentMethod, paymentDate' },
+        { status: 400 }
+      );
+    }
+
+    // Validate invoice belongs to tenant
+    const invoice = await Invoice.findOne({ _id: invoiceId, tenantId });
+    if (!invoice) {
+      return NextResponse.json(
+        { error: 'Invoice not found or does not belong to your organization' },
+        { status: 400 }
+      );
     }
 
     // Create new payment
     const payment = new Payment({
+      tenantId, // Always set tenantId from auth context
       invoiceId,
+      customerId: invoice.customerId, // Add customerId from the invoice
+      paymentNumber: `PAY-${Date.now()}`, // Generate a unique payment number
       amount: parseFloat(amount),
       paymentMethod,
       paymentDate: new Date(paymentDate),
       reference: reference || '',
       notes: notes || '',
-      status: 'pending'
+      status: 'pending',
     });
 
     await payment.save();
 
-    // Populate the response
     await payment.populate([
       {
         path: 'invoiceId',
         populate: [
           {
             path: 'customerId',
-            select: 'firstName lastName'
+            select: 'firstName lastName',
           },
           {
             path: 'vehicleId',
-            select: 'make model year licensePlate'
-          }
-        ]
-      }
+            select: 'make model year licensePlate',
+          },
+        ],
+      },
     ]);
 
     return NextResponse.json(payment, { status: 201 });
-  } catch (error) {
-    console.error('Error creating payment:', error);
-    return NextResponse.json({ error: 'Failed to create payment' }, { status: 500 });
-  }
-}
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);

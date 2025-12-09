@@ -16,14 +16,17 @@ const Breadcrumbs = () => {
   }
 
   return (
-    <nav aria-label={t('ui.breadcrumb')} className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
-      <ol className="flex items-center space-x-2 text-sm">
+    <nav
+      aria-label={t('ui.breadcrumb')}
+      className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 px-4 sm:px-6 lg:px-8 py-4"
+    >
+      <ol className="flex items-center space-x-1 text-sm">
         <li>
-          <Link 
-            href="/dashboard" 
-            className="flex items-center text-gray-500 hover:text-[#F13F33] transition-colors"
+          <Link
+            href="/dashboard"
+            className="flex items-center px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:text-[#F97402] dark:hover:text-[#F97402] hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
           >
-            <Home className="w-4 h-4 mr-1" />
+            <Home className="w-4 h-4 me-1.5" />
             {t("dashboard.title")}
           </Link>
         </li>
@@ -35,17 +38,19 @@ const Breadcrumbs = () => {
 
           return (
             <li key={href} className="flex items-center">
-              <ChevronRight className="w-4 h-4 text-gray-400 mx-2" />
-              <Link 
-                href={href} 
-                className={`${
-                  isLast 
-                    ? 'font-semibold text-[#063479]' 
-                    : 'text-gray-500 hover:text-[#F13F33] transition-colors'
-                }`}
-              >
-                {title}
-              </Link>
+              <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-600 mx-1" />
+              {isLast ? (
+                <span className="px-3 py-1.5 rounded-lg font-semibold text-[#F97402] bg-[#F97402]/10 dark:bg-[#F97402]/20">
+                  {title}
+                </span>
+              ) : (
+                <Link
+                  href={href}
+                  className="px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:text-[#F97402] dark:hover:text-[#F97402] hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
+                >
+                  {title}
+                </Link>
+              )}
             </li>
           );
         })}

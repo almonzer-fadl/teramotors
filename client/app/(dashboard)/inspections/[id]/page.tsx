@@ -238,8 +238,32 @@ export default function InspectionDetailsPage() {
             console.log('[AUTOMATION STEP 2 SUCCESS] Invoice created for inspection job card:', invoiceData.invoice._id);
             console.log('Invoice total (inspection fee only):', invoiceData.invoice.totalAmount);
 
+            // 3. Send WhatsApp notification
+            console.log('[AUTOMATION STEP 3] Sending WhatsApp notification...');
+            try {
+              await fetch('/api/whatsapp/inspection-completed', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  customerId: inspection.jobCardId.customerId._id,
+                  vehicleMake: inspection.jobCardId.vehicleId.make,
+                  vehicleModel: inspection.jobCardId.vehicleId.model,
+                  itemsChecked: inspection.items.length,
+                  itemsNeedingAttention: itemsNeedingRepair.length,
+                  inspectionFee: invoiceData.invoice.totalAmount,
+                  invoiceNumber: invoiceData.invoice.invoiceNumber,
+                  estimateTotal: estimateData.estimate.total,
+                  serviceCount: estimateData.estimate.services.length
+                }),
+              });
+              console.log('[AUTOMATION STEP 3 SUCCESS] WhatsApp notification sent');
+            } catch (whatsappError) {
+              console.error('[AUTOMATION STEP 3 WARNING] WhatsApp notification failed:', whatsappError);
+              // Don't fail the whole automation if WhatsApp fails
+            }
+
             console.log('[AUTOMATION] All steps completed successfully!');
-            alert('Inspection completed! Estimate and invoice generated successfully. Click "Print Reports" to review and print.');
+            alert('Inspection completed! Estimate and invoice generated successfully. WhatsApp notification sent to customer. Click "Print Reports" to review and print.');
           } catch (autoError) {
             console.error('[AUTOMATION FAILED]', autoError);
             alert(`Inspection marked as completed, but automation failed: ${autoError instanceof Error ? autoError.message : 'Unknown error'}. Please check the console for details.`);

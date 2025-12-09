@@ -3,13 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email';
 import Customer from '@/lib/models/Customer';
 import { connectToDatabase } from '@/lib/db';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await context.params;
+export const POST = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
+    const { id } = await params;
     await connectToDatabase();
 
-    const customer = await Customer.findById(id);
+    const customer = await Customer.findOne({ _id: id, tenantId });
 
     if (!customer) {
       return NextResponse.json({ success: false, error: { message: 'Customer not found' } }, { status: 404 });
@@ -29,8 +30,5 @@ export async function POST(req: NextRequest, context: { params: Promise<{ id: st
     });
 
     return NextResponse.json({ success: true, message: 'Email sent successfully' });
-  } catch (error) {
-    console.error('Error sending email:', error);
-    return NextResponse.json({ success: false, error: { message: 'Error sending email' } }, { status: 500 });
   }
-}
+);

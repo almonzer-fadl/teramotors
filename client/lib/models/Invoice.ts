@@ -1,6 +1,8 @@
 import mongoose, { Document, Schema as MongooseSchema } from 'mongoose';
 
 export interface IInvoice extends Document {
+  tenantId: MongooseSchema.Types.ObjectId;
+  invoiceNumber: string;
   jobCardId?: MongooseSchema.Types.ObjectId;
   inspectionId?: MongooseSchema.Types.ObjectId;
   isInspectionInvoice?: boolean;
@@ -35,22 +37,40 @@ export interface IInvoice extends Document {
 
 const { Schema } = mongoose;
 
-const InvoiceSchema = new Schema({
+const InvoiceSchema = new Schema<IInvoice>({
+  tenantId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Tenant',
+    required: true,
+    index: true,
+  },
+  invoiceNumber: {
+    type: String,
+    required: true,
+  },
   jobCardId: { type: Schema.Types.ObjectId, ref: 'JobCard', required: false },
   inspectionId: { type: Schema.Types.ObjectId, ref: 'VehicleInspection', required: false },
   isInspectionInvoice: { type: Boolean, default: false },
-  customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
-  vehicleId: { type: Schema.Types.ObjectId, ref: 'Vehicle', required: true },
+  customerId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Customer',
+    required: true,
+  },
+  vehicleId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Vehicle',
+    required: true,
+  },
   mechanicId: { type: Schema.Types.ObjectId, ref: 'Mechanic', required: false },
   status: { type: String, enum: ['pending', 'paid', 'cancelled'], default: 'pending' },
   notes: { type: String, required: false },
   totalAmount: { type: Number, required: true, min: 0 },
-  paidAmount: { type: Number, required: false, min: 0 }, // Make optional
+  paidAmount: { type: Number, required: false, min: 0 },
   dueDate: { type: Date, required: true },
-  paymentMethod: { type: String, enum: ['cash', 'card', 'bank_transfer', 'other'], required: false }, // Make optional
+  paymentMethod: { type: String, enum: ['cash', 'card', 'bank_transfer', 'other'], required: false },
   paymentDate: { type: Date, required: false },
   paidAt: { type: Date, required: false },
-  
+
   // ZATCA compliance fields
   zatca: {
     qrCode: { type: String, required: false },
@@ -66,23 +86,51 @@ const InvoiceSchema = new Schema({
       warnings: [{ type: String }]
     }
   },
-  
+
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
+}, {
+  timestamps: true,
 });
-// Add indexes for better query performance
-InvoiceSchema.index({ jobCardId: 1 });
-InvoiceSchema.index({ customerId: 1 });
-InvoiceSchema.index({ vehicleId: 1 });
-InvoiceSchema.index({ mechanicId: 1 });
-InvoiceSchema.index({ status: 1 });
-InvoiceSchema.index({ dueDate: 1 });
-InvoiceSchema.index({ createdAt: -1 });
-InvoiceSchema.index({ 'zatca.invoiceNumber': 1 });
-InvoiceSchema.index({ status: 1, createdAt: 1 });
-InvoiceSchema.index({ inspectionId: 1 });
-InvoiceSchema.index({ isInspectionInvoice: 1 });
 
-const Invoice = (mongoose.models && mongoose.models.Invoice) || mongoose.model('Invoice', InvoiceSchema);
+// Compound indexes with tenantId for proper tenant isolation
+InvoiceSchema.index({ tenantId: 1, invoiceNumber: 1 }, { unique: true });
+InvoiceSchema.index({ tenantId: 1, customerId: 1 });
+InvoiceSchema.index({ tenantId: 1, vehicleId: 1 });
+InvoiceSchema.index({ tenantId: 1, jobCardId: 1 });
+InvoiceSchema.index({ tenantId: 1, inspectionId: 1 });
+InvoiceSchema.index({ tenantId: 1, status: 1 });
+InvoiceSchema.index({ tenantId: 1, dueDate: 1 });
+InvoiceSchema.index({ tenantId: 1, createdAt: -1 });
+InvoiceSchema.index({ tenantId: 1, 'zatca.invoiceNumber': 1 });
+InvoiceSchema.index({ tenantId: 1, status: 1, createdAt: 1 });
+InvoiceSchema.index({ tenantId: 1, isInspectionInvoice: 1 });
+
+// Helper method to find invoices by tenant
+InvoiceSchema.statics.findByTenant = function(
+  tenantId: string | mongoose.Types.ObjectId,
+  filter = {}
+) {
+  return this.find({ tenantId, ...filter });
+};
+
+// Generate next invoice number for tenant
+InvoiceSchema.statics.getNextInvoiceNumber = async function(
+  tenantId: string | mongoose.Types.ObjectId
+) {
+  const lastInvoice = await this.findOne({ tenantId })
+    .sort({ createdAt: -1 })
+    .select('invoiceNumber');
+
+  if (!lastInvoice) {
+    return 'INV-0001';
+  }
+
+  const lastNumber = parseInt(lastInvoice.invoiceNumber.split('-')[1]);
+  const nextNumber = (lastNumber + 1).toString().padStart(4, '0');
+  return `INV-${nextNumber}`;
+};
+
+const Invoice = (mongoose.models && mongoose.models.Invoice) || mongoose.model<IInvoice>('Invoice', InvoiceSchema);
 
 export default Invoice;

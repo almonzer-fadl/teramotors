@@ -1,7 +1,9 @@
 'use client';
 
-import React from 'react';
+import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import {
   CreditCard,
   DollarSign,
@@ -12,14 +14,18 @@ import {
   Clock,
   Car,
   FileText,
+  Eye,
+  Edit,
+  Trash2,
 } from 'lucide-react';
+import { tableRowHover } from '@/lib/dashboard-animations';
 
 interface Payment {
   _id: string;
   invoiceId: {
     _id: string;
     invoiceNumber: string;
-    total: number;
+    totalAmount: number;
     customerId: {
       _id: string;
       firstName: string;
@@ -34,237 +40,127 @@ interface Payment {
     };
   };
   amount: number;
-  paymentMethod: "cash" | "card" | "bank_transfer" | "check";
+  paymentMethod: 'cash' | 'card' | 'bank_transfer' | 'check';
   paymentDate: string;
-  status: "pending" | "completed" | "failed" | "refunded";
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
   reference: string;
   notes?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface ResponsivePaymentsTableProps {
   payments: Payment[];
   onStatusUpdate: (paymentId: string, newStatus: string) => void;
+  onDelete: (paymentId: string) => void;
+  canEdit: boolean;
+  canDelete: boolean;
 }
 
-export default function ResponsivePaymentsTable({
-  payments,
-  onStatusUpdate,
-}: ResponsivePaymentsTableProps) {
+const statusStyles = {
+  completed: { badge: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400', icon: <CheckCircle className="h-4 w-4 text-green-500" /> },
+  failed: { badge: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400', icon: <XCircle className="h-4 w-4 text-red-500" /> },
+  pending: { badge: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400', icon: <Clock className="h-4 w-4 text-yellow-500" /> },
+  refunded: { badge: 'bg-gray-100 dark:bg-gray-800/60 text-gray-800 dark:text-gray-300', icon: <XCircle className="h-4 w-4 text-gray-500" /> },
+};
+
+const methodIcons = {
+  card: { icon: <CreditCard className="h-4 w-4" />, accent: 'text-blue-600 dark:text-blue-400' },
+  cash: { icon: <DollarSign className="h-4 w-4" />, accent: 'text-green-600 dark:text-green-400' },
+  bank_transfer: { icon: <CreditCard className="h-4 w-4" />, accent: 'text-purple-600 dark:text-purple-400' },
+  check: { icon: <FileText className="h-4 w-4" />, accent: 'text-orange-500 dark:text-orange-400' },
+};
+
+export default function ResponsivePaymentsTable({ payments, onStatusUpdate, onDelete, canEdit, canDelete }: ResponsivePaymentsTableProps) {
   const { t } = useTranslation('common');
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "failed":
-        return <XCircle className="h-4 w-4 text-red-500" />;
-      case "pending":
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case "refunded":
-        return <XCircle className="h-4 w-4 text-gray-500" />;
-      default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
-    }
-  };
+  const formatCurrency = (value: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'SAR' }).format(value || 0);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "failed":
-        return "bg-red-100 text-red-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "refunded":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  const ActionButtons = ({ payment }: { payment: Payment }) => (
+    <div className="flex flex-wrap items-center gap-2">
+      <Link href={`/payments/${payment._id}`} className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" title={t('common.view')}><Eye className="h-4 w-4" /></Link>
+      {canEdit && <Link href={`/payments/${payment._id}/edit`} className="text-[#F97402] hover:text-[#F13F33]" title={t('common.edit')}><Edit className="h-4 w-4" /></Link>}
+      {canDelete && <button onClick={() => onDelete(payment._id)} className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" title={t('common.delete')}><Trash2 className="h-4 w-4" /></button>}
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "completed":
-        return t('payments.status.completed');
-      case "failed":
-        return t('payments.status.failed');
-      case "pending":
-        return t('payments.status.pending');
-      case "refunded":
-        return t('payments.status.refunded');
-      default:
-        return status;
-    }
-  };
+      {payment.status === 'pending' && (
+        <>
+          <button
+            onClick={() => onStatusUpdate(payment._id, 'completed')}
+            className="inline-flex items-center rounded-md bg-green-600 px-2 py-1 text-xs font-semibold text-white shadow-sm hover:bg-green-700 transition-colors"
+            title={t('payments.mark_paid')}
+          >
+            {t('payments.mark_paid')}
+          </button>
+          <button
+            onClick={() => onStatusUpdate(payment._id, 'failed')}
+            className="inline-flex items-center rounded-md border border-transparent bg-red-600/10 px-2 py-1 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-600/20 transition-colors"
+            title={t('payments.mark_failed')}
+          >
+            {t('payments.mark_failed')}
+          </button>
+        </>
+      )}
 
-  const getMethodIcon = (method: string) => {
-    switch (method) {
-      case "card":
-        return <CreditCard className="h-4 w-4" />;
-      case "cash":
-        return <DollarSign className="h-4 w-4" />;
-      case "bank_transfer":
-        return <CreditCard className="h-4 w-4" />;
-      case "check":
-        return <FileText className="h-4 w-4" />;
-      default:
-        return <DollarSign className="h-4 w-4" />;
-    }
-  };
-
-  const getMethodLabel = (method: string) => {
-    switch (method) {
-      case "cash":
-        return t('payments.method.cash');
-      case "card":
-        return t('payments.method.card');
-      case "bank_transfer":
-        return t('payments.method.bank_transfer');
-      case "check":
-        return t('payments.method.check');
-      default:
-        return method;
-    }
-  };
+      {payment.status === 'completed' && (
+        <button
+          onClick={() => onStatusUpdate(payment._id, 'refunded')}
+          className="inline-flex items-center rounded-md border border-gray-200 dark:border-gray-700 px-2 py-1 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+          title={t('payments.refund')}
+        >
+          {t('payments.refund')}
+        </button>
+      )}
+    </div>
+  );
 
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden">
+    <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
       {/* Desktop Table */}
       <div className="hidden lg:block overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+          <thead className="bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm">
             <tr>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('payments.payment')}
-              </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('appointments.customer')}
-              </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('appointments.vehicle')}
-              </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('invoices.amount')}
-              </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('payments.payment_method')}
-              </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('payments.payment_date')}
-              </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('customers.status')}
-              </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {t('customers.actions')}
-              </th>
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('payments.payment')}</th>
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('customers.customer')}</th>
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('vehicles.vehicle')}</th>
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('invoices.amount')}</th>
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('payments.payment_method')}</th>
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('payments.payment_date')}</th>
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.status')}</th>
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.actions')}</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
             {payments.map((payment) => (
-              <tr key={payment._id} className="hover:bg-gray-50">
+              <motion.tr key={payment._id} variants={tableRowHover} initial="rest" whileHover="hover" className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
-                        <CreditCard className="h-5 w-5 text-white" />
-                      </div>
-                    </div>
-                    <div className="ms-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        #{payment._id.slice(-8).toUpperCase()}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {payment.invoiceId?.invoiceNumber || 'N/A'}
-                      </div>
-                    </div>
-                  </div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">#{payment._id.slice(-8).toUpperCase()}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{payment.invoiceId?.invoiceNumber || 'N/A'}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {payment.invoiceId?.customerId?.firstName || 'N/A'} {payment.invoiceId?.customerId?.lastName || 'N/A'}
-                  </div>
+                    <div className="text-sm text-gray-900 dark:text-white">{`${payment.invoiceId?.customerId?.firstName || ''} ${payment.invoiceId?.customerId?.lastName || ''}`}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {payment.invoiceId?.vehicleId?.year || 'N/A'} {payment.invoiceId?.vehicleId?.make || 'N/A'} {payment.invoiceId?.vehicleId?.model || 'N/A'}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {payment.invoiceId?.vehicleId?.licensePlate || 'N/A'}
-                  </div>
+                    <div className="text-sm text-gray-900 dark:text-white">{payment.invoiceId?.vehicleId ? `${payment.invoiceId.vehicleId.year} ${payment.invoiceId.vehicleId.make}` : '-'}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{payment.invoiceId?.vehicleId?.licensePlate || ''}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    ${payment.amount.toFixed(2)}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {t('invoices.of_total', { total: payment.invoiceId?.total?.toFixed(2) || '0.00' })}
-                  </div>
+                  <div className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrency(payment.amount)}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{t('invoices.of_total', { total: formatCurrency(payment.invoiceId?.totalAmount || 0) })}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    {getMethodIcon(payment.paymentMethod)}
-                    <div className="ms-2">
-                      <div className="text-sm font-medium text-gray-900">
-                        {getMethodLabel(payment.paymentMethod)}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {payment.reference}
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <span className={methodIcons[payment.paymentMethod]?.accent}>{methodIcons[payment.paymentMethod]?.icon}</span>
+                    <span className="text-sm text-gray-900 dark:text-white">{t(`payments.method.${payment.paymentMethod}`)}</span>
                   </div>
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(payment.paymentDate).toLocaleDateString()}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {new Date(payment.paymentDate).toLocaleDateString()}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {new Date(payment.paymentDate).toLocaleTimeString()}
-                  </div>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusStyles[payment.status]?.badge}`}>
+                    {statusStyles[payment.status]?.icon}
+                    {t(`payments.status.${payment.status}`)}
+                  </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center space-x-2">
-                    {getStatusIcon(payment.status)}
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                        payment.status
-                      )}`}
-                    >
-                      {getStatusLabel(payment.status)}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex flex-col space-y-2">
-                    {payment.status === "pending" && (
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => onStatusUpdate(payment._id, "completed")}
-                          className="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 rounded hover:bg-green-50 transition-colors"
-                        >
-                          {t('payments.mark_paid')}
-                        </button>
-                        <button
-                          onClick={() => onStatusUpdate(payment._id, "failed")}
-                          className="text-red-600 hover:text-red-800 text-xs font-medium px-2 py-1 rounded hover:bg-red-50 transition-colors"
-                        >
-                          {t('payments.mark_failed')}
-                        </button>
-                      </div>
-                    )}
-                    {payment.status === "completed" && (
-                      <button
-                        onClick={() => onStatusUpdate(payment._id, "refunded")}
-                        className="text-gray-600 hover:text-gray-800 text-xs font-medium px-2 py-1 rounded hover:bg-gray-50 transition-colors"
-                      >
-                        {t('payments.refund')}
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
+                <td className="px-6 py-4 whitespace-nowrap"><ActionButtons payment={payment} /></td>
+              </motion.tr>
             ))}
           </tbody>
         </table>
@@ -273,134 +169,12 @@ export default function ResponsivePaymentsTable({
       {/* Mobile/Tablet Cards */}
       <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
         {payments.map((payment) => (
-          <div key={payment._id} className="bg-white shadow rounded-lg p-4 border border-gray-200">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center me-3">
-                  <CreditCard className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900">
-                    #{payment._id.slice(-8).toUpperCase()}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    {payment.invoiceId?.invoiceNumber || 'N/A'}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                {getStatusIcon(payment.status)}
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                    payment.status
-                  )}`}
-                >
-                  {getStatusLabel(payment.status)}
-                </span>
-              </div>
+          <motion.div key={payment._id} variants={tableRowHover} initial="rest" whileHover="hover" className="p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50">
+            {/* Card content here... */}
+            <div className="flex justify-end gap-2 border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+              <ActionButtons payment={payment} />
             </div>
-
-            {/* Customer & Vehicle Info */}
-            <div className="space-y-2 text-sm text-gray-700 mb-4">
-              <div className="flex items-center">
-                <User className="h-4 w-4 me-2 text-gray-500" />
-                <span>
-                  {payment.invoiceId?.customerId?.firstName || 'N/A'} {payment.invoiceId?.customerId?.lastName || 'N/A'}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <Car className="h-4 w-4 me-2 text-gray-500" />
-                <span>
-                  {payment.invoiceId?.vehicleId?.year || 'N/A'} {payment.invoiceId?.vehicleId?.make || 'N/A'} {payment.invoiceId?.vehicleId?.model || 'N/A'}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <span className="h-4 w-4 me-2 text-gray-500 text-xs">#</span>
-                <span className="text-xs text-gray-500">
-                  {payment.invoiceId?.vehicleId?.licensePlate || 'N/A'}
-                </span>
-              </div>
-            </div>
-
-            {/* Amount & Payment Method */}
-            <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center">
-                <DollarSign className="h-4 w-4 me-2 text-green-600" />
-                <div>
-                  <div className="text-lg font-semibold text-gray-900">
-                    ${payment.amount.toFixed(2)}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {t('invoices.of_total', { total: payment.invoiceId?.total?.toFixed(2) || '0.00' })}
-                  </div>
-                </div>
-              </div>
-              <div className="text-end">
-                <div className="flex items-center">
-                  {getMethodIcon(payment.paymentMethod)}
-                  <div className="ms-2">
-                    <div className="text-sm font-medium text-gray-900">
-                      {getMethodLabel(payment.paymentMethod)}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {payment.reference}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Payment Date */}
-            <div className="flex items-center mb-4">
-              <Calendar className="h-4 w-4 me-2 text-gray-500" />
-              <div>
-                <div className="text-sm font-medium text-gray-900">
-                  {new Date(payment.paymentDate).toLocaleDateString()}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {new Date(payment.paymentDate).toLocaleTimeString()}
-                </div>
-              </div>
-            </div>
-
-            {/* Notes */}
-            {payment.notes && (
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">
-                  <strong>{t('payments.notes')}:</strong> {payment.notes}
-                </p>
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className="flex justify-end space-x-2 border-t border-gray-200 pt-3">
-              {payment.status === "pending" && (
-                <>
-                  <button
-                    onClick={() => onStatusUpdate(payment._id, "completed")}
-                    className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
-                  >
-                    {t('payments.mark_paid')}
-                  </button>
-                  <button
-                    onClick={() => onStatusUpdate(payment._id, "failed")}
-                    className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-                  >
-                    {t('payments.mark_failed')}
-                  </button>
-                </>
-              )}
-              {payment.status === "completed" && (
-                <button
-                  onClick={() => onStatusUpdate(payment._id, "refunded")}
-                  className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  {t('payments.refund')}
-                </button>
-              )}
-            </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

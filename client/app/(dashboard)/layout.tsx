@@ -2,319 +2,126 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useSession } from "@/lib/hooks/useSession";
-import { signOut } from "@/lib/simple-auth-client";
+import { usePathname, useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/dashboard/Breadcrumbs";
-import ToastProvider from "@/components/dashboard/ToastProvider";
-import { getNavigationItems } from "@/lib/roles";
-import { socket } from "@/lib/services/socket";
-import {
-  LayoutDashboard,
-  Users,
-  Car,
-  ClipboardList,
-  FileText,
-  Package,
-  Search,
-  CreditCard,
-  BarChart3,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  Bell,
-  Wrench,
-  MessageSquare,
-} from "lucide-react";
+import { Loader2 } from 'lucide-react';
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/dashboard/LanguageSwitcher";
 import { NotificationBell } from "@/components/dashboard/NotificationBell";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import DashboardThemeProvider from "./DashboardThemeProvider";
+import Sidebar from "@/components/dashboard/Sidebar"; 
+import TopBarLogo from "@/components/dashboard/TopBarLogo"; 
+import StaticSidebarToggle from "@/components/dashboard/StaticSidebarToggle";
+import { SidebarProvider, useSidebar } from "@/lib/contexts/SidebarContext";
+import AdminHeader from "@/components/dashboard/AdminHeader";
+import { useSession } from "@/lib/hooks/useSession";
+import Tour from "@/components/dashboard/Tour";
 
-// Icon mapping for dynamic navigation
-const iconMap = {
-  LayoutDashboard,
-  Users,
-  Car,
-  ClipboardList,
-  FileText,
-  Package,
-  Search,
-  CreditCard,
-  BarChart3,
-  Settings,
-  Wrench,
-  MessageSquare,
-};
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
+  const [onboardingState, setOnboardingState] = useState<{completed: boolean, step: number} | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const { user, isLoading } = useSession(); // Get isLoading state
+  const { setSidebarOpen } = useSidebar();
+
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
+
+  useEffect(() => {
+    if (user && user.tenantId && !isSuperAdmin) {
+      const fetchOnboardingStatus = async () => {
+          try {
+              const response = await fetch('/api/settings/company-profile');
+              if (response.ok) {
+                  const data = await response.json();
+                  const onboarding = data.settings?.onboardingState;
+                  if(onboarding) {
+                      setOnboardingState(onboarding);
+                  }
+              }
+          } catch (error) {
+              console.error("Failed to fetch onboarding status", error);
+          }
+      };
+      fetchOnboardingStatus();
+    }
+  }, [user, isSuperAdmin]);
+
+  useEffect(() => {
+    if (!isSuperAdmin && onboardingState && !onboardingState.completed && pathname !== '/onboarding') {
+        router.replace('/onboarding');
+    }
+
+    if (pathname === '/dashboard' || pathname === '/admin') {
+      const timer1 = setTimeout(() => {
+          setSidebarOpen(true);
+          const timer2 = setTimeout(() => {
+              setSidebarOpen(false);
+          }, 1000);
+          return () => clearTimeout(timer2);
+      }, 500);
+      return () => clearTimeout(timer1);
+    }
+  }, [onboardingState, pathname, router, isSuperAdmin, setSidebarOpen]);
+
+  // Render a loading screen while session is being fetched
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-gray-100/50 dark:bg-black">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Sidebar />
+      <div className="min-h-screen bg-gray-100/50 dark:bg-black">
+        <div className="flex flex-col min-h-screen">
+          {isSuperAdmin ? (
+            <AdminHeader />
+          ) : (
+            <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200/80 dark:border-white/10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg px-4 sm:gap-x-6 sm:px-6 lg:px-8">
+              <div className="flex h-16 flex-1 items-center gap-x-4 self-stretch lg:gap-x-6">
+                  <StaticSidebarToggle />
+                  <div id="tour-step-1-logo" className="pl-4">
+                      <TopBarLogo />
+                  </div>
+                  <div className="flex-1"></div>
+                  <div className="flex items-center gap-x-4 lg:gap-x-6">
+                      <Tour />
+                      <LanguageSwitcher />
+                      <div id="tour-step-2-theme-toggle">
+                          <ThemeToggle />
+                      </div>
+                      <NotificationBell />
+                  </div>
+              </div>
+            </header>
+          )}
+
+          <main className="py-10 flex-1">
+            <div className="px-4 sm:px-6 lg:px-8">
+              <Breadcrumbs />
+              <div className="mt-4">{children}</div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </>
+  );
+}
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const pathname = usePathname();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(pathname === '/dashboard');
-  const { user } = useSession();
-  const { t } = useTranslation("common");
-
-  // Get role-based navigation items
-  const userRole = (user as any)?.role || "mechanic";
-  const navigation = getNavigationItems(userRole);
-
-  // Auto-collapse sidebar on dashboard
-  useEffect(() => {
-    setSidebarCollapsed(pathname === '/dashboard');
-  }, [pathname]);
-
-  useEffect(() => {
-    socket.connect();
-    console.log("Connecting to socket...");
-
-    return () => {
-      socket.disconnect();
-      console.log("Disconnecting from socket...");
-    };
-  }, []);
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile sidebar */}
-      <div
-        className={`fixed inset-0 z-50 lg:hidden ${
-          sidebarOpen ? "block" : "hidden"
-        }`}
-      >
-        <div
-          className="fixed inset-0 bg-gray-600 bg-opacity-75"
-          onClick={() => setSidebarOpen(false)}
-        />
-        <div className="fixed inset-y-0 start-0 flex w-72 flex-col bg-white shadow-2xl">
-          <div className="flex h-20 items-center justify-between px-6 bg-gradient-to-r from-[#063479] to-[#052a5f]">
-            <div className="flex items-center">
-              <img 
-                src="/icon.png" 
-                alt={t('ui.teramotors_logo')} 
-                className="w-12 h-12 rounded-xl mr-3 object-contain bg-white p-1"
-              />
-              <div className="flex flex-col">
-                  <span className="flex items-center space-x-2">
-                    <span className="text-2xl font-extrabold tracking-tight text-white drop-shadow-sm font-logo" style={{ letterSpacing: '0.04em' }}>
-                      Tera
-                      <span className="text-[#F13F33]">Motors</span>
-                    </span>
-                  </span>
-                  <span className="text-xs font-semibold uppercase tracking-widest text-white bg-blue-900/40 rounded px-2 py-0.5 mt-1 self-start shadow-sm" style={{ letterSpacing: '0.15em' }}>
-                    Auto Repair
-                  </span>
-                </div>
-              
-            </div>
-            <button 
-              onClick={() => setSidebarOpen(false)}
-              className="text-white hover:text-blue-200 transition-colors"
-            >
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          <nav className="flex-1 px-6 py-6">
-            <ul className="space-y-3">
-              {navigation.map((item) => {
-                const Icon = iconMap[item.icon as keyof typeof iconMap];
-                return (
-                  <li key={item.tKey}>
-                    <Link
-                      href={item.href}
-                      className={`flex items-center rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-                        pathname === item.href
-                          ? "bg-[#F13F33] text-white shadow-lg"
-                          : "text-gray-700 hover:bg-gray-100 hover:text-[#F13F33]"
-                      }`}
-                      onClick={() => setSidebarOpen(false)}
-                    >
-                      <Icon className="mr-3 h-5 w-5" />
-                      {t(item.tKey)}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-          
-          {/* User profile and sign out at bottom */}
-          <div className="border-t border-gray-200 p-6">
-            <div className="flex items-center gap-x-3 mb-4">
-              <div className="w-10 h-10 bg-[#F13F33] rounded-xl flex items-center justify-center">
-                <Users className="h-5 w-5 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold text-gray-900">
-                  {user?.name}
-                </span>
-                <span className="text-xs text-gray-500">
-                  {t(`roles.${userRole}.name`)}
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                signOut();
-                setSidebarOpen(false);
-              }}
-              className="flex items-center gap-x-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium w-full"
-            >
-              <LogOut className="h-4 w-4" />
-              {t("header.sign_out")}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop sidebar */}
-      <div className={`hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-all duration-300 ${
-        sidebarCollapsed ? 'lg:w-0 lg:opacity-0 lg:pointer-events-none' : 'lg:w-72'
-      }`}>
-        <div className="flex flex-grow flex-col overflow-y-auto bg-white shadow-2xl">
-          <div className="flex h-20 items-center px-6 bg-gradient-to-r from-[#063479] to-[#052a5f]">
-            <div className="flex items-center">
-              <img 
-                src="/icon.png" 
-                alt={t('ui.teramotors_logo')} 
-                className="w-12 h-12 rounded-xl mr-3 object-contain bg-white p-1"
-              />
-              {!sidebarCollapsed && (
-                <div className="flex flex-col">
-                  <span className="flex items-center space-x-2">
-                    <span className="text-2xl font-extrabold tracking-tight text-white drop-shadow-sm font-logo" style={{ letterSpacing: '0.04em' }}>
-                      Tera
-                      <span className="text-[#F13F33]">Motors</span>
-                    </span>
-                  </span>
-                  <span className="text-xs font-semibold uppercase tracking-widest text-white bg-blue-900/40 rounded px-2 py-0.5 mt-1 self-start shadow-sm" style={{ letterSpacing: '0.15em' }}>
-                    Auto Repair
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-          <nav className="flex-1 px-6 py-6">
-            <ul className="space-y-3">
-              {navigation.map((item) => {
-                const Icon = iconMap[item.icon as keyof typeof iconMap];
-                return (
-                  <li key={item.tKey}>
-                    <Link
-                      href={item.href}
-                      className={`flex items-center rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300 ${
-                        pathname === item.href
-                          ? "bg-[#F13F33] text-white shadow-lg"
-                          : "text-gray-700 hover:bg-gray-100 hover:text-[#F13F33]"
-                      } ${sidebarCollapsed ? 'justify-center' : ''}`}
-                      title={sidebarCollapsed ? t(item.tKey) : undefined}
-                    >
-                      <Icon className={`h-5 w-5 ${sidebarCollapsed ? '' : 'me-3'}`} />
-                      {!sidebarCollapsed && t(item.tKey)}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          {/* Desktop user profile at bottom of sidebar - only show when sidebar is expanded */}
-          {!sidebarCollapsed && (
-            <div className="hidden lg:block mt-auto p-4 border-t border-gray-200">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-[#F13F33] rounded-xl flex items-center justify-center">
-                  <Users className="h-5 w-5 text-white" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-gray-900">
-                    {user?.name}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {t(`roles.${userRole}.name`)}
-                  </span>
-                </div>
-              </div>
-              <button
-                onClick={() => signOut()}
-                className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium w-full"
-              >
-                <LogOut className="h-4 w-4" />
-                {t("header.sign_out")}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ps-0' : 'lg:ps-72'}`}>
-        <ToastProvider />
-        {/* Top bar */}
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-          <button
-            type="button"
-            className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-
-          {/* Desktop sidebar toggle */}
-          <button
-            type="button"
-            className="hidden lg:block -m-2.5 p-2.5 text-gray-700 hover:text-[#F13F33] transition-colors"
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
-
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <div className="flex flex-1"></div>
-            <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <LanguageSwitcher />
-              <NotificationBell />
-
-              {/* Desktop user profile - only show when sidebar is collapsed */}
-              {sidebarCollapsed && (
-                <div className="hidden lg:flex items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#F13F33] rounded-xl flex items-center justify-center">
-                      <Users className="h-5 w-5 text-white" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-gray-900">
-                        {user?.name}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {t(`roles.${userRole}.name`)}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => signOut()}
-                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#F13F33] transition-colors font-medium"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    {t("header.sign_out")}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Page content */}
-        <main>
-          <div className="mx-auto max-w-7xl">
-            <Breadcrumbs />
-            {children}
-          </div>
-        </main>
-      </div>
-    </div>
+    <SidebarProvider>
+      <DashboardThemeProvider>
+        <DashboardLayoutContent>{children}</DashboardLayoutContent>
+      </DashboardThemeProvider>
+    </SidebarProvider>
   );
 }

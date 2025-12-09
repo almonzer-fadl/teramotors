@@ -12,7 +12,12 @@ export async function POST(request: NextRequest) {
 
     await connectToDatabase();
 
-    const parts = await Part.find({});
+    const tenantId = (session.user as any).tenantId;
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant ID not found' }, { status: 400 });
+    }
+
+    const parts = await Part.find({ tenantId });
     
     if (parts.length === 0) {
       return NextResponse.json({ message: 'No parts found to update.' });

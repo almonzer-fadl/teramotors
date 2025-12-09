@@ -1,24 +1,19 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Plus,
-  Edit,
-  Trash2,
-  Eye,
-  Phone,
-  Mail,
-  MapPin,
   Users,
-  ArrowUpDown,
 } from "lucide-react";
-import Search from "@/components/dashboard/Search";
+import { motion } from "framer-motion";
 import Pagination from "@/components/ui/Pagination";
 import ResponsiveTable from "@/components/ui/ResponsiveTable";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
+import { fadeInUp } from "@/lib/dashboard-animations";
+import { useReferenceData } from "@/lib/stores/referenceDataStore";
 
 interface Customer {
   _id: string;
@@ -68,20 +63,11 @@ export default function CustomersPage() {
   });
   const router = useRouter();
 
-  useEffect(() => {
-    fetchCustomers(searchTerm, sortKey, sortDirection, currentPage, itemsPerPage);
-  }, [searchTerm, sortKey, sortDirection, currentPage, itemsPerPage]);
+  // Use global cache invalidation
+  const { invalidateCustomers } = useReferenceData();
 
-  useEffect(() => {
-    socket.on("update-customers", () => {
-      fetchCustomers(searchTerm, sortKey, sortDirection, currentPage, itemsPerPage);
-    });
-    return () => {
-      socket.off("update-customers");
-    };
-  });
-
-  const fetchCustomers = async (
+  // Debounced fetch
+  const fetchCustomers = useCallback(async (
     search: string,
     sort: SortKey,
     direction: SortDirection,
@@ -90,8 +76,8 @@ export default function CustomersPage() {
   ) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ 
-        search, 
+      const params = new URLSearchParams({
+        search,
         sortBy: sort === "name" ? "firstName" : sort,
         sortOrder: direction,
         page: page.toString(),
@@ -143,7 +129,24 @@ export default function CustomersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Fetch customers on initial load and when sort/pagination changes (NOT on search - handled locally)
+  useEffect(() => {
+    fetchCustomers("", sortKey, sortDirection, currentPage, itemsPerPage);
+  }, [sortKey, sortDirection, currentPage, itemsPerPage, fetchCustomers]);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      fetchCustomers("", sortKey, sortDirection, currentPage, itemsPerPage);
+      invalidateCustomers(); // Invalidate cache when customers are updated
+    };
+
+    socket.on("update-customers", handleUpdate);
+    return () => {
+      socket.off("update-customers", handleUpdate);
+    };
+  }, [sortKey, sortDirection, currentPage, itemsPerPage, fetchCustomers, invalidateCustomers]);
 
   const fetchCustomerSuggestions = async (
     query: string
@@ -175,7 +178,19 @@ export default function CustomersPage() {
   };
 
   // Remove client-side sorting since we're now doing it server-side
-  const sortedCustomers = customers;
+  // Filter customers based on search term (name, email, phone)
+  const filteredCustomers = customers.filter(customer => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      customer.firstName?.toLowerCase().includes(search) ||
+      customer.lastName?.toLowerCase().includes(search) ||
+      customer.email?.toLowerCase().includes(search) ||
+      customer.phone?.toLowerCase().includes(search)
+    );
+  });
+
+  const sortedCustomers = filteredCustomers;
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -202,9 +217,10 @@ export default function CustomersPage() {
         const response = await fetch(`/api/customers/${id}`, {
           method: "DELETE",
         });
-        
+
         if (response.ok) {
           setCustomers(customers.filter((c) => c._id !== id));
+          invalidateCustomers(); // Invalidate cache after deletion
           alert(t("customers.delete_success"));
         } else {
           const errorData = await response.json();
@@ -220,80 +236,104 @@ export default function CustomersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 py-6">
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        {/* Header - Only animate this section */}
+        <motion.div
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+        >
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
               {t("customers.title")}
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-2 text-base text-gray-700 dark:text-gray-300">
               {t("customers.description")}
             </p>
           </div>
-          <div className="flex-shrink-0">
-            <Link
-              href="/customers/new"
-              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
-            >
-              <Plus className="me-2 h-4 w-4" />
-              {t("customers.add_customer")}
-            </Link>
-          </div>
+          <Link
+            id="tour-step-4-add-customer"
+            href="/customers/new"
+            className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+          >
+            <Plus className="me-2 h-5 w-5" />
+            {t("customers.add_customer")}
+          </Link>
+        </motion.div>
+
+        {/* Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-6 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Customers</h3>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{pagination.totalCount}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+            </div>
+            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl p-6 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Active Customers</h3>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">{customers.filter(c => c.isActive).length}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+            </div>
         </div>
 
         {/* Search and Stats */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+          <div className="px-6 py-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="w-full sm:w-1/2">
-                <Search
-                  placeholder={t("customers.search_placeholder")}
-                  fetchSuggestions={fetchCustomerSuggestions}
-                  onSearch={(customer: Customer) =>
-                    router.push(`/customers/${customer._id}`)
-                  }
-                  renderSuggestion={(customer: Customer) => (
-                    <div>
-                      <p className="font-medium">
-                        {customer.firstName} {customer.lastName}
-                      </p>
-                      <p className="text-sm text-gray-500">{customer.email}</p>
-                    </div>
-                  )}
+                <input
+                  type="text"
+                  placeholder={t('customers.search_placeholder')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                 />
               </div>
-              <div className="text-sm text-gray-500 text-center sm:text-end">
+              <div className="text-sm font-medium text-gray-600 dark:text-gray-400 text-center sm:text-end uppercase tracking-wider">
                 {t(
-                  pagination.totalCount === 1
+                  filteredCustomers.length === 1
                     ? "customers.customer_count"
                     : "customers.customer_count_plural",
-                  { count: pagination.totalCount }
+                  { count: filteredCustomers.length }
                 )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Customers Table */}
-        <ResponsiveTable
-          customers={sortedCustomers}
-          onDelete={handleDelete}
-          onSort={handleSort}
-          sortKey={sortKey}
-          sortDirection={sortDirection}
-        />
+        {/* Customers Table - No animation */}
+        <div>
+          <ResponsiveTable
+            customers={sortedCustomers}
+            onDelete={handleDelete}
+            onSort={handleSort}
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+          />
+        </div>
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 rounded-lg shadow">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-gray-800/30">
             <Pagination
               currentPage={pagination.currentPage}
               totalPages={pagination.totalPages}
@@ -309,23 +349,25 @@ export default function CustomersPage() {
 
         {/* Empty State */}
         {sortedCustomers.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <Users className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium text-gray-900">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-12 text-center">
+            <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl flex items-center justify-center">
+              <Users className="h-10 w-10 text-gray-400 dark:text-gray-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
               {t("customers.no_customers_found")}
             </h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-3 text-base text-gray-700 dark:text-gray-300">
               {searchTerm
                 ? t("customers.adjust_search")
                 : t("customers.get_started")}
             </p>
             {!searchTerm && (
-              <div className="mt-6">
+              <div className="mt-8">
                 <Link
                   href="/customers/new"
-                  className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+                  className="inline-flex items-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                 >
-                  <Plus className="me-2 h-4 w-4" />
+                  <Plus className="me-2 h-5 w-5" />
                   {t("customers.add_customer")}
                 </Link>
               </div>

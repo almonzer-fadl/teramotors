@@ -20,8 +20,10 @@ import {
   ChevronRight,
   Trash2,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/lib/hooks/useSession';
+import { fadeInUp, staggerContainer, scaleIn } from '@/lib/dashboard-animations';
 
 interface JobCard {
   _id: string;
@@ -101,39 +103,39 @@ export default function ResponsiveJobCardsGrid({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-green-500 dark:text-green-400" />;
       case "in-progress":
-        return <Clock className="h-4 w-4 text-blue-500" />;
+        return <Clock className="h-4 w-4 text-blue-500 dark:text-blue-400" />;
       case "cancelled":
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-red-500 dark:text-red-400" />;
       default:
-        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+        return <AlertCircle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border-green-200 dark:border-green-800";
       case "in-progress":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-200 dark:border-blue-800";
       case "cancelled":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-200 dark:border-red-800";
       default:
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "urgent":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-200 dark:border-red-800";
       case "high":
-        return "bg-orange-100 text-orange-800 border-orange-200";
+        return "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 border-orange-200 dark:border-orange-800";
       case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-700";
     }
   };
 
@@ -185,46 +187,61 @@ export default function ResponsiveJobCardsGrid({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
-      <div className="space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 py-6">
+      <motion.div
+        className="space-y-6"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <motion.div
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          variants={fadeInUp}
+        >
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('job_cards.title')}</h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">{t('job_cards.title')}</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {t('job_cards.description')}
             </p>
           </div>
-          <div className="flex-shrink-0">
+          <motion.div
+            className="flex-shrink-0"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
             <Link
               href="/job-cards/new"
-              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-[#F97402] hover:bg-[#F13F33] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300"
             >
               <Plus className="me-2 h-4 w-4" />
               {t('job_cards.create')}
             </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Search and Filters */}
-        <div className="bg-white shadow rounded-lg">
+        <motion.div
+          className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800"
+          variants={scaleIn}
+        >
           <div className="px-4 py-5 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-1">
                 <div className="relative flex-1 sm:max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                   <input
                     type="text"
                     placeholder={t('job_cards.search_placeholder')}
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-[#F97402] focus:border-[#F97402] transition-all"
                   />
                 </div>
                 <select
                   value={statusFilter}
                   onChange={(e) => onStatusFilterChange(e.target.value)}
-                  className="rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
+                  className="rounded-lg border-gray-300 dark:border-gray-700 shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-[#F97402] focus:ring-[#F97402] px-3 py-2"
                 >
                   <option value="active">{t('job_cards.active_jobs')}</option>
                   <option value="all">{t('appointments.all_status')}</option>
@@ -234,23 +251,28 @@ export default function ResponsiveJobCardsGrid({
                   <option value="cancelled">{t('appointments.cancelled')}</option>
                 </select>
               </div>
-              <div className="text-sm text-gray-500 text-center sm:text-end">
+              <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-end">
                 {t(jobCards.length === 1 ? 'job_cards.job_card_count' : 'job_cards.job_card_count_plural', { count: jobCards.length })}
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Job Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+          variants={staggerContainer}
+        >
           {jobCards.map((jobCard) => (
-            <div
+            <motion.div
               key={jobCard._id}
-              className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col"
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-2xl transition-all duration-300 flex flex-col"
+              variants={scaleIn}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
             >
               {/* Active Workers moved under header near ID */}
               {/* Card Header */}
-              <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+              <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
                     {getStatusIcon(jobCard.status)}
@@ -275,7 +297,7 @@ export default function ResponsiveJobCardsGrid({
                   {activeWorkersMap[jobCard._id]?.isSelfActive ? (
                     <button
                       onClick={async () => { try { await fetch(`/api/job-cards/${jobCard._id}/work/stop`, { method: 'POST' }); } catch {} finally { try { const res = await fetch(`/api/job-cards/${jobCard._id}/work/active`); const data = await res.json(); setActiveWorkersMap(prev => ({ ...prev, [jobCard._id]: { names: (data.logs||[]).map((l:any)=>l.userId?.displayName||`${l.userId?.firstName||''} ${l.userId?.lastName||''}`.trim()).filter(Boolean), isSelfActive: false } })) } catch {} } }}
-                      className="ml-2 inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-white bg-gray-700 hover:bg-gray-800"
+                      className="ml-2 inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-white bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-700 transition-colors"
                       title={t('job_cards.stop_work')}
                     >
                       <Clock className="h-3 w-3 mr-1" /> {t('job_cards.stop')}
@@ -283,7 +305,7 @@ export default function ResponsiveJobCardsGrid({
                   ) : (
                     <button
                       onClick={async () => { try { await fetch(`/api/job-cards/${jobCard._id}/work/start`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }); } catch {} finally { try { const res = await fetch(`/api/job-cards/${jobCard._id}/work/active`); const data = await res.json(); const names = (data.logs||[]).map((l:any)=>l.userId?.displayName||`${l.userId?.firstName||''} ${l.userId?.lastName||''}`.trim()).filter(Boolean); setActiveWorkersMap(prev => ({ ...prev, [jobCard._id]: { names, isSelfActive: true } })) } catch {} } }}
-                      className="ml-2 inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-white bg-blue-600 hover:bg-blue-700"
+                      className="ml-2 inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-white bg-[#F97402] hover:bg-[#F13F33] transition-colors"
                       title={t('job_cards.start_work')}
                     >
                       <Clock className="h-3 w-3 mr-1" /> {t('job_cards.start')}
@@ -291,13 +313,13 @@ export default function ResponsiveJobCardsGrid({
                   )}
                   </div>
                 </div>
-                
+
                 {/* Job Card ID */}
-                <div className="text-xs text-gray-500 font-mono">
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">
                   #{jobCard._id.slice(-8).toUpperCase()}
                 </div>
                 {/* Active Workers under header */}
-                <div className="text-xs text-gray-500 font-mono mt-1">
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-1">
                   {activeWorkersMap[jobCard._id]?.names?.length
                     ? `${t('job_cards.active_workers')}: ${activeWorkersMap[jobCard._id].names.join(', ')}`
                     : t('job_cards.no_active_workers')}
@@ -309,32 +331,32 @@ export default function ResponsiveJobCardsGrid({
                 {/* Customer & Vehicle */}
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="h-5 w-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                      <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900 truncate">
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                         {jobCard.customerId.firstName} {jobCard.customerId.lastName}
                       </div>
-                      <div className="text-xs text-gray-500">{t('job_cards.customer')}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{t('job_cards.customer')}</div>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <Car className="h-5 w-5 text-green-600" />
+                    <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                      <Car className="h-5 w-5 text-green-600 dark:text-green-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-gray-900 truncate">
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                         {jobCard.vehicleId ? (
                           `${jobCard.vehicleId.year} ${jobCard.vehicleId.make} ${jobCard.vehicleId.model}`
                         ) : (
-                          <span className="text-gray-400 italic">No vehicle data</span>
+                          <span className="text-gray-400 dark:text-gray-500 italic">No vehicle data</span>
                         )}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         {jobCard.vehicleId?.licensePlate || (
-                          <span className="text-gray-400 italic">N/A</span>
+                          <span className="text-gray-400 dark:text-gray-500 italic">N/A</span>
                         )}
                       </div>
                     </div>
@@ -344,17 +366,17 @@ export default function ResponsiveJobCardsGrid({
 
                 {/* Services */}
                 <div className="space-y-2">
-                  <div className="flex items-center text-sm font-medium text-gray-700">
-                    <Wrench className="h-4 w-4 me-2 text-gray-400" />
+                  <div className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <Wrench className="h-4 w-4 me-2 text-gray-400 dark:text-gray-500" />
                     {t('job_cards.services_label')}
                   </div>
                   <div className="space-y-1">
                     {jobCard.services.slice(0, 3).map((service, index) => (
                       <div key={index} className="flex items-center justify-between text-xs">
-                        <span className="text-gray-600 truncate flex-1">
+                        <span className="text-gray-600 dark:text-gray-400 truncate flex-1">
                           {service.serviceId.name}
                         </span>
-                        <span className="text-gray-500 ml-2">
+                        <span className="text-gray-500 dark:text-gray-400 ml-2">
                           {service.laborHours}h
                         </span>
                       </div>
@@ -366,7 +388,7 @@ export default function ResponsiveJobCardsGrid({
                         .filter(Boolean)
                         .join(', ');
                       return (
-                        <div className="text-xs text-gray-500" title={remainingNames}>
+                        <div className="text-xs text-gray-500 dark:text-gray-400" title={remainingNames}>
                           {t('job_cards.more_services_count', { count: remaining.length })}
                         </div>
                       );
@@ -375,39 +397,39 @@ export default function ResponsiveJobCardsGrid({
                 </div>
 
                 {/* Stats */}
-                <div className={`grid gap-3 pt-2 border-t border-gray-100 ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'} mt-auto`}>
+                <div className={`grid gap-3 pt-2 border-t border-gray-100 dark:border-gray-800 ${isAdmin ? 'grid-cols-2' : 'grid-cols-1'} mt-auto`}>
                   <div className="text-center">
-                    <div className="text-lg font-semibold text-gray-900">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">
                       {totalLaborHours(jobCard.services)}h
                     </div>
-                    <div className="text-xs text-gray-500">{t('job_cards.labor_hours')}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{t('job_cards.labor_hours')}</div>
                   </div>
                   {isAdmin && (
                     <div className="text-center">
-                      <div className="text-lg font-semibold text-gray-900">
+                      <div className="text-lg font-semibold text-gray-900 dark:text-white">
                         ${totalCost(jobCard).toFixed(0)}
                       </div>
-                      <div className="text-xs text-gray-500">{t('job_cards.estimated_cost')}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{t('job_cards.estimated_cost')}</div>
                     </div>
                   )}
                 </div>
 
                 {/* Notes */}
                 {jobCard.notes && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                    <div className="text-xs font-medium text-yellow-800 mb-1">{t('forms.notes')}</div>
-                    <div className="text-xs text-yellow-700 line-clamp-2">{jobCard.notes}</div>
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                    <div className="text-xs font-medium text-yellow-800 dark:text-yellow-400 mb-1">{t('forms.notes')}</div>
+                    <div className="text-xs text-yellow-700 dark:text-yellow-300 line-clamp-2">{jobCard.notes}</div>
                   </div>
                 )}
               </div>
 
               {/* Card Footer */}
-              <div className="px-6 bg-gray-50 border-t border-gray-100 h-16 flex items-center">
+              <div className="px-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 h-16 flex items-center">
                 <div className="flex items-center justify-between w-full">
                   <div className="flex space-x-2">
                     <Link
                       href={`/job-cards/${jobCard._id}`}
-                      className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                      className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-700 shadow-sm text-xs font-medium rounded-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       <Eye className="h-3 w-3 me-1" />
                       {t('common.view')}
@@ -415,7 +437,7 @@ export default function ResponsiveJobCardsGrid({
                     {isAdmin && (
                       <Link
                         href={`/job-cards/${jobCard._id}/edit`}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded-lg text-white bg-[#F97402] hover:bg-[#F13F33] transition-colors"
                       >
                         <Edit className="h-3 w-3 me-1" />
                         {t('common.edit')}
@@ -424,7 +446,7 @@ export default function ResponsiveJobCardsGrid({
                     {isAdmin && onDeleteJobCard && (
                       <button
                         onClick={() => onDeleteJobCard(jobCard._id)}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors"
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-xs font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition-colors"
                       >
                         <Trash2 className="h-3 w-3 me-1" />
                         {t('common.delete')}
@@ -434,7 +456,7 @@ export default function ResponsiveJobCardsGrid({
                   <select
                     value={jobCard.status}
                     onChange={(e) => onStatusChange(jobCard._id, e.target.value)}
-                    className="text-xs rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white"
+                    className="text-xs rounded-lg border-gray-300 dark:border-gray-700 shadow-sm focus:border-[#F97402] focus:ring-[#F97402] bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                   >
                     <option value="pending">{t('estimates.pending')}</option>
                     <option value="in-progress">{t('appointments.in_progress')}</option>
@@ -443,36 +465,48 @@ export default function ResponsiveJobCardsGrid({
                   </select>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Empty State */}
-        {jobCards.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium text-gray-900">
-              {t('job_cards.no_job_cards_found')}
-            </h3>
-            <p className="mt-2 text-sm text-gray-500">
-              {searchTerm || (statusFilter !== "all" && statusFilter !== "active")
-                ? t('job_cards.adjust_search')
-                : t('job_cards.get_started')}
-            </p>
-            {!searchTerm && (statusFilter === "all" || statusFilter === "active") && (
-              <div className="mt-6">
-                <Link
-                  href="/job-cards/new"
-                  className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+        <AnimatePresence>
+          {jobCards.length === 0 && (
+            <motion.div
+              className="bg-white dark:bg-gray-900 rounded-lg shadow-sm dark:shadow-gray-800/50 border border-gray-200 dark:border-gray-800 p-8 text-center"
+              variants={scaleIn}
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, scale: 0.95 }}
+            >
+              <Calendar className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                {t('job_cards.no_job_cards_found')}
+              </h3>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {searchTerm || (statusFilter !== "all" && statusFilter !== "active")
+                  ? t('job_cards.adjust_search')
+                  : t('job_cards.get_started')}
+              </p>
+              {!searchTerm && (statusFilter === "all" || statusFilter === "active") && (
+                <motion.div
+                  className="mt-6"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <Plus className="me-2 h-4 w-4" />
-                  {t('job_cards.create')}
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+                  <Link
+                    href="/job-cards/new"
+                    className="inline-flex items-center rounded-lg bg-[#F97402] hover:bg-[#F13F33] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300"
+                  >
+                    <Plus className="me-2 h-4 w-4" />
+                    {t('job_cards.create')}
+                  </Link>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

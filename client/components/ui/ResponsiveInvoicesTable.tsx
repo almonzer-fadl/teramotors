@@ -1,15 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import { useSession } from '@/lib/simple-auth-client';
-import PrintModal from '@/components/pdf/PrintModal';
 import {
   Trash2,
   Eye,
   CreditCard,
-  FileText,
   CheckCircle,
   XCircle,
   Clock,
@@ -20,6 +18,7 @@ import {
   AlertTriangle,
   Printer,
 } from 'lucide-react';
+import { tableRowHover } from '@/lib/dashboard-animations';
 
 interface Invoice {
   _id: string;
@@ -42,12 +41,12 @@ interface Invoice {
     _id: string;
     fullName: string;
   };
-  status: "pending" | "paid" | "cancelled";
+  status: 'pending' | 'paid' | 'cancelled';
   notes?: string;
   totalAmount: number;
   paidAmount?: number;
   dueDate: string;
-  paymentMethod?: "cash" | "card" | "bank_transfer" | "other";
+  paymentMethod?: 'cash' | 'card' | 'bank_transfer' | 'other';
   paymentDate?: string;
   createdAt: string;
   zatca?: {
@@ -70,174 +69,167 @@ interface ResponsiveInvoicesTableProps {
   invoices: Invoice[];
   isOverdue: (dueDate: string) => boolean;
   onDeleteInvoice?: (invoiceId: string) => void;
+  onPrintInvoice?: (invoice: Invoice) => void;
 }
+
+const statusStyles: Record<
+  Invoice['status'],
+  { badge: string; iconColor: string }
+> = {
+  paid: {
+    badge:
+      'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400',
+    iconColor: 'text-green-500 dark:text-green-400',
+  },
+  cancelled: {
+    badge: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400',
+    iconColor: 'text-red-500 dark:text-red-400',
+  },
+  pending: {
+    badge:
+      'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400',
+    iconColor: 'text-yellow-500 dark:text-yellow-400',
+  },
+};
+
+const getStatusIcon = (status: Invoice['status']) => {
+  switch (status) {
+    case 'paid':
+      return <CheckCircle className="h-4 w-4" />;
+    case 'cancelled':
+      return <XCircle className="h-4 w-4" />;
+    default:
+      return <Clock className="h-4 w-4" />;
+  }
+};
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: 'USD',
+  }).format(value);
+
+const formatDate = (value: string | Date) =>
+  new Date(value).toLocaleDateString();
 
 export default function ResponsiveInvoicesTable({
   invoices,
   isOverdue,
   onDeleteInvoice,
+  onPrintInvoice,
 }: ResponsiveInvoicesTableProps) {
   const { t } = useTranslation('common');
   const { user } = useSession();
   const isAdmin = user?.role === 'admin';
-  
-  const [showPrintModal, setShowPrintModal] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const [selectedJobCard, setSelectedJobCard] = useState<any>(null);
-  const [qrCodeData, setQrCodeData] = useState<string>('');
 
-  const handleDeleteInvoice = async (invoiceId: string) => {
+  const renderStatusLabel = (status: Invoice['status']) => {
+    if (status === 'paid') return t('invoices.paid');
+    if (status === 'cancelled') return t('appointments.cancelled');
+    return t('invoices.pending');
+  };
+
+  const handleDelete = (invoiceId: string) => {
     if (!isAdmin || !onDeleteInvoice) return;
-    
     if (window.confirm(t('invoices.delete_confirmation'))) {
-      try {
-        const response = await fetch(`/api/invoices/${invoiceId}`, {
-          method: 'DELETE',
-        });
-        
-        if (response.ok) {
-          onDeleteInvoice(invoiceId);
-        } else {
-          console.error('Failed to delete invoice');
-        }
-      } catch (error) {
-        console.error('Error deleting invoice:', error);
-      }
+      onDeleteInvoice(invoiceId);
     }
   };
 
-  const handlePrintInvoice = async (invoice: Invoice) => {
-    try {
-      // Fetch invoice details with job card and QR code
-      const response = await fetch(`/api/invoices/${invoice._id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setSelectedInvoice(data.invoice);
-        setSelectedJobCard(data.jobCard);
-        setShowPrintModal(true);
-      } else {
-        console.error('Failed to fetch invoice details');
-      }
-    } catch (error) {
-      console.error('Error fetching invoice details:', error);
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "paid":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "cancelled":
-        return <XCircle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "bg-green-100 text-green-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-yellow-100 text-yellow-800";
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "paid":
-        return t('invoices.paid');
-      case "cancelled":
-        return t('appointments.cancelled');
-      case "pending":
-        return t('invoices.pending');
-      default:
-        return status;
+  const handlePrint = (invoice: Invoice) => {
+    if (onPrintInvoice) {
+      onPrintInvoice(invoice);
     }
   };
 
   return (
-    <div className="bg-white shadow rounded-lg overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm rounded-lg overflow-hidden">
       {/* Desktop Table */}
       <div className="hidden lg:block overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+          <thead className="bg-gray-50 dark:bg-gray-800/50">
             <tr>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t('invoices.invoice')}
               </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t('appointments.customer')}
               </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t('appointments.vehicle')}
               </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t('invoices.amount')}
               </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t('invoices.due_date')}
               </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t('customers.status')}
               </th>
-              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t('customers.actions')}
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
             {invoices.map((invoice) => (
-              <tr key={invoice._id} className="hover:bg-gray-50">
+              <motion.tr
+                key={invoice._id}
+                className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                variants={tableRowHover}
+                initial="rest"
+                whileHover="hover"
+              >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="h-10 w-10 flex-shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center">
-                        <CreditCard className="h-5 w-5 text-white" />
+                      <div className="h-10 w-10 rounded-full bg-blue-500/10 dark:bg-blue-900/30 flex items-center justify-center">
+                        <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
                     </div>
                     <div className="ms-4">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
                         INV-{invoice._id.slice(-6)}
                       </div>
-                      <div className="text-sm text-gray-500">
-                        {new Date(invoice.createdAt).toLocaleDateString()}
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {formatDate(invoice.createdAt)}
                       </div>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {invoice.customerId.firstName}{" "}
-                    {invoice.customerId.lastName}
+                  <div className="text-sm text-gray-900 dark:text-white">
+                    {invoice.customerId.firstName} {invoice.customerId.lastName}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
+                  <div className="text-sm text-gray-900 dark:text-white">
                     {invoice.vehicleId ? (
                       <>
-                        {invoice.vehicleId.year} {invoice.vehicleId.make}{" "}
+                        {invoice.vehicleId.year} {invoice.vehicleId.make}{' '}
                         {invoice.vehicleId.model}
                       </>
                     ) : (
-                      <span className="text-gray-400 italic">No vehicle data</span>
+                      <span className="text-gray-400 dark:text-gray-500 italic">
+                        {t('vehicles.no_vehicle', { defaultValue: 'No vehicle data' })}
+                      </span>
                     )}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
                     {invoice.vehicleId?.licensePlate || (
-                      <span className="text-gray-400 italic">N/A</span>
+                      <span className="text-gray-400 dark:text-gray-500 italic">
+                        N/A
+                      </span>
                     )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    ${invoice.totalAmount.toFixed(2)}
+                  <div className="text-sm font-medium text-gray-900 dark:text-white">
+                    {formatCurrency(invoice.totalAmount)}
                   </div>
                   {invoice.paidAmount && (
-                    <div className="text-sm text-gray-500">
-                      {t("invoices.paid_amount", {
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {t('invoices.paid_amount', {
                         amount: invoice.paidAmount.toFixed(2),
                       })}
                     </div>
@@ -247,62 +239,63 @@ export default function ResponsiveInvoicesTable({
                   <div
                     className={`text-sm ${
                       isOverdue(invoice.dueDate)
-                        ? "text-red-600 font-medium"
-                        : "text-gray-900"
+                        ? 'text-red-600 dark:text-red-400 font-medium'
+                        : 'text-gray-900 dark:text-white'
                     }`}
                   >
-                    {new Date(invoice.dueDate).toLocaleDateString()}
+                    {formatDate(invoice.dueDate)}
                   </div>
                   {isOverdue(invoice.dueDate) && (
-                    <div className="text-xs text-red-500">
-                      {t("invoices.overdue")}
+                    <div className="text-xs text-red-500 dark:text-red-400">
+                      {t('invoices.overdue')}
                     </div>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center space-x-2">
-                    {getStatusIcon(invoice.status)}
+                    <span className={statusStyles[invoice.status].iconColor}>
+                      {getStatusIcon(invoice.status)}
+                    </span>
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                        invoice.status
-                      )}`}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[invoice.status].badge}`}
                     >
-                      {getStatusLabel(invoice.status)}
+                      {renderStatusLabel(invoice.status)}
                     </span>
                     {invoice.zatca?.compliance?.isCompliant && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
                         ZATCA ✓
                       </span>
                     )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-3">
                     {isAdmin && onDeleteInvoice && (
                       <button
-                        onClick={() => handleDeleteInvoice(invoice._id)}
-                        className="text-red-600 hover:text-red-900"
+                        onClick={() => handleDelete(invoice._id)}
+                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+                        aria-label={t('common.delete')}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     )}
                     <Link
                       href={`/invoices/${invoice._id}`}
-                      className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+                      className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-semibold text-[#F97402] hover:text-[#F13F33] transition-colors"
                     >
-                      <Eye className="h-3 w-3 me-1" />
+                      <Eye className="h-4 w-4" />
                       {t('common.view')}
                     </Link>
                     <button
-                      onClick={() => handlePrintInvoice(invoice)}
-                      className="inline-flex items-center px-2 py-1 text-xs font-medium text-white bg-emerald-600 rounded hover:bg-emerald-700"
+                      onClick={() => handlePrint(invoice)}
+                      className="inline-flex items-center gap-1 rounded-md bg-[#F97402] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#F13F33] transition-colors"
                     >
-                      <Printer className="h-3 w-3 me-1" />
-                      طباعة
+                      <Printer className="h-4 w-4" />
+                      {t('invoices.print', { defaultValue: 'Print' })}
                     </button>
                   </div>
                 </td>
-              </tr>
+              </motion.tr>
             ))}
           </tbody>
         </table>
@@ -311,154 +304,136 @@ export default function ResponsiveInvoicesTable({
       {/* Mobile/Tablet Cards */}
       <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
         {invoices.map((invoice) => (
-          <div key={invoice._id} className="bg-white shadow rounded-lg p-4 border border-gray-200">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center">
-                <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center me-3">
-                  <CreditCard className="h-5 w-5 text-white" />
+          <motion.div
+            key={invoice._id}
+            className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+            variants={tableRowHover}
+            initial="rest"
+            whileHover="hover"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-blue-500/10 dark:bg-blue-900/30 flex items-center justify-center">
+                  <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900">
+                  <p className="text-base font-semibold text-gray-900 dark:text-white">
                     INV-{invoice._id.slice(-6)}
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    {new Date(invoice.createdAt).toLocaleDateString()}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {formatDate(invoice.createdAt)}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                {getStatusIcon(invoice.status)}
+              <div className="flex items-center gap-2">
+                <span className={statusStyles[invoice.status].iconColor}>
+                  {getStatusIcon(invoice.status)}
+                </span>
                 <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                    invoice.status
-                  )}`}
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[invoice.status].badge}`}
                 >
-                  {getStatusLabel(invoice.status)}
+                  {renderStatusLabel(invoice.status)}
                 </span>
               </div>
             </div>
 
-            {/* Customer & Vehicle Info */}
-            <div className="space-y-2 text-sm text-gray-700 mb-4">
-              <div className="flex items-center">
-                <User className="h-4 w-4 me-2 text-gray-500" />
+            <div className="space-y-3 text-sm text-gray-700 dark:text-gray-300 mb-4">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-gray-400" />
                 <span>
                   {invoice.customerId.firstName} {invoice.customerId.lastName}
                 </span>
               </div>
-              <div className="flex items-center">
-                <Car className="h-4 w-4 me-2 text-gray-500" />
+              <div className="flex items-center gap-2">
+                <Car className="h-4 w-4 text-gray-400" />
                 <span>
-                  {invoice.vehicleId ? (
-                    `${invoice.vehicleId.year} ${invoice.vehicleId.make} ${invoice.vehicleId.model}`
-                  ) : (
-                    <span className="text-gray-400 italic">No vehicle data</span>
-                  )}
+                  {invoice.vehicleId
+                    ? `${invoice.vehicleId.year} ${invoice.vehicleId.make} ${invoice.vehicleId.model}`
+                    : t('vehicles.no_vehicle', { defaultValue: 'No vehicle data' })}
                 </span>
               </div>
-              <div className="flex items-center">
-                <span className="h-4 w-4 me-2 text-gray-500 text-xs">#</span>
-                <span className="text-xs text-gray-500">
-                  {invoice.vehicleId?.licensePlate || (
-                    <span className="text-gray-400 italic">N/A</span>
-                  )}
+              <div className="flex items-center gap-2">
+                <span className="h-4 w-4 text-gray-400">#</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {invoice.vehicleId?.licensePlate || 'N/A'}
                 </span>
               </div>
             </div>
 
-            {/* Amount & Due Date */}
-            <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center">
-                <DollarSign className="h-4 w-4 me-2 text-green-600" />
+            <div className="flex items-center justify-between mb-4 rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/60 p-3">
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-green-600 dark:text-green-400" />
                 <div>
-                  <div className="text-lg font-semibold text-gray-900">
-                    ${invoice.totalAmount.toFixed(2)}
-                  </div>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {formatCurrency(invoice.totalAmount)}
+                  </p>
                   {invoice.paidAmount && (
-                    <div className="text-xs text-gray-500">
-                      {t("invoices.paid_amount", {
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('invoices.paid_amount', {
                         amount: invoice.paidAmount.toFixed(2),
                       })}
-                    </div>
+                    </p>
                   )}
                 </div>
               </div>
               <div className="text-end">
-                <div className="flex items-center">
-                  <Calendar className="h-4 w-4 me-1 text-gray-500" />
-                  <div
+                <div className="flex items-center justify-end gap-1 text-gray-600 dark:text-gray-300">
+                  <Calendar className="h-4 w-4" />
+                  <span
                     className={`text-sm ${
                       isOverdue(invoice.dueDate)
-                        ? "text-red-600 font-medium"
-                        : "text-gray-700"
+                        ? 'text-red-600 dark:text-red-400 font-medium'
+                        : ''
                     }`}
                   >
-                    {new Date(invoice.dueDate).toLocaleDateString()}
-                  </div>
+                    {formatDate(invoice.dueDate)}
+                  </span>
                 </div>
                 {isOverdue(invoice.dueDate) && (
-                  <div className="flex items-center text-xs text-red-500 mt-1">
+                  <div className="flex items-center justify-end text-xs text-red-500 dark:text-red-400 mt-1">
                     <AlertTriangle className="h-3 w-3 me-1" />
-                    {t("invoices.overdue")}
+                    {t('invoices.overdue')}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* ZATCA Compliance */}
             {invoice.zatca?.compliance?.isCompliant && (
               <div className="mb-4">
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
                   ZATCA ✓ {t('invoices.compliant')}
                 </span>
               </div>
             )}
 
-            {/* Actions */}
-            <div className="flex justify-end space-x-2 border-t border-gray-200 pt-3">
+            <div className="flex items-center justify-end gap-2 border-t border-gray-100 dark:border-gray-800 pt-3">
               {isAdmin && onDeleteInvoice && (
                 <button
-                  onClick={() => handleDeleteInvoice(invoice._id)}
-                  className="inline-flex items-center px-3 py-1 border border-red-300 shadow-sm text-xs font-medium rounded-md text-red-700 bg-white hover:bg-red-50"
+                  onClick={() => handleDelete(invoice._id)}
+                  className="inline-flex items-center gap-1 rounded-md border border-transparent px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                 >
-                  <Trash2 className="h-3 w-3 me-1" />
+                  <Trash2 className="h-3.5 w-3.5" />
                   {t('common.delete')}
                 </button>
               )}
               <Link
                 href={`/invoices/${invoice._id}`}
-                className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-semibold text-[#F97402] hover:text-[#F13F33] transition-colors"
               >
-                <Eye className="h-3 w-3 me-1" />
+                <Eye className="h-3.5 w-3.5" />
                 {t('common.view')}
               </Link>
               <button
-                onClick={() => handlePrintInvoice(invoice)}
-                className="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700"
+                onClick={() => handlePrint(invoice)}
+                className="inline-flex items-center gap-1 rounded-md bg-[#F97402] px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#F13F33] transition-colors"
               >
-                <Printer className="h-3 w-3 me-1" />
-                طباعة
+                <Printer className="h-3.5 w-3.5" />
+                {t('invoices.print', { defaultValue: 'Print' })}
               </button>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
-
-      {/* Print Modal */}
-      {selectedInvoice && (
-        <PrintModal
-          isOpen={showPrintModal}
-          onClose={() => {
-            setShowPrintModal(false);
-            setSelectedInvoice(null);
-            setSelectedJobCard(null);
-          }}
-          invoice={selectedInvoice}
-          jobCard={selectedJobCard}
-          language={'ar'}
-        />
-      )}
     </div>
   );
 }

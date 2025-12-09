@@ -1,66 +1,30 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IWhatsAppMessage extends Document {
-  customerId: mongoose.Types.ObjectId;
-  messageType: 'welcome' | 'job_started' | 'job_completed' | 'invoice_ready' | 'advertisement';
-  content: string;
-  mediaUrl?: string;
-  status: 'pending' | 'sent' | 'delivered' | 'failed';
-  twilioMessageId?: string; // For backward compatibility
-  wahaMessageId?: string; // Waha message ID
-  sentAt?: Date;
-  deliveredAt?: Date;
+  tenantId: Schema.Types.ObjectId;
+  customerId: Schema.Types.ObjectId;
+  phoneNumber: string;
+  body: string;
+  status: 'sent' | 'failed' | 'delivered'; // Simplified status
   errorMessage?: string;
-  language: 'ar' | 'en';
-  createdAt: Date;
-  updatedAt: Date;
+  sentAt: Date;
 }
 
 const WhatsAppMessageSchema = new Schema<IWhatsAppMessage>({
-  customerId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Customer',
-    required: true
-  },
-  messageType: {
-    type: String,
-    enum: ['welcome', 'job_started', 'job_completed', 'invoice_ready', 'advertisement'],
-    required: true
-  },
-  content: {
-    type: String,
-    required: true
-  },
-  mediaUrl: {
-    type: String
-  },
-  status: {
-    type: String,
-    enum: ['pending', 'sent', 'delivered', 'failed'],
-    default: 'pending'
-  },
-  twilioMessageId: {
-    type: String
-  },
-  wahaMessageId: {
-    type: String
-  },
-  sentAt: {
-    type: Date
-  },
-  deliveredAt: {
-    type: Date
-  },
-  errorMessage: {
-    type: String
-  },
-  language: {
-    type: String,
-    enum: ['ar', 'en'],
-    default: 'ar'
-  }
+  tenantId: { type: Schema.Types.ObjectId, ref: 'Tenant', required: true, index: true },
+  customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
+  phoneNumber: { type: String, required: true },
+  body: { type: String, required: true },
+  status: { type: String, enum: ['sent', 'failed', 'delivered'], required: true },
+  errorMessage: { type: String },
+  sentAt: { type: Date, default: Date.now },
 }, {
-  timestamps: true
+  timestamps: true,
 });
 
-export default mongoose.models.WhatsAppMessage || mongoose.model<IWhatsAppMessage>('WhatsAppMessage', WhatsAppMessageSchema);
+WhatsAppMessageSchema.index({ tenantId: 1, sentAt: -1 });
+WhatsAppMessageSchema.index({ tenantId: 1, customerId: 1 });
+
+const WhatsAppMessage = mongoose.models.WhatsAppMessage || mongoose.model<IWhatsAppMessage>('WhatsAppMessage', WhatsAppMessageSchema);
+
+export default WhatsAppMessage;

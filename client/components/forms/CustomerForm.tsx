@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, X, Users, MapPin, Phone, FileText } from "lucide-react";
+import { ArrowLeft, Save, X, Users, MapPin, FileText, Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
+import { fadeInUp } from "@/lib/dashboard-animations";
+import { useReferenceData } from "@/lib/stores/referenceDataStore";
 
 interface CustomerFormData {
   firstName: string;
@@ -31,6 +34,8 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
   const { t } = useTranslation('common');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [fetchingCustomer, setFetchingCustomer] = useState(false);
+  const { invalidateCustomers } = useReferenceData();
   const [formData, setFormData] = useState<CustomerFormData>({
     firstName: "",
     lastName: "",
@@ -55,6 +60,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
   const isEditing = !!customerId;
 
   const fetchCustomer = async () => {
+    setFetchingCustomer(true);
     try {
       const response = await fetch(`/api/customers/${customerId}`);
       if (response.ok) {
@@ -82,6 +88,8 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
       }
     } catch (error) {
       console.error("Failed to fetch customer:", error);
+    } finally {
+      setFetchingCustomer(false);
     }
   };
 
@@ -109,6 +117,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
 
       if (response.ok) {
         socket.emit("customer-created");
+        invalidateCustomers(); // Invalidate cache after create/update
         router.push("/customers");
       } else {
         const error = await response.json();
@@ -141,50 +150,83 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
     });
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="py-8">
-            <div className="flex items-center">
+  // Show loading skeleton while fetching customer data
+  if (fetchingCustomer) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
+        <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex items-center gap-4">
               <button
                 onClick={() => router.back()}
-                className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
+                className="p-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#F97402] transition-all duration-200"
               >
-                <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
+                <ArrowLeft className="h-6 w-6" />
               </button>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  {isEditing ? t('forms.edit_customer') : t('forms.add_new_customer')}
-                </h1>
-                <p className="mt-3 text-xl text-gray-600">
-                  {isEditing
-                    ? t('forms.update_customer_information')
-                    : t('forms.enter_customer_details')}
-                </p>
+              <div className="animate-pulse space-y-2">
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-96"></div>
               </div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-[#F97402]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="p-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#F97402] transition-all duration-200 group"
+            >
+              <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
+            </button>
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
+                {isEditing ? t('forms.edit_customer') : t('forms.add_new_customer')}
+              </h1>
+              <p className="mt-2 text-base text-gray-700 dark:text-gray-300">
+                {isEditing
+                  ? t('forms.update_customer_information')
+                  : t('forms.enter_customer_details')}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-12">
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-10">
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-            <div className="px-8 py-8">
-              <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mr-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Form - Animate container only */}
+        <motion.form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+        >
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="px-6 py-6">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-xl flex items-center justify-center shadow-lg shadow-[#F97402]/25">
                   <Users className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                   {t('forms.basic_information')}
                 </h3>
               </div>
-              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t('forms.first_name')}
                   </label>
                   <input
@@ -194,12 +236,12 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     onChange={(e) =>
                       handleInputChange("firstName", e.target.value)
                     }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder={t('ui.enter_first_name')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t('forms.last_name')}
                   </label>
                   <input
@@ -209,12 +251,12 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     onChange={(e) =>
                       handleInputChange("lastName", e.target.value)
                     }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder={t('ui.enter_last_name')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t('forms.email_address')}
                   </label>
                   <input
@@ -222,12 +264,12 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     required
                     value={formData.email}
                     onChange={(e) => handleInputChange("email", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder={t('ui.enter_email_address')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t('forms.phone_number')}
                   </label>
                   <input
@@ -235,24 +277,24 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     required
                     value={formData.phone}
                     onChange={(e) => handleInputChange("phone", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder={t('ui.enter_phone_number')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     WhatsApp Number
                   </label>
                   <input
                     type="tel"
                     value={formData.phoneNumber}
                     onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder="+966590090612 (leave empty to use phone number)"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Language Preference
                   </label>
                   <select
@@ -285,19 +327,19 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-            <div className="px-8 py-8">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="px-6 py-6">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mr-4">
                   <MapPin className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                   {t('forms.address_information')}
                 </h3>
               </div>
               <div className="space-y-8">
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t('forms.street_address')}
                   </label>
                   <input
@@ -306,13 +348,13 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     onChange={(e) =>
                       handleInputChange("address.street", e.target.value)
                     }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder={t('forms.street_address')}
                   />
                 </div>
                 <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
                   <div className="space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                       {t('forms.city')}
                     </label>
                     <input
@@ -321,12 +363,12 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                       onChange={(e) =>
                         handleInputChange("address.city", e.target.value)
                       }
-                      className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                       placeholder={t('forms.city')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                       {t('forms.state')}
                     </label>
                     <input
@@ -335,12 +377,12 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                       onChange={(e) =>
                         handleInputChange("address.state", e.target.value)
                       }
-                      className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                       placeholder={t('forms.state')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                       {t('forms.zip_code')}
                     </label>
                     <input
@@ -349,7 +391,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                       onChange={(e) =>
                         handleInputChange("address.zipCode", e.target.value)
                       }
-                      className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                       placeholder={t('forms.zip_code')}
                     />
                   </div>
@@ -358,19 +400,19 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-            <div className="px-8 py-8">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="px-6 py-6">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                   Business Information
                 </h3>
               </div>
-              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     Company Name
                   </label>
                   <input
@@ -379,12 +421,12 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     onChange={(e) =>
                       handleInputChange("companyName", e.target.value)
                     }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder="Enter Company Name"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     VAT Number
                   </label>
                   <input
@@ -393,13 +435,13 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     onChange={(e) =>
                       handleInputChange("vatNumber", e.target.value)
                     }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder="Enter VAT Number (15 digits)"
                     maxLength={15}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     CR / License / ID No
                   </label>
                   <input
@@ -408,7 +450,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                     onChange={(e) =>
                       handleInputChange("idNumber", e.target.value)
                     }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder="Enter CR / License / ID No (10 digits)"
                     maxLength={10}
                   />
@@ -417,13 +459,13 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
             </div>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-            <div className="px-8 py-8">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="px-6 py-6">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                   {t('forms.additional_notes')}
                 </h3>
               </div>
@@ -435,7 +477,7 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
                   rows={6}
                   value={formData.notes}
                   onChange={(e) => handleInputChange("notes", e.target.value)}
-                  className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
+                  className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 resize-none transition-all duration-200"
                   placeholder="Enter any additional notes about the customer..."
                 />
               </div>
@@ -443,29 +485,35 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-6">
+          <div className="flex flex-col sm:flex-row justify-end gap-4">
             <button
               type="button"
               onClick={() => router.back()}
-              className="group inline-flex items-center px-8 py-4 border-2 border-gray-300 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:border-[#F13F33] hover:text-[#F13F33] hover:bg-[#F13F33]/5 transition-all duration-300"
+              disabled={loading}
+              className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#F97402] hover:text-[#F97402] hover:bg-[#F97402]/5 active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <X className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              <X className="me-2 h-5 w-5" />
               {t('forms.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200"
             >
-              <Save className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-              {loading
-                ? t('forms.saving')
-                : isEditing
-                ? t('forms.update_customer')
-                : t('forms.save_customer')}
+              {loading ? (
+                <>
+                  <Loader2 className="me-2 h-5 w-5 animate-spin" />
+                  {t('forms.saving')}
+                </>
+              ) : (
+                <>
+                  <Save className="me-2 h-5 w-5" />
+                  {isEditing ? t('forms.update_customer') : t('forms.save_customer')}
+                </>
+              )}
             </button>
           </div>
-        </form>
+        </motion.form>
       </div>
     </div>
   );
