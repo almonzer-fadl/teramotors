@@ -25,7 +25,68 @@ module.exports = {
         arabic: ['Asal Arabic ITF', 'sans-serif'],
         english: ['Franklin Gothic', 'sans-serif'],
       },
+      // Safari-optimized animations
+      transitionTimingFunction: {
+        'safari': 'cubic-bezier(0.4, 0, 0.2, 1)', // Optimized for Safari
+      },
+      animation: {
+        'fade-in-safari': 'fadeInSafari 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        'slide-in-safari': 'slideInSafari 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        'scale-safari': 'scaleSafari 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+      },
+      keyframes: {
+        fadeInSafari: {
+          '0%': {
+            opacity: '0',
+            transform: 'translateZ(0)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateZ(0)',
+          },
+        },
+        slideInSafari: {
+          '0%': {
+            transform: 'translate3d(-100%, 0, 0)',
+            opacity: '0',
+          },
+          '100%': {
+            transform: 'translate3d(0, 0, 0)',
+            opacity: '1',
+          },
+        },
+        scaleSafari: {
+          '0%': {
+            transform: 'scale3d(0.95, 0.95, 1)',
+            opacity: '0',
+          },
+          '100%': {
+            transform: 'scale3d(1, 1, 1)',
+            opacity: '1',
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    // Safari animation optimization plugin
+    function({ addUtilities }) {
+      const safariUtilities = {
+        '.gpu-accelerate': {
+          '-webkit-transform': 'translate3d(0, 0, 0)',
+          'transform': 'translate3d(0, 0, 0)',
+          '-webkit-backface-visibility': 'hidden',
+          'backface-visibility': 'hidden',
+          '-webkit-perspective': '1000px',
+          'perspective': '1000px',
+        },
+        '.safari-smooth': {
+          '-webkit-font-smoothing': 'subpixel-antialiased',
+          '-webkit-transform': 'translateZ(0)',
+          'transform': 'translateZ(0)',
+        },
+      };
+      addUtilities(safariUtilities);
+    },
+  ],
 }
