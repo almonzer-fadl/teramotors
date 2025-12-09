@@ -201,12 +201,12 @@ export default function UserManagementSettings() {
     return (
          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center"><Users className="w-6 h-6 mr-3 text-[#F97402]" /> User Management</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center"><Users className="w-6 h-6 me-3 text-[#F97402]" /> User Management</h2>
                  <button 
                     onClick={() => setShowAddUserModal(true)}
                     className="inline-flex items-center justify-center px-4 py-2 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
                 >
-                    <UserPlus className="w-5 h-5 mr-2" />
+                    <UserPlus className="w-5 h-5 me-2" />
                     Add User
                 </button>
             </div>
@@ -283,7 +283,7 @@ export default function UserManagementSettings() {
                             disabled={submitting}
                             className="inline-flex items-center justify-center px-4 py-2 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
                         >
-                            {submitting ? <Loader2 className="me-2 h-5 w-5 animate-spin" /> : <UserPlus className="w-5 h-5 mr-2" />}
+                            {submitting ? <Loader2 className="me-2 h-5 w-5 animate-spin" /> : <UserPlus className="w-5 h-5 me-2" />}
                             Add User
                         </button>
                     </div>
@@ -310,7 +310,7 @@ export default function UserManagementSettings() {
                             disabled={submitting}
                             className="inline-flex items-center justify-center px-4 py-2 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
                         >
-                            {submitting ? <Loader2 className="me-2 h-5 w-5 animate-spin" /> : <Edit className="w-5 h-5 mr-2" />}
+                            {submitting ? <Loader2 className="me-2 h-5 w-5 animate-spin" /> : <Edit className="w-5 h-5 me-2" />}
                             Update Role
                         </button>
                     </div>

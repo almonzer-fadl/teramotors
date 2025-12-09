@@ -224,7 +224,7 @@ export default function Search({
           
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="p-1 text-gray-400 hover:text-gray-600 ml-1"
+            className="p-1 text-gray-400 hover:text-gray-600 ms-1"
           >
             <Filter className="h-4 w-4" />
           </button>

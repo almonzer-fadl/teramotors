@@ -73,7 +73,7 @@ export default function AdminSystemPage() {
                         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
-                    <tab.icon className="w-5 h-5 mr-3" />
+                    <tab.icon className="w-5 h-5 me-3" />
                     <span>{tab.name}</span>
                   </button>
                 ))}

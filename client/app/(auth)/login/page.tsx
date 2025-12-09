@@ -131,7 +131,7 @@ function LoginForm() {
           href="/"
           className="absolute -top-16 left-0 flex items-center text-white/80 hover:text-white transition-colors group"
         >
-          <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="w-5 h-5 me-2 group-hover:-translate-x-1 transition-transform" />
           {t('landing_missing.back_to_home')}
         </Link>
 
@@ -183,7 +183,7 @@ function LoginForm() {
                 exit={{ opacity: 0, y: -10 }}
                 className="mb-6 p-4 bg-green-50/90 dark:bg-green-900/50 border border-green-200 dark:border-green-700 rounded-2xl text-green-700 dark:text-green-300 text-sm backdrop-blur-sm flex items-center"
               >
-                <CheckCircle2 className="w-5 h-5 mr-3 text-green-500" />
+                <CheckCircle2 className="w-5 h-5 me-3 text-green-500" />
                 <span>Workshop created successfully! Please sign in.</span>
               </motion.div>
             )}
@@ -263,7 +263,7 @@ function LoginForm() {
             >
               {isLoading ? (
                 <div className="flex items-center">
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  <Loader2 className="w-5 h-5 me-2 animate-spin" />
                   {t('landing_missing.signing_in')}
                 </div>
               ) : (
@@ -296,7 +296,7 @@ function LoginForm() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <Sparkles className="w-4 h-4 mr-2 text-[#F97402]" />
+                  <Sparkles className="w-4 h-4 me-2 text-[#F97402]" />
                   Create your workshop
                 </motion.span>
               </Link>

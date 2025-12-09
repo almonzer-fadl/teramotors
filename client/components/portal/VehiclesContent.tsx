@@ -78,7 +78,7 @@ export function VehiclesContent() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
         >
-            <Plus className="mr-2" />
+            <Plus className="me-2" />
             {t('vehicles.add_vehicle')}
         </motion.button>
       </div>

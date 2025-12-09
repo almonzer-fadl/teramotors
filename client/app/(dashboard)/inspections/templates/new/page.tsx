@@ -106,7 +106,7 @@ export default function NewTemplatePage() {
         <div className="flex items-center">
           <Link
             href="/inspections/templates"
-            className="mr-4 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+            className="me-4 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -126,7 +126,7 @@ export default function NewTemplatePage() {
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-              <FileText className="h-5 w-5 mr-2 text-blue-600" />
+              <FileText className="h-5 w-5 me-2 text-blue-600" />
               {t("templates.basic_information")}
             </h2>
             
@@ -184,7 +184,7 @@ export default function NewTemplatePage() {
         <div className="bg-white shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-              <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+              <CheckCircle className="h-5 w-5 me-2 text-green-600" />
               {t("templates.template_items")}
             </h2>
 
@@ -269,7 +269,7 @@ export default function NewTemplatePage() {
                 disabled={!currentCategory}
                 className="w-full inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="me-2 h-4 w-4" />
                 {t("templates.add_item")}
               </button>
             </div>

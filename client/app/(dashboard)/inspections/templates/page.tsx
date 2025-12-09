@@ -92,7 +92,7 @@ export default function TemplatesPage() {
             href="/inspections/templates/new"
             className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-200"
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="me-2 h-4 w-4" />
             {t("templates.create_template")}
           </Link>
         </div>
@@ -131,7 +131,7 @@ export default function TemplatesPage() {
               href="/inspections/templates/new"
               className="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors duration-200"
             >
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="me-2 h-4 w-4" />
               {t("templates.create_template")}
             </Link>
           </div>

@@ -21,7 +21,7 @@ export default function SystemStatusCard({ name, status, message }: SystemStatus
       <div className="flex-shrink-0">
         <PlugAnimation status={status} />
       </div>
-      <div className="ml-4 flex-grow">
+      <div className="ms-4 flex-grow">
         <p className="text-lg font-bold text-gray-900 dark:text-white">{name}</p>
         <p className={`text-sm ${statusColors[status]}`}>{message}</p>
       </div>

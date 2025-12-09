@@ -320,7 +320,7 @@ export default function InlineInvoiceCreator({ isOpen, onClose, jobCardId, onCre
               onClick={addItem}
               className="inline-flex items-center px-4 py-2 border-2 border-dashed border-gray-300 text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t('invoices.add_item')}
             </button>
           </div>
@@ -438,7 +438,7 @@ export default function InlineInvoiceCreator({ isOpen, onClose, jobCardId, onCre
             disabled={loading || form.items.length === 0}
             className="inline-flex items-center px-5 py-3 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-[#F13F33] to-[#E63946] hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Calculator className="h-4 w-4 mr-2" />
+            <Calculator className="h-4 w-4 me-2" />
             {loading ? t('forms.saving') : t('invoices.create_invoice')}
           </button>
         </div>

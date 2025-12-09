@@ -89,7 +89,7 @@ export default function NewTemplatePage() {
         <div className="flex items-center">
           <button
             onClick={() => router.back()}
-            className="mr-4 p-2 text-gray-400 hover:text-gray-600"
+            className="me-4 p-2 text-gray-400 hover:text-gray-600"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -157,7 +157,7 @@ export default function NewTemplatePage() {
                 onChange={(e) => handleInputChange("isActive", e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="isActive" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="isActive" className="ms-2 block text-sm text-gray-900">
                 {t("templates.active")}
               </label>
             </div>
@@ -174,7 +174,7 @@ export default function NewTemplatePage() {
               onClick={addItem}
               className="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               {t("templates.add_item")}
             </button>
           </div>
@@ -222,7 +222,7 @@ export default function NewTemplatePage() {
             onClick={() => router.back()}
             className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
           >
-            <X className="mr-2 h-4 w-4" />
+            <X className="me-2 h-4 w-4" />
             {t("forms.cancel")}
           </button>
           <button
@@ -230,7 +230,7 @@ export default function NewTemplatePage() {
             disabled={loading}
             className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
           >
-            <Save className="mr-2 h-4 w-4" />
+            <Save className="me-2 h-4 w-4" />
             {loading ? t("forms.saving") : t("templates.save_template")}
           </button>
         </div>

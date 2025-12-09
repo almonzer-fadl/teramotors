@@ -795,27 +795,27 @@ export default function SMSSettingsPage() {
 
         <div className="space-y-3">
           <label className="flex items-center">
-            <input type="checkbox" className="mr-2" defaultChecked />
+            <input type="checkbox" className="me-2" defaultChecked />
             <span>Appointment reminders (24h before)</span>
           </label>
           <label className="flex items-center">
-            <input type="checkbox" className="mr-2" defaultChecked />
+            <input type="checkbox" className="me-2" defaultChecked />
             <span>Appointment reminders (1h before)</span>
           </label>
           <label className="flex items-center">
-            <input type="checkbox" className="mr-2" defaultChecked />
+            <input type="checkbox" className="me-2" defaultChecked />
             <span>Estimate ready notifications</span>
           </label>
           <label className="flex items-center">
-            <input type="checkbox" className="mr-2" defaultChecked />
+            <input type="checkbox" className="me-2" defaultChecked />
             <span>Job completed notifications</span>
           </label>
           <label className="flex items-center">
-            <input type="checkbox" className="mr-2" defaultChecked />
+            <input type="checkbox" className="me-2" defaultChecked />
             <span>Payment reminders</span>
           </label>
           <label className="flex items-center">
-            <input type="checkbox" className="mr-2" />
+            <input type="checkbox" className="me-2" />
             <span>Payment confirmation</span>
           </label>
         </div>
@@ -827,7 +827,7 @@ export default function SMSSettingsPage() {
 
         <div className="space-y-4">
           <label className="flex items-center">
-            <input type="checkbox" className="mr-2" />
+            <input type="checkbox" className="me-2" />
             <span>Enable auto-reply outside business hours</span>
           </label>
 

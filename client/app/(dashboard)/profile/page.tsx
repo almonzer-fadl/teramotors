@@ -175,7 +175,7 @@ export default function ProfilePage() {
                     whileTap={{ scale: 0.95 }}
                     >
                     {isSubmitting ? <Loader2 className="animate-spin" /> : <Save />}
-                    <span className="ml-2">{t('common:save_changes')}</span>
+                    <span className="ms-2">{t('common:save_changes')}</span>
                     </motion.button>
                 </motion.div>
             )}

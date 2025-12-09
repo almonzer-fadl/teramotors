@@ -185,7 +185,7 @@ export default function EstimateDetailPage() {
             href="/estimates"
             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white font-bold rounded-xl hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
           >
-            <ArrowLeft className="mr-2 h-5 w-5" />
+            <ArrowLeft className="me-2 h-5 w-5" />
             {t('estimates.back_to_estimates')}
           </Link>
         </div>
@@ -203,7 +203,7 @@ export default function EstimateDetailPage() {
               <div className="flex items-center">
                 <Link
                   href="/estimates"
-                  className="mr-6 p-3 text-gray-600 dark:text-gray-400 hover:text-[#F97402] transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 group"
+                  className="me-6 p-3 text-gray-600 dark:text-gray-400 hover:text-[#F97402] transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 group"
                 >
                   <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
                 </Link>
@@ -222,14 +222,14 @@ export default function EstimateDetailPage() {
                   disabled={generatingPDF}
                   className="inline-flex items-center px-4 py-2.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#F97402] hover:text-[#F97402] hover:bg-[#F97402]/5 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50"
                 >
-                  <Download className="mr-2 h-5 w-5" />
+                  <Download className="me-2 h-5 w-5" />
                   {generatingPDF ? t('estimates.generating') : t('estimates.generate_pdf')}
                 </button>
                 <Link
                   href={`/estimates/${estimate._id}/edit`}
                   className="inline-flex items-center px-4 py-2.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#F97402] hover:text-[#F97402] hover:bg-[#F97402]/5 rounded-xl font-semibold text-sm transition-all duration-200"
                 >
-                  <Edit className="mr-2 h-5 w-5" />
+                  <Edit className="me-2 h-5 w-5" />
                   {t('estimates.edit')}
                 </Link>
                 <button
@@ -237,7 +237,7 @@ export default function EstimateDetailPage() {
                   disabled={deleting}
                   className="inline-flex items-center px-4 py-2.5 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50"
                 >
-                  <Trash2 className="mr-2 h-5 w-5" />
+                  <Trash2 className="me-2 h-5 w-5" />
                   {deleting ? t('estimates.deleting') : t('estimates.delete')}
                 </button>
               </div>
@@ -254,7 +254,7 @@ export default function EstimateDetailPage() {
             <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
               <div className="px-6 sm:px-8 py-8">
                 <div className="flex items-center mb-8">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center me-4">
                     <FileText className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
@@ -300,7 +300,7 @@ export default function EstimateDetailPage() {
               <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
                 <div className="px-6 sm:px-8 py-8">
                   <div className="flex items-center mb-8">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-2xl flex items-center justify-center mr-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-2xl flex items-center justify-center me-4">
                       <DollarSign className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
@@ -336,7 +336,7 @@ export default function EstimateDetailPage() {
               <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
                 <div className="px-6 sm:px-8 py-8">
                   <div className="flex items-center mb-8">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center me-4">
                       <Package className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
@@ -372,7 +372,7 @@ export default function EstimateDetailPage() {
               <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
                 <div className="px-6 sm:px-8 py-8">
                   <div className="flex items-center mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-2xl flex items-center justify-center mr-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-2xl flex items-center justify-center me-4">
                       <FileText className="w-6 h-6 text-white" />
                     </div>
                     <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
@@ -391,7 +391,7 @@ export default function EstimateDetailPage() {
             <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
               <div className="px-6 sm:px-8 py-8">
                 <div className="flex items-center mb-8">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center me-4">
                     <User className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
@@ -434,7 +434,7 @@ export default function EstimateDetailPage() {
             <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
               <div className="px-6 sm:px-8 py-8">
                 <div className="flex items-center mb-8">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mr-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center me-4">
                     <DollarSign className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">

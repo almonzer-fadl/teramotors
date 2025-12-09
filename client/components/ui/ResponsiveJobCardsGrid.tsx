@@ -297,18 +297,18 @@ export default function ResponsiveJobCardsGrid({
                   {activeWorkersMap[jobCard._id]?.isSelfActive ? (
                     <button
                       onClick={async () => { try { await fetch(`/api/job-cards/${jobCard._id}/work/stop`, { method: 'POST' }); } catch {} finally { try { const res = await fetch(`/api/job-cards/${jobCard._id}/work/active`); const data = await res.json(); setActiveWorkersMap(prev => ({ ...prev, [jobCard._id]: { names: (data.logs||[]).map((l:any)=>l.userId?.displayName||`${l.userId?.firstName||''} ${l.userId?.lastName||''}`.trim()).filter(Boolean), isSelfActive: false } })) } catch {} } }}
-                      className="ml-2 inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-white bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-700 transition-colors"
+                      className="ms-2 inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-white bg-gray-700 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-700 transition-colors"
                       title={t('job_cards.stop_work')}
                     >
-                      <Clock className="h-3 w-3 mr-1" /> {t('job_cards.stop')}
+                      <Clock className="h-3 w-3 me-1" /> {t('job_cards.stop')}
                     </button>
                   ) : (
                     <button
                       onClick={async () => { try { await fetch(`/api/job-cards/${jobCard._id}/work/start`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }); } catch {} finally { try { const res = await fetch(`/api/job-cards/${jobCard._id}/work/active`); const data = await res.json(); const names = (data.logs||[]).map((l:any)=>l.userId?.displayName||`${l.userId?.firstName||''} ${l.userId?.lastName||''}`.trim()).filter(Boolean); setActiveWorkersMap(prev => ({ ...prev, [jobCard._id]: { names, isSelfActive: true } })) } catch {} } }}
-                      className="ml-2 inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-white bg-[#F97402] hover:bg-[#F13F33] transition-colors"
+                      className="ms-2 inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium text-white bg-[#F97402] hover:bg-[#F13F33] transition-colors"
                       title={t('job_cards.start_work')}
                     >
-                      <Clock className="h-3 w-3 mr-1" /> {t('job_cards.start')}
+                      <Clock className="h-3 w-3 me-1" /> {t('job_cards.start')}
                     </button>
                   )}
                   </div>
@@ -376,7 +376,7 @@ export default function ResponsiveJobCardsGrid({
                         <span className="text-gray-600 dark:text-gray-400 truncate flex-1">
                           {service.serviceId.name}
                         </span>
-                        <span className="text-gray-500 dark:text-gray-400 ml-2">
+                        <span className="text-gray-500 dark:text-gray-400 ms-2">
                           {service.laborHours}h
                         </span>
                       </div>

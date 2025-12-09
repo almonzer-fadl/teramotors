@@ -224,7 +224,7 @@ export default function InvoiceDetailPage() {
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center mb-2">
-                        <Wrench className="w-4 h-4 mr-2 text-cyan-500"/>
+                        <Wrench className="w-4 h-4 me-2 text-cyan-500"/>
                         {t('services.services')}
                       </h3>
                       <p className="text-gray-800 dark:text-gray-200">
@@ -233,7 +233,7 @@ export default function InvoiceDetailPage() {
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center mb-2">
-                        <Package className="w-4 h-4 mr-2 text-lime-500"/>
+                        <Package className="w-4 h-4 me-2 text-lime-500"/>
                         {t('inventory.parts_used')}
                       </h3>
                       <p className="text-gray-800 dark:text-gray-200">

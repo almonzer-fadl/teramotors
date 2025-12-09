@@ -56,7 +56,7 @@ export default function ResponsiveInventoryTable({
   const renderSortIndicator = (key: SortKey) => {
     if (sortKey !== key) return null;
     return (
-      <span className="ml-1 text-xs">
+      <span className="ms-1 text-xs">
         {sortDirection === 'asc' ? '↑' : '↓'}
       </span>
     );

@@ -106,7 +106,7 @@ export default function ExcelImportModal({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mr-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center me-4">
               <FileSpreadsheet className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -173,14 +173,14 @@ export default function ExcelImportModal({
             <div className="space-y-2">
               {exampleHeaders.map((header, index) => (
                 <div key={index} className="flex items-center text-sm text-gray-700">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full me-3"></div>
                   <span className="font-mono bg-white px-2 py-1 rounded border">{header}</span>
                 </div>
               ))}
             </div>
             <div className="mt-4 p-4 bg-blue-50 rounded-xl">
               <div className="flex items-start">
-                <AlertCircle className="w-5 h-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="w-5 h-5 text-blue-500 me-2 mt-0.5 flex-shrink-0" />
                 <div className="text-sm text-blue-800">
                   <p className="font-semibold">Note:</p>
                   <p>Only <strong>name</strong> and <strong>price</strong> are required. Other columns are optional.</p>
@@ -197,9 +197,9 @@ export default function ExcelImportModal({
                 : 'bg-red-50 text-red-800'
             }`}>
               {importResult.success ? (
-                <CheckCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+                <CheckCircle className="w-5 h-5 me-3 flex-shrink-0" />
               ) : (
-                <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
+                <AlertCircle className="w-5 h-5 me-3 flex-shrink-0" />
               )}
               <span className="font-medium">{importResult.message}</span>
             </div>

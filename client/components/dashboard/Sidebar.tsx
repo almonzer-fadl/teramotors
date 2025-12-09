@@ -54,7 +54,7 @@ export default function Sidebar() {
     const navigation = getNavigationItems(userRole).map(item => ({...item, icon: iconMap[item.icon as keyof typeof iconMap], tKey: t(item.tKey) }));
 
     const getPositionStyles = () => {
-        return { top: '80px', left: '20px' };
+        return { top: '80px',start: '20px' };
     };
     
     return (

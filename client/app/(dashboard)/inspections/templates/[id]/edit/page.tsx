@@ -171,7 +171,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                 disabled={saving || !formData.name || items.length === 0}
                 className="inline-flex items-center px-6 py-3 bg-[#F13F33] text-white font-bold rounded-xl hover:bg-[#E03A2F] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-xl"
               >
-                <Save className="mr-2 h-5 w-5" />
+                <Save className="me-2 h-5 w-5" />
                 {saving ? t("templates.saving") : t("templates.save_changes")}
               </button>
             </div>
@@ -185,7 +185,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
             <div className="px-6 py-8">
               <div className="flex items-center mb-6">
-                <div className="p-3 bg-blue-100 rounded-xl mr-4">
+                <div className="p-3 bg-blue-100 rounded-xl me-4">
                   <FileText className="h-6 w-6 text-blue-600" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">
@@ -247,7 +247,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
             <div className="px-6 py-8">
               <div className="flex items-center mb-6">
-                <div className="p-3 bg-green-100 rounded-xl mr-4">
+                <div className="p-3 bg-green-100 rounded-xl me-4">
                   <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">
@@ -336,7 +336,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                   disabled={!currentCategory}
                   className="w-full inline-flex items-center justify-center px-6 py-3 bg-[#F13F33] text-white font-bold rounded-xl hover:bg-[#E03A2F] transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Plus className="mr-2 h-5 w-5" />
+                  <Plus className="me-2 h-5 w-5" />
                   {t("templates.add_item")}
                 </button>
               </div>

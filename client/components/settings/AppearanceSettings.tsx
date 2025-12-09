@@ -85,7 +85,7 @@ export default function AppearanceSettings() {
             </div>
             {saving && (
                 <div className="mt-6 flex items-center text-gray-600 dark:text-gray-400">
-                    <Loader2 className="animate-spin mr-2" /> Saving theme...
+                    <Loader2 className="animate-spin me-2" /> Saving theme...
                 </div>
             )}
         </div>

@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
           href="/login" 
           className="absolute -top-16 left-0 flex items-center text-white/80 hover:text-white transition-colors group"
         >
-          <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="w-5 h-5 me-2 group-hover:-translate-x-1 transition-transform" />
           {t('landing_missing.back_to_login')}
         </Link>
 
@@ -94,7 +94,7 @@ export default function ForgotPasswordPage() {
                 >
                   {submitting ? (
                     <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white me-2"></div>
                       {t('auth.sending')}
                     </div>
                   ) : (

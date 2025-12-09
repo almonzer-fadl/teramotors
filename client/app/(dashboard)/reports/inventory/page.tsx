@@ -67,7 +67,7 @@ export default function InventoryReportPage() {
             <div className="flex items-center">
               <button 
                 onClick={() => router.back()} 
-                className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
+                className="me-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
               >
                 <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
               </button>
@@ -92,7 +92,7 @@ export default function InventoryReportPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
                 <Package className="h-8 w-8 text-white" />
               </div>
-              <div className="ml-6">
+              <div className="ms-6">
                 <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Total Parts</h3>
                 <p className="text-3xl font-bold text-gray-900">{report.totalParts}</p>
               </div>
@@ -103,7 +103,7 @@ export default function InventoryReportPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center">
                 <Package className="h-8 w-8 text-white" />
               </div>
-              <div className="ml-6">
+              <div className="ms-6">
                 <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Total Stock Quantity</h3>
                 <p className="text-3xl font-bold text-gray-900">{report.totalStockQuantity}</p>
               </div>
@@ -114,7 +114,7 @@ export default function InventoryReportPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center">
                 <Package className="h-8 w-8 text-white" />
               </div>
-              <div className="ml-6">
+              <div className="ms-6">
                 <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider">Total Stock Value</h3>
                 <p className="text-3xl font-bold text-gray-900">${report.totalStockValue.toFixed(2)}</p>
               </div>
@@ -126,7 +126,7 @@ export default function InventoryReportPage() {
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden mt-12">
           <div className="px-8 py-8">
             <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center me-4">
                 <Package className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900">Low Stock Parts</h3>
@@ -160,7 +160,7 @@ export default function InventoryReportPage() {
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden mt-12">
           <div className="px-8 py-8">
             <div className="flex items-center mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center me-4">
                 <Package className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900">All Parts</h3>

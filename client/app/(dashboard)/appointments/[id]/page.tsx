@@ -99,7 +99,7 @@ export default function AppointmentDetailPage() {
               onClick={() => setCancelModalOpen(true)}
               className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 flex items-center"
             >
-              <X className="h-4 w-4 mr-2" />
+              <X className="h-4 w-4 me-2" />
               {t('appointments.cancel_appointment')}
             </button>
           )}
@@ -107,22 +107,22 @@ export default function AppointmentDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <div>
             <h2 className="text-lg font-semibold mb-2">{t('appointments.customer_vehicle')}</h2>
-            <p><User className="inline-block h-4 w-4 mr-2" /> <Link href={`/customers/${appointment.customerId._id}`} className="text-indigo-600 hover:text-indigo-900">{appointment.customerId.firstName} {appointment.customerId.lastName}</Link></p>
-            <p><Car className="inline-block h-4 w-4 mr-2" /> <Link href={`/vehicles/${appointment.vehicleId._id}`} className="text-indigo-600 hover:text-indigo-900">{appointment.vehicleId.year} {appointment.vehicleId.make} {appointment.vehicleId.model}</Link></p>
+            <p><User className="inline-block h-4 w-4 me-2" /> <Link href={`/customers/${appointment.customerId._id}`} className="text-indigo-600 hover:text-indigo-900">{appointment.customerId.firstName} {appointment.customerId.lastName}</Link></p>
+            <p><Car className="inline-block h-4 w-4 me-2" /> <Link href={`/vehicles/${appointment.vehicleId._id}`} className="text-indigo-600 hover:text-indigo-900">{appointment.vehicleId.year} {appointment.vehicleId.make} {appointment.vehicleId.model}</Link></p>
           </div>
           <div>
             <h2 className="text-lg font-semibold mb-2">{t('appointments.service_mechanic')}</h2>
-            <p><Wrench className="inline-block h-4 w-4 mr-2" /> {appointment.serviceId.name}</p>
-            <p><User className="inline-block h-4 w-4 mr-2" /> {appointment.mechanicId.firstName} {appointment.mechanicId.lastName}</p>
+            <p><Wrench className="inline-block h-4 w-4 me-2" /> {appointment.serviceId.name}</p>
+            <p><User className="inline-block h-4 w-4 me-2" /> {appointment.mechanicId.firstName} {appointment.mechanicId.lastName}</p>
           </div>
           <div>
             <h2 className="text-lg font-semibold mb-2">{t('appointments.date_time')}</h2>
-            <p><Calendar className="inline-block h-4 w-4 mr-2" /> {new Date(appointment.appointmentDate).toLocaleDateString()}</p>
-            <p><Clock className="inline-block h-4 w-4 mr-2" /> {appointment.startTime} - {appointment.endTime}</p>
+            <p><Calendar className="inline-block h-4 w-4 me-2" /> {new Date(appointment.appointmentDate).toLocaleDateString()}</p>
+            <p><Clock className="inline-block h-4 w-4 me-2" /> {appointment.startTime} - {appointment.endTime}</p>
           </div>
           <div>
             <h2 className="text-lg font-semibold mb-2">{t('appointments.cost')}</h2>
-            <p><DollarSign className="inline-block h-4 w-4 mr-2" /> {t('appointments.estimated')}: ${appointment.estimatedCost.toFixed(2)}</p>
+            <p><DollarSign className="inline-block h-4 w-4 me-2" /> {t('appointments.estimated')}: ${appointment.estimatedCost.toFixed(2)}</p>
           </div>
         </div>
       </div>

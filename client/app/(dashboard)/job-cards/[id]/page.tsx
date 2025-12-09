@@ -463,7 +463,7 @@ export default function JobCardDetailsPage() {
                   {t("job_cards.customer_info")}
                 </h3>
                 <div className="flex items-center">
-                  <User className="h-5 w-5 text-gray-400 mr-2" />
+                  <User className="h-5 w-5 text-gray-400 me-2" />
                   <p className="text-lg font-bold text-gray-900 dark:text-white">
                     {jobCard.customerId.firstName} {jobCard.customerId.lastName}
                   </p>
@@ -474,7 +474,7 @@ export default function JobCardDetailsPage() {
                   {t("job_cards.vehicle_info")}
                 </h3>
                 <div className="flex items-center">
-                  <Car className="h-5 w-5 text-gray-400 mr-2" />
+                  <Car className="h-5 w-5 text-gray-400 me-2" />
                   <div>
                     <p className="text-lg font-bold text-gray-900 dark:text-white">
                       {jobCard.vehicleId.make} {jobCard.vehicleId.model} ({jobCard.vehicleId.year})
@@ -491,7 +491,7 @@ export default function JobCardDetailsPage() {
                     {t("job_cards.assigned_mechanic")}
                   </h3>
                   <div className="flex items-center">
-                    <User className="h-5 w-5 text-gray-400 mr-2" />
+                    <User className="h-5 w-5 text-gray-400 me-2" />
                     <p className="text-lg font-bold text-gray-900 dark:text-white">
                       {jobCard.mechanicId.fullName}
                     </p>
@@ -588,7 +588,7 @@ export default function JobCardDetailsPage() {
                     {t("inspections.inspection_date")}
                   </h3>
                   <div className="flex items-center">
-                    <Calendar className="h-5 w-5 text-gray-400 mr-2" />
+                    <Calendar className="h-5 w-5 text-gray-400 me-2" />
                     <p className="text-lg font-bold text-gray-900 dark:text-white">
                       {new Date(jobCard.inspectionId.inspectionDate).toLocaleDateString()}
                     </p>

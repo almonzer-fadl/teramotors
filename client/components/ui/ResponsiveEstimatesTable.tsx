@@ -206,7 +206,7 @@ export default function ResponsiveEstimatesTable({
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {(estimate.services || []).slice(0, 2).map((service) => (
                       <div key={service.serviceId?._id || service.name} className="flex items-center">
-                        <Wrench className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" />
+                        <Wrench className="h-4 w-4 me-2 text-gray-400 dark:text-gray-500" />
                         <span className="truncate">{service.name || service.serviceId?.name}</span>
                       </div>
                     ))}
@@ -223,7 +223,7 @@ export default function ResponsiveEstimatesTable({
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusClasses(estimate.status)}`}>
                       {getStatusIcon(estimate.status)}
-                      <span className="ml-1">{t(`estimates.${estimate.status}`)}</span>
+                      <span className="ms-1">{t(`estimates.${estimate.status}`)}</span>
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -275,29 +275,29 @@ export default function ResponsiveEstimatesTable({
               </div>
               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusClasses(estimate.status)}`}>
                 {getStatusIcon(estimate.status)}
-                <span className="ml-1">{t(`estimates.${estimate.status}`)}</span>
+                <span className="ms-1">{t(`estimates.${estimate.status}`)}</span>
               </span>
             </div>
 
             <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300 mb-4">
               <div className="flex items-center">
-                <User className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                <User className="h-4 w-4 me-2 text-gray-500 dark:text-gray-400" />
                 <span>
                   {estimate.customerId.firstName} {estimate.customerId.lastName}
                 </span>
               </div>
               <div className="flex items-center">
-                <Car className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                <Car className="h-4 w-4 me-2 text-gray-500 dark:text-gray-400" />
                 <span>
                   {estimate.vehicleId.year} {estimate.vehicleId.make} {estimate.vehicleId.model}
                 </span>
               </div>
               <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                <Calendar className="h-4 w-4 me-2 text-gray-500 dark:text-gray-400" />
                 <span>{estimate.vehicleId.licensePlate}</span>
               </div>
               <div className="flex items-center">
-                <DollarSign className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                <DollarSign className="h-4 w-4 me-2 text-gray-500 dark:text-gray-400" />
                 <span>${estimate.total.toFixed(2)}</span>
               </div>
             </div>

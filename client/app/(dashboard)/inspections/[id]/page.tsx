@@ -412,7 +412,7 @@ export default function InspectionDetailsPage() {
             href="/inspections"
             className="inline-flex items-center px-6 py-3 bg-[#F13F33] text-white font-bold rounded-xl hover:bg-[#E03A2F] transition-all duration-300"
           >
-            <ArrowLeft className="mr-2 h-5 w-5" />
+            <ArrowLeft className="me-2 h-5 w-5" />
             Back to Inspections
           </Link>
         </div>
@@ -449,7 +449,7 @@ export default function InspectionDetailsPage() {
                   disabled={loadingReports}
                   className="inline-flex items-center px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-xl transition-all duration-300 font-medium disabled:opacity-50"
                 >
-                  <Download className="mr-2 h-4 w-4" />
+                  <Download className="me-2 h-4 w-4" />
                   {loadingReports ? 'Loading...' : 'Print Reports'}
                 </button>
               )}
@@ -458,21 +458,21 @@ export default function InspectionDetailsPage() {
                 disabled={generatingPDF}
                 className="inline-flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-300 font-medium"
               >
-                <Download className="mr-2 h-4 w-4" />
+                <Download className="me-2 h-4 w-4" />
                 {generatingPDF ? t("inspections.generating_pdf") : t("inspections.generate_pdf")}
               </button>
               <Link
                 href={`/inspections/${id}/edit`}
                 className="inline-flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-300 font-medium"
               >
-                <Edit className="mr-2 h-4 w-4" />
+                <Edit className="me-2 h-4 w-4" />
                 {t("forms.edit")}
               </Link>
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 className="inline-flex items-center px-4 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-xl transition-all duration-300 font-medium"
               >
-                <Trash2 className="mr-2 h-4 w-4" />
+                <Trash2 className="me-2 h-4 w-4" />
                 {t("forms.delete")}
               </button>
             </div>
@@ -489,7 +489,7 @@ export default function InspectionDetailsPage() {
               <div className="px-6 py-8">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center">
-                    <div className="p-3 bg-[#F13F33]/10 rounded-xl mr-4">
+                    <div className="p-3 bg-[#F13F33]/10 rounded-xl me-4">
                       <Settings className="h-6 w-6 text-[#F13F33]" />
                     </div>
                     <h2 className="text-xl font-bold text-gray-900">Inspection Status</h2>
@@ -536,7 +536,7 @@ export default function InspectionDetailsPage() {
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
               <div className="px-6 py-8">
                 <div className="flex items-center mb-6">
-                  <div className="p-3 bg-blue-100 rounded-xl mr-4">
+                  <div className="p-3 bg-blue-100 rounded-xl me-4">
                     <Car className="h-6 w-6 text-blue-600" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">Vehicle Information</h2>
@@ -568,7 +568,7 @@ export default function InspectionDetailsPage() {
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
               <div className="px-6 py-8">
                 <div className="flex items-center mb-6">
-                  <div className="p-3 bg-green-100 rounded-xl mr-4">
+                  <div className="p-3 bg-green-100 rounded-xl me-4">
                     <CheckCircle className="h-6 w-6 text-green-600" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">Inspection Items</h2>
@@ -605,7 +605,7 @@ export default function InspectionDetailsPage() {
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
                 <div className="px-6 py-8">
                   <div className="flex items-center mb-6">
-                    <div className="p-3 bg-yellow-100 rounded-xl mr-4">
+                    <div className="p-3 bg-yellow-100 rounded-xl me-4">
                       <AlertTriangle className="h-6 w-6 text-yellow-600" />
                     </div>
                     <h2 className="text-xl font-bold text-gray-900">Recommendations</h2>
@@ -622,7 +622,7 @@ export default function InspectionDetailsPage() {
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
               <div className="px-6 py-8">
                 <div className="flex items-center mb-6">
-                  <div className="p-3 bg-purple-100 rounded-xl mr-4">
+                  <div className="p-3 bg-purple-100 rounded-xl me-4">
                     <User className="h-6 w-6 text-purple-600" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">Customer</h2>
@@ -642,7 +642,7 @@ export default function InspectionDetailsPage() {
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
               <div className="px-6 py-8">
                 <div className="flex items-center mb-6">
-                  <div className="p-3 bg-orange-100 rounded-xl mr-4">
+                  <div className="p-3 bg-orange-100 rounded-xl me-4">
                     <Wrench className="h-6 w-6 text-orange-600" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">Mechanic</h2>
@@ -663,7 +663,7 @@ export default function InspectionDetailsPage() {
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
                 <div className="px-6 py-8">
                   <div className="flex items-center mb-6">
-                    <div className="p-3 bg-indigo-100 rounded-xl mr-4">
+                    <div className="p-3 bg-indigo-100 rounded-xl me-4">
                       <FileText className="h-6 w-6 text-indigo-600" />
                     </div>
                     <h2 className="text-xl font-bold text-gray-900">Template</h2>
@@ -683,7 +683,7 @@ export default function InspectionDetailsPage() {
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/50 overflow-hidden">
                 <div className="px-6 py-8">
                   <div className="flex items-center mb-6">
-                    <div className="p-3 bg-teal-100 rounded-xl mr-4">
+                    <div className="p-3 bg-teal-100 rounded-xl me-4">
                       <Calendar className="h-6 w-6 text-teal-600" />
                     </div>
                     <h2 className="text-xl font-bold text-gray-900">Next Inspection</h2>

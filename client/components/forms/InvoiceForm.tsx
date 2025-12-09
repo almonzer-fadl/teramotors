@@ -425,7 +425,7 @@ export default function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
           <motion.div variants={fadeInUp} className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-6">
               <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-3"><Wrench className="text-[#F97402]"/>{t('services.services')}</h3>
-                  <button type="button" onClick={addService} className="inline-flex items-center px-4 py-2 rounded-xl font-semibold text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-[#F97402]/10 hover:text-[#F97402] transition-all duration-200"><Plus className="h-4 w-4 mr-2"/>{t('invoices.add_service')}</button>
+                  <button type="button" onClick={addService} className="inline-flex items-center px-4 py-2 rounded-xl font-semibold text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-[#F97402]/10 hover:text-[#F97402] transition-all duration-200"><Plus className="h-4 w-4 me-2"/>{t('invoices.add_service')}</button>
               </div>
               <div className="space-y-4">
                   {services.map((service, index) => (
@@ -447,7 +447,7 @@ export default function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
            <motion.div variants={fadeInUp} className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 p-6">
               <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-3"><Package className="text-[#F97402]"/>{t('inventory.parts')}</h3>
-                  <button type="button" onClick={addPart} className="inline-flex items-center px-4 py-2 rounded-xl font-semibold text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-[#F97402]/10 hover:text-[#F97402] transition-all duration-200"><Plus className="h-4 w-4 mr-2"/>{t('invoices.add_part')}</button>
+                  <button type="button" onClick={addPart} className="inline-flex items-center px-4 py-2 rounded-xl font-semibold text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-[#F97402]/10 hover:text-[#F97402] transition-all duration-200"><Plus className="h-4 w-4 me-2"/>{t('invoices.add_part')}</button>
               </div>
               <div className="space-y-4">
                   {parts.map((part, index) => (

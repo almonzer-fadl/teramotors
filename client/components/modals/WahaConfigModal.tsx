@@ -255,7 +255,7 @@ export function WahaConfigModal({ isOpen, onClose }: WahaConfigModalProps) {
               تحديث
             </button>
 
-            <label className="flex items-center gap-2 ml-auto">
+            <label className="flex items-center gap-2 ms-auto">
               <input
                 type="checkbox"
                 checked={autoRefresh}

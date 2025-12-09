@@ -80,7 +80,7 @@ export default function VehiclesPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
         >
-            <Plus className="mr-2" />
+            <Plus className="me-2" />
             {t('dashboard:vehicles.add_vehicle')}
         </motion.button>
       </div>
