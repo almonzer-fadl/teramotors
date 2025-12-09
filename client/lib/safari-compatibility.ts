@@ -90,138 +90,146 @@ export class SafariCompatibility {
 
     if (browserInfo.isSafari) {
       this.addSafariStyles();
-      this.fixFlexboxIssues();
-      this.fixGridIssues();
       this.fixCustomProperties();
       this.fixIntersectionObserver();
       this.optimizeAnimations();
+      // Removed fixFlexboxIssues() and fixGridIssues() - they cause performance issues
     }
   }
 
-  // Optimize animations for Safari
+  // Optimize animations for Safari - PURE CSS ONLY (no dynamic manipulation)
   private optimizeAnimations(): void {
-    // Target all animated elements and force GPU acceleration
-    const animatedSelectors = [
-      '[class*="animate"]',
-      '[class*="transition"]',
-      '[class*="transform"]',
-      '[style*="transition"]',
-      '[style*="animation"]',
-      '.hover\\:',
-      '[class*="fade"]',
-      '[class*="slide"]',
-      '[class*="scale"]',
-      '[class*="rotate"]',
-    ];
-
-    const animatedElements = document.querySelectorAll(animatedSelectors.join(','));
-
-    animatedElements.forEach(element => {
-      const htmlElement = element as HTMLElement;
-
-      // Force hardware acceleration
-      htmlElement.style.transform = htmlElement.style.transform || 'translateZ(0)';
-      htmlElement.style.webkitTransform = htmlElement.style.webkitTransform || 'translateZ(0)';
-      htmlElement.style.backfaceVisibility = 'hidden';
-      htmlElement.style.webkitBackfaceVisibility = 'hidden';
-      htmlElement.style.perspective = '1000px';
-      htmlElement.style.webkitPerspective = '1000px';
-    });
-
-    // Use MutationObserver to apply fixes to dynamically added elements
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            const element = node as HTMLElement;
-
-            // Check if element has animation classes
-            const hasAnimation = animatedSelectors.some(selector => {
-              const cleanSelector = selector.replace(/[\[\]'":*\\]/g, '');
-              return element.className.includes(cleanSelector);
-            });
-
-            if (hasAnimation) {
-              element.style.transform = element.style.transform || 'translateZ(0)';
-              element.style.webkitTransform = element.style.webkitTransform || 'translateZ(0)';
-              element.style.backfaceVisibility = 'hidden';
-              element.style.webkitBackfaceVisibility = 'hidden';
-            }
+    const style = document.createElement('style');
+    style.id = 'safari-animation-optimizations';
+    style.textContent = `
+      @media not print {
+        /* Target only Safari browsers */
+        @supports (-webkit-touch-callout: none) {
+          /* AGGRESSIVE: Make all animations much faster for instant feel */
+          * {
+            animation-duration: 0.15s !important;
+            transition-duration: 0.1s !important;
+            /* Use hardware-accelerated timing function */
+            animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
           }
-        });
-      });
-    });
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
+          /* Ultra-fast hover effects - nearly instant */
+          button:hover,
+          a:hover,
+          [role="button"]:hover,
+          .cursor-pointer:hover {
+            transition-duration: 0.05s !important;
+          }
+
+          /* Disable animations on scroll containers completely */
+          [class*="overflow"],
+          .overflow-auto,
+          .overflow-scroll,
+          .overflow-y-auto,
+          .overflow-x-auto {
+            animation: none !important;
+            transition: none !important;
+          }
+
+          /* Speed up common Tailwind animations */
+          .animate-spin {
+            animation-duration: 0.6s !important;
+          }
+
+          .animate-pulse {
+            animation-duration: 1s !important;
+          }
+
+          /* Disable resource-heavy animations */
+          .animate-bounce,
+          .animate-ping {
+            animation: none !important;
+          }
+
+          /* Disable Tailwind scale utility classes only (not Framer Motion inline styles) */
+          .scale-0, .scale-50, .scale-75, .scale-90, .scale-95, .scale-100, .scale-105, .scale-110, .scale-125, .scale-150,
+          .hover\\:scale-0:hover, .hover\\:scale-50:hover, .hover\\:scale-75:hover, .hover\\:scale-90:hover,
+          .hover\\:scale-95:hover, .hover\\:scale-100:hover, .hover\\:scale-105:hover, .hover\\:scale-110:hover,
+          .hover\\:scale-125:hover, .hover\\:scale-150:hover {
+            transform: translateZ(0) !important;
+          }
+
+          /* Disable complex transform chains */
+          [class*="rotate"],
+          [class*="skew"] {
+            animation: none !important;
+          }
+
+          /* Simple active state feedback - no transforms */
+          button:active,
+          a:active,
+          [role="button"]:active {
+            opacity: 0.8;
+            transition-duration: 0.05s !important;
+          }
+
+          /* Force GPU acceleration on ALL interactive elements */
+          button,
+          a,
+          [role="button"],
+          input,
+          select,
+          textarea,
+          [class*="cursor-pointer"],
+          [class*="hover:"] {
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: auto;
+          }
+
+          /* Optimize backdrop blur which is expensive on Safari */
+          [class*="backdrop-blur"],
+          .backdrop-blur-sm,
+          .backdrop-blur-md,
+          .backdrop-blur-lg {
+            -webkit-backdrop-filter: blur(4px) !important;
+            backdrop-filter: blur(4px) !important;
+          }
+
+          /* Disable gradient animations - very expensive */
+          [class*="animate-gradient"] {
+            animation: none !important;
+          }
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   private addSafariStyles(): void {
     const style = document.createElement('style');
+    style.id = 'safari-performance-fixes';
     style.textContent = `
-      /* Safari-specific fixes */
-      .safari-fix {
+      /* Safari-specific fixes - OPTIMIZED FOR PERFORMANCE */
+
+      /* Font rendering for all elements */
+      body * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Minimal GPU acceleration - only for interactive elements */
+      button,
+      a,
+      [role="button"],
+      input,
+      select,
+      textarea {
         -webkit-transform: translateZ(0);
         transform: translateZ(0);
       }
 
-      /* Critical: Safari Animation Performance Fixes */
-      * {
-        /* Force hardware acceleration for all animations */
-        -webkit-transform: translateZ(0);
-        -webkit-backface-visibility: hidden;
-        -webkit-perspective: 1000;
-      }
-
-      /* Optimize animated elements */
-      [class*="animate"],
-      [class*="transition"],
-      [class*="hover"],
-      [class*="fade"],
-      [class*="slide"] {
-        /* Force GPU acceleration */
-        -webkit-transform: translate3d(0, 0, 0);
-        transform: translate3d(0, 0, 0);
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-        -webkit-perspective: 1000px;
-        perspective: 1000px;
-        /* Improve compositing */
-        will-change: transform, opacity;
-        /* Reduce paint operations */
-        -webkit-font-smoothing: subpixel-antialiased;
-      }
-
-      /* Fix for Safari transition performance */
-      .safari-animation-fix {
-        -webkit-transform: translate3d(0, 0, 0);
-        transform: translate3d(0, 0, 0);
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden;
-        -webkit-perspective: 1000px;
-        perspective: 1000px;
-        will-change: transform, opacity;
-      }
-
-      /* Optimize opacity transitions */
-      [style*="opacity"] {
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-      }
-
-      /* Fix for Safari flexbox issues */
-      .safari-flex-fix {
-        display: -webkit-flex;
-        display: -ms-flexbox;
-        display: flex;
-      }
-
-      /* Fix for Safari grid issues */
-      .safari-grid-fix {
-        display: -webkit-grid;
-        display: grid;
+      /* Optimize scrolling containers */
+      [class*="overflow"],
+      .overflow-auto,
+      .overflow-scroll {
+        -webkit-overflow-scrolling: touch;
       }
 
       /* Fix for Safari backdrop-filter */
@@ -278,22 +286,6 @@ export class SafariCompatibility {
       }
     `;
     document.head.appendChild(style);
-  }
-
-  private fixFlexboxIssues(): void {
-    // Add Safari flexbox classes to elements that use flexbox
-    const flexElements = document.querySelectorAll('[class*="flex"]');
-    flexElements.forEach(element => {
-      element.classList.add('safari-flex-fix');
-    });
-  }
-
-  private fixGridIssues(): void {
-    // Add Safari grid classes to elements that use grid
-    const gridElements = document.querySelectorAll('[class*="grid"]');
-    gridElements.forEach(element => {
-      element.classList.add('safari-grid-fix');
-    });
   }
 
   private fixCustomProperties(): void {
