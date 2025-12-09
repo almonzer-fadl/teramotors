@@ -1,95 +1,82 @@
-import { NextResponse } from 'next/server'
-import { connectToDatabase } from '@/lib/db'
-import User from '@/lib/models/User'
-import { getServerSession } from "@/lib/auth-server";
-import { saltAndHashPassword } from '@/lib/utils/password'
+import { NextRequest, NextResponse } from 'next/server';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
+import { checkUsageLimit } from '@/lib/middleware/usage-enforcement';
+import { updateTenantStats } from '@/lib/utils/usage-tracker';
+import { connectToDatabase } from '@/lib/db';
+import User from '@/lib/models/User';
+import bcrypt from 'bcryptjs';
 
-export async function GET() {
-  const session = await getServerSession()
-  if (!session || (session.user as any).role !== 'admin') {
-    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 })
-  }
-
-  try {
-    await connectToDatabase()
-    const users = await User.find({}).select('firstName lastName displayName role isActive email createdAt')
-    return NextResponse.json(users, { status: 200 })
-  } catch (error) {
-    console.error('Error fetching users:', error)
-    return NextResponse.json({ message: 'Error fetching users' }, { status: 500 })
-  }
-}
-
-export async function POST(request: Request) {
-  const session = await getServerSession()
-  if (!session || (session.user as any).role !== 'admin') {
-    return NextResponse.json({ message: 'Not authenticated' }, { status: 401 })
-  }
-
-  try {
-    await connectToDatabase()
-    
-    const body = await request.json()
-    const { email, firstName, lastName, role = 'mechanic', phone } = body
-    
-    // Validate required fields
-    if (!email || !firstName || !lastName) {
-      return NextResponse.json({ error: 'Email, first name, and last name are required' }, { status: 400 })
+// GET /api/users - List all users for the current tenant
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
+    await connectToDatabase();
+    try {
+      // Find all users that belong to the tenant, excluding their passwords
+      const users = await User.find({ tenantId }).select('-password').lean();
+      return NextResponse.json(users);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
-    
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
-    }
-    
-    // Check if user already exists
-    const existingUser = await User.findOne({ email })
-    if (existingUser) {
-      return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
-    }
-    
-    // Create new user with temporary password
-    const tempPassword = 'TempPass123!' // This will be changed on first login
-    const user = new User({
-      email,
-      password: saltAndHashPassword(tempPassword),
-      firstName,
-      lastName,
-      fullName: `${firstName} ${lastName}`,
-      displayName: `${firstName} ${lastName}`,
-      role,
-      phone,
-      isActive: true,
-      emailVerified: false,
-      needsPasswordChange: true // Flag to force password change on first login
-    })
-    
-    await user.save()
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: 'User created successfully',
-      user: {
-        id: user._id,
-        email: user.email,
-        fullName: user.fullName,
-        role: user.role
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);
+
+// POST /api/users - Add a new user to the tenant
+export const POST = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
+    await connectToDatabase();
+    try {
+      const body = await req.json();
+      const { firstName, lastName, email, role } = body;
+
+      if (!firstName || !lastName || !email || !role) {
+        return NextResponse.json({ error: 'First name, last name, email, and role are required.' }, { status: 400 });
       }
-    })
-    
-  } catch (error: any) {
-    console.error('Error creating user:', error)
-    
-    if (error.code === 11000) {
-      return NextResponse.json({ error: 'Email already exists' }, { status: 400 })
+
+      // Check if user with this email already exists for this tenant
+      const existingUser = await User.findOne({ email, tenantId });
+      if (existingUser) {
+        return NextResponse.json({ error: 'A user with this email already exists in your organization.' }, { status: 409 });
+      }
+
+      // Check usage limits before creating a new user
+      const usageCheck = await checkUsageLimit(tenantId.toString(), 'user', 'create');
+      if (!usageCheck.allowed) {
+        return NextResponse.json({
+          error: usageCheck.reason,
+          current: usageCheck.current,
+          limit: usageCheck.limit
+        }, { status: 403 });
+      }
+
+      // Generate and hash a temporary password
+      const temporaryPassword = "TempPass123!"; // This could be randomized and emailed
+      const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
+
+      const newUser = await User.create({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        role,
+        tenantId,
+        status: 'active', // New users are active by default
+      });
+      
+      // Update tenant stats after successful creation
+      await updateTenantStats(tenantId.toString());
+
+      // Return the new user without the password
+      const userResponse = newUser.toObject();
+      delete userResponse.password;
+
+      return NextResponse.json(userResponse, { status: 201 });
+
+    } catch (error) {
+      console.error('Error adding new user:', error);
+      return NextResponse.json({ error: 'Failed to add new user' }, { status: 500 });
     }
-    
-    if (error.name === 'ValidationError') {
-      const errors = Object.values(error.errors).map((err: any) => err.message)
-      return NextResponse.json({ error: errors.join(', ') }, { status: 400 })
-    }
-    
-    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
-  }
-}
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);

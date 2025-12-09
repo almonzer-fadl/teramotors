@@ -13,8 +13,13 @@ export async function GET() {
     }
 
     await connectToDatabase();
-    
-    const mechanics = await Mechanic.find({}).populate('userId', 'firstName lastName');
+
+    const tenantId = (session.user as any).tenantId;
+    if (!tenantId) {
+      return new Response(JSON.stringify({ error: 'Tenant ID not found' }), { status: 400 });
+    }
+
+    const mechanics = await Mechanic.find({ tenantId }).populate('userId', 'firstName lastName');
 
     return new Response(JSON.stringify(mechanics));
   } catch (error) {

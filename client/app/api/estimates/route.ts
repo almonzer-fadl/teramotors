@@ -37,10 +37,11 @@ export async function GET(request: NextRequest) {
     const sort: any = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
     
-    // Get total count for pagination
-    const totalCount = await Estimate.countDocuments({});
-    
-    const estimates = await Estimate.find({})
+    // Get total count for pagination with tenant filter
+    const tenantId = (session.user as any).tenantId;
+    const totalCount = await Estimate.countDocuments({ tenantId });
+
+    const estimates = await Estimate.find({ tenantId })
       .populate('jobCardId', '_id')
       .populate('inspectionId', 'inspectionDate overallCondition')
       .populate('customerId', 'firstName lastName')
@@ -205,7 +206,8 @@ export async function POST(request: Request) {
       tax,
       total,
       validUntil: body.validUntil ? new Date(body.validUntil) : validUntil,
-      notes: body.notes || ''
+      notes: body.notes || '',
+      tenantId: (session.user as any).tenantId
     })
 
     await estimate.save()

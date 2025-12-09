@@ -29,6 +29,11 @@ export async function POST(request: NextRequest) {
 
     await connectToDatabase()
 
+    const tenantId = (session.user as any).tenantId
+    if (!tenantId) {
+      return new Response(JSON.stringify({ error: 'Tenant ID not found' }), { status: 400 })
+    }
+
     // Calculate date range
     const endDate = new Date()
     const startDate = new Date()
@@ -44,30 +49,34 @@ export async function POST(request: NextRequest) {
       parts,
       payments
     ] = await Promise.all([
-      Customer.find({}).sort({ createdAt: -1 }),
-      Vehicle.find({}).populate('customerId', 'firstName lastName').sort({ createdAt: -1 }),
-      Appointment.find({ 
+      Customer.find({ tenantId }).sort({ createdAt: -1 }),
+      Vehicle.find({ tenantId }).populate('customerId', 'firstName lastName').sort({ createdAt: -1 }),
+      Appointment.find({
+        tenantId,
         appointmentDate: { $gte: startDate, $lte: endDate } 
       }).populate('customerId', 'firstName lastName')
        .populate('vehicleId', 'make model licensePlate')
        .populate('serviceId', 'name')
        .sort({ appointmentDate: -1 }),
-      JobCard.find({ 
-        createdAt: { $gte: startDate, $lte: endDate } 
+      JobCard.find({
+        tenantId,
+        createdAt: { $gte: startDate, $lte: endDate }
       }).populate('customerId', 'firstName lastName')
        .populate('vehicleId', 'make model licensePlate')
        .populate('services.serviceId', 'name')
        .populate('partsUsed.partId', 'name')
        .sort({ createdAt: -1 }),
-      Invoice.find({ 
-        createdAt: { $gte: startDate, $lte: endDate } 
+      Invoice.find({
+        tenantId,
+        createdAt: { $gte: startDate, $lte: endDate }
       }).populate('customerId', 'firstName lastName')
        .populate('jobCardId')
        .sort({ createdAt: -1 }),
-      Part.find({}).sort({ name: 1 }),
+      Part.find({ tenantId }).sort({ name: 1 }),
       // Get payments data for financial analysis
-      Payment.find({ 
-        paymentDate: { $gte: startDate, $lte: endDate } 
+      Payment.find({
+        tenantId,
+        paymentDate: { $gte: startDate, $lte: endDate }
       }).populate('invoiceId', 'total customerId')
     ])
 

@@ -14,9 +14,14 @@ export async function POST(
 
     await connectToDatabase()
 
+    const tenantId = (session.user as any).tenantId
+    if (!tenantId) {
+      return Response.json({ error: 'Tenant ID not found' }, { status: 400 })
+    }
+
     const { id } = await context.params
 
-    const active = await WorkLog.findOne({ jobCardId: id, userId: session.user.id, endedAt: { $exists: false } })
+    const active = await WorkLog.findOne({ tenantId, jobCardId: id, userId: session.user.id, endedAt: { $exists: false } })
     if (!active) return Response.json({ error: 'No active work log' }, { status: 400 })
 
     const endedAt = new Date()

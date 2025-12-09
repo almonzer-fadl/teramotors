@@ -211,12 +211,12 @@ export default function SearchableComboBox({
       <div
         onClick={toggleOpen}
         className={`
-          w-full px-6 py-4 pr-12 border-2 border-gray-200 rounded-2xl 
-          focus-within:ring-4 focus-within:ring-[#F13F33]/20 focus-within:border-[#F13F33] 
-          transition-all duration-300 text-gray-900 placeholder-gray-500 
-          bg-white/80 backdrop-blur-sm hover:border-gray-300
+          w-full px-4 py-3.5 pr-12 border-2 border-gray-200 dark:border-gray-700 rounded-xl
+          focus-within:ring-4 focus-within:ring-[#F97402]/20 focus-within:border-[#F97402]
+          transition-all duration-200 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder:text-gray-400
+          bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:border-gray-300 dark:hover:border-gray-600
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-          ${isOpen ? 'ring-4 ring-[#F13F33]/20 border-[#F13F33]' : ''}
+          ${isOpen ? 'ring-4 ring-[#F97402]/20 border-[#F97402]' : ''}
         `}
       >
         <div className="flex items-center justify-between">
@@ -231,7 +231,7 @@ export default function SearchableComboBox({
               disabled={disabled}
             />
           ) : (
-            <span className={displayValue ? 'text-gray-900' : 'text-gray-500'}>
+            <span className={displayValue ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}>
               {displayValue || placeholder}
             </span>
           )}
@@ -241,13 +241,13 @@ export default function SearchableComboBox({
               <button
                 type="button"
                 onClick={handleClear}
-                className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
               >
-                <X className="h-4 w-4 text-gray-500" />
+                <X className="h-4 w-4 text-gray-500 dark:text-gray-400" />
               </button>
             )}
-            <ChevronDown 
-              className={`h-5 w-5 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+            <ChevronDown
+              className={`h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
             />
           </div>
         </div>
@@ -264,11 +264,11 @@ export default function SearchableComboBox({
             width: `${dropdownPosition.width}px`,
             zIndex: 9999,
           }}
-          className="bg-white border-2 border-gray-200 rounded-2xl shadow-xl max-h-80 overflow-y-auto"
+          className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-80 overflow-y-auto"
         >
           {filteredOptions.length === 0 && !onCreateNew && (
-            <div className="px-6 py-8 text-center text-gray-500">
-              <Search className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+            <div className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+              <Search className="h-8 w-8 mx-auto mb-2 text-gray-400 dark:text-gray-500" />
               <p>{emptyMessage || t('ui.no_results_found')}</p>
             </div>
           )}
@@ -279,9 +279,9 @@ export default function SearchableComboBox({
               onClick={() => handleSelect(option.value)}
               onMouseEnter={() => setHighlightedIndex(index)}
               className={`
-                px-6 py-3 cursor-pointer transition-colors
-                ${highlightedIndex === index ? 'bg-[#F13F33]/10 text-[#F13F33]' : 'hover:bg-gray-50'}
-                ${option.value === value ? 'bg-[#F13F33]/5 font-semibold' : ''}
+                px-6 py-3 cursor-pointer transition-colors text-gray-900 dark:text-white
+                ${highlightedIndex === index ? 'bg-[#F97402]/10 text-[#F97402]' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}
+                ${option.value === value ? 'bg-[#F97402]/5 font-semibold' : ''}
               `}
             >
               {option.label}
@@ -294,8 +294,8 @@ export default function SearchableComboBox({
               onClick={handleCreateNew}
               onMouseEnter={() => setHighlightedIndex(filteredOptions.length)}
               className={`
-                px-6 py-4 cursor-pointer transition-colors border-t-2 border-dashed border-gray-200
-                ${highlightedIndex === filteredOptions.length ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50'}
+                px-6 py-4 cursor-pointer transition-colors border-t-2 border-dashed border-gray-200 dark:border-gray-700
+                ${highlightedIndex === filteredOptions.length ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}
               `}
             >
               <div className="flex items-center gap-3">
@@ -303,10 +303,10 @@ export default function SearchableComboBox({
                   <Plus className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <div className="font-semibold">
+                  <div className="font-semibold text-gray-900 dark:text-white">
                     {createNewLabel || t('ui.create_new')}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     {t('ui.no_matches_create_new')}
                   </div>
                 </div>
@@ -320,8 +320,8 @@ export default function SearchableComboBox({
               onClick={handleCreateNew}
               onMouseEnter={() => setHighlightedIndex(filteredOptions.length)}
               className={`
-                px-6 py-3 cursor-pointer transition-colors border-t-2 border-gray-100
-                ${highlightedIndex === filteredOptions.length ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-50 text-gray-700'}
+                px-6 py-3 cursor-pointer transition-colors border-t-2 border-gray-100 dark:border-gray-700
+                ${highlightedIndex === filteredOptions.length ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}
               `}
             >
               <div className="flex items-center gap-2 font-semibold">

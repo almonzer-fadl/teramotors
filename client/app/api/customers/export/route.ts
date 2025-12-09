@@ -3,12 +3,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Parser } from 'json2csv';
 import Customer from '@/lib/models/Customer';
 import { connectToDatabase } from '@/lib/db';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(req: NextRequest) {
-  try {
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
     await connectToDatabase();
 
-    const customers = await Customer.find({});
+    const customers = await Customer.find({ tenantId });
 
     const fields = [
       'firstName',
@@ -33,8 +34,5 @@ export async function GET(req: NextRequest) {
     });
 
     return response;
-  } catch (error) {
-    console.error('Error exporting customers:', error);
-    return NextResponse.json({ success: false, error: { message: 'Error exporting customers' } }, { status: 500 });
   }
-}
+);

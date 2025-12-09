@@ -15,6 +15,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
+    const tenantId = (session.user as any).tenantId;
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Tenant ID not found' }, { status: 400 });
+    }
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
@@ -24,7 +29,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build query
-    const query: any = {};
+    const query: any = { tenantId };
     if (customerId) {
       query.customerId = customerId;
     }

@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import ResponsiveEstimatesTable from "@/components/ui/ResponsiveEstimatesTable";
 import { socket } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
+import { fadeInUp, staggerContainer } from "@/lib/dashboard-animations";
 
 interface Estimate {
   _id: string;
@@ -104,20 +106,45 @@ export default function EstimatesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402]"></div>
       </div>
     );
   }
 
   return (
-    <ResponsiveEstimatesTable
-      estimates={filteredEstimates}
-      searchTerm={searchTerm}
-      statusFilter={statusFilter}
-      onSearchChange={setSearchTerm}
-      onStatusFilterChange={setStatusFilter}
-    />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 py-6">
+      <motion.div
+        className="space-y-6"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4" variants={fadeInUp}>
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">{t('estimates.title')}</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {t('estimates.description')}
+            </p>
+          </div>
+          <Link
+            href="/estimates/new"
+            className="inline-flex items-center justify-center rounded-lg bg-[#F97402] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#F13F33] transition-colors"
+          >
+            {t('estimates.create_estimate')}
+          </Link>
+        </motion.div>
+
+        <motion.div variants={fadeInUp}>
+          <ResponsiveEstimatesTable
+            estimates={filteredEstimates}
+            searchTerm={searchTerm}
+            statusFilter={statusFilter}
+            onSearchChange={setSearchTerm}
+            onStatusFilterChange={setStatusFilter}
+          />
+        </motion.div>
+      </motion.div>
+    </div>
   );
 }
-

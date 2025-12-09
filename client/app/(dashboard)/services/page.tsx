@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Plus, Search, Upload } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import ResponsiveServicesTable from "@/components/ui/ResponsiveServicesTable";
 import Pagination from "@/components/ui/Pagination";
 import ExcelImportModal from "@/components/dashboard/ExcelImportModal";
@@ -10,6 +11,7 @@ import { socket } from "@/lib/services/socket";
 import { useSession } from "@/lib/hooks/useSession";
 import { hasPermission } from "@/lib/roles";
 import { useTranslation } from "react-i18next";
+import { fadeInUp, scaleIn, staggerContainer } from "@/lib/dashboard-animations";
 
 interface Service {
   _id: string;
@@ -156,8 +158,8 @@ export default function ServicesPage() {
 
   if (initialLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex items-center justify-center h-64 bg-gray-50 dark:bg-gray-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97402]"></div>
       </div>
     );
   }
@@ -213,119 +215,104 @@ export default function ServicesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-8 py-6">
-      <div className="space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 px-4 sm:px-6 lg:px-8 py-6">
+      <motion.div
+        className="space-y-6"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <motion.div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" variants={fadeInUp}>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
               {t('services.title')}
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {t('services.description')}
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/services/new"
-              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-[#F97402] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#F13F33] transition-colors"
             >
               <Plus className="me-2 h-4 w-4" />
               {t('services.add_service')}
             </Link>
-            
+
             <button
               onClick={() => setIsImportModalOpen(true)}
-              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-purple-500 transition-colors"
+              className="inline-flex items-center justify-center w-full sm:w-auto rounded-lg bg-gray-900 dark:bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 dark:hover:bg-gray-700 transition-colors"
             >
               <Upload className="me-2 h-4 w-4" />
               Import from Excel
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Plus className="h-6 w-6 text-blue-400" />
-                </div>
-                <div className="ms-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      {t('services.total_services')}
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      {totalServices}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Plus className="h-6 w-6 text-green-400" />
-                </div>
-                <div className="ms-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      {t('services.active')}
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      {activeServices}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Plus className="h-6 w-6 text-red-400" />
-                </div>
-                <div className="ms-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      {t('services.inactive')}
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      {inactiveServices}
-                    </dd>
-                  </dl>
+        <motion.div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" variants={staggerContainer}>
+          {[
+            {
+              label: t('services.total_services'),
+              value: totalServices,
+              icon: <Plus className="h-6 w-6 text-blue-500 dark:text-blue-400" />,
+            },
+            {
+              label: t('services.active'),
+              value: activeServices,
+              icon: <Plus className="h-6 w-6 text-green-500 dark:text-green-400" />,
+            },
+            {
+              label: t('services.inactive'),
+              value: inactiveServices,
+              icon: <Plus className="h-6 w-6 text-red-500 dark:text-red-400" />,
+            },
+          ].map((stat, idx) => (
+            <motion.div
+              key={stat.label}
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-gray-100 dark:border-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30"
+              variants={scaleIn}
+            >
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">{stat.icon}</div>
+                  <div className="ms-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                        {stat.label}
+                      </dt>
+                      <dd className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {stat.value}
+                      </dd>
+                    </dl>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          ))}
+        </motion.div>
 
         {/* Search and Filters */}
-        <div className="bg-white shadow rounded-lg">
+        <motion.div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-gray-100 dark:border-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30" variants={fadeInUp}>
           <div className="px-4 py-5 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="relative flex-1 sm:flex-none">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
+                <div className="relative flex-1">
                   <Search className="absolute start-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
                     placeholder={t('services.search_placeholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full ps-10 pe-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full ps-10 pe-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:ring-[#F97402] focus:border-[#F97402]"
                   />
                 </div>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:border-[#F97402] focus:ring-[#F97402]"
                 >
                   <option value="">{t('services.all_categories')}</option>
                   {categories.map((category) => (
@@ -335,57 +322,69 @@ export default function ServicesPage() {
                   ))}
                 </select>
               </div>
-              <div className="text-sm text-gray-500 text-center sm:text-end">
+              <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-end">
                 {t(sortedServices.length === 1 ? 'services.service_count' : 'services.service_count_plural', { count: sortedServices.length })}
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Services Table */}
-        <ResponsiveServicesTable
-          services={paginatedServices}
-          sortKey={sortKey}
-          sortDirection={sortDirection}
-          onSort={handleSort}
-          onDelete={handleDelete}
-          canDelete={canDeleteServices}
-        />
+        <motion.div variants={fadeInUp}>
+          <ResponsiveServicesTable
+            services={paginatedServices}
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+            onDelete={handleDelete}
+            canDelete={canDeleteServices}
+          />
+        </motion.div>
 
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={sortedServices.length}
-          itemsPerPage={itemsPerPage}
-          onPageChange={handlePageChange}
-          onItemsPerPageChange={handleItemsPerPageChange}
-        />
+        <motion.div variants={fadeInUp}>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={sortedServices.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        </motion.div>
 
         {/* Empty State */}
-        {sortedServices.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <Plus className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-4 text-lg font-medium text-gray-900">
-              {t('services.no_services_found')}
-            </h3>
-            <p className="mt-2 text-sm text-gray-500">
-              {searchTerm
-                ? t('services.adjust_search_terms')
-                : t('services.get_started_adding')}
-            </p>
-            {!searchTerm && (
-              <div className="mt-6">
-                <Link
-                  href="/services/new"
-                  className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 transition-colors"
-                >
-                  <Plus className="me-2 h-4 w-4" />
-                  {t('services.add_service')}
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
+        <AnimatePresence>
+          {sortedServices.length === 0 && (
+            <motion.div
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 p-8 text-center"
+              variants={scaleIn}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+            >
+              <Plus className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                {t('services.no_services_found')}
+              </h3>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {searchTerm
+                  ? t('services.adjust_search_terms')
+                  : t('services.get_started_adding')}
+              </p>
+              {!searchTerm && (
+                <div className="mt-6">
+                  <Link
+                    href="/services/new"
+                    className="inline-flex items-center rounded-lg bg-[#F97402] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#F13F33] transition-colors"
+                  >
+                    <Plus className="me-2 h-4 w-4" />
+                    {t('services.add_service')}
+                  </Link>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Excel Import Modal */}
         <ExcelImportModal
@@ -398,7 +397,7 @@ export default function ServicesPage() {
           maxFileSize="5MB"
           exampleHeaders={['name', 'price', 'description', 'category', 'laborHours']}
         />
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -1,66 +1,85 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Appointment from '@/lib/models/Appointment';
-import { getServerSession } from '@/lib/auth-server';
+import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
-export async function GET(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// GET /api/appointments/[id] - Get single appointment
+export const GET = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const appointment = await Appointment.findById(id)
+
+    // Filter by BOTH id AND tenantId
+    const appointment = await Appointment.findOne({
+      _id: params?.id,
+      tenantId,
+    })
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate({        path: 'mechanicId',        populate: {          path: 'userId',          select: 'firstName lastName'        }      })
+      .populate({
+        path: 'mechanicId',
+        populate: {
+          path: 'userId',
+          select: 'firstName lastName',
+        },
+      })
       .populate('serviceId', 'name');
-    
+
     if (!appointment) {
-      return new Response(JSON.stringify({ error: 'Appointment not found' }), { status: 404 });
+      return NextResponse.json(
+        { error: 'Appointment not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify(appointment));
-  } catch (error) {
-    console.error('Error fetching appointment:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch appointment' }), { status: 500 });
-  }
-}
+    return NextResponse.json(appointment);
+  },
+  { requireTenant: true }
+);
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await context.params;
-    const session = await getServerSession();
-    if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
+// PUT /api/appointments/[id] - Update appointment
+export const PUT = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
     await connectToDatabase();
-    
-    const body = await request.json();
-    
-    const appointment = await Appointment.findByIdAndUpdate(
-      id,
+
+    const body = await req.json();
+
+    // Update only if belongs to tenant
+    const appointment = await Appointment.findOneAndUpdate(
+      { _id: params?.id, tenantId },
       body,
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!appointment) {
-      return new Response(JSON.stringify({ error: 'Appointment not found' }), { status: 404 });
+      return NextResponse.json(
+        { error: 'Appointment not found' },
+        { status: 404 }
+      );
     }
 
-    return new Response(JSON.stringify({ success: true, appointment }));
-  } catch (error) {
-    console.error('Error updating appointment:', error);
-    return new Response(JSON.stringify({ error: 'Failed to update appointment' }), { status: 500 });
-  }
-}
+    return NextResponse.json({ success: true, appointment });
+  },
+  { requireTenant: true }
+);
+
+// DELETE /api/appointments/[id] - Delete appointment
+export const DELETE = withTenantAuth(
+  async (req: NextRequest, { tenantId, params }) => {
+    await connectToDatabase();
+
+    const appointment = await Appointment.findOneAndDelete({
+      _id: params?.id,
+      tenantId,
+    });
+
+    if (!appointment) {
+      return NextResponse.json(
+        { error: 'Appointment not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  },
+  { requireTenant: true, allowedRoles: ['admin'] }
+);

@@ -681,7 +681,7 @@ export default function JobCardForm({
     }));
   
     return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
       <InlineInspectionCreator
         isOpen={isInspectionModalOpen}
         onClose={() => setInspectionModalOpen(false)}
@@ -711,22 +711,22 @@ export default function JobCardForm({
         onCreated={handleServiceCreated}
       />
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="py-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <button
                   onClick={() => router.back()}
-                  className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
+                  className="mr-6 p-3 text-gray-600 dark:text-gray-400 hover:text-[#F97402] transition-all duration-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:bg-gray-800 group"
                 >
                   <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
                 </button>
                 <div>
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                  <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                     {isEditing ? t("forms.edit_job_card") : t("forms.new_job_card")}
                   </h1>
-                  <p className="mt-3 text-xl text-gray-600">
+                  <p className="mt-3 text-base text-gray-700 dark:text-gray-300">
                     {isEditing
                       ? t("forms.update_job_card_details")
                       : t("forms.create_new_job_card")}
@@ -778,13 +778,13 @@ export default function JobCardForm({
       <div className="px-4 sm:px-6 lg:px-8 py-12">
         <form onSubmit={handleSubmit} className="space-y-10">
           {/* Main Details Section - Customer and Vehicle Only */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-8 py-8">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mr-4">
                   <Wrench className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                   {t("forms.job_card_Main_details")}
                 </h3>
               </div>
@@ -793,7 +793,7 @@ export default function JobCardForm({
                 {/* START: Estimate Selector for Repair Job Cards */}
                 {formData.type === 'repair' && !isEditing && (
                     <div className="space-y-2 md:col-span-2">
-                        <label className="block text-sm font-bold text-gray-700">
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                             Create from Estimate
                         </label>
                         <SearchableComboBox
@@ -803,7 +803,7 @@ export default function JobCardForm({
                             placeholder="Select an estimate to auto-fill form"
                             emptyMessage="No pending estimates found"
                         />
-                         <p className="text-xs text-gray-500 mt-1">
+                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             Selecting an estimate will automatically fill customer, vehicle, and service details.
                         </p>
                     </div>
@@ -814,7 +814,7 @@ export default function JobCardForm({
                 {(formData.type !== 'repair' || isEditing || formData.estimateId) && (
                     <>
                         <div className="space-y-2">
-                        <label className="block text-sm font-bold text-gray-700">
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                             {t("forms.customer")} <span className="text-red-500">*</span>
                         </label>
                         <SearchableComboBox
@@ -830,7 +830,7 @@ export default function JobCardForm({
                         />
                         </div>
                         <div className="space-y-2">
-                        <label className="block text-sm font-bold text-gray-700">
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                             {t("forms.vehicle")} <span className="text-red-500">*</span>
                         </label>
                         <SearchableComboBox
@@ -851,20 +851,20 @@ export default function JobCardForm({
 
                 {/* Job Type */}
                 <div className="space-y-2 md:col-span-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t("forms.job_type")} <span className="text-red-500">*</span>
                   </label>
                   <select
                     required
                     value={formData.type}
                     onChange={(e) => handleInputChange("type", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                   >
                     <option value="regular">{t("job_types.regular")}</option>
                     <option value="inspection">{t("job_types.inspection")}</option>
                     <option value="repair">{t("job_types.repair")}</option>
                   </select>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {formData.type === 'regular' && t("job_types.regular_desc")}
                     {formData.type === 'inspection' && t("job_types.inspection_desc")}
                     {formData.type === 'repair' && t("job_types.repair_desc")}
@@ -876,32 +876,32 @@ export default function JobCardForm({
 
           {/* Services Section */}
           {formData.type === 'inspection' ? (
-            <div className="bg-blue-50 border-2 border-dashed border-blue-200 rounded-3xl p-8 text-center">
+            <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-dashed border-blue-200 dark:border-blue-800 rounded-3xl p-8 text-center">
                 <div className="flex items-center mb-4 justify-center">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
                         <Wrench className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                         {t("forms.services")}
                     </h3>
                 </div>
-                <p className="text-blue-800">
+                <p className="text-blue-800 dark:text-blue-400">
                     This is an inspection job card. The services section is disabled.
                 </p>
-                <div className="mt-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-900">
+                <div className="mt-4 p-4 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-800 rounded-lg text-yellow-900 dark:text-yellow-400">
                     <p className="font-bold">Developer Reminder:</p>
                     <p>Remember to add auto-filled/recommendations for the inspection services we have.</p>
                 </div>
             </div>
           ) : (
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
               {/* Existing Services Section Content */}
               <div className="px-8 py-8">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-[#063479] to-[#052a5f] rounded-2xl flex items-center justify-center mr-4">
                   <Wrench className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                   {t("forms.services")}
                 </h3>
               </div>
@@ -911,7 +911,7 @@ export default function JobCardForm({
                   className="grid grid-cols-5 gap-4 items-center mb-4"
                 >
                   <div className="col-span-2 space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">{t('forms.service')}</label>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.service')}</label>
                     <SearchableComboBox
                       value={service.serviceId}
                       onChange={(value) => handleServiceChange(index, "serviceId", value)}
@@ -923,43 +923,43 @@ export default function JobCardForm({
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">{t('forms.qty')}</label>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.qty')}</label>
                     <input
                       type="number"
                       value={service.quantity}
                       onChange={(e) =>
                         handleServiceChange(index, "quantity", parseInt(e.target.value))
                       }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-sm font-bold text-gray-700">{t('job_cards.labor_hours')}</label>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('job_cards.labor_hours')}</label>
                     <input
                       type="number"
                       value={service.laborHours}
                       onChange={(e) =>
                         handleServiceChange(index, "laborHours", parseFloat(e.target.value))
                       }
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                      className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     />
                   </div>
                   {isAdmin ? (
                     <div className="space-y-2">
-                      <label className="block text-sm font-bold text-gray-700">{t('forms.labor_placeholder')}</label>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.labor_placeholder')}</label>
                       <input
                         type="number"
                         value={service.laborRate}
                         onChange={(e) =>
                           handleServiceChange(index, "laborRate", parseFloat(e.target.value))
                         }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                        className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                       />
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <label className="block text-sm font-bold text-gray-700">{t('forms.labor_placeholder')}</label>
-                      <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.labor_placeholder')}</label>
+                      <div className="w-full px-4 py-3.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-center">
                         {t("job_cards.admin_only")}
                       </div>
                     </div>
@@ -976,9 +976,9 @@ export default function JobCardForm({
               <button
                 type="button"
                 onClick={(e) => addService(e)}
-                className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                className="mt-4 inline-flex items-center px-4 py-2.5 border-2 border-dashed border-gray-300 dark:border-gray-700 text-sm font-semibold rounded-xl text-gray-700 dark:text-gray-300 bg-white/80 dark:bg-gray-800/80 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-[#F97402] dark:hover:border-[#F97402] hover:text-[#F97402] transition-all duration-200"
               >
-                <Wrench className="mr-2 h-4 w-4" />
+                <Wrench className="me-2 h-4 w-4" />
                 {t("forms.add_service")}
               </button>
             </div>
@@ -987,13 +987,13 @@ export default function JobCardForm({
 
           {/* Parts Used Section */}
           {formData.type !== 'inspection' && (
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
                 <div className="px-8 py-8">
                 <div className="flex items-center mb-8">
                     <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
                     <Wrench className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                     {t("forms.parts_used")}
                     </h3>
                 </div>
@@ -1003,7 +1003,7 @@ export default function JobCardForm({
                     className="grid grid-cols-4 gap-4 items-center mb-4"
                     >
                     <div className="col-span-2 space-y-2">
-                        <label className="block text-sm font-bold text-gray-700">{t('job_cards.select_part')}</label>
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('job_cards.select_part')}</label>
                         <SearchableComboBox
                         value={part.partId}
                         onChange={(value) => handlePartChange(index, "partId", value)}
@@ -1015,19 +1015,19 @@ export default function JobCardForm({
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="block text-sm font-bold text-gray-700">{t('forms.qty')}</label>
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.qty')}</label>
                         <input
                         type="number"
                         value={part.quantity}
                         onChange={(e) =>
                             handlePartChange(index, "quantity", parseInt(e.target.value))
                         }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                        className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                         />
                     </div>
                     {isAdmin ? (
                         <div className="space-y-2">
-                        <label className="block text-sm font-bold text-gray-700">{t('forms.cost_placeholder')}</label>
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.cost_placeholder')}</label>
                         <input
                             type="number"
                             name="cost"
@@ -1035,13 +1035,13 @@ export default function JobCardForm({
                             onChange={(e) =>
                             handlePartChange(index, "cost", parseFloat(e.target.value))
                             }
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                            className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                         />
                         </div>
                     ) : (
                         <div className="space-y-2">
-                        <label className="block text-sm font-bold text-gray-700">{t('forms.cost_placeholder')}</label>
-                        <div className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-100 text-gray-500 text-center">
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.cost_placeholder')}</label>
+                        <div className="w-full px-4 py-3.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-center">
                             {t("job_cards.admin_only")}
                         </div>
                         </div>
@@ -1058,9 +1058,9 @@ export default function JobCardForm({
                 <button
                     type="button"
                     onClick={(e) => addPart(e)}
-                    className="mt-4 inline-flex items-center px-4 py-2 border border-dashed border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    className="mt-4 inline-flex items-center px-4 py-2.5 border-2 border-dashed border-gray-300 dark:border-gray-700 text-sm font-semibold rounded-xl text-gray-700 dark:text-gray-300 bg-white/80 dark:bg-gray-800/80 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-[#F97402] dark:hover:border-[#F97402] hover:text-[#F97402] transition-all duration-200"
                 >
-                    <Package className="mr-2 h-4 w-4" />
+                    <Package className="me-2 h-4 w-4" />
                     {t("forms.add_part")}
                 </button>
                 </div>
@@ -1068,25 +1068,25 @@ export default function JobCardForm({
           )}
 
           {/* Additional Job Card Details Section */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-8 py-8">
               <div className="flex items-center mb-8">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mr-4">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                   {t("job_cards.additional_details")}
                 </h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t("forms.status")}
                   </label>
                   <select
                     value={formData.status}
                     onChange={(e) => handleInputChange("status", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                   >
                     <option value="pending">{t("estimates.pending")}</option>
                     <option value="in-progress">{t("forms.in_progress")}</option>
@@ -1095,13 +1095,13 @@ export default function JobCardForm({
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t("forms.priority")}
                   </label>
                   <select
                     value={formData.priority}
                     onChange={(e) => handleInputChange("priority", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                   >
                     <option value="low">{t("forms.low")}</option>
                     <option value="medium">{t("forms.medium")}</option>
@@ -1110,7 +1110,7 @@ export default function JobCardForm({
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t("forms.start_time")}
                   </label>
                   <input
@@ -1119,11 +1119,11 @@ export default function JobCardForm({
                     onChange={(e) =>
                       handleInputChange("estimatedStartTime", e.target.value)
                     }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t("forms.end_time")}
                   </label>
                   <input
@@ -1132,18 +1132,18 @@ export default function JobCardForm({
                     onChange={(e) =>
                       handleInputChange("estimatedEndTime", e.target.value)
                     }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                   />
                 </div>
                 <div className="md:col-span-2 space-y-2">
-                  <label className="block text-sm font-bold text-gray-700">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
                     {t("forms.notes")}
                   </label>
                   <textarea
                     value={formData.notes}
                     onChange={(e) => handleInputChange("notes", e.target.value)}
                     rows={4}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200 resize-none"
                     placeholder={t('ui.enter_job_card_notes')}
                   />
                 </div>
@@ -1156,7 +1156,7 @@ export default function JobCardForm({
             {formData.inspectionId ? (
               <Link
                 href={`/inspections/${formData.inspectionId}`}
-                className="group inline-flex items-center px-8 py-4 border-2 border-[#F13F33] text-sm font-bold rounded-2xl text-[#F13F33] bg-white hover:bg-[#F13F33]/50 hover:border-[#F13F33] transition-all duration-300"
+                className="inline-flex items-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#F97402] hover:text-[#F97402] hover:bg-[#F97402]/5 active:scale-[0.98] transition-all duration-200"
               >
                 {t('inspections.view_inspection')}
               </Link>
@@ -1165,9 +1165,9 @@ export default function JobCardForm({
                 type="button"
                 onClick={() => setInspectionModalOpen(true)}
                 disabled={!formData.customerId || !formData.vehicleId}
-                className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-green-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+                className="inline-flex items-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200"
               >
-                <Plus className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                <Plus className="me-2 h-5 w-5" />
                 {t('inspections.new_inspection')}
               </button>
             )}
@@ -1178,9 +1178,9 @@ export default function JobCardForm({
                   type="button"
                   onClick={handleSaveAndCreateInvoice}
                   disabled={!formData.customerId || !formData.vehicleId || loading}
-                  className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-blue-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+                  className="inline-flex items-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200"
                 >
-                  <FileText className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                  <FileText className="me-2 h-5 w-5" />
                   {t('job_cards.save_and_create_invoice')}
                 </button>
 
@@ -1188,9 +1188,9 @@ export default function JobCardForm({
                   type="button"
                   onClick={handleSaveAndCreateEstimate}
                   disabled={!formData.customerId || !formData.vehicleId || loading}
-                  className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-green-600/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+                  className="inline-flex items-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200"
                 >
-                  <FileText className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+                  <FileText className="me-2 h-5 w-5" />
                   {t('job_cards.save_and_create_estimate')}
                 </button>
               </>
@@ -1199,17 +1199,17 @@ export default function JobCardForm({
             <button
               type="button"
               onClick={() => router.back()}
-              className="group inline-flex items-center px-8 py-4 border-2 border-gray-300 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:border-[#F13F33] hover:text-[#F13F33] hover:bg-[#F13F33]/5 transition-all duration-300"
+              className="inline-flex items-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#F97402] hover:text-[#F97402] hover:bg-[#F97402]/5 active:scale-[0.98] transition-all duration-200"
             >
-              <X className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              <X className="me-2 h-5 w-5" />
               {t("forms.cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+              className="inline-flex items-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200"
             >
-              <Save className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              <Save className="me-2 h-5 w-5" />
               {loading
                 ? t("forms.saving")
                 : isEditing

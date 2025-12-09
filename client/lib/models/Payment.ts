@@ -1,9 +1,41 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
-const PaymentSchema = new mongoose.Schema({
+// TypeScript interface for Payment
+export interface IPayment extends Document {
+  tenantId: mongoose.Types.ObjectId;
+  paymentNumber: string;
+  invoiceId: mongoose.Types.ObjectId;
+  customerId: mongoose.Types.ObjectId;
+  amount: number;
+  paymentMethod: 'cash' | 'card' | 'bank_transfer' | 'check';
+  paymentDate: Date;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  reference?: string;
+  notes?: string;
+  processedBy?: mongoose.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const PaymentSchema = new mongoose.Schema<IPayment>({
+  tenantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Tenant',
+    required: true,
+    index: true,
+  },
+  paymentNumber: {
+    type: String,
+    required: true,
+  },
   invoiceId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Invoice',
+    required: true
+  },
+  customerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Customer',
     required: true
   },
   amount: {
@@ -43,10 +75,21 @@ const PaymentSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for better query performance
-PaymentSchema.index({ invoiceId: 1 });
-PaymentSchema.index({ status: 1 });
-PaymentSchema.index({ paymentDate: -1 });
-PaymentSchema.index({ paymentMethod: 1 });
+// Compound indexes with tenantId for proper tenant isolation
+PaymentSchema.index({ tenantId: 1, paymentNumber: 1 }, { unique: true });
+PaymentSchema.index({ tenantId: 1, invoiceId: 1 });
+PaymentSchema.index({ tenantId: 1, customerId: 1 });
+PaymentSchema.index({ tenantId: 1, status: 1 });
+PaymentSchema.index({ tenantId: 1, paymentDate: -1 });
+PaymentSchema.index({ tenantId: 1, paymentMethod: 1 });
+PaymentSchema.index({ tenantId: 1, createdAt: -1 });
 
-export default mongoose.models.Payment || mongoose.model('Payment', PaymentSchema);
+// Helper method to find payments by tenant
+PaymentSchema.statics.findByTenant = function(
+  tenantId: string | mongoose.Types.ObjectId,
+  filter = {}
+) {
+  return this.find({ tenantId, ...filter });
+};
+
+export default mongoose.models.Payment || mongoose.model<IPayment>('Payment', PaymentSchema);

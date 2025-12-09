@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Key } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save, X, Wrench, FileText } from "lucide-react";
 
@@ -44,15 +44,6 @@ export default function ServiceForm({
     isActive: true,
     isTemplate: false,
   });
-
-  // Debug logging
-  console.log('Service categories:', serviceCategories);
-  console.log('Current category value:', formData.category);
-
-  // Track formData changes
-  useEffect(() => {
-    console.log('ServiceForm formData changed:', formData);
-  }, [formData]);
 
   const router = useRouter();
 
@@ -132,33 +123,30 @@ export default function ServiceForm({
   };
 
   const handleInputChange = (field: string, value: any) => {
-    console.log('ServiceForm handleInputChange:', { field, value, currentFormData: formData });
     setFormData((prev) => {
-      const newData = { ...prev, [field]: value };
-      console.log('ServiceForm new form data:', newData);
-      return newData;
+      return { ...prev, [field]: value };
     });
   };
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-xl shadow-lg border-b border-gray-200/50">
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
         <div className="px-4 sm:px-6 lg:px-8">
-          <div className="py-8">
+          <div className="py-6">
             <div className="flex items-center">
               <button
                 onClick={() => router.back()}
-                className="mr-6 p-3 text-gray-400 hover:text-[#F13F33] transition-all duration-300 rounded-2xl hover:bg-gray-100 group"
+                className="mr-6 p-3 text-gray-600 dark:text-gray-400 hover:text-[#F97402] transition-all duration-200 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 group"
               >
                 <ArrowLeft className="h-6 w-6 group-hover:-translate-x-1 transition-transform" />
               </button>
               <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
                   {isEditing ? t('forms.edit_service') : t('forms.new_service')}
                 </h1>
-                <p className="mt-3 text-xl text-gray-600">
+                <p className="mt-2 text-base text-gray-700 dark:text-gray-300">
                   {isEditing ? t('forms.update_service_details') : t('forms.create_new_service')}
                 </p>
               </div>
@@ -167,23 +155,23 @@ export default function ServiceForm({
         </div>
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-12">
-        <form onSubmit={handleSubmit} className="space-y-10">
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* Template Selection Section */}
           {fromTemplate && (
-            <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-              <div className="px-8 py-8">
+            <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+              <div className="px-6 sm:px-8 py-8">
                 <div className="flex items-center mb-8">
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
                     <FileText className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900">
+                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                     {t('forms.create_from_template')}
                   </h3>
                 </div>
                 <select
                   onChange={(e) => handleTemplateChange(e.target.value)}
-                  className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                  className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                 >
                   <option value="">{t('forms.select_template')}</option>
                   {templates.map((t) => (
@@ -197,31 +185,31 @@ export default function ServiceForm({
           )}
 
           {/* Service Details Section */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
-            <div className="px-8 py-8">
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="px-6 sm:px-8 py-8">
               <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#F13F33] to-[#d6352a] rounded-2xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-2xl flex items-center justify-center mr-4">
                   <Wrench className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
                   {t('forms.service_details')}
                 </h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="block text-sm font-bold text-gray-700">{t('inventory.name')}</label>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('inventory.name')}</label>
                   <input
                     type="text"
                     id="name"
                     required
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder={t('ui.enter_service_name')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="category" className="block text-sm font-bold text-gray-700">{t('forms.select_category')} <span className="text-gray-400">({t('forms.optional')})</span></label>
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.select_category')} <span className="text-gray-400 dark:text-gray-500 normal-case">({t('forms.optional')})</span></label>
                   <Combobox
                     options={serviceCategories}
                     value={formData.category}
@@ -232,8 +220,8 @@ export default function ServiceForm({
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="uniqueCode" className="block text-sm font-bold text-gray-700">
-                    Unique Code <span className="text-gray-400">(Optional - Format: E001, B001, etc.)</span>
+                  <label htmlFor="uniqueCode" className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                    Unique Code <span className="text-gray-400 dark:text-gray-500 normal-case">(Optional - Format: E001, B001, etc.)</span>
                   </label>
                   <input
                     type="text"
@@ -242,15 +230,15 @@ export default function ServiceForm({
                     onChange={(e) => handleInputChange("uniqueCode", e.target.value.toUpperCase())}
                     maxLength={4}
                     pattern="[A-Z]\d{3}"
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 font-mono"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200 font-mono"
                     placeholder="E001"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Format: 1 letter + 3 digits (e.g., E001 for Engine, B001 for Brakes)
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="laborRate" className="block text-sm font-bold text-gray-700">{t('services.labor_rate')}</label>
+                  <label htmlFor="laborRate" className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('services.labor_rate')}</label>
                   <input
                     type="number"
                     id="laborRate"
@@ -260,12 +248,12 @@ export default function ServiceForm({
                     onChange={(e) =>
                       handleInputChange("laborRate", parseFloat(e.target.value) || 0)
                     }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder={t('ui.enter_labor_rate')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="laborHours" className="block text-sm font-bold text-gray-700">{t('services.labor_hours')}</label>
+                  <label htmlFor="laborHours" className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('services.labor_hours')}</label>
                   <input
                     type="number"
                     id="laborHours"
@@ -274,17 +262,17 @@ export default function ServiceForm({
                     onChange={(e) =>
                       handleInputChange("laborHours", parseFloat(e.target.value) || 0)
                     }
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                     placeholder={t('ui.enter_labor_hours')}
                   />
                 </div>
                 <div className="md:col-span-2 space-y-2">
-                  <label htmlFor="description" className="block text-sm font-bold text-gray-700">{t('vehicles.description')}</label>
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('vehicles.description')}</label>
                   <textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => handleInputChange("description", e.target.value)}
-                    className="w-full px-6 py-4 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-[#F13F33]/20 focus:border-[#F13F33] transition-all duration-300 text-gray-900 placeholder-gray-500 bg-white/80 backdrop-blur-sm hover:border-gray-300 resize-none"
+                    className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200 resize-none"
                     placeholder={t('ui.enter_service_description')}
                     rows={4}
                   />
@@ -297,11 +285,11 @@ export default function ServiceForm({
                     onChange={(e) =>
                       handleInputChange("isTemplate", e.target.checked)
                     }
-                    className="h-5 w-5 rounded border-2 border-gray-300 text-[#F13F33] focus:ring-[#F13F33] focus:ring-2"
+                    className="h-5 w-5 rounded border-2 border-gray-300 dark:border-gray-600 text-[#F97402] focus:ring-[#F97402] focus:ring-2 bg-white dark:bg-gray-800"
                   />
                   <label
                     htmlFor="isTemplate"
-                    className="text-sm font-bold text-gray-700"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     {t('forms.save_as_template')}
                   </label>
@@ -312,21 +300,21 @@ export default function ServiceForm({
 
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-6">
+          <div className="flex flex-col sm:flex-row justify-end gap-3">
             <button
               type="button"
               onClick={() => router.back()}
-              className="group inline-flex items-center px-8 py-4 border-2 border-gray-300 text-sm font-bold rounded-2xl text-gray-700 bg-white hover:border-[#F13F33] hover:text-[#F13F33] hover:bg-[#F13F33]/5 transition-all duration-300"
+              className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#F97402] hover:text-[#F97402] hover:bg-[#F97402]/5 active:scale-[0.98] transition-all duration-200"
             >
-              <X className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              <X className="me-2 h-5 w-5" />
               {t('forms.cancel')}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="group inline-flex items-center px-8 py-4 border border-transparent text-sm font-bold rounded-2xl text-white bg-gradient-to-r from-[#F13F33] to-[#d6352a] hover:shadow-xl hover:shadow-[#F13F33]/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200"
             >
-              <Save className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
+              <Save className="me-2 h-5 w-5" />
               {loading
                 ? t('forms.saving')
                 : isEditing
