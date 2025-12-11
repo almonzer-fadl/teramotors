@@ -7,6 +7,8 @@ import Appointment from '@/lib/models/Appointment';
 import Service from '@/lib/models/Service';
 import { CustomerPortalAuth } from '@/lib/services/CustomerPortalAuth';
 
+export const dynamic = 'force-dynamic';
+
 // Customer Portal Dashboard API
 export async function GET(req: NextRequest) {
   try {

@@ -3,6 +3,8 @@ import Appointment from '@/lib/models/Appointment';
 import { connectToDatabase } from '@/lib/db';
 import { CustomerPortalAuth } from '@/lib/services/CustomerPortalAuth';
 
+export const dynamic = 'force-dynamic';
+
 async function getAuthenticatedCustomer(request: NextRequest) {
     const customerId = request.cookies.get('portal_customer_id')?.value;
     const sessionToken = request.cookies.get('portal_session_token')?.value;
