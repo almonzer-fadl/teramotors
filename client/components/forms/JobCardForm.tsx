@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Save, X, Trash2, FileText, Wrench, Package, Plus } from "lucide-react";
+import { ArrowLeft, Save, X, Trash2, FileText, Wrench, Package, Plus, Loader2 } from "lucide-react";
 import { socketService } from "../../lib/services/socket";
 import { useTranslation } from "react-i18next";
 import { useSession } from "../../lib/hooks/useSession";
@@ -13,6 +13,7 @@ import QuickCreateVehicle from "./QuickCreateVehicle";
 import QuickCreatePart from "./QuickCreatePart";
 import QuickCreateService from "./QuickCreateService";
 import Link from "next/link";
+import PrintModal from "@/components/pdf/PrintModal";
 
 interface AppointmentMinimal {
   _id: string;
@@ -70,7 +71,7 @@ export default function JobCardForm({
   jobCardId?: string;
   appointmentId?: string;
 }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const router = useRouter();
   const { user } = useSession();
   const [loading, setLoading] = useState(false);
@@ -88,6 +89,10 @@ export default function JobCardForm({
   const [isVehicleModalOpen, setVehicleModalOpen] = useState(false);
   const [isPartModalOpen, setPartModalOpen] = useState(false);
   const [isServiceModalOpen, setServiceModalOpen] = useState(false);
+  const [linkedInvoiceId, setLinkedInvoiceId] = useState<string | null>(null);
+  const [printModalData, setPrintModalData] = useState<{ invoice: any; jobCard?: any } | null>(null);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [printingInvoice, setPrintingInvoice] = useState(false);
   const [formData, setFormData] = useState<JobCardFormData>({
     appointmentId: "",
     customerId: "",
@@ -106,6 +111,37 @@ export default function JobCardForm({
 
 
   const isEditing = !!jobCardId;
+
+  const pricingTotals = useMemo(() => {
+    const servicesTotal = formData.services.reduce((total, service) => {
+      const quantity = Number(service.quantity) || 0;
+      const laborHours = Number(service.laborHours) || 0;
+      const laborRate = Number(service.laborRate) || 0;
+      return total + quantity * laborHours * laborRate;
+    }, 0);
+
+    const partsTotal = formData.partsUsed.reduce((total, part) => {
+      const quantity = Number(part.quantity) || 0;
+      const cost = Number(part.cost) || 0;
+      return total + quantity * cost;
+    }, 0);
+
+    const partsVat = partsTotal * 0.15;
+    const grandTotal = servicesTotal + partsTotal + partsVat;
+
+    return { servicesTotal, partsTotal, partsVat, grandTotal };
+  }, [formData.services, formData.partsUsed]);
+
+  const currencyFormatter = useMemo(() => {
+    return new Intl.NumberFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', {
+      style: 'currency',
+      currency: 'SAR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }, [i18n.language]);
+
+  const formatCurrency = (value: number) => currencyFormatter.format(value);
 
   const fetchJobCard = async () => {
     try {
@@ -161,6 +197,28 @@ export default function JobCardForm({
       fetchAppointmentDetails(appointmentId);
     }
   }, [jobCardId, isEditing, appointmentId]);
+
+  useEffect(() => {
+    if (!isEditing || !jobCardId) {
+      setLinkedInvoiceId(null);
+      return;
+    }
+    const fetchLinkedInvoice = async () => {
+      try {
+        const response = await fetch(`/api/job-cards/${jobCardId}/invoice`);
+        if (response.ok) {
+          const data = await response.json();
+          setLinkedInvoiceId(data.invoice?._id || null);
+        } else {
+          setLinkedInvoiceId(null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch linked invoice:', error);
+        setLinkedInvoiceId(null);
+      }
+    };
+    fetchLinkedInvoice();
+  }, [isEditing, jobCardId]);
 
   // Restore scroll position after parts/services update
   useEffect(() => {
@@ -292,16 +350,7 @@ export default function JobCardForm({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    // If creating from an estimate, use the dedicated handler
-    if (formData.estimateId && !isEditing) {
-        await handleCreateFromEstimate(e);
-        return;
-    }
-
-    e.preventDefault();
-    setLoading(true);
-
+  const persistJobCard = async () => {
     try {
       const url = isEditing ? `/api/job-cards/${jobCardId}` : "/api/job-cards";
       const method = isEditing ? "PUT" : "POST";
@@ -314,16 +363,37 @@ export default function JobCardForm({
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        socketService.emitJobCreated();
-        router.push("/job-cards");
-      } else {
-        const error = await response.json();
-        alert(error.message || t("forms.failed_to_save_job_card"));
+      if (!response.ok) {
+        const error = await response.json().catch(() => null);
+        alert(error?.message || t("forms.failed_to_save_job_card"));
+        return null;
       }
+
+      const data = await response.json();
+      socketService.emitJobCreated();
+      return data?.jobCard || data;
     } catch (error) {
       console.error("Failed to save job card:", error);
       alert(t("forms.failed_to_save_job_card"));
+      return null;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    // If creating from an estimate, use the dedicated handler
+    if (formData.estimateId && !isEditing) {
+        await handleCreateFromEstimate(e);
+        return;
+    }
+
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const savedJobCard = await persistJobCard();
+      if (savedJobCard) {
+        router.push("/job-cards");
+      }
     } finally {
       setLoading(false);
     }
@@ -484,6 +554,36 @@ export default function JobCardForm({
       alert(t("forms.failed_to_save_job_card"));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateAndPrintInvoice = async () => {
+    if (!isEditing || !linkedInvoiceId) {
+      alert(t('invoices.print_error'));
+      return;
+    }
+    setPrintingInvoice(true);
+    const savedJobCard = await persistJobCard();
+    if (!savedJobCard) {
+      setPrintingInvoice(false);
+      return;
+    }
+    try {
+      const invoiceResponse = await fetch(`/api/invoices/${linkedInvoiceId}`);
+      if (!invoiceResponse.ok) {
+        throw new Error('Failed to fetch invoice');
+      }
+      const invoiceData = await invoiceResponse.json();
+      setPrintModalData({
+        invoice: invoiceData.invoice,
+        jobCard: invoiceData.jobCard || savedJobCard,
+      });
+      setIsPrintModalOpen(true);
+    } catch (error) {
+      console.error('Failed to prepare invoice for printing:', error);
+      alert(t('invoices.print_error'));
+    } finally {
+      setPrintingInvoice(false);
     }
   };
 
@@ -1067,6 +1167,64 @@ export default function JobCardForm({
             </div>
           )}
 
+          {/* Pricing Summary Section */}
+          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="px-8 py-8">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+                    {t("job_cards.pricing_summary.title")}
+                  </h3>
+                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    {t("job_cards.pricing_summary.description")}
+                  </p>
+                </div>
+                <div className="inline-flex flex-col items-start px-5 py-4 rounded-2xl border border-[#F97402]/30 bg-[#F97402]/5 text-[#F97402]">
+                  <span className="text-xs font-semibold uppercase tracking-wide">
+                    {t("job_cards.pricing_summary.grand_total")}
+                  </span>
+                  <span className="text-2xl font-bold mt-1">
+                    {formatCurrency(pricingTotals.grandTotal)}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/60">
+                  <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                    {t("job_cards.pricing_summary.services_total")}
+                  </p>
+                  <p className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
+                    {formatCurrency(pricingTotals.servicesTotal)}
+                  </p>
+                </div>
+                <div className="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/60">
+                  <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                    {t("job_cards.pricing_summary.parts_total")}
+                  </p>
+                  <p className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
+                    {formatCurrency(pricingTotals.partsTotal)}
+                  </p>
+                </div>
+                <div className="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/60">
+                  <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                    {t("job_cards.pricing_summary.parts_vat")}
+                  </p>
+                  <p className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
+                    {formatCurrency(pricingTotals.partsVat)}
+                  </p>
+                </div>
+                <div className="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/60">
+                  <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                    {t("job_cards.pricing_summary.grand_total")}
+                  </p>
+                  <p className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
+                    {formatCurrency(pricingTotals.grandTotal)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Additional Job Card Details Section */}
           <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
             <div className="px-8 py-8">
@@ -1196,6 +1354,27 @@ export default function JobCardForm({
               </>
             )}
 
+            {isEditing && linkedInvoiceId && (
+              <button
+                type="button"
+                onClick={handleUpdateAndPrintInvoice}
+                disabled={printingInvoice || loading}
+                className="inline-flex items-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-white/90 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white hover:border-[#F97402] hover:text-[#F97402] hover:bg-[#F97402]/5 active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {printingInvoice ? (
+                  <>
+                    <Loader2 className="me-2 h-5 w-5 animate-spin" />
+                    {t('invoices.update_job_card_and_invoice')}
+                  </>
+                ) : (
+                  <>
+                    <FileText className="me-2 h-5 w-5" />
+                    {t('invoices.update_job_card_and_invoice')}
+                  </>
+                )}
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => router.back()}
@@ -1219,6 +1398,19 @@ export default function JobCardForm({
           </div>
         </form>
       </div>
+
+      {printModalData && (
+        <PrintModal
+          isOpen={isPrintModalOpen}
+          onClose={() => {
+            setIsPrintModalOpen(false);
+            setPrintModalData(null);
+          }}
+          invoice={printModalData.invoice}
+          jobCard={printModalData.jobCard}
+          language={i18n.language}
+        />
+      )}
 
     </div>
   );

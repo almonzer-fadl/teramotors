@@ -236,7 +236,7 @@ export default function LandingPage() {
     },
     {
       src: '/Testimonials/4.png',
-      alt: 'Professional auto repair service with excellent customer satisfaction',
+      alt: t('landing.testimonials.alt_4'),
       className: 'w-full max-w-xs'
     }
   ];
@@ -268,7 +268,7 @@ export default function LandingPage() {
                     </span>
                   </span>
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#063479] dark:text-gray-300 bg-blue-100 dark:bg-gray-800 rounded px-2 py-0.5 mt-1 self-start shadow-sm" style={{ letterSpacing: '0.15em' }}>
-                    Auto Repair
+                    {t('landing.header.auto_repair')}
                   </span>
                 </div>
             </div>
@@ -279,8 +279,7 @@ export default function LandingPage() {
               <a href="#about" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.about.title")}</a>
               <a href="#contact" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.contact.title")}</a>
               <Link href="/portal/teramotors-default/login" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors flex items-center gap-1">
-                <User className="w-4 h-4" />
-                Customer Portal
+                {t('landing.header.customer_portal')}
               </Link>
               <LanguageSwitch />
               <ThemeToggle />
@@ -337,8 +336,8 @@ export default function LandingPage() {
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center gap-2 py-2 text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors font-medium"
             >
-              <User className="w-4 h-4" />
-              Customer Portal
+              
+              {t('landing.header.customer_portal')}
             </Link>
             <div className="py-2">
               <LanguageSwitch />
@@ -413,7 +412,7 @@ export default function LandingPage() {
                     className="group relative inline-flex items-center justify-center px-8 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 text-white font-semibold rounded-2xl hover:bg-white/20 transition-all duration-300 hover:-translate-y-1"
                   >
                     <User className="w-5 h-5 me-2 group-hover:scale-110 transition-transform" />
-                    Customer Portal
+                    {t('landing.header.customer_portal')}
                   </Link>
                 </motion.div>
               </motion.div>
@@ -457,14 +456,14 @@ export default function LandingPage() {
                       variants={scaleInAnimation}
                       className="bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6"
                     >
-                      <div className="text-2xl sm:text-2xl md:text-3xl font-bold text-white">100%</div>
+                      <div className="text-2xl sm:text-2xl md:text-3xl font-bold text-white">{t('landing.hero.satisfaction_value')}</div>
                       <div className="text-xs sm:text-sm text-blue-200">{t('landing_missing.satisfaction')}</div>
                     </motion.div>
                     <motion.div
                       variants={scaleInAnimation}
                       className="bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6"
                     >
-                      <div className="text-2xl sm:text-2xl md:text-3xl font-bold text-white">24/7</div>
+                      <div className="text-2xl sm:text-2xl md:text-3xl font-bold text-white">{t('landing.hero.support_value')}</div>
                       <div className="text-xs sm:text-sm text-blue-200">{t('landing_missing.support_24_7')}</div>
                     </motion.div>
                     <motion.div
@@ -780,7 +779,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-white text-sm">{t("landing.contact.book_online")}</h4>
-                  <p className="text-blue-200 dark:text-blue-300 text-xs">info@teramotors.com</p>
+                  <p className="text-blue-200 dark:text-blue-300 text-xs">{t('landing.contact.email_address')}</p>
                 </div>
               </div>
             </motion.a>
@@ -864,20 +863,20 @@ export default function LandingPage() {
                     className="flex items-center gap-1 text-blue-400 hover:text-white dark:hover:text-gray-300 transition-colors font-medium text-sm"
                   >
                     <User className="w-4 h-4" />
-                    Customer Portal
+                    {t('landing.header.customer_portal')}
                   </Link>
                   <Link
                     href="/login"
                     className="block text-[#F97402] hover:text-white dark:hover:text-gray-300 transition-colors font-medium text-sm"
                   >
-                    Staff Login
+                    {t('landing.footer.staff_login')}
                   </Link>
                 </div>
               </div>
             </div>
           </div>
           <div className="border-t border-gray-800 dark:border-gray-700 mt-6 pt-4 text-center text-gray-400 dark:text-gray-500 text-sm">
-            <p>&copy; 2024 TeraMotors Auto Repair. {t('landing_missing.all_rights_reserved')}</p>
+            <p>&copy; {new Date().getFullYear()} {t('landing.footer.company_name')}. {t('landing_missing.all_rights_reserved')}</p>
           </div>
         </div>
       </footer>

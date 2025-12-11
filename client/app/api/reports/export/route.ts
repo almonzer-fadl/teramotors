@@ -77,12 +77,12 @@ export async function POST(request: NextRequest) {
       Payment.find({
         tenantId,
         paymentDate: { $gte: startDate, $lte: endDate }
-      }).populate('invoiceId', 'total customerId')
+      }).populate('invoiceId', 'totalAmount customerId')
     ])
 
     // Calculate financial metrics
     const totalRevenue = invoices.reduce((sum, inv) => {
-      const invoiceTotal = inv.total || (inv.subtotal || 0) + (inv.tax || 0)
+      const invoiceTotal = Number(inv.totalAmount ?? 0)
       return sum + invoiceTotal
     }, 0)
     const totalExpenses = totalRevenue * 0.7 // Estimated 70% expenses
@@ -117,11 +117,15 @@ export async function POST(request: NextRequest) {
     const checkPayments = paymentMethods.check
     
     // Calculate outstanding invoices
-    const outstandingInvoices = invoices.filter(inv => inv.status !== 'paid').reduce((sum, inv) => {
-      const invoiceTotal = inv.total || (inv.subtotal || 0) + (inv.tax || 0)
-      return sum + invoiceTotal
-    }, 0)
-    const overdueInvoices = invoices.filter(inv => inv.status === 'overdue').length
+    const outstandingInvoices = invoices
+      .filter(inv => inv.status !== 'paid')
+      .reduce((sum, inv) => sum + Number(inv.totalAmount ?? 0), 0)
+    const now = new Date()
+    const overdueInvoices = invoices.filter(inv => {
+      if (inv.status === 'paid') return false
+      const dueDate = inv.dueDate ? new Date(inv.dueDate) : null
+      return !!(dueDate && dueDate < now)
+    }).length
     
     // Calculate top services by revenue
     const serviceRevenueMap = new Map()
@@ -153,8 +157,11 @@ export async function POST(request: NextRequest) {
     // Calculate top customers by revenue
     const customerRevenueMap = new Map()
     invoices.forEach(invoice => {
-      const customerName = invoice.customerId ? `${invoice.customerId.firstName} ${invoice.customerId.lastName}` : 'Unknown'
-      const revenue = invoice.total || 0
+      const customerDoc: any = invoice.customerId
+      const customerName = customerDoc?.firstName
+        ? `${customerDoc.firstName} ${customerDoc.lastName || ''}`.trim()
+        : 'Unknown'
+      const revenue = Number(invoice.totalAmount ?? 0)
       if (customerRevenueMap.has(customerName)) {
         customerRevenueMap.set(customerName, {
           revenue: customerRevenueMap.get(customerName).revenue + revenue,
@@ -229,25 +236,61 @@ export async function POST(request: NextRequest) {
         appointments: appointments.map(a => ({
           date: a.appointmentDate,
           time: `${a.startTime} - ${a.endTime}`,
-          customer: a.customerId ? `${a.customerId.firstName} ${a.customerId.lastName}` : 'Unknown',
-          vehicle: a.vehicleId ? `${a.vehicleId.make} ${a.vehicleId.model}` : 'Unknown',
-          service: a.serviceId ? a.serviceId.name : 'Unknown',
+          customer: (() => {
+            const customerDoc: any = a.customerId
+            return customerDoc?.firstName
+              ? `${customerDoc.firstName} ${customerDoc.lastName || ''}`.trim()
+              : 'Unknown'
+          })(),
+          vehicle: (() => {
+            const vehicleDoc: any = a.vehicleId
+            return vehicleDoc
+              ? `${vehicleDoc.make || 'Unknown'} ${vehicleDoc.model || ''}`.trim()
+              : 'Unknown'
+          })(),
+          service: (() => {
+            const serviceDoc: any = a.serviceId
+            return serviceDoc?.name || 'Unknown'
+          })(),
           status: a.status
         })),
         jobCards: jobCards.map(j => ({
           id: j._id,
-          customer: j.customerId ? `${j.customerId.firstName} ${j.customerId.lastName}` : 'Unknown',
-          vehicle: j.vehicleId ? `${j.vehicleId.make} ${j.vehicleId.model}` : 'Unknown',
+          customer: (() => {
+            const customerDoc: any = j.customerId
+            return customerDoc?.firstName
+              ? `${customerDoc.firstName} ${customerDoc.lastName || ''}`.trim()
+              : 'Unknown'
+          })(),
+          vehicle: (() => {
+            const vehicleDoc: any = j.vehicleId
+            return vehicleDoc
+              ? `${vehicleDoc.make || 'Unknown'} ${vehicleDoc.model || ''}`.trim()
+              : 'Unknown'
+          })(),
           status: j.status,
           priority: j.priority,
           createdAt: j.createdAt,
-          services: j.services.map((s: { serviceId: { name: any; }; }) => s.serviceId?.name || 'Unknown').join(', '),
-          parts: j.partsUsed.map((p: { partId: { name: any; }; }) => p.partId?.name || 'Unknown').join(', ')
+          services: j.services
+            .map((s: any) =>
+              s?.serviceId && typeof s.serviceId === 'object' ? s.serviceId.name : 'Unknown'
+            )
+            .join(', '),
+          parts: j.partsUsed
+            .map((p: any) =>
+              p?.partId && typeof p.partId === 'object' ? p.partId.name : 'Unknown'
+            )
+            .join(', ')
         })),
         invoices: invoices.map(i => ({
           id: i._id,
-          customer: i.customerId ? `${i.customerId.firstName} ${i.customerId.lastName}` : 'Unknown',
-          total: i.total,
+          customer: (() => {
+            const customerDoc: any = i.customerId
+            return customerDoc?.firstName
+              ? `${customerDoc.firstName} ${customerDoc.lastName || ''}`.trim()
+              : 'Unknown'
+          })(),
+          total: Number(i.totalAmount ?? 0),
           status: i.status,
           createdAt: i.createdAt
         })),

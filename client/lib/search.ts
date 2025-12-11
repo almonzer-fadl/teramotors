@@ -145,13 +145,17 @@ export class SearchService {
           .limit(5);
 
         jobs.forEach(job => {
+          const jobId = String(job._id);
+          const jobNumber = (job as any).jobNumber ?? job.jobCardNumber ?? jobId;
+          const customer = job.customerId as any;
+          const vehicle = job.vehicleId as any;
           results.push({
             type: 'job',
-            id: job._id.toString(),
-            title: `Job #${job.jobNumber} - ${job.customerId?.firstName} ${job.customerId?.lastName}`,
-            description: `${job.vehicleId?.make} ${job.vehicleId?.model} • Status: ${job.status}`,
-            url: `/job-cards/${job._id}`,
-            score: this.calculateScore(query, job.description || ''),
+            id: jobId,
+            title: `Job #${jobNumber} - ${customer?.firstName ?? ''} ${customer?.lastName ?? ''}`,
+            description: `${vehicle?.make ?? ''} ${vehicle?.model ?? ''} • Status: ${job.status}`,
+            url: `/job-cards/${jobId}`,
+            score: this.calculateScore(query, (job as any).description || ''),
             data: job
           });
         });
@@ -182,12 +186,14 @@ export class SearchService {
           .limit(5);
 
         invoices.forEach(invoice => {
+          const invoiceId = String(invoice._id);
+          const invoiceCustomer = invoice.customerId as any;
           results.push({
             type: 'invoice',
-            id: invoice._id.toString(),
-            title: `Invoice #${invoice.invoiceNumber} - ${invoice.customerId?.firstName} ${invoice.customerId?.lastName}`,
+            id: invoiceId,
+            title: `Invoice #${invoice.invoiceNumber} - ${invoiceCustomer?.firstName ?? ''} ${invoiceCustomer?.lastName ?? ''}`,
             description: `Amount: SAR ${invoice.totalAmount} • Status: ${invoice.status}`,
-            url: `/invoices/${invoice._id}`,
+            url: `/invoices/${invoiceId}`,
             score: this.calculateScore(query, invoice.invoiceNumber || ''),
             data: invoice
           });

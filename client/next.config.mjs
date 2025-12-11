@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  outputFileTracingRoot: '/Users/almonzerfadl/Desktop/Work/Programming/teramotors',
+  experimental: {
+    outputFileTracingRoot: '/Users/almonzerfadl/Desktop/Work/Programming/teramotors',
+  },
   async headers() {
     return [
       {

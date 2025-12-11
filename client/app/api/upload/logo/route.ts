@@ -1,64 +1,73 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse, NextRequest } from 'next/server';
+import { Readable } from 'stream';
 import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 import { connectToDatabase } from '@/lib/db';
 import { FileUploadService } from '@/lib/cloudinary';
-import multer from '@/lib/multer'; // Using the pre-configured multer instance
 
-// Multer setup as a middleware for API route
-const uploadMiddleware = multer.single('logo'); // 'logo' is the field name for the file
+export const runtime = 'nodejs';
 
-// Helper to convert NextApiRequest to a format multer can understand
-function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: (...args: any[]) => void): Promise<any> {
-  return new Promise((resolve, reject) => {
-    fn(req, res, (result: any) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
-    });
-  });
-}
-
-// Next.js API route config
-export const config = {
-  api: {
-    bodyParser: false, // Disable default body parser as multer handles it
-  },
+type FormDataFile = {
+  name?: string;
+  type?: string;
+  arrayBuffer: () => Promise<ArrayBuffer>;
 };
 
-// POST /api/upload/logo
-export default withTenantAuth(
-  async (req: NextApiRequest, res: NextApiResponse, { tenantId }) => {
+const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+const handler = withTenantAuth(
+  async (req: NextRequest, { tenantId }) => {
     await connectToDatabase();
 
     try {
-      // Run the multer middleware
-      await runMiddleware(req, res, uploadMiddleware);
+      const formData = await req.formData();
+      const file = formData.get('logo') as FormDataFile | null;
 
-      // Multer adds 'file' object to req
-      if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded.' });
+      if (!file || typeof file === 'string') {
+        return NextResponse.json(
+          { error: 'No file uploaded.' },
+          { status: 400 }
+        );
       }
 
-      // Validate file type (optional, already done in cloudinary.ts fileFilter)
-      const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-      if (!allowedMimeTypes.includes(req.file.mimetype)) {
-        return res.status(400).json({ error: 'Invalid file type. Only images (JPEG, PNG, GIF, WEBP) are allowed.' });
-      }
-      
-      // Upload to Cloudinary
-      const uploadResult = await FileUploadService.uploadFile(req.file, `tenants/${tenantId}/logos`);
-
-      if (!uploadResult.success) {
-        throw new Error(uploadResult.error || 'Cloudinary upload failed.');
+      const mimeType = file.type || 'application/octet-stream';
+      if (!allowedMimeTypes.includes(mimeType)) {
+        return NextResponse.json(
+          { error: 'Invalid file type. Only images (JPEG, PNG, GIF, WEBP) are allowed.' },
+          { status: 400 }
+        );
       }
 
-      return res.status(200).json({ url: uploadResult.url });
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
 
+      const multerLikeFile = {
+        fieldname: 'logo',
+        originalname: file.name || 'logo',
+        encoding: '7bit',
+        mimetype: mimeType,
+        size: buffer.length,
+        buffer,
+        destination: '',
+        filename: '',
+        path: '',
+        stream: Readable.from(buffer),
+      } as Express.Multer.File;
+
+      const uploadResult = await FileUploadService.uploadFile(
+        multerLikeFile,
+        `tenants/${tenantId}/logos`
+      );
+
+      return NextResponse.json({ url: uploadResult.url });
     } catch (error: any) {
       console.error('Logo upload error:', error);
-      return res.status(500).json({ error: error.message || 'Failed to upload logo.' });
+      return NextResponse.json(
+        { error: error?.message || 'Failed to upload logo.' },
+        { status: 500 }
+      );
     }
   },
-  { requireTenant: true, allowedRoles: ['admin'] } // Only admins can upload logos
+  { requireTenant: true, allowedRoles: ['admin'] }
 );
+
+export const POST = handler;

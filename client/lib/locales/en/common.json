@@ -59,7 +59,18 @@
     "verify_email_pending": "Verifying your email...",
     "verify_email_success": "Email verified successfully.",
     "verify_email_error": "Invalid or expired verification link.",
-    "home": "Home"
+    "home": "Home",
+    "no_account_yet": "Don't have an account yet?",
+    "create_workshop_cta": "Create a Workshop",
+    "workshop_created_success": "Workshop created successfully!",
+    "stats": {
+      "workshops": "Workshops",
+      "uptime": "Uptime",
+      "support": "Support",
+      "workshops_value": "500+",
+      "uptime_value": "99.9%",
+      "support_value": "24/7"
+    }
   },
   "forms": {
     "part_details": "Part Details",
@@ -588,7 +599,13 @@
     "compliant": "Compliant",
     "no_invoices_found": "No invoices found",
     "adjust_search": "Try adjusting your search or filter terms.",
-    "get_started": "Get started by creating your first invoice."
+    "get_started": "Get started by creating your first invoice.",
+    "delete_success": "Invoice deleted successfully.",
+    "delete_failed": "Failed to delete invoice.",
+    "print_invoice": "Print Invoice",
+    "print_error": "Failed to prepare invoice for printing.",
+    "create_job_card_and_invoice": "Create Job Card & Invoice",
+    "update_job_card_and_invoice": "Update Job Card & Invoice"
   },
   "payments": {
     "title": "Payments",
@@ -803,7 +820,15 @@
     "additional_details": "Additional Details",
     "save_and_create_invoice": "Save & Create Invoice",
     "save_and_create_estimate": "Save & Create Estimate",
-    "job_card_saved_successfully": "Job card saved successfully"
+    "job_card_saved_successfully": "Job card saved successfully",
+    "pricing_summary": {
+      "title": "Pricing Summary",
+      "description": "Totals update automatically as you add services and parts.",
+      "services_total": "Services Total",
+      "parts_total": "Parts Total",
+      "parts_vat": "Parts VAT (15%)",
+      "grand_total": "Grand Total"
+    }
   },
   "vehicles": {
     "title": "Vehicles",
@@ -821,7 +846,7 @@
     "license_plate": "License Plate",
     "mileage": "Mileage",
     "transmission": "Transmission",
-    "vin": "VIN:",
+    "vin": "VIN",
     "engine": "Engine:",
     "service_history": "Service History",
     "date": "Date",
@@ -830,10 +855,13 @@
     "miles": "miles",
     "active": "Active",
     "inactive": "Inactive",
-    "no_vehicles_found": "No vehicles found",
+    "no_vehicles_found": "No vehicles found.",
     "adjust_search": "Try adjusting your search terms.",
     "get_started": "Get started by adding your first vehicle.",
     "delete_confirm": "Are you sure you want to delete this vehicle?",
+    "delete_success": "Vehicle deleted successfully!",
+    "delete_error": "Failed to delete vehicle.",
+    "fetch_error": "Failed to fetch vehicles.",
     "color": "Color",
     "year": "Year",
     "make": "Make",
@@ -896,7 +924,8 @@
     "new": "New",
     "breadcrumbs": {
       "label": "Breadcrumb"
-    }
+    },
+    "na": "N/A"
   },
   "settings": {
     "description": "Manage users and system settings",
@@ -1066,13 +1095,19 @@
     }
   },
   "landing": {
+    "header": {
+        "auto_repair": "Auto Repair",
+        "customer_portal": "Customer Portal"
+    },
     "hero": {
       "title": "Tera Auto Repair",
       "subtitle": "Your Trusted Partner for Professional Auto Repair Services",
       "description": "With over 15 years of experience, we provide expert automotive repair and maintenance services. From routine oil changes to complex engine repairs, we keep your vehicle running smoothly and safely.",
       "book_appointment": "Book Appointment",
       "call_now": "Call Now",
-      "phone": "+966590090612"
+      "phone": "+966590090612",
+      "satisfaction_value": "100%",
+      "support_value": "24/7"
     },
     "subscriptions": {
       "title": "Service Plans",
@@ -1166,7 +1201,8 @@
     },
     "testimonials": {
       "title": "What Our Customers Say",
-      "subtitle": "Real feedback from satisfied customers"
+      "subtitle": "Real feedback from satisfied customers",
+      "alt_4": "Professional auto repair service with excellent customer satisfaction"
     },
     "gallery": {
       "title": "Our Workshop",
@@ -1180,7 +1216,8 @@
       "email": "info@teramotors.com",
       "hours": "Mon-Fri: 7AM-6PM, Sat: 8AM-4PM, Sun: Closed",
       "book_online": "Book Online",
-      "call_us": "Call Us Now"
+      "call_us": "Call Us Now",
+      "email_address": "info@teramotors.com"
     },
     "login": {
       "title": "Customer Portal",
@@ -1188,6 +1225,10 @@
       "description": "Track your vehicle's service history, schedule appointments, and view repair estimates all in one place.",
       "sign_in": "Sign In to Portal",
       "create_account": "Create Account"
+    },
+    "footer": {
+        "staff_login": "Staff Login",
+        "company_name": "TeraMotors Auto Repair"
     }
   },
   "templates": {
@@ -1387,6 +1428,9 @@
     "description": "Professional auto repair management system for TeraMotors"
   },
   "marketing": {
+    "header": {
+      "company_name": "TeraMotors"
+    },
     "navigation": {
       "features": "Features",
       "pricing": "Pricing",
@@ -1405,7 +1449,9 @@
       "floating_invoice": "Invoice Sent",
       "floating_just_now": "Just now",
       "floating_vehicles": "+15 Vehicles",
-      "floating_this_week": "This week"
+      "floating_this_week": "This week",
+      "dashboard_preview": "Dashboard Preview",
+      "dashboard_subtitle": "Beautiful, intuitive interface"
     },
     "stats": {
       "workshops": "Auto Repair Shops",
@@ -1453,8 +1499,50 @@
       "most_popular": "Most Popular",
       "custom": "Custom",
       "free": "Free",
+      "free_tier": {
+        "name": "Free",
+        "description": "Perfect for getting started"
+      },
+      "basic": {
+        "name": "Basic",
+        "description": "Unlock essential features for your growing workshop"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Advanced tools for established businesses"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Custom solutions for large organizations"
+      },
+      "features": {
+        "customer_management_free": { "name": "Customer Management" },
+        "vehicle_tracking_free": { "name": "Vehicle Tracking" },
+        "basic_invoicing_free": { "name": "Basic Invoicing" },
+        "job_cards_free": { "name": "Job Cards" },
+        "email_support": { "name": "Email Support" },
+
+        "customer_management_basic": { "name": "Customer Management" },
+        "vehicle_tracking_basic": { "name": "Vehicle Tracking" },
+        "basic_invoicing_basic": { "name": "Basic Invoicing" },
+        "job_cards_basic": { "name": "Job Cards" },
+        "email_support_basic": { "name": "Email Support" },
+
+        "customer_management_pro": { "name": "Customer Management" },
+        "vehicle_tracking_pro": { "name": "Vehicle Tracking" },
+        "basic_invoicing_pro": { "name": "Basic Invoicing" },
+        "job_cards_pro": { "name": "Job Cards" },
+        "priority_support": { "name": "Priority Support" },
+
+        "customer_management_enterprise": { "name": "Customer Management" },
+        "vehicle_tracking_enterprise": { "name": "Vehicle Tracking" },
+        "basic_invoicing_enterprise": { "name": "Basic Invoicing" },
+        "job_cards_enterprise": { "name": "Job Cards" },
+        "dedicated_support": { "name": "Dedicated Support" }
+      },
       "contact_sales": "Contact Sales",
-      "get_started": "Get Started"
+      "get_started": "Get Started",
+      "per_month": "/mo"
     },
     "testimonials": {
       "section_label": "TESTIMONIALS",
@@ -1495,53 +1583,52 @@
       "privacy": "Privacy",
       "terms": "Terms",
       "copyright": "All rights reserved",
-      "made_in": "Built for Saudi Workshops with Arabic Support"
+      "made_in": "Built for Saudi Workshops with Arabic Support",
+      "company_name": "TeraMotors"
     }
   },
-  "landing_missing": {
-    "professional_service": "Professional Service",
-    "trusted_by_thousands": "Trusted by thousands of customers in more than 5 countries", 
-    "trusted_by_leading_organizations": "We are proud to work with these respected organizations",
-    "years_experience": "Years Experience",
-    "satisfaction": "Satisfaction",
-    "support_24_7": "Support",
-    "happy_customers": "Happy Customers",
-    "professional_auto_repair": "Professional Auto Repair",
-    "our_services": "Our Services",
-    "why_choose_us": "Why Choose Us",
-    "workshop_portal": "Workshop Portal",
-    "staff_management_access": "Staff & Management Access",
-    "staff_login": "Staff Login",
-    "get_in_touch": "Get In Touch",
-    "working_hours": "Working Hours",
-    "hours": "Hours",
-    "call_us": "Call Us",
-    "visit_our_shop": "Visit Our Shop",
-    "engine_repair": "Engine Repair",
-    "brake_service": "Brake Service",
-    "transmission": "Transmission",
-    "electrical": "Electrical",
-    "contact_info": "Contact Info",
-    "services": "Services",
-    "all_rights_reserved": "All rights reserved",
-    "back_to_home": "Back to Home",
-    "back_to_login": "Back to Login",
-    "sign_in_to_manage": "Sign in to manage your auto repair business",
-    "email_address": "Email Address",
-    "password": "Password",
-    "signing_in": "Signing in...",
-    "forgot_your_password": "Forgot your password?",
-    "testimonial_1": "TeraMotors has been servicing my fleet for 5 years. Their attention to detail and honest pricing keeps me coming back.",
-    "testimonial_2": "When my car broke down unexpectedly, TeraMotors got me back on the road quickly and affordably. Highly recommended!",
-    "testimonial_3": "The team at TeraMotors understands cars like no one else. They've kept my classic car running perfectly for years.",
-    "subscriptions": "Service Plans",
-    "basic_plan": "Basic Plan",
-    "premium_plan": "Premium Plan",
-    "enterprise_plan": "Enterprise Plan",
-    "custom_plan": "Custom Plan",
-    "our_subscriptions": "Our Service Plans"
-  },
-  "dashboard_missing": {
+    "landing_missing": {
+      "professional_service": "Professional Service",
+      "trusted_by_thousands": "Trusted by thousands of customers in more than 5 countries",
+      "trusted_by_leading_organizations": "We are proud to work with these respected organizations",
+      "years_experience": "Years Experience",
+      "satisfaction": "Satisfaction",
+      "support_24_7": "Support",
+      "happy_customers": "Happy Customers",
+      "professional_auto_repair": "Professional Auto Repair",
+      "our_services": "Our Services",
+      "why_choose_us": "Why Choose Us",
+      "workshop_portal": "Workshop Portal",
+      "staff_management_access": "Staff & Management Access",
+      "staff_login": "Staff Login",
+      "get_in_touch": "Get In Touch",
+      "working_hours": "Working Hours",
+      "hours": "Hours",
+      "call_us": "Call Us",
+      "visit_our_shop": "Visit Our Shop",
+      "engine_repair": "Engine Repair",
+      "brake_service": "Brake Service",
+      "transmission": "Transmission",
+      "electrical": "Electrical",
+      "contact_info": "Contact Info",
+      "services": "Services",
+      "all_rights_reserved": "All rights reserved",
+      "back_to_home": "Back to Home",
+      "sign_in_to_manage": "Sign in to manage your auto repair business",
+      "email_address": "Email Address",
+      "password": "Password",
+      "signing_in": "Signing in...",
+      "forgot_your_password": "Forgot your password?",
+      "testimonial_1": "TeraMotors has been servicing my fleet for 5 years. Their attention to detail and honest pricing keeps me coming back.",
+      "testimonial_2": "When my car broke down unexpectedly, TeraMotors got me back on the road quickly and affordably. Highly recommended!",
+      "testimonial_3": "The team at TeraMotors understands cars like no one else. They've kept my classic car running perfectly for years.",
+      "subscriptions": "Service Plans",
+      "basic_plan": "Basic Plan",
+      "premium_plan": "Premium Plan",
+      "enterprise_plan": "Enterprise Plan",
+      "custom_plan": "Custom Plan",
+      "our_subscriptions": "Our Service Plans"
+    },  "dashboard_missing": {
     "welcome_back": "Welcome back {{role}} user",
     "payments": "Payments",
     "quick_access_descriptions": {

@@ -88,9 +88,13 @@ export const SalesReport = ({ data }: { data: any }) => {
                                 outerRadius={110}
                                 fill="#8884d8"
                                 dataKey="amount"
-                                label={({ category, percent }) => `${category}: ${(percent * 100).toFixed(0)}%`}
+                                label={(props) => {
+                                    const { name, percent } = props as { name?: string; percent?: number };
+                                    const pct = (percent ?? 0) * 100;
+                                    return `${name ?? ''}: ${pct.toFixed(0)}%`;
+                                }}
                             >
-                                {salesByServiceCategory.map((entry, index) => (
+                                {salesByServiceCategory.map((entry: { amount: number }, index: number) => (
                                     <Cell key={`cell-${index}`} fill={COLORS_SERVICES[index % COLORS_SERVICES.length]} />
                                 ))}
                             </Pie>

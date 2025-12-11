@@ -5,35 +5,35 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { useSession } from '@/lib/hooks/useSession';
-import { 
-  Menu, 
-  X, 
-  Home, 
-  Users, 
-  Car, 
-  Calendar, 
-  Wrench, 
-  FileText, 
-  Receipt, 
-  Package, 
+import {
+  Menu,
+  X,
+  Home,
+  Users,
+  Car,
+  Calendar,
+  Wrench,
+  FileText,
+  Receipt,
+  Package,
   Settings,
   Bell,
   Search,
   Plus,
   CreditCard,
-  Shield, // Added for admin icon
-  Database, // Added for migration icon
-  LayoutDashboard, // Added for dashboard icon
-  ClipboardList, // Added for job cards icon
-  MessageSquare, // Added for WhatsApp icon
-  BarChart3, // Added for reports icon
-  Icon // Import the Icon type
+  Shield,
+  Database,
+  LayoutDashboard,
+  ClipboardList,
+  MessageSquare,
+  BarChart3,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 import { getNavigationItems } from '@/lib/roles';
 
 // Map string icon names to Lucide React components
-const iconMap: { [key: string]: Icon } = {
+const iconMap: Record<string, LucideIcon> = {
   Home: Home,
   Users: Users,
   Car: Car,

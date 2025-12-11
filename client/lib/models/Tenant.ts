@@ -33,6 +33,11 @@ export interface ITenant extends Document {
     currency: string;
     locale: string;
     dateFormat: string;
+    theme?: string;
+    onboardingState?: {
+      step: number;
+      completed: boolean;
+    };
   };
   bookingSettings?: {
     enabled: boolean;
@@ -147,6 +152,7 @@ const TenantSchema = new Schema<ITenant>(
       currency: { type: String, default: 'SAR' },
       locale: { type: String, default: 'ar-SA' },
       dateFormat: { type: String, default: 'DD/MM/YYYY' },
+      theme: { type: String, default: 'default' },
       onboardingState: {
         step: { type: Number, default: 1 },
         completed: { type: Boolean, default: false }

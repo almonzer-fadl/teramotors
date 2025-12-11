@@ -82,7 +82,7 @@ export async function calculateRevenueTrend(
         count: { $sum: 1 }
       }
     },
-    { $sort: { _id: 1 } }
+    { $sort: { _id: 1 as 1 } }
   ];
 
   const result = await Invoice.aggregate(pipeline).exec();
@@ -126,7 +126,7 @@ export async function calculateTenantGrowth(
     }
 
     // Calculate 'churned' tenants for their churn day if within the range
-    if (churnDate && churnDate >= startDate && churnDate <= endDate && dateMap[churnDateStr] && tenant.status === 'cancelled') {
+    if (churnDate && churnDateStr && churnDate >= startDate && churnDate <= endDate && dateMap[churnDateStr] && tenant.status === 'cancelled') {
         dateMap[churnDateStr].churned++;
     }
   }
@@ -202,4 +202,3 @@ export async function calculateHistoricalMRR(date: Date): Promise<number> {
     return mrr + planValue;
   }, 0);
 }
-

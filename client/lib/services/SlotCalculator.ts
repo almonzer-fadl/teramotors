@@ -8,6 +8,15 @@ export interface TimeSlot {
   available: boolean;
 }
 
+type DayName =
+  | 'sunday'
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday';
+
 export class SlotCalculator {
   /**
    * Calculate available appointment slots for a given date and tenant
@@ -17,12 +26,15 @@ export class SlotCalculator {
     date: Date,
     bookingSettings: ITenant['bookingSettings']
   ): Promise<TimeSlot[]> {
-    if (!bookingSettings?.enabled) {
+    if (!bookingSettings || !bookingSettings.enabled) {
       return [];
     }
 
     const dayOfWeek = this.getDayName(date);
-    const workingHours = bookingSettings.workingHours[dayOfWeek];
+    const workingHours =
+      bookingSettings.workingHours[
+        dayOfWeek as keyof typeof bookingSettings.workingHours
+      ];
 
     // If the shop is closed on this day
     if (workingHours.closed) {
@@ -120,8 +132,8 @@ export class SlotCalculator {
   /**
    * Get day name from date
    */
-  private static getDayName(date: Date): keyof ITenant['bookingSettings']['workingHours'] {
-    const days = [
+  private static getDayName(date: Date): DayName {
+    const days: DayName[] = [
       'sunday',
       'monday',
       'tuesday',
@@ -129,7 +141,7 @@ export class SlotCalculator {
       'thursday',
       'friday',
       'saturday',
-    ] as const;
+    ];
     return days[date.getDay()];
   }
 

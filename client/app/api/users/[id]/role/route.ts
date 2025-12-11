@@ -6,7 +6,10 @@ import User from '@/lib/models/User';
 // PUT /api/users/[id]/role - Update user's role
 export const PUT = withTenantAuth(
   async (req: NextRequest, { params, tenantId }) => {
-    const { id } = params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
     await connectToDatabase();
 
     try {

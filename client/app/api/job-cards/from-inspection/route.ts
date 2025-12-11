@@ -14,6 +14,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
+    const tenantId = (session.user as any)?.tenantId;
+    if (!tenantId) {
+      return NextResponse.json({ error: 'Unauthorized - No tenant assigned' }, { status: 401 });
+    }
+
     await connectToDatabase();
 
     const body = await request.json();
@@ -24,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 1. Fetch the Estimate - this is the source of truth for services and parts
-    const estimate = await Estimate.findById(estimateId).lean<IEstimate>();
+    const estimate = await Estimate.findOne({ _id: estimateId, tenantId }).lean<IEstimate>();
 
     if (!estimate) {
       return NextResponse.json({ error: 'Estimate not found' }, { status: 404 });
@@ -37,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Fetch the original inspection to get the parent job card
-    const inspection = await VehicleInspection.findById(inspectionId)
+    const inspection = await VehicleInspection.findOne({ _id: inspectionId, tenantId })
       .populate('jobCardId', 'jobCardNumber')
       .lean();
     
@@ -62,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // 4. Find the inspection invoice to get the fee for deduction
     let inspectionFeeDeducted = 0;
-    const inspectionInvoice = await Invoice.findOne({ inspectionId: inspection._id, isInspectionInvoice: true }).lean<IInvoice>();
+    const inspectionInvoice = await Invoice.findOne({ inspectionId: inspection._id, tenantId, isInspectionInvoice: true }).lean<IInvoice>();
     if (inspectionInvoice) {
         inspectionFeeDeducted = inspectionInvoice.totalAmount;
     } else {
@@ -70,7 +75,11 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Create the new 'repair' Job Card
+    const jobCardNumber = await JobCard.getNextJobCardNumber(tenantId);
+
     const newJobCard = new JobCard({
+      tenantId,
+      jobCardNumber,
       customerId: customerId,
       vehicleId: vehicleId,
       type: 'repair',
@@ -87,7 +96,7 @@ export async function POST(request: NextRequest) {
     await newJobCard.save();
 
     // 6. Update the estimate status to 'approved'
-    await Estimate.findByIdAndUpdate(estimateId, { status: 'approved' });
+    await Estimate.findOneAndUpdate({ _id: estimateId, tenantId }, { status: 'approved' });
 
     const populatedJobCard = await JobCard.findById(newJobCard._id)
         .populate('customerId', 'firstName lastName')

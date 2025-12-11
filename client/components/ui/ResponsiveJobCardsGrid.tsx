@@ -174,16 +174,38 @@ export default function ResponsiveJobCardsGrid({
   }, [jobCards, user])
 
   const totalLaborHours = (services: JobCard['services']) => {
-    return services.reduce((sum, s) => sum + s.laborHours, 0);
+    return services.reduce((sum, service) => {
+      const hours = Number(service.laborHours ?? service.serviceId?.laborHours ?? 0);
+      const quantity = Number(service.quantity ?? 1) || 1;
+      return sum + (hours * quantity);
+    }, 0);
+  };
+
+  const calculateServiceTotal = (services: JobCard['services']) => {
+    return services.reduce((sum, service) => {
+      const hours = Number(service.laborHours ?? service.serviceId?.laborHours ?? 0);
+      const rate = Number(service.laborRate ?? service.serviceId?.laborRate ?? 0);
+      const quantity = Number(service.quantity ?? 1) || 1;
+      return sum + (hours * rate * quantity);
+    }, 0);
+  };
+
+  const calculatePartsTotal = (parts?: JobCard['partsUsed']) => {
+    if (!Array.isArray(parts)) {
+      return 0;
+    }
+    return parts.reduce((sum, part) => {
+      const cost = Number(part.cost ?? part.partId?.price ?? 0);
+      const quantity = Number(part.quantity ?? 1) || 1;
+      return sum + (quantity * cost);
+    }, 0);
   };
 
   const totalCost = (jobCard: JobCard) => {
-    const servicesCost = jobCard.services.reduce((sum, s) => sum + (s.laborHours * s.laborRate), 0);
-    const partsCost = (jobCard.partsUsed || []).reduce((sum, p) => sum + (p.quantity * p.cost), 0);
-    const subtotal = servicesCost + partsCost;
-    const tax = partsCost * 0.15; // 15% tax only on parts
-    const discountAmount = (subtotal + tax) * ((jobCard.discount || 0) / 100); // Discount as percentage
-    return subtotal + tax - discountAmount;
+    const servicesCost = calculateServiceTotal(jobCard.services);
+    const partsCost = calculatePartsTotal(jobCard.partsUsed);
+    const partsVat = partsCost * 0.15; // 15% VAT applied to parts only
+    return servicesCost + partsCost + partsVat;
   };
 
   return (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm, FieldValues, UseFormRegister, FormState } from 'react-hook-form';
+import { useForm, FieldValues, UseFormRegister, FormState, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -67,14 +67,17 @@ const InputField = ({
   icon: any;
   register: UseFormRegister<FormData>;
   errors: FormState<FormData>['errors'];
-  watchedValue: string | number;
+  watchedValue: string | number | undefined;
   type?: string;
   placeholder?: string;
   required?: boolean;
   colSpan?: number;
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const hasValue = watchedValue?.toString().length > 0;
+  const hasValue =
+    watchedValue !== undefined &&
+    watchedValue !== null &&
+    watchedValue.toString().length > 0;
   const hasError = !!errors[name];
 
   return (
@@ -147,7 +150,7 @@ export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }
     formState: { errors },
     watch,
   } = useForm<FormData>({
-    resolver: zodResolver(formSchema(isArabic)),
+    resolver: zodResolver(formSchema(isArabic)) as Resolver<FormData>,
     defaultValues: {
       firstName: '',
       lastName: '',

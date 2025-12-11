@@ -20,7 +20,10 @@ export default function SubscriptionPieChart({ data }: SubscriptionPieChartProps
           cy="50%"
           outerRadius={80}
           labelLine={false}
-          label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+          label={(props) => {
+            const percent = (props as { percent?: number })?.percent ?? 0;
+            return `${(percent * 100).toFixed(0)}%`;
+          }}
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

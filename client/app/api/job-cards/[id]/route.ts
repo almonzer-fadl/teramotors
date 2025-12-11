@@ -83,8 +83,17 @@ export const PUT = withTenantAuth(
     // Check if job card status changed to completed
     if (body.status === 'completed' && jobCard.customerId) {
       try {
-        const whatsappListeners = WhatsAppEventListeners.getInstance();
-        await whatsappListeners.onJobCardClosed(jobCard.customerId.toString());
+        const customerIdValue =
+          (jobCard.customerId as any)?._id ?? jobCard.customerId;
+        const customerIdString = customerIdValue?.toString();
+        const jobCardIdString = jobCard._id?.toString();
+        if (customerIdString && jobCardIdString) {
+          const whatsappListeners = WhatsAppEventListeners.getInstance();
+          await whatsappListeners.onJobCardClosed(
+            customerIdString,
+            jobCardIdString
+          );
+        }
       } catch (whatsappError) {
         console.error(
           'Error sending job completed WhatsApp message:',

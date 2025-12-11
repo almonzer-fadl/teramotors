@@ -119,8 +119,11 @@ export const POST = withTenantAuth(
       return part.partId && part.partId.trim() !== '';
     });
 
+    const jobCardNumber = await JobCard.getNextJobCardNumber(tenantId);
+
     const jobCardData: Record<string, unknown> = {
       tenantId, // Always set tenantId from auth context
+      jobCardNumber,
       customerId: body.customerId,
       vehicleId: body.vehicleId,
       type: body.type || 'regular',
@@ -162,7 +165,13 @@ export const POST = withTenantAuth(
     // Send job started WhatsApp message
     try {
       const whatsappListeners = WhatsAppEventListeners.getInstance();
-      await whatsappListeners.onJobCardOpened(body.customerId);
+      const jobCardIdString = jobCard._id?.toString();
+      if (jobCardIdString) {
+        await whatsappListeners.onJobCardOpened(
+          body.customerId,
+          jobCardIdString
+        );
+      }
     } catch (whatsappError) {
       console.error('Error sending job started WhatsApp message:', whatsappError);
     }

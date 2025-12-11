@@ -3,10 +3,13 @@
 import { useState, useEffect } from "react"
 
 export interface AuthUser {
-  id: string
-  email: string
-  name: string
-  role: string
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  firstName?: string;
+  lastName?: string;
+  tenantId?: string;
 }
 
 export interface AuthSession {

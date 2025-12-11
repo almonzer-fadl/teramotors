@@ -7,7 +7,13 @@ import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
 export const POST = withTenantAuth(
   async (req: NextRequest, { tenantId, params }) => {
-    const { id } = await params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: { message: 'Customer ID is required' } },
+        { status: 400 }
+      );
+    }
     await connectToDatabase();
 
     const customer = await Customer.findOne({ _id: id, tenantId });

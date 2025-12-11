@@ -27,7 +27,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Download, HardDriveRestore, PlusCircle } from 'lucide-react';
+import { Download, HardDrive, PlusCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface IBackup {
@@ -149,7 +149,7 @@ export default function BackupManager() {
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" size="sm">
-                        <HardDriveRestore className="me-2 h-4 w-4" /> Restore
+                        <HardDrive className="me-2 h-4 w-4" /> Restore
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>

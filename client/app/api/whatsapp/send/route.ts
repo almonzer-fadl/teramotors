@@ -17,7 +17,7 @@ export const POST = withTenantAuth(
         return NextResponse.json({ error: 'customerId and messageBody are required.' }, { status: 400 });
       }
 
-      const customer = await Customer.findOne({ _id: customerId, tenantId }).lean();
+      const customer = (await Customer.findOne({ _id: customerId, tenantId }).lean()) as any;
       if (!customer) {
         return NextResponse.json({ error: 'Customer not found in your organization.' }, { status: 404 });
       }

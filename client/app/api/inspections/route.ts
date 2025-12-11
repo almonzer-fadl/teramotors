@@ -99,10 +99,15 @@ export const POST = withTenantAuth(
       }
     }
 
+    const inspectionNumber = await VehicleInspection.getNextInspectionNumber(tenantId);
+
     const inspectionData: any = {
       tenantId, // Always set tenantId from auth context
       jobCardId: body.jobCardId,
       mechanicId: body.mechanicId,
+      customerId: jobCard.customerId,
+      vehicleId: jobCard.vehicleId,
+      inspectionNumber,
       inspectionDate: body.inspectionDate,
       mileage: body.mileage,
       items: body.items,

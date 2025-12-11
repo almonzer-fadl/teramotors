@@ -7,7 +7,10 @@ import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 // GET /api/payments/[id] - Get a single payment by ID
 export const GET = withTenantAuth(
   async (req: NextRequest, { params, tenantId }) => {
-    const { id } = params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json({ error: 'Payment ID is required' }, { status: 400 });
+    }
     await connectToDatabase();
 
     const payment = await Payment.findOne({ _id: id, tenantId })
@@ -32,7 +35,10 @@ export const GET = withTenantAuth(
 // PUT /api/payments/[id] - Update a single payment
 export const PUT = withTenantAuth(
   async (req: NextRequest, { params, tenantId }) => {
-    const { id } = params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json({ error: 'Payment ID is required' }, { status: 400 });
+    }
     await connectToDatabase();
 
     const body = await req.json();
@@ -76,7 +82,10 @@ export const PUT = withTenantAuth(
 // DELETE /api/payments/[id] - Delete a single payment
 export const DELETE = withTenantAuth(
   async (req: NextRequest, { params, tenantId }) => {
-    const { id } = params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json({ error: 'Payment ID is required' }, { status: 400 });
+    }
     await connectToDatabase();
 
     const deletedPayment = await Payment.findOneAndDelete({ _id: id, tenantId });

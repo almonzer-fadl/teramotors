@@ -6,7 +6,10 @@ import User from '@/lib/models/User';
 // PUT /api/users/[id]/status - Update user's status (active/inactive)
 export const PUT = withTenantAuth(
   async (req: NextRequest, { params, tenantId }) => {
-    const { id } = params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
     await connectToDatabase();
 
     try {
