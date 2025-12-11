@@ -3,6 +3,8 @@ import { CustomerPortalAuth } from '@/lib/services/CustomerPortalAuth';
 import Customer from '@/lib/models/Customer';
 import { connectToDatabase } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const customerId = request.cookies.get('portal_customer_id')?.value;

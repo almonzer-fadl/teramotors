@@ -5,6 +5,8 @@ import * as z from 'zod';
 import { CustomerPortalAuth } from '@/lib/services/CustomerPortalAuth';
 import Customer from '@/lib/models/Customer';
 
+export const dynamic = 'force-dynamic';
+
 const vehicleSchema = z.object({
   make: z.string().min(2),
   model: z.string().min(1),

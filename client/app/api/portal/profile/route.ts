@@ -4,6 +4,8 @@ import { connectToDatabase } from '@/lib/db';
 import * as z from 'zod';
 import { CustomerPortalAuth } from '@/lib/services/CustomerPortalAuth';
 
+export const dynamic = 'force-dynamic';
+
 const profileSchema = z.object({
   firstName: z.string().min(2),
   lastName: z.string().min(2),
