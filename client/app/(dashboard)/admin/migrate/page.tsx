@@ -10,6 +10,7 @@ import { RoleGuard } from '@/components/RoleGuard';
 export default function MigratePage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [tenantSlug, setTenantSlug] = useState('teramotors-default');
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
@@ -24,6 +25,7 @@ export default function MigratePage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ tenantSlug }),
       });
 
       const data = await response.json();
@@ -80,8 +82,20 @@ export default function MigratePage() {
 
               <div className="mb-8 space-y-4">
                 <p className="text-base text-gray-700 dark:text-gray-300">
-                  This migration will add tenantId to existing WorkLog and WhatsAppMessage records.
+                  This migration backfills the tenantId field on all legacy records (customers, vehicles, invoices, etc.) so they appear under the correct tenant.
                 </p>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Target Tenant Slug
+                  </label>
+                  <input
+                    type="text"
+                    value={tenantSlug}
+                    onChange={(e) => setTenantSlug(e.target.value)}
+                    className="w-full px-4 py-3 bg-white/80 dark:bg-gray-800/80 border-2 border-gray-200 dark:border-gray-700 rounded-xl focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all"
+                    placeholder="teramotors-default"
+                  />
+                </div>
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
                   <p className="text-sm text-yellow-800 dark:text-yellow-400 flex items-start">
                     <span className="text-xl me-2">⚠️</span>
@@ -133,6 +147,13 @@ export default function MigratePage() {
                     Migration Complete
                   </h3>
                   <div className="text-green-700 dark:text-green-300 space-y-3 text-base">
+                    {result.collectionUpdates && Object.keys(result.collectionUpdates).map((key) => (
+                      <p key={key} className="flex items-center">
+                        <span className="text-green-500 me-2">✓</span>
+                        <span className="font-medium">{key} updated:</span>
+                        <span className="ms-2 font-semibold">{result.collectionUpdates[key]}</span>
+                      </p>
+                    ))}
                     <p className="flex items-center">
                       <span className="text-green-500 me-2">✓</span>
                       <span className="font-medium">WorkLogs updated:</span>
