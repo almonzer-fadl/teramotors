@@ -91,7 +91,11 @@ export const ProfitAndLossReport = ({ data }: { data: any }) => {
                                 outerRadius={110}
                                 fill="#8884d8"
                                 dataKey="value"
-                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                label={(props) => {
+                                    const { name, percent } = props as { name?: string; percent?: number };
+                                    const pct = (percent ?? 0) * 100;
+                                    return `${name ?? ''}: ${pct.toFixed(0)}%`;
+                                }}
                             >
                                 {revenueBreakdownData.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

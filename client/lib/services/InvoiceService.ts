@@ -12,7 +12,6 @@ import { COMPANY_CONFIG } from '../../config/company-config';
 
 export class InvoiceService {
   private qrGenerator: ZATCAQRGenerator;
-  private invoiceCounter: number = 1;
 
   constructor() {
     this.qrGenerator = new ZATCAQRGenerator();
@@ -21,7 +20,7 @@ export class InvoiceService {
   /**
    * Create invoice from job card data (main integration point)
    */
-  async createInvoiceFromJobCard(jobCardData: {
+  async createInvoiceFromJobCard(invoiceNumber: string, jobCardData: {
     jobCardId: string;
     customerId: any;
     vehicleId: any;
@@ -34,7 +33,7 @@ export class InvoiceService {
   }): Promise<InvoiceGenerationResult> {
     try {
       // Convert job card data to ZATCA invoice format
-      const invoiceData = this.convertJobCardToInvoiceData(jobCardData);
+      const invoiceData = this.convertJobCardToInvoiceData(invoiceNumber, jobCardData);
       
       // Generate ZATCA-compliant invoice
       const result = await this.qrGenerator.generateInvoice(invoiceData);
@@ -69,7 +68,7 @@ export class InvoiceService {
   /**
    * Convert job card data to ZATCA invoice format
    */
-  private convertJobCardToInvoiceData(jobCardData: any): InvoiceData {
+  private convertJobCardToInvoiceData(invoiceNumber: string, jobCardData: any): InvoiceData {
     const items: InvoiceItem[] = [];
     
     // Convert services to invoice items (NO TAX on services)
@@ -106,9 +105,6 @@ export class InvoiceService {
       phone: jobCardData.customerId.phone,
     };
 
-    // Generate invoice number
-    const invoiceNumber = ZATCAUtils.generateInvoiceNumber('INV', this.invoiceCounter++);
-
     // Calculate global discount from percentage
     const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
     const globalDiscount = subtotal * ((jobCardData.discount || 0) / 100);
@@ -130,7 +126,7 @@ export class InvoiceService {
   /**
    * Create a simple B2C sale (as shown in examples)
    */
-  async createInvoice(invoiceData: {
+  async createInvoice(invoiceNumber: string, invoiceData: {
     items: Array<{
       name: string;
       description?: string;
@@ -155,7 +151,7 @@ export class InvoiceService {
       }));
 
       const zatcaInvoiceData: InvoiceData = {
-        invoiceNumber: ZATCAUtils.generateInvoiceNumber('INV', this.invoiceCounter++),
+        invoiceNumber,
         invoiceDate: new Date(),
         dueDate: invoiceData.dueDate,
         currency: 'SAR',
@@ -206,7 +202,8 @@ export class InvoiceService {
       name: params.customerName || 'Walk-in Customer',
     };
 
-    return await this.createInvoice({
+    const invoiceNumber = `POS-${Date.now()}`;
+    return await this.createInvoice(invoiceNumber, {
       items,
       customer,
       paymentMethod: params.paymentMethod || 'cash',
@@ -285,19 +282,6 @@ export class InvoiceService {
     return ZATCAUtils.isB2BInvoice(invoiceData);
   }
 
-  /**
-   * Update invoice counter (for persistence)
-   */
-  setInvoiceCounter(counter: number): void {
-    this.invoiceCounter = counter;
-  }
-
-  /**
-   * Get current invoice counter
-   */
-  getInvoiceCounter(): number {
-    return this.invoiceCounter;
-  }
 }
 
 // Export singleton instance

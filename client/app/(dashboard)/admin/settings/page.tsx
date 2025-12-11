@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { CogIcon, ShieldCheckIcon, CloudIcon, ServerIcon, LogOut, Icon } from 'lucide-react';
+import { CogIcon, ShieldCheckIcon, CloudIcon, ServerIcon, LogOut } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { fadeInUp, staggerContainer } from '@/lib/dashboard-animations';
 
 import PlatformDefaultsSettings from '@/components/settings/admin/PlatformDefaultsSettings';
@@ -12,7 +13,7 @@ import LogoutButton from '@/components/ui/LogoutButton';
 // Define the structure for each tab
 interface AdminTab {
   name: string;
-  icon: Icon;
+  icon: LucideIcon;
   component: React.ReactNode;
 }
 

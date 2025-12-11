@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import SystemStatusCard from './SystemStatusCard';
 import { motion } from 'framer-motion';
-import { RefreshCw, CheckCircle, XCircle, AlertCircle, Loader2, Activity } from 'lucide-react';
+import { RefreshCw, CheckCircle, XCircle, AlertCircle, Loader2, Activity, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface HealthComponent {

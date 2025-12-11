@@ -175,7 +175,7 @@ export default function LandingPage() {
                 <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
               <span className="ms-2 sm:ms-3 text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                TeraMotors
+                {t('marketing.header.company_name')}
               </span>
             </Link>
 
@@ -389,10 +389,10 @@ export default function LandingPage() {
                       <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
                     </div>
                     <p className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
-                      Dashboard Preview
+                      {t('marketing.hero.dashboard_preview')}
                     </p>
                     <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1 sm:mt-2">
-                      Beautiful, intuitive interface
+                      {t('marketing.hero.dashboard_subtitle')}
                     </p>
                   </div>
                 </div>
@@ -577,10 +577,10 @@ export default function LandingPage() {
 
                       <div className={`${config.popular ? 'pt-4' : ''}`}>
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                          {config.name}
+                          {t(config.name)}
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                          {config.description}
+                          {t(config.description)}
                         </p>
 
                         <div className="mt-6">
@@ -597,7 +597,7 @@ export default function LandingPage() {
                               <span className="text-3xl font-bold text-gray-900 dark:text-white">
                                 SAR {billingCycle === 'annual' ? Math.round(price / 12) : price}
                               </span>
-                              <span className="text-gray-500 dark:text-gray-400 ms-1">/mo</span>
+                              <span className="text-gray-500 dark:text-gray-400 ms-1">{t('marketing.pricing.per_month')}</span>
                             </div>
                           )}
                         </div>
@@ -606,7 +606,7 @@ export default function LandingPage() {
                           {config.features.slice(0, 5).map((feature, i) => (
                             <li key={i} className="flex items-start text-sm">
                               <CheckCircle2 className="w-5 h-5 text-emerald-500 me-2 flex-shrink-0" />
-                              <span className="text-gray-600 dark:text-gray-300">{feature.name}</span>
+                              <span className="text-gray-600 dark:text-gray-300">{t(feature.name)}</span>
                             </li>
                           ))}
                         </ul>
@@ -769,7 +769,7 @@ export default function LandingPage() {
 
           <div className="border-t border-gray-800 dark:border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between">
             <p className="text-sm">
-              © {new Date().getFullYear()} TeraMotors. {t('marketing.footer.copyright')}
+              © {new Date().getFullYear()} {t('marketing.footer.company_name')}. {t('marketing.footer.copyright')}
             </p>
             <p className="text-sm mt-4 md:mt-0">
               {t('marketing.footer.made_in')}

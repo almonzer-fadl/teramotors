@@ -35,6 +35,16 @@ export interface IInvoice extends Document {
   updatedAt: Date;
 }
 
+interface InvoiceModel extends mongoose.Model<IInvoice> {
+  findByTenant(
+    tenantId: string | mongoose.Types.ObjectId,
+    filter?: Record<string, unknown>
+  ): Promise<IInvoice[]>;
+  getNextInvoiceNumber(
+    tenantId: string | mongoose.Types.ObjectId
+  ): Promise<string>;
+}
+
 const { Schema } = mongoose;
 
 const InvoiceSchema = new Schema<IInvoice>({
@@ -118,19 +128,34 @@ InvoiceSchema.statics.findByTenant = function(
 InvoiceSchema.statics.getNextInvoiceNumber = async function(
   tenantId: string | mongoose.Types.ObjectId
 ) {
-  const lastInvoice = await this.findOne({ tenantId })
-    .sort({ createdAt: -1 })
-    .select('invoiceNumber');
+  try {
+    const lastInvoice = await this.findOne({ tenantId })
+      .sort({ createdAt: -1 })
+      .select('invoiceNumber');
 
-  if (!lastInvoice) {
+    const rawInvoiceNumber = typeof lastInvoice?.invoiceNumber === 'string'
+      ? lastInvoice.invoiceNumber.trim()
+      : '';
+
+    if (!rawInvoiceNumber) {
+      return 'INV-0001';
+    }
+
+    const prefixMatch = rawInvoiceNumber.match(/^([A-Za-z]+)-/);
+    const numberMatch = rawInvoiceNumber.match(/(\d+)$/);
+    const prefix = prefixMatch ? prefixMatch[1] : 'INV';
+    const lastNumber = numberMatch ? parseInt(numberMatch[1], 10) : 0;
+    const safeLastNumber = Number.isFinite(lastNumber) ? lastNumber : 0;
+    const nextNumber = (safeLastNumber + 1).toString().padStart(4, '0');
+    return `${prefix}-${nextNumber}`;
+  } catch (error) {
+    console.error("Error in getNextInvoiceNumber, falling back to INV-0001:", error);
     return 'INV-0001';
   }
-
-  const lastNumber = parseInt(lastInvoice.invoiceNumber.split('-')[1]);
-  const nextNumber = (lastNumber + 1).toString().padStart(4, '0');
-  return `INV-${nextNumber}`;
 };
 
-const Invoice = (mongoose.models && mongoose.models.Invoice) || mongoose.model<IInvoice>('Invoice', InvoiceSchema);
+const Invoice =
+  (mongoose.models.Invoice as InvoiceModel) ||
+  mongoose.model<IInvoice, InvoiceModel>('Invoice', InvoiceSchema);
 
 export default Invoice;

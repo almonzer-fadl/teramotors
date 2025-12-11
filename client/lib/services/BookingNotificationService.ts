@@ -32,6 +32,7 @@ export class BookingNotificationService {
         to: customer.email,
         subject: emailContent.subject,
         html: emailContent.html,
+        text: emailContent.text,
       });
     } catch (error) {
       console.error('Failed to send customer confirmation email:', error);
@@ -66,6 +67,7 @@ export class BookingNotificationService {
           to: tenant.companyInfo.email,
           subject: emailContent.subject,
           html: emailContent.html,
+          text: emailContent.text,
         });
       }
     } catch (error) {
@@ -84,7 +86,7 @@ export class BookingNotificationService {
     time: Date,
     confirmationNumber: string,
     language: 'ar' | 'en'
-  ): { subject: string; html: string } {
+  ): { subject: string; html: string; text: string } {
     const isArabic = language === 'ar';
 
     const formattedDate = date.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', {
@@ -102,6 +104,7 @@ export class BookingNotificationService {
     if (isArabic) {
       return {
         subject: `تأكيد الموعد - ${confirmationNumber}`,
+        text: `تم تأكيد موعدك للخدمة ${service.name} بتاريخ ${formattedDate} الساعة ${formattedTime}. رقم التأكيد: ${confirmationNumber}.`,
         html: `
           <!DOCTYPE html>
           <html dir="rtl" lang="ar">
@@ -152,6 +155,7 @@ export class BookingNotificationService {
 
     return {
       subject: `Appointment Confirmation - ${confirmationNumber}`,
+      text: `Your appointment for ${service.name} is confirmed on ${formattedDate} at ${formattedTime}. Confirmation #${confirmationNumber}.`,
       html: `
         <!DOCTYPE html>
         <html lang="en">
@@ -211,7 +215,7 @@ export class BookingNotificationService {
     time: Date,
     confirmationNumber: string,
     requiresApproval: boolean
-  ): { subject: string; html: string } {
+  ): { subject: string; html: string; text: string } {
     const formattedDate = date.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
@@ -228,6 +232,7 @@ export class BookingNotificationService {
 
     return {
       subject: `New Online Booking ${requiresApproval ? '(Approval Required)' : ''} - ${confirmationNumber}`,
+      text: `New booking ${confirmationNumber} for ${service.name} on ${formattedDate} at ${formattedTime}. Customer: ${customer.firstName} ${customer.lastName}. Status: ${status}.`,
       html: `
         <!DOCTYPE html>
         <html lang="en">

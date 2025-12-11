@@ -4,10 +4,16 @@ import JobCard from '@/lib/models/JobCard';
 import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 
 export const GET = withTenantAuth(
-  async (req: NextRequest, { params, tenantId }: { params: { id: string }, tenantId: string }) => {
+  async (req: NextRequest, { params, tenantId }) => {
     await connectToDatabase();
 
-    const serviceId = params.id;
+    const serviceId = params?.id;
+    if (!serviceId) {
+      return NextResponse.json(
+        { success: false, error: 'Service ID is required' },
+        { status: 400 }
+      );
+    }
 
     // Find all job cards that include this service
     const jobCards = await JobCard.find({

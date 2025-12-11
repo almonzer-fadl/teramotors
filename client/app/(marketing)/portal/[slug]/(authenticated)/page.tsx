@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { User, Car, Calendar } from 'lucide-react';
+import { User, Car, Calendar, Loader2 } from 'lucide-react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Modal from '@/components/portal/Modal';
 import { ProfileContent } from '@/components/portal/ProfileContent';

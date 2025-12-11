@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Vehicle from '@/lib/models/Vehicle';
-import { connectToDB } from '@/lib/db';
+import { connectToDatabase } from '@/lib/db';
 import * as z from 'zod';
 import { CustomerPortalAuth } from '@/lib/services/CustomerPortalAuth';
 import Customer from '@/lib/models/Customer';

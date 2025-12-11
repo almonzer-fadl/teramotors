@@ -7,7 +7,10 @@ import bcrypt from 'bcryptjs';
 // POST /api/users/[id]/reset-password
 export const POST = withTenantAuth(
   async (req: NextRequest, { params, tenantId }) => {
-    const { id } = params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
     await connectToDatabase();
 
     try {

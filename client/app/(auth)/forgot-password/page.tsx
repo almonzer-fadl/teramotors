@@ -40,7 +40,7 @@ export default function ForgotPasswordPage() {
           className="absolute -top-16 left-0 flex items-center text-white/80 hover:text-white transition-colors group"
         >
           <ArrowLeft className="w-5 h-5 me-2 group-hover:-translate-x-1 transition-transform" />
-          {t('landing_missing.back_to_login')}
+          {t('auth.back_to_login')}
         </Link>
 
         <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20">

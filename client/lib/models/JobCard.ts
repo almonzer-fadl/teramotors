@@ -34,10 +34,21 @@ export interface IJobCard extends Document {
   actualEndTime?: Date;
   services: IService[];
   partsUsed: IPartUsed[];
+  discount?: number;
   notes?: string;
   photos: string[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+interface JobCardModel extends mongoose.Model<IJobCard> {
+  findByTenant(
+    tenantId: string | mongoose.Types.ObjectId,
+    filter?: Record<string, unknown>
+  ): Promise<IJobCard[]>;
+  getNextJobCardNumber(
+    tenantId: string | mongoose.Types.ObjectId
+  ): Promise<string>;
 }
 
 const JobCardSchema = new Schema<IJobCard>({
@@ -96,6 +107,7 @@ const JobCardSchema = new Schema<IJobCard>({
     quantity: { type: Number, required: true, min: 1 },
     cost: { type: Number, required: true, min: 0 }
   }],
+  discount: { type: Number, default: 0, min: 0 },
   notes: { type: String, required: false },
   photos: [{ type: String }],
   createdAt: { type: Date, default: Date.now },
@@ -133,7 +145,7 @@ JobCardSchema.statics.getNextJobCardNumber = async function(
     .sort({ createdAt: -1 })
     .select('jobCardNumber');
 
-  if (!lastJobCard) {
+  if (!lastJobCard || !lastJobCard.jobCardNumber) {
     return 'JC-0001';
   }
 
@@ -142,6 +154,8 @@ JobCardSchema.statics.getNextJobCardNumber = async function(
   return `JC-${nextNumber}`;
 };
 
-const JobCard = (mongoose.models && mongoose.models.JobCard) || mongoose.model<IJobCard>('JobCard', JobCardSchema);
+const JobCard =
+  (mongoose.models.JobCard as JobCardModel) ||
+  mongoose.model<IJobCard, JobCardModel>('JobCard', JobCardSchema);
 
 export default JobCard;

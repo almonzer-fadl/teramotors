@@ -9,12 +9,16 @@ import { IBackup } from '@/lib/models/Backup';
 const execAsync = promisify(exec);
 
 async function getDocumentCounts(): Promise<{counts: Record<string, number>, collectionNames: string[]}> {
-    const collections = await mongoose.connection.db.listCollections().toArray();
+    const db = mongoose.connection.db;
+    if (!db) {
+        throw new Error('Database connection not initialized');
+    }
+    const collections = await db.listCollections().toArray();
     const counts: Record<string, number> = {};
     const collectionNames = collections.map(c => c.name);
     for (const collection of collections) {
         if(collection.type === 'view') continue;
-        const count = await mongoose.connection.db.collection(collection.name).countDocuments();
+        const count = await db.collection(collection.name).countDocuments();
         counts[collection.name] = count;
     }
     return {counts, collectionNames};

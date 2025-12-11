@@ -26,7 +26,7 @@ export async function POST(
     const validationResult = createBookingSchema.safeParse(body);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Invalid booking data', details: validationResult.error.errors },
+        { error: 'Invalid booking data', details: validationResult.error.issues },
         { status: 400 }
       );
     }

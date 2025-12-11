@@ -80,7 +80,11 @@ export const InventoryValuationReport = ({ data }: { data: any }) => {
                                 fill="#8884d8"
                                 dataKey="totalValue"
                                 nameKey="category"
-                                label={({ category, percent }: { category: string, percent: any }) => `${category}: ${(percent * 100).toFixed(0)}%`}
+                                label={(props) => {
+                                    const { percent, name } = props as { percent?: number; name?: string };
+                                    const pct = (percent ?? 0) * 100;
+                                    return `${name ?? ''}: ${pct.toFixed(0)}%`;
+                                }}
                             >
                                 {valueByCategory.map((entry: any, index: number) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

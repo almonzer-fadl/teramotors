@@ -3,7 +3,7 @@ import WhatsAppMessage from '@/lib/models/WhatsAppMessage';
 
 async function sendMessage(tenantId: string, customerId: string, to: string, body: string): Promise<{ success: boolean; message?: string; error?: any }> {
     
-    const tenant = await Tenant.findById(tenantId).select('integrations.whatsapp').lean();
+    const tenant = (await Tenant.findById(tenantId).select('integrations.whatsapp').lean()) as any;
     
     const instanceId = tenant?.integrations?.whatsapp?.instanceId;
     const token = tenant?.integrations?.whatsapp?.token;

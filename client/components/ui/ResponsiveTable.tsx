@@ -19,7 +19,7 @@ interface Customer {
     state: string;
     zipCode: string;
   };
-  vehicles: number;
+  vehicles: number | Array<unknown>;
   isActive: boolean;
   createdAt: string;
 }

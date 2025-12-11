@@ -27,6 +27,16 @@ export interface IVehicleInspection extends Document {
   updatedAt: Date;
 }
 
+interface VehicleInspectionModel extends mongoose.Model<IVehicleInspection> {
+  getNextInspectionNumber(
+    tenantId: string | mongoose.Types.ObjectId
+  ): Promise<string>;
+  findByTenant(
+    tenantId: string | mongoose.Types.ObjectId,
+    filter?: Record<string, unknown>
+  ): Promise<IVehicleInspection[]>;
+}
+
 const { Schema } = mongoose;
 
 const VehicleInspectionSchema = new Schema<IVehicleInspection>({
@@ -84,6 +94,22 @@ VehicleInspectionSchema.index({ tenantId: 1, generatedEstimateId: 1 });
 VehicleInspectionSchema.index({ tenantId: 1, generatedInvoiceId: 1 });
 VehicleInspectionSchema.index({ tenantId: 1, createdAt: -1 });
 
+VehicleInspectionSchema.statics.getNextInspectionNumber = async function(
+  tenantId: string | mongoose.Types.ObjectId
+) {
+  const lastInspection = await this.findOne({ tenantId })
+    .sort({ createdAt: -1 })
+    .select('inspectionNumber');
+
+  if (!lastInspection || !lastInspection.inspectionNumber) {
+    return 'INSP-0001';
+  }
+
+  const lastNumber = parseInt(lastInspection.inspectionNumber.split('-')[1]);
+  const nextNumber = (isNaN(lastNumber) ? 1 : lastNumber + 1).toString().padStart(4, '0');
+  return `INSP-${nextNumber}`;
+};
+
 // Helper method to find inspections by tenant
 VehicleInspectionSchema.statics.findByTenant = function(
   tenantId: string | mongoose.Types.ObjectId,
@@ -92,11 +118,11 @@ VehicleInspectionSchema.statics.findByTenant = function(
   return this.find({ tenantId, ...filter });
 };
 
-// Clear any existing model to avoid caching issues
-if (mongoose.models && mongoose.models.VehicleInspection) {
-  delete mongoose.models.VehicleInspection;
-}
-
-const VehicleInspection = mongoose.model<IVehicleInspection>('VehicleInspection', VehicleInspectionSchema);
+const VehicleInspection =
+  (mongoose.models.VehicleInspection as VehicleInspectionModel) ||
+  mongoose.model<IVehicleInspection, VehicleInspectionModel>(
+    'VehicleInspection',
+    VehicleInspectionSchema
+  );
 
 export default VehicleInspection;

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from '@/lib/auth-server';
-import { WhatsAppService } from '@/lib/services/WhatsAppService';
+import { connectToDatabase } from '@/lib/db';
+import WhatsAppMessage from '@/lib/models/WhatsAppMessage';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ customerId: string }> }
+  { params }: { params: { customerId: string } }
 ) {
   try {
     const session = await getServerSession();
@@ -12,9 +13,23 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { customerId } = await params;
-    const whatsappService = WhatsAppService.getInstance();
-    const messages = await whatsappService.getCustomerMessages(customerId);
+    await connectToDatabase();
+
+    const customerId = params?.customerId;
+    if (!customerId) {
+      return NextResponse.json({ error: 'Customer ID is required' }, { status: 400 });
+    }
+
+    const tenantId = (session.user as any)?.tenantId;
+    const query: Record<string, any> = { customerId };
+    if (tenantId) {
+      query.tenantId = tenantId;
+    }
+
+    const messages = await WhatsAppMessage.find(query)
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .lean();
 
     return NextResponse.json({ messages });
 

@@ -116,8 +116,9 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
       });
 
       if (response.ok) {
-        socket.emit("customer-created");
+        socket.emit("update-customers");
         invalidateCustomers(); // Invalidate cache after create/update
+        router.refresh();
         router.push("/customers");
       } else {
         const error = await response.json();

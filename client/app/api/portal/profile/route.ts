@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Customer from '@/lib/models/Customer';
-import { connectToDB } from '@/lib/db';
+import { connectToDatabase } from '@/lib/db';
 import * as z from 'zod';
 import { CustomerPortalAuth } from '@/lib/services/CustomerPortalAuth';
 
@@ -27,7 +27,7 @@ async function getAuthenticatedCustomer(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    connectToDatabase
+    await connectToDatabase();
     const customerId = await getAuthenticatedCustomer(request);
     if (!customerId) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    connectToDatabase
+    await connectToDatabase();
     const customerId = await getAuthenticatedCustomer(request);
     if (!customerId) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

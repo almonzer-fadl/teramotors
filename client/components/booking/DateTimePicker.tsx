@@ -6,7 +6,8 @@ import { Calendar as CalendarIcon, Clock, AlertCircle, ArrowRight, ArrowLeft, Lo
 
 interface DateTimePickerProps {
   tenantSlug: string;
-  inspectionTemplateId: string;
+  inspectionTemplateId?: string;
+  serviceId?: string;
   advanceBookingDays: number;
   onSelect: (appointmentDate: Date, startTime: Date, notes?: string) => void;
   onBack: () => void;

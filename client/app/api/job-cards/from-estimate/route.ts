@@ -10,13 +10,18 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const tenantId = (session.user as any)?.tenantId
+    if (!tenantId) {
+      return Response.json({ error: 'Unauthorized - No tenant assigned' }, { status: 401 })
+    }
+
     await connectToDatabase()
     
     const body = await request.json()
     const { estimateId } = body
     
     // Get the estimate
-    const estimate = await Estimate.findById(estimateId)
+    const estimate = await Estimate.findOne({ _id: estimateId, tenantId })
       .populate('inspectionId', 'inspectionDate overallCondition')
       .populate('customerId', 'firstName lastName')
       .populate('vehicleId', 'make model year licensePlate')
@@ -27,6 +32,12 @@ export async function POST(request: Request) {
     if (!estimate) {
       return Response.json({ error: 'Estimate not found' }, { status: 404 })
     }
+
+    const jobCardNumber = await JobCard.getNextJobCardNumber(tenantId)
+    const inspectionId = (estimate.inspectionId as any)?._id || estimate.inspectionId
+    const customerId = (estimate.customerId as any)?._id || estimate.customerId
+    const vehicleId = (estimate.vehicleId as any)?._id || estimate.vehicleId
+    const mechanicId = (estimate.mechanicId as any)?._id || estimate.mechanicId
 
     // Convert estimate services to job card services
     const jobCardServices = estimate.services.map((service: any) => {
@@ -58,10 +69,12 @@ export async function POST(request: Request) {
 
     // Create the job card
     const jobCard = new JobCard({
-      inspectionId: estimate.inspectionId?._id,
-      customerId: estimate.customerId._id,
-      vehicleId: estimate.vehicleId._id,
-      mechanicId: estimate.mechanicId._id,
+      tenantId,
+      jobCardNumber,
+      inspectionId,
+      customerId,
+      vehicleId,
+      mechanicId,
       status: 'pending',
       priority: 'medium',
       services: jobCardServices,
@@ -73,10 +86,13 @@ export async function POST(request: Request) {
     await jobCard.save()
 
     // Update estimate status to approved
-    await Estimate.findByIdAndUpdate(estimateId, { 
-      status: 'approved',
-      jobCardId: jobCard._id 
-    })
+    await Estimate.findOneAndUpdate(
+      { _id: estimateId, tenantId }, 
+      { 
+        status: 'approved',
+        jobCardId: jobCard._id 
+      }
+    )
 
     // Populate the job card for response
     const populatedJobCard = await JobCard.findById(jobCard._id)

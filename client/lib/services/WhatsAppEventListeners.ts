@@ -16,7 +16,7 @@ export class WhatsAppEventListeners {
   // Generic helper to send a message
   private async sendMessage(customerId: string, messageBody: string): Promise<void> {
     try {
-      const customer = await Customer.findById(customerId).lean();
+      const customer = (await Customer.findById(customerId).lean()) as any;
       if (!customer || !customer.whatsappEnabled || !customer.phoneNumber || !customer.tenantId) {
         console.log(`[WhatsApp Event] Cannot send message: Customer ${customerId} has WhatsApp disabled, or phone/tenant is missing.`);
         return;
@@ -38,7 +38,7 @@ export class WhatsAppEventListeners {
 
   // Customer created - Send welcome message
   public async onCustomerCreated(customerId: string): Promise<void> {
-    const customer = await Customer.findById(customerId).select('firstName').lean();
+    const customer = (await Customer.findById(customerId).select('firstName').lean()) as any;
     if(!customer) return;
     const message = `Welcome, ${customer.firstName}! We are happy to have you as a customer at our workshop.`;
     await this.sendMessage(customerId, message);
@@ -113,4 +113,3 @@ Thank you for choosing our service!`;
     await this.sendMessage(customerId, message);
   }
 }
-

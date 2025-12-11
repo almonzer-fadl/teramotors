@@ -161,8 +161,23 @@ function InvoicesPageContent() {
     setCurrentPage(page);
   };
 
-  const handleDeleteInvoice = (invoiceId: string) => {
-    setInvoices(prev => prev.filter(invoice => invoice._id !== invoiceId));
+  const handleDeleteInvoice = async (invoiceId: string) => {
+    try {
+      const response = await fetch(`/api/invoices/${invoiceId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || 'Failed to delete invoice');
+      }
+
+      alert(t('invoices.delete_success', { defaultValue: 'Invoice deleted successfully.' }));
+      await fetchInvoices(searchTerm, statusFilter, currentPage, itemsPerPage);
+    } catch (error) {
+      console.error('Failed to delete invoice:', error);
+      alert(t('invoices.delete_failed', { defaultValue: 'Failed to delete invoice.' }));
+    }
   };
 
   const handlePrintInvoice = async (invoice: Invoice) => {

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -93,7 +93,7 @@ interface JobCard {
 }
 
 export default function JobCardDetailsPage() {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const params = useParams();
   const router = useRouter();
   const { user } = useSession();
@@ -109,6 +109,51 @@ export default function JobCardDetailsPage() {
   const [linkedEstimateId, setLinkedEstimateId] = useState<string | null>(null);
 
   const isAdmin = user?.role === 'admin';
+
+  const currencyFormatter = useMemo(() => {
+    return new Intl.NumberFormat(i18n.language === 'ar' ? 'ar-SA' : 'en-US', {
+      style: 'currency',
+      currency: 'SAR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }, [i18n.language]);
+
+  const pricingTotals = useMemo(() => {
+    if (!jobCard) {
+      return { servicesTotal: 0, partsTotal: 0, partsVat: 0, grandTotal: 0 };
+    }
+
+    const servicesTotal = (jobCard.services || []).reduce((total, service) => {
+      const quantity = Number(service.quantity) || 0;
+      const laborHours =
+        Number(service.laborHours) ||
+        Number(typeof service.serviceId === 'object' ? service.serviceId?.laborHours : 0) ||
+        0;
+      const laborRate =
+        Number(service.laborRate) ||
+        Number(typeof service.serviceId === 'object' ? service.serviceId?.laborRate : 0) ||
+        0;
+      return total + quantity * laborHours * laborRate;
+    }, 0);
+
+    const partsTotal = (jobCard.partsUsed || []).reduce((total, part) => {
+      const quantity = Number(part.quantity) || 0;
+      const fallbackCost =
+        typeof part.partId === 'object'
+          ? Number((part.partId as any)?.cost ?? (part.partId as any)?.price ?? 0)
+          : 0;
+      const cost = Number(part.cost ?? fallbackCost) || 0;
+      return total + quantity * cost;
+    }, 0);
+
+    const partsVat = partsTotal * 0.15;
+    const grandTotal = servicesTotal + partsTotal + partsVat;
+
+    return { servicesTotal, partsTotal, partsVat, grandTotal };
+  }, [jobCard]);
+
+  const formatCurrency = (value: number) => currencyFormatter.format(value);
 
   useEffect(() => {
     if (id) {
@@ -771,6 +816,64 @@ export default function JobCardDetailsPage() {
               </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* Pricing Summary */}
+        <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+          <div className="px-8 py-8">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {t("job_cards.pricing_summary.title")}
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                  {t("job_cards.pricing_summary.description")}
+                </p>
+              </div>
+              <div className="inline-flex flex-col items-start px-5 py-4 rounded-2xl border border-[#F97402]/30 bg-[#F97402]/5 text-[#F97402]">
+                <span className="text-xs font-semibold uppercase tracking-wide">
+                  {t("job_cards.pricing_summary.grand_total")}
+                </span>
+                <span className="text-2xl font-bold mt-1">
+                  {formatCurrency(pricingTotals.grandTotal)}
+                </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/60">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                  {t("job_cards.pricing_summary.services_total")}
+                </p>
+                <p className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
+                  {formatCurrency(pricingTotals.servicesTotal)}
+                </p>
+              </div>
+              <div className="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/60">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                  {t("job_cards.pricing_summary.parts_total")}
+                </p>
+                <p className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
+                  {formatCurrency(pricingTotals.partsTotal)}
+                </p>
+              </div>
+              <div className="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/60">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                  {t("job_cards.pricing_summary.parts_vat")}
+                </p>
+                <p className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
+                  {formatCurrency(pricingTotals.partsVat)}
+                </p>
+              </div>
+              <div className="p-5 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/70 dark:bg-gray-800/60">
+                <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                  {t("job_cards.pricing_summary.grand_total")}
+                </p>
+                <p className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
+                  {formatCurrency(pricingTotals.grandTotal)}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 

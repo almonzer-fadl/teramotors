@@ -60,8 +60,7 @@ export async function GET(request: NextRequest) {
 
     // Calculate total revenue - handle missing total values
     const totalRevenue = invoices.reduce((sum, invoice) => {
-      // If total is missing, calculate from subtotal + tax
-      const invoiceTotal = invoice.total || (invoice.subtotal || 0) + (invoice.tax || 0)
+      const invoiceTotal = Number(invoice.totalAmount ?? 0)
       return sum + invoiceTotal
     }, 0)
 
@@ -78,10 +77,10 @@ export async function GET(request: NextRequest) {
         createdAt: { $gte: monthStart, $lte: monthEnd }
       })
       
-      const monthRevenue = monthInvoices.reduce((sum, invoice) => {
-        const invoiceTotal = invoice.total || (invoice.subtotal || 0) + (invoice.tax || 0)
-        return sum + invoiceTotal
-      }, 0)
+      const monthRevenue = monthInvoices.reduce(
+        (sum, invoice) => sum + Number(invoice.totalAmount ?? 0),
+        0
+      )
       
       monthlyRevenue.push({
         month: date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
@@ -102,7 +101,7 @@ export async function GET(request: NextRequest) {
     const serviceStats = new Map()
     
     jobCards.forEach(jobCard => {
-      jobCard.services.forEach((service: { serviceId: { name: any; }; quantity: number; laborHours: number; laborRate: number; }) => {
+      jobCard.services.forEach((service: any) => {
         if (service.serviceId && typeof service.serviceId === 'object') {
           const serviceName = service.serviceId.name
           const quantity = service.quantity || 1
@@ -150,7 +149,8 @@ export async function GET(request: NextRequest) {
     const mechanicStats = new Map()
     jobCards.forEach(jobCard => {
       if (jobCard.mechanicId && typeof jobCard.mechanicId === 'object') {
-        const mechanicName = jobCard.mechanicId.fullName || 'Unknown'
+        const mechanicDoc: any = jobCard.mechanicId
+        const mechanicName = mechanicDoc?.fullName || 'Unknown'
         const jobDuration = jobCard.actualStartTime && jobCard.actualEndTime 
           ? (new Date(jobCard.actualEndTime).getTime() - new Date(jobCard.actualStartTime).getTime()) / (1000 * 60 * 60) // hours
           : 0
@@ -197,6 +197,9 @@ export async function GET(request: NextRequest) {
     })
 
     const totalCompletionTime = completedJobs.reduce((sum, job) => {
+      if (!job.actualStartTime || !job.actualEndTime) {
+        return sum
+      }
       const start = new Date(job.actualStartTime).getTime()
       const end = new Date(job.actualEndTime).getTime()
       return sum + (end - start) / (1000 * 60 * 60) // hours
@@ -238,18 +241,25 @@ export async function GET(request: NextRequest) {
     const bankTransferPayments = paymentMethods.bank_transfer
     const checkPayments = paymentMethods.check
     
-    // Calculate outstanding invoices
-    const outstandingInvoices = invoices.filter(inv => inv.status !== 'paid').reduce((sum, inv) => {
-      const invoiceTotal = inv.total || (inv.subtotal || 0) + (inv.tax || 0)
-      return sum + invoiceTotal
-    }, 0)
-    const overdueInvoices = invoices.filter(inv => inv.status === 'overdue').length
+    // Calculate outstanding and overdue invoices
+    const outstandingInvoices = invoices
+      .filter(inv => inv.status !== 'paid')
+      .reduce((sum, inv) => sum + Number(inv.totalAmount ?? 0), 0)
+    const now = new Date()
+    const overdueInvoices = invoices.filter(inv => {
+      if (inv.status === 'paid') return false
+      const dueDate = inv.dueDate ? new Date(inv.dueDate) : null
+      return !!(dueDate && dueDate < now)
+    }).length
     
     // Calculate top customers by revenue
     const customerRevenueMap = new Map()
     invoices.forEach(invoice => {
-      const customerName = invoice.customerId ? `${invoice.customerId.firstName} ${invoice.customerId.lastName}` : 'Unknown'
-      const revenue = invoice.total || (invoice.subtotal || 0) + (invoice.tax || 0)
+      const customerDoc: any = invoice.customerId
+      const customerName = customerDoc?.firstName
+        ? `${customerDoc.firstName} ${customerDoc.lastName || ''}`.trim()
+        : 'Unknown'
+      const revenue = Number(invoice.totalAmount ?? 0)
       if (customerRevenueMap.has(customerName)) {
         customerRevenueMap.set(customerName, {
           revenue: customerRevenueMap.get(customerName).revenue + revenue,

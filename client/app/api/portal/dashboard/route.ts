@@ -112,7 +112,7 @@ export async function GET(req: NextRequest) {
         phone: customer.phone
       },
       upcomingAppointments: upcomingAppointments.map(apt => ({
-        _id: apt._id.toString(),
+        _id: String(apt._id),
         scheduledDate: apt.scheduledDate,
         scheduledTime: apt.scheduledTime,
         status: apt.status,
@@ -125,7 +125,7 @@ export async function GET(req: NextRequest) {
         }
       })),
       vehicles: vehicles.map(v => ({
-        _id: v._id.toString(),
+        _id: String(v._id),
         make: v.make,
         model: v.model,
         year: v.year,

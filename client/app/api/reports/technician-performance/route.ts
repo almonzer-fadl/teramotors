@@ -36,7 +36,14 @@ export const GET = withTenantAuth(
         jobCardId: { $in: jobCards.map(jc => jc._id) }
       }).select('jobCardId totalAmount').lean();
       
-      const invoiceMap = new Map(invoices.map(inv => [inv.jobCardId.toString(), inv.totalAmount]));
+      const invoiceMap = new Map(
+        invoices
+          .filter(inv => inv.jobCardId)
+          .map(inv => [
+            (inv.jobCardId as unknown as { toString(): string }).toString(),
+            Number(inv.totalAmount ?? 0),
+          ])
+      );
       const techPerformance: { [key: string]: { totalRevenue: number; jobsCompleted: number; totalTime: number, mechanicName: string } } = {};
 
       jobCards.forEach(jc => {

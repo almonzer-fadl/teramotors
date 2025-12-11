@@ -6,7 +6,10 @@ import User from '@/lib/models/User';
 // GET /api/users/[id] - Get a single user's details
 export const GET = withTenantAuth(
   async (req: NextRequest, { params, tenantId }) => {
-    const { id } = params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
     await connectToDatabase();
     try {
       const user = await User.findOne({ _id: id, tenantId }).select('-password').lean();
@@ -25,7 +28,10 @@ export const GET = withTenantAuth(
 // DELETE /api/users/[id] - Delete a user
 export const DELETE = withTenantAuth(
   async (req: NextRequest, { params, tenantId }) => {
-    const { id } = params;
+    const id = params?.id;
+    if (!id) {
+      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    }
     await connectToDatabase();
 
     try {

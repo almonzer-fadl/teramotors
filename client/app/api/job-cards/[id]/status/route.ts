@@ -32,7 +32,16 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       // Send job completed WhatsApp message
       try {
         const whatsappListeners = WhatsAppEventListeners.getInstance();
-        await whatsappListeners.onJobCardClosed(updatedJobCard.customerId.toString());
+        const customerIdValue =
+          (updatedJobCard.customerId as any)?._id ?? updatedJobCard.customerId;
+        const customerIdString = customerIdValue?.toString();
+        const jobCardIdString = updatedJobCard._id?.toString();
+        if (customerIdString && jobCardIdString) {
+          await whatsappListeners.onJobCardClosed(
+            customerIdString,
+            jobCardIdString
+          );
+        }
       } catch (whatsappError) {
         console.error('Error sending job completed WhatsApp message:', whatsappError);
         // Don't fail the status update if WhatsApp fails
