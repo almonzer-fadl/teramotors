@@ -815,6 +815,7 @@
     "save_and_create_invoice": "حفظ وإنشاء فاتورة",
     "save_and_create_estimate": "حفظ وإنشاء عرض سعر",
     "job_card_saved_successfully": "تم حفظ كرت العمل بنجاح",
+    "select_customer_first": "يرجى اختيار العميل أولاً قبل إضافة مركبة جديدة.",
     "pricing_summary": {
       "title": "ملخص الأسعار",
       "description": "يتم تحديث الإجماليات تلقائياً عند إضافة الخدمات أو القطع.",

@@ -821,6 +821,7 @@
     "save_and_create_invoice": "Save & Create Invoice",
     "save_and_create_estimate": "Save & Create Estimate",
     "job_card_saved_successfully": "Job card saved successfully",
+    "select_customer_first": "Please select a customer before adding a vehicle.",
     "pricing_summary": {
       "title": "Pricing Summary",
       "description": "Totals update automatically as you add services and parts.",
