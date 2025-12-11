@@ -8,12 +8,17 @@
  */
 
 const path = require('path');
-const clientDir = path.join(__dirname, '../client');
 
-// Change to client directory to access node_modules
-process.chdir(clientDir);
+// Determine if we're running from project root or client directory
+const isInClient = __dirname.includes('/client/scripts') || process.cwd().includes('/client');
+const clientDir = isInClient ? process.cwd() : path.join(__dirname, '../client');
 
-const mongoose = require('mongoose');
+// Add client's node_modules to the module search path
+if (!isInClient) {
+  process.chdir(clientDir);
+}
+
+const mongoose = require(path.join(clientDir, 'node_modules', 'mongoose'));
 
 // MongoDB connection string - update if needed
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/teramotors';
