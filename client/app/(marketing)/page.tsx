@@ -1,7 +1,3 @@
-'use client';
-
-import SaasLandingPage from "@/components/SaasLandingPage";
-
-export default function MarketingPage() {
-  return <SaasLandingPage />;
+export default function Page() {
+  return <div>Marketing Page</div>;
 }

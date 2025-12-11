@@ -1,8 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
-"use client";
 
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Wrench,
   Car,
@@ -127,9 +126,11 @@ function TestimonialImage({ src, alt, className }: { src: string, alt: string, c
       transition={{ duration: 0.6 }}
       className={`group relative overflow-hidden rounded-2xl shadow-lg dark:shadow-gray-900/50 hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-300 hover:-translate-y-1 hover:scale-105 ${className}`}
     >
-      <img
+      <Image
         src={src}
         alt={alt}
+        width={500}
+        height={500}
         className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-110"
       />
     </motion.div>
@@ -250,9 +251,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-                <img
+                <Image
                   src="/icon.png"
                   alt="TeraMotors Logo"
+                  width={56}
+                  height={56}
                   className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl me-2 sm:me-3 object-contain"
                 />
                 <div className="flex flex-col">
@@ -808,9 +811,11 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
             <div className="flex items-center mb-3">
-                <img
+                <Image
                   src="/icon.png"
                   alt="TeraMotors Logo"
+                  width={40}
+                  height={40}
                   className="w-10 h-10 rounded-lg me-3 object-contain"
                 />
                 <div className="flex flex-col">
