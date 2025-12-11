@@ -144,8 +144,8 @@ const PrintEstimateDocument = ({
           align-items: center;
           justify-content: center;
           border-bottom: 2px solid #000;
-          padding: 20px 0;
-          margin-bottom: 30px;
+          padding: 10px 0;
+          margin-bottom: 15px;
           position: relative;
         }
 
@@ -230,44 +230,45 @@ const PrintEstimateDocument = ({
         .estimate-info {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 30px;
-          margin-bottom: 30px;
+          gap: 15px;
+          margin-bottom: 15px;
         }
 
         .info-section h3 {
-          font-size: 18px;
+          font-size: 16px;
           font-weight: 600;
           color: #000;
-          margin-bottom: 15px;
+          margin-bottom: 8px;
           border-bottom: 2px solid #e5e7eb;
-          padding-bottom: 5px;
+          padding-bottom: 3px;
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
         }
 
         .info-section p {
-          margin: 8px 0;
+          margin: 4px 0;
           color: #666;
+          font-size: 13px;
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
         }
 
         .services-table, .parts-table {
           width: 100%;
           border-collapse: collapse;
-          margin: 20px 0;
-          font-size: 14px;
+          margin: 10px 0;
+          font-size: 13px;
         }
 
         .services-table th, .parts-table th {
           background: #1e3a8a;
           color: white;
-          padding: 12px 8px;
+          padding: 8px 6px;
           text-align: ${isRTL ? 'right' : 'left'};
           font-weight: 600;
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
         }
 
         .services-table td, .parts-table td {
-          padding: 10px 8px;
+          padding: 6px 6px;
           border-bottom: 1px solid #e5e7eb;
           text-align: ${isRTL ? 'right' : 'left'};
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
@@ -278,31 +279,32 @@ const PrintEstimateDocument = ({
         }
 
         .totals {
-          margin-top: 30px;
+          margin-top: 15px;
           text-align: ${isRTL ? 'left' : 'right'};
         }
 
         .total-row {
           display: flex;
           justify-content: space-between;
-          padding: 8px 0;
+          padding: 4px 0;
           border-bottom: 1px solid #e5e7eb;
+          font-size: 14px;
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
         }
 
         .grand-total {
           font-weight: 700;
-          font-size: 18px;
+          font-size: 16px;
           color: #000;
           border-top: 2px solid #000;
-          margin-top: 10px;
-          padding-top: 10px;
+          margin-top: 6px;
+          padding-top: 6px;
           ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
         }
 
         .notes {
-          margin-top: 30px;
-          padding: 20px;
+          margin-top: 15px;
+          padding: 12px;
           background: #f8f9fa;
           border-radius: 8px;
           border-${isRTL ? 'right' : 'left'}: 4px solid #000;
@@ -355,7 +357,7 @@ const PrintEstimateDocument = ({
         @media print {
           @page {
             size: A4;
-            margin: 15mm;
+            margin: 10mm;
           }
 
           body {
@@ -370,6 +372,84 @@ const PrintEstimateDocument = ({
             box-shadow: none;
             background: white;
             min-height: auto;
+            line-height: 1.4;
+          }
+
+          .header {
+            padding: 8px 0;
+            margin-bottom: 10px;
+          }
+
+          .estimate-title {
+            margin: 8px 0 0 0;
+          }
+
+          .estimate-note {
+            margin: 6px 0;
+            padding: 6px;
+            font-size: 12px;
+          }
+
+          .estimate-info {
+            gap: 10px;
+            margin-bottom: 10px;
+          }
+
+          .info-section h3 {
+            font-size: 14px;
+            margin-bottom: 6px;
+            padding-bottom: 2px;
+          }
+
+          .info-section p {
+            margin: 2px 0;
+            font-size: 12px;
+          }
+
+          .services-table, .parts-table {
+            margin: 8px 0;
+            font-size: 11px;
+          }
+
+          .services-table th, .parts-table th {
+            padding: 6px 4px;
+            font-size: 11px;
+          }
+
+          .services-table td, .parts-table td {
+            padding: 4px 4px;
+            font-size: 11px;
+          }
+
+          .totals {
+            margin-top: 10px;
+          }
+
+          .total-row {
+            padding: 3px 0;
+            font-size: 12px;
+          }
+
+          .grand-total {
+            font-size: 14px;
+            margin-top: 4px;
+            padding-top: 4px;
+          }
+
+          .notes {
+            margin-top: 10px;
+            padding: 8px;
+            font-size: 11px;
+          }
+
+          .notes h3 {
+            font-size: 12px;
+            margin-bottom: 4px;
+          }
+
+          .footer {
+            margin-top: 15px;
+            font-size: 10px;
           }
 
           /* Allow page breaks */
@@ -377,27 +457,88 @@ const PrintEstimateDocument = ({
             page-break-before: always;
           }
 
-          /* Prevent breaking inside these elements */
-          .header, .estimate-info, .info-section {
+          /* Prevent breaking inside header only */
+          .header {
             page-break-inside: avoid;
+            page-break-after: avoid;
           }
 
-          /* Allow tables to break across pages */
-          .services-table, .parts-table {
-            page-break-inside: auto;
+          .estimate-title {
+            page-break-inside: avoid;
+            page-break-after: avoid;
           }
 
-          .services-table tr, .parts-table tr {
+          .estimate-note {
             page-break-inside: avoid;
             page-break-after: auto;
           }
 
+          /* Allow estimate-info to break if needed */
+          .estimate-info {
+            page-break-inside: auto;
+            page-break-after: auto;
+          }
+
+          .info-section {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+
+          /* FORCE tables to start on same page - NEVER break before */
+          .services-table, .parts-table {
+            page-break-inside: auto !important;
+            page-break-before: avoid !important;
+            page-break-after: auto !important;
+            break-inside: auto !important;
+            break-before: avoid-page !important;
+            break-after: auto !important;
+            margin-top: 0 !important;
+          }
+
+          .services-table tr, .parts-table tr {
+            page-break-inside: avoid !important;
+            page-break-after: auto !important;
+            page-break-before: auto !important;
+            break-inside: avoid-page !important;
+            break-after: auto !important;
+            break-before: auto !important;
+          }
+
+          .services-table tbody tr, .parts-table tbody tr {
+            orphans: 1;
+            widows: 1;
+          }
+
           .services-table thead, .parts-table thead {
             display: table-header-group;
+            page-break-after: avoid !important;
           }
 
           .services-table tfoot, .parts-table tfoot {
             display: table-footer-group;
+          }
+
+          /* Ensure info sections don't push tables to next page */
+          .estimate-info {
+            page-break-after: avoid !important;
+          }
+
+          .info-section:last-child {
+            page-break-after: avoid !important;
+            margin-bottom: 5px !important;
+          }
+
+          /* Allow totals to flow and fill page */
+          .totals {
+            page-break-inside: auto !important;
+            page-break-before: auto !important;
+            break-inside: auto !important;
+            break-before: auto !important;
+          }
+
+          .total-row {
+            page-break-inside: avoid;
+            page-break-after: auto;
           }
 
           /* Ensure all text is black in print */
@@ -433,12 +574,19 @@ const PrintEstimateDocument = ({
           .notes {
             border-${isRTL ? 'right' : 'left'}: 4px solid #000 !important;
             page-break-inside: avoid;
+            page-break-before: auto;
           }
 
-          /* Prevent orphans and widows */
+          /* Minimize orphans and widows - allow more breaks */
           p, li {
-            orphans: 3;
-            widows: 3;
+            orphans: 1;
+            widows: 1;
+          }
+
+          h3 {
+            orphans: 2;
+            widows: 2;
+            page-break-after: avoid;
           }
 
           /* Ensure estimate note styling is preserved */
