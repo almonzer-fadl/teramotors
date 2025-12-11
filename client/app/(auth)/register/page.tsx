@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Building2,
   ArrowLeft,
@@ -30,7 +30,7 @@ const STEPS = [
 ];
 
 // Animation variants
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -41,38 +41,44 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 300,
       damping: 24
     }
   }
 };
 
-const slideVariants = {
-  enter: (direction: number) => ({
-    x: direction > 0 ? 100 : -100,
-    opacity: 0
-  }),
+const slideVariants: Variants = {
+  enter: (custom: unknown) => {
+    const direction = typeof custom === "number" ? custom : 0;
+    return {
+      x: direction > 0 ? 100 : -100,
+      opacity: 0
+    };
+  },
   center: {
     x: 0,
     opacity: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 300,
       damping: 30
     }
   },
-  exit: (direction: number) => ({
-    x: direction < 0 ? 100 : -100,
-    opacity: 0,
-    transition: { duration: 0.2 }
-  })
+  exit: (custom: unknown) => {
+    const direction = typeof custom === "number" ? custom : 0;
+    return {
+      x: direction < 0 ? 100 : -100,
+      opacity: 0,
+      transition: { duration: 0.2 }
+    };
+  }
 };
 
 interface FormData {

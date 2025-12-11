@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Users,
   Car,
@@ -63,7 +63,7 @@ interface ModernWidgetData {
 }
 
 // Page transition variants
-const pageVariants = {
+const pageVariants: Variants = {
   initial: {
     opacity: 0,
   },
@@ -81,7 +81,7 @@ const pageVariants = {
   }
 };
 
-const sectionVariants = {
+const sectionVariants: Variants = {
   initial: {
     opacity: 0,
     y: 20
