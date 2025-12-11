@@ -3,7 +3,25 @@ import type { NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const hostname = request.headers.get('host') || ''
 
+  // Domain-based routing
+  const isMainDomain = hostname === 'teramotor.cc' || hostname === 'www.teramotor.cc'
+  const isAppDomain = hostname.startsWith('app.') || hostname.includes('vercel.app')
+
+  // If accessing main domain (teramotor.cc), show landing page
+  if (isMainDomain) {
+    // Only show landing page on root path
+    if (pathname === '/') {
+      return NextResponse.next()
+    }
+    // Redirect other paths on main domain to app subdomain
+    const url = request.nextUrl.clone()
+    url.host = hostname.replace('teramotor.cc', 'app.teramotor.cc').replace('www.', '')
+    return NextResponse.redirect(url)
+  }
+
+  // For app domain or Vercel preview domains, apply authentication logic
   // Public routes that don't require authentication
   const publicRoutes = [
     '/',
@@ -31,6 +49,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Allow portal routes (customer portal is public)
+  if (pathname.startsWith('/portal/')) {
+    return NextResponse.next()
+  }
+
   // If it's a public route, allow access
   if (isPublicRoute) {
     return NextResponse.next()
@@ -38,7 +61,7 @@ export async function middleware(request: NextRequest) {
 
   // For all other routes, check for auth token cookie
   const sessionToken = request.cookies.get('auth-token')
-  
+
   // If no session token and trying to access protected route, redirect to login
   if (!sessionToken) {
     const loginUrl = new URL('/login', request.url)
