@@ -338,7 +338,7 @@ const PrintEstimateModal = ({
               }
 
               @page {
-                margin: 15mm;
+                margin: 10mm;
                 size: A4 portrait;
               }
 
@@ -354,32 +354,170 @@ const PrintEstimateModal = ({
                 margin: 0;
                 box-shadow: none;
                 background: white;
-                font-size: 12px;
+                font-size: 11px;
                 overflow: visible;
+                line-height: 1.4;
               }
               .page-break { page-break-before: always; }
 
-              /* Allow tables to break across pages */
-              .services-table, .parts-table {
-                page-break-inside: auto;
+              /* Compact spacing for print */
+              .header {
+                page-break-inside: avoid;
+                page-break-after: avoid;
+                padding: 8px 0;
+                margin-bottom: 10px;
               }
 
-              .services-table tr, .parts-table tr {
+              .estimate-title {
+                page-break-inside: avoid;
+                page-break-after: avoid;
+                margin: 8px 0 0 0;
+              }
+
+              .estimate-note {
+                page-break-inside: avoid;
+                page-break-after: auto;
+                margin: 6px 0;
+                padding: 6px;
+                font-size: 12px;
+              }
+
+              .estimate-info {
+                gap: 10px;
+                margin-bottom: 10px;
+              }
+
+              .info-section h3 {
+                font-size: 14px;
+                margin-bottom: 6px;
+                padding-bottom: 2px;
+              }
+
+              .info-section p {
+                margin: 2px 0;
+                font-size: 12px;
+              }
+
+              .services-table, .parts-table {
+                margin: 8px 0;
+                font-size: 11px;
+              }
+
+              .services-table th, .parts-table th {
+                padding: 6px 4px;
+                font-size: 11px;
+              }
+
+              .services-table td, .parts-table td {
+                padding: 4px 4px;
+                font-size: 11px;
+              }
+
+              .totals {
+                margin-top: 10px;
+              }
+
+              .total-row {
+                padding: 3px 0;
+                font-size: 12px;
+              }
+
+              .grand-total {
+                font-size: 14px;
+                margin-top: 4px;
+                padding-top: 4px;
+              }
+
+              .notes {
+                margin-top: 10px;
+                padding: 8px;
+                font-size: 11px;
+              }
+
+              .notes h3 {
+                font-size: 12px;
+                margin-bottom: 4px;
+              }
+
+              .footer {
+                margin-top: 15px;
+                font-size: 10px;
+              }
+
+              /* Ensure info sections don't push tables to next page */
+              .estimate-info {
+                page-break-inside: auto;
+                page-break-after: avoid !important;
+              }
+
+              .info-section {
                 page-break-inside: avoid;
                 page-break-after: auto;
               }
 
-              .services-table thead, .parts-table thead {
-                display: table-header-group;
+              .info-section:last-child {
+                page-break-after: avoid !important;
+                margin-bottom: 5px !important;
               }
 
-              /* Prevent breaking inside these elements */
-              .header, .estimate-info, .info-section {
-                page-break-inside: avoid;
+              /* FORCE tables to start on same page - NEVER break before */
+              .services-table, .parts-table {
+                page-break-inside: auto !important;
+                page-break-before: avoid !important;
+                page-break-after: auto !important;
+                break-inside: auto !important;
+                break-before: avoid-page !important;
+                break-after: auto !important;
+                margin-top: 0 !important;
+              }
+
+              .services-table tr, .parts-table tr {
+                page-break-inside: avoid !important;
+                page-break-after: auto !important;
+                page-break-before: auto !important;
+                break-inside: avoid-page !important;
+                break-after: auto !important;
+                break-before: auto !important;
+              }
+
+              .services-table tbody tr, .parts-table tbody tr {
+                orphans: 1;
+                widows: 1;
+              }
+
+              .services-table thead, .parts-table thead {
+                display: table-header-group;
+                page-break-after: avoid !important;
               }
 
               .notes {
                 page-break-inside: avoid;
+                page-break-before: auto;
+              }
+
+              /* Allow totals to flow and fill page */
+              .totals {
+                page-break-inside: auto !important;
+                page-break-before: auto !important;
+                break-inside: auto !important;
+                break-before: auto !important;
+              }
+
+              .total-row {
+                page-break-inside: avoid;
+                page-break-after: auto;
+              }
+
+              /* Minimize orphans and widows - allow more breaks */
+              p, li {
+                orphans: 1;
+                widows: 1;
+              }
+
+              h3 {
+                orphans: 2;
+                widows: 2;
+                page-break-after: avoid;
               }
 
               /* Keep colors in print */
