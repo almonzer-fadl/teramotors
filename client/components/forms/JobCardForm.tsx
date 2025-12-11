@@ -940,7 +940,13 @@ export default function JobCardForm({
                             placeholder={t("forms.select_vehicle")}
                             required={true}
                             disabled={!formData.customerId || !!formData.estimateId}
-                            onCreateNew={() => setVehicleModalOpen(true)}
+                            onCreateNew={() => {
+                              if (!formData.customerId) {
+                                alert(t('job_cards.select_customer_first'));
+                                return;
+                              }
+                              setVehicleModalOpen(true);
+                            }}
                             createNewLabel={t("vehicles.create_new_vehicle")}
                             emptyMessage={t("vehicles.no_vehicles_found")}
                         />
