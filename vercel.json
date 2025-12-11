@@ -1,9 +1,10 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
+  "buildCommand": "cd client && npm install && npm run build",
+  "outputDirectory": "client/.next",
+  "installCommand": "cd client && npm install",
   "framework": "nextjs",
   "functions": {
-    "app/api/**/*.ts": {
+    "client/app/api/**/*.ts": {
       "maxDuration": 30
     }
   },
