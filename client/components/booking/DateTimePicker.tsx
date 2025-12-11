@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Calendar as CalendarIcon, Clock, AlertCircle, ArrowRight, ArrowLeft, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface DateTimePickerProps {
@@ -20,7 +20,7 @@ interface TimeSlot {
   available: boolean;
 }
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -28,27 +28,30 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { type: 'spring', stiffness: 300, damping: 24 },
+    transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
   },
 };
 
-const slotVariants = {
+const slotVariants: Variants = {
   hidden: { opacity: 0, y: 10 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: i * 0.03,
-      type: 'spring',
-      stiffness: 300,
-      damping: 24,
-    },
-  }),
+  visible: (custom: unknown) => {
+    const index = typeof custom === 'number' ? custom : 0;
+    return {
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: index * 0.03,
+        type: 'spring' as const,
+        stiffness: 300,
+        damping: 24,
+      },
+    };
+  },
 };
 
 export function DateTimePicker({

@@ -1,137 +1,123 @@
-/**
- * Reusable animation variants for dashboard components
- * Optimized for performance - reduced duration and delays
- * Use with Framer Motion for consistent animations across all pages
- */
+import type { Variants } from 'framer-motion';
 
-// Fade in from bottom with slide - OPTIMIZED
-export const fadeInUp = {
-  hidden: { opacity: 0, y: 10 }, // Reduced from 20
+const easeOut = 'easeOut' as const;
+const spring = 'spring' as const;
+
+export const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.2, // Reduced from 0.4
-      ease: "easeOut"
-    }
-  }
+      duration: 0.2,
+      ease: easeOut,
+    },
+  },
 };
 
-// Fade in without movement - OPTIMIZED
-export const fadeIn = {
+export const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      duration: 0.15, // Reduced from 0.3
-      ease: "easeOut"
-    }
-  }
+      duration: 0.15,
+      ease: easeOut,
+    },
+  },
 };
 
-// Scale in animation for cards - OPTIMIZED
-export const scaleIn = {
-  hidden: { opacity: 0, scale: 0.98 }, // Reduced from 0.95
+export const scaleIn: Variants = {
+  hidden: { opacity: 0, scale: 0.98 },
   visible: {
     opacity: 1,
     scale: 1,
     transition: {
-      duration: 0.2, // Reduced from 0.3
-      ease: "easeOut"
-    }
-  }
+      duration: 0.2,
+      ease: easeOut,
+    },
+  },
 };
 
-// Stagger container for list items - OPTIMIZED
-export const staggerContainer = {
+export const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.02, // Reduced from 0.05
-      delayChildren: 0 // Removed delay
-    }
-  }
+      staggerChildren: 0.02,
+      delayChildren: 0,
+    },
+  },
 };
 
-// List item animation
-export const listItem = {
+export const listItem: Variants = {
   hidden: { opacity: 0, x: -10 },
   visible: {
     opacity: 1,
     x: 0,
     transition: {
       duration: 0.3,
-      ease: "easeOut"
-    }
-  }
+      ease: easeOut,
+    },
+  },
 };
 
-// Slide in from right (for sidebars/modals)
-export const slideInRight = {
-  hidden: { x: "100%", opacity: 0 },
+export const slideInRight: Variants = {
+  hidden: { x: '100%', opacity: 0 },
   visible: {
     x: 0,
     opacity: 1,
     transition: {
-      type: "spring",
+      type: spring,
       stiffness: 300,
-      damping: 30
-    }
+      damping: 30,
+    },
   },
   exit: {
-    x: "100%",
+    x: '100%',
     opacity: 0,
     transition: {
-      duration: 0.2
-    }
-  }
+      duration: 0.2,
+    },
+  },
 };
 
-// Hover animation for interactive elements
 export const hoverScale = {
   whileHover: { scale: 1.02 },
   whileTap: { scale: 0.98 },
-  transition: { duration: 0.2 }
+  transition: { duration: 0.2 },
 };
 
-// Button press animation
 export const buttonPress = {
   whileHover: { scale: 1.05 },
   whileTap: { scale: 0.95 },
-  transition: { type: "spring", stiffness: 400, damping: 17 }
+  transition: { type: spring, stiffness: 400, damping: 17 },
 };
 
-// Card hover lift
 export const cardHover = {
-  rest: { y: 0, boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)" },
+  rest: { y: 0, boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' },
   hover: {
     y: -4,
-    boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+    boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
     transition: {
       duration: 0.2,
-      ease: "easeOut"
-    }
-  }
+      ease: easeOut,
+    },
+  },
 };
 
-// Page transition
-export const pageTransition = {
+export const pageTransition: Variants = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -20 },
-  transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }
 };
 
-// Modal backdrop
-export const backdropFade = {
+export const backdropFade: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
-  exit: { opacity: 0 }
+  exit: { opacity: 0 },
 };
 
-// Table row hover - OPTIMIZED (use CSS instead of JS animation)
-export const tableRowHover = {
+export const tableRowHover: Variants = {
   rest: {},
-  hover: {}
+  hover: {},
 };

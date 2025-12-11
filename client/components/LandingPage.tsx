@@ -22,7 +22,7 @@ import {
   X,
   User
 } from "lucide-react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, useScroll, useTransform, type Variants } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { LogoLoop } from "@/components/LogoLoop";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -31,54 +31,49 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 
 // Animation Variants
-const fadeInUp = {
+const fadeInUp: Variants = {
   initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
+  animate: { opacity: 1, y: 0, transition: { duration: 0.6 } }
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   animate: {
     transition: { staggerChildren: 0.1, delayChildren: 0.2 }
   }
 };
 
-const staggerItem = {
+const staggerItem: Variants = {
   initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 }
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5 } }
 };
 
-const slideInLeft = {
+const slideInLeft: Variants = {
   initial: { opacity: 0, x: -50 },
-  animate: { opacity: 1, x: 0 },
-  transition: { duration: 0.7 }
+  animate: { opacity: 1, x: 0, transition: { duration: 0.7 } }
 };
 
-const slideInRight = {
+const slideInRight: Variants = {
   initial: { opacity: 0, x: 50 },
-  animate: { opacity: 1, x: 0 },
-  transition: { duration: 0.7 }
+  animate: { opacity: 1, x: 0, transition: { duration: 0.7 } }
 };
 
-const floatingAnimation = {
+const floatingAnimation: Variants = {
   animate: {
     y: [0, -10, 0],
     transition: {
       duration: 3,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut" as const
     }
   }
 };
 
-const scaleInAnimation = {
+const scaleInAnimation: Variants = {
   initial: { opacity: 0, scale: 0.8 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.6 }
+  animate: { opacity: 1, scale: 1, transition: { duration: 0.6 } }
 };
 
-const pulseAnimation = {
+const pulseAnimation: Variants = {
   animate: {
     boxShadow: [
       "0 0 0 0 rgba(249, 116, 2, 0.4)",

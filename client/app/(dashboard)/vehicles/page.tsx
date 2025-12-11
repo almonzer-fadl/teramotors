@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Car, Plus, Loader2 } from 'lucide-react';
 import { useSession } from '@/lib/hooks/useSession';
@@ -13,12 +13,12 @@ import { useReferenceData } from "@/lib/stores/referenceDataStore";
 import { socket } from "@/lib/services/socket";
 import Link from 'next/link';
 
-const pageVariants = {
+const pageVariants: Variants = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0, transition: { duration: 0.5, staggerChildren: 0.1 } },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { User, Car, Calendar, Loader2 } from 'lucide-react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
@@ -11,12 +11,12 @@ import { VehiclesContent } from '@/components/portal/VehiclesContent';
 import { AppointmentsContent } from '@/components/portal/AppointmentsContent';
 import { useCustomerSession } from '@/lib/hooks/useCustomerSession';
 
-const pageVariants = {
+const pageVariants: Variants = {
   initial: { opacity: 0 },
   animate: { opacity: 1, transition: { duration: 0.7, ease: [0.32, 0.72, 0, 1] } },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.32, 0.72, 0, 1] } },
 };

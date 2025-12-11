@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { Check, ArrowRight, ClipboardCheck, Zap, Cpu, Wrench, Car, Shield } from 'lucide-react';
 import type { IInspectionTemplate } from '@/lib/models/InspectionTemplate';
 
@@ -11,7 +11,7 @@ interface InspectionTypeSelectorProps {
   language?: 'ar' | 'en';
 }
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -21,14 +21,14 @@ const containerVariants = {
   },
 };
 
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.4,
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 300,
       damping: 24,
     },

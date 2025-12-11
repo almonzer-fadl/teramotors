@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm, FieldValues, UseFormRegister, FormState, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { User, Mail, Phone, Car, Calendar, Hash, FileText, ArrowLeft, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import type { BookingCustomerInput, BookingVehicleInput } from '@/lib/validation/booking';
 
@@ -15,7 +15,7 @@ interface CustomerFormProps {
   language?: 'ar' | 'en';
 }
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -23,12 +23,12 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: 'spring', stiffness: 300, damping: 24 },
+    transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
   },
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { CheckCircle2, Calendar, Clock, Wrench, Printer, Home, AlertCircle, Sparkles } from 'lucide-react';
 
 interface BookingConfirmationProps {
@@ -13,7 +13,7 @@ interface BookingConfirmationProps {
   language?: 'ar' | 'en';
 }
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -21,22 +21,22 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: 'spring', stiffness: 300, damping: 24 },
+    transition: { type: 'spring' as const, stiffness: 300, damping: 24 },
   },
 };
 
-const iconVariants = {
+const iconVariants: Variants = {
   hidden: { scale: 0, rotate: -180 },
   visible: {
     scale: 1,
     rotate: 0,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 200,
       damping: 15,
       delay: 0.2,
@@ -44,18 +44,21 @@ const iconVariants = {
   },
 };
 
-const sparkleVariants = {
+const sparkleVariants: Variants = {
   initial: { scale: 0, opacity: 0 },
-  animate: (i: number) => ({
-    scale: [0, 1, 0],
-    opacity: [0, 1, 0],
-    transition: {
-      duration: 2,
-      delay: i * 0.2,
-      repeat: Infinity,
-      repeatDelay: 1,
-    },
-  }),
+  animate: (custom: unknown) => {
+    const index = typeof custom === 'number' ? custom : 0;
+    return {
+      scale: [0, 1, 0],
+      opacity: [0, 1, 0],
+      transition: {
+        duration: 2,
+        delay: index * 0.2,
+        repeat: Infinity,
+        repeatDelay: 1,
+      },
+    };
+  },
 };
 
 export function BookingConfirmation({

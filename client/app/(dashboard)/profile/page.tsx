@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { useSession } from '@/lib/hooks/useSession';
 import { useTranslation } from 'react-i18next';
 import { User, Mail, Phone, Lock, Save, Loader2, Edit, X } from 'lucide-react';
@@ -18,12 +18,12 @@ const profileSchema = (isArabic: boolean) => z.object({
 
 type ProfileFormData = z.infer<ReturnType<typeof profileSchema>>;
 
-const pageVariants = {
+const pageVariants: Variants = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0, transition: { duration: 0.5, staggerChildren: 0.1 } },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
