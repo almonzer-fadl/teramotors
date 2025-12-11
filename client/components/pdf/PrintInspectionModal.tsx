@@ -120,13 +120,13 @@ const PrintInspectionModal = ({
 
             .print-inspection-container {
               font-family: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
-              line-height: 1.6;
+              line-height: 1.4;
               color: #333;
               direction: rtl;
               background: white;
               width: 210mm;
               margin: 0 auto;
-              padding: 20mm;
+              padding: 10mm;
               box-sizing: border-box;
             }
 
@@ -135,8 +135,8 @@ const PrintInspectionModal = ({
               align-items: center;
               justify-content: center;
               border-bottom: 2px solid #000;
-              padding: 20px 0;
-              margin-bottom: 30px;
+              padding: 10px 0;
+              margin-bottom: 15px;
               position: relative;
             }
 
@@ -197,10 +197,10 @@ const PrintInspectionModal = ({
             }
 
             .inspection-title {
-              font-size: 20px;
+              font-size: 18px;
               font-weight: 600;
               color: #000;
-              margin: 15px 0 0 0;
+              margin: 10px 0 0 0;
               text-align: center;
               font-family: "Cairo", sans-serif;
             }
@@ -208,32 +208,33 @@ const PrintInspectionModal = ({
             .inspection-info {
               display: grid;
               grid-template-columns: 1fr 1fr;
-              gap: 30px;
-              margin-bottom: 30px;
+              gap: 15px;
+              margin-bottom: 15px;
             }
 
             .info-section h3 {
-              font-size: 18px;
+              font-size: 16px;
               font-weight: 600;
               color: #000;
-              margin-bottom: 15px;
+              margin-bottom: 8px;
               border-bottom: 2px solid #e5e7eb;
               padding-bottom: 5px;
               font-family: "Cairo", sans-serif;
             }
 
             .info-section p {
-              margin: 8px 0;
+              margin: 4px 0;
               color: #666;
+              font-size: 13px;
               font-family: "Cairo", sans-serif;
             }
 
             .inspection-items {
-              margin: 20px 0;
+              margin: 10px 0 0 0;
             }
 
             .category-section {
-              margin-bottom: 30px;
+              margin-bottom: 15px;
               border: 1px solid #e5e7eb;
               border-radius: 8px;
               overflow: hidden;
@@ -243,8 +244,8 @@ const PrintInspectionModal = ({
             .category-header {
               background: linear-gradient(to right, #1e3a8a, #1e40af);
               color: white;
-              padding: 12px 16px;
-              font-size: 16px;
+              padding: 8px 12px;
+              font-size: 14px;
               font-weight: 600;
               font-family: "Cairo", sans-serif;
             }
@@ -257,7 +258,7 @@ const PrintInspectionModal = ({
               display: flex;
               align-items: center;
               justify-content: space-between;
-              padding: 12px 16px;
+              padding: 8px 12px;
               border-bottom: 1px solid #e5e7eb;
               background: white;
             }
@@ -361,7 +362,7 @@ const PrintInspectionModal = ({
               }
 
               @page {
-                margin: 15mm;
+                margin: 10mm;
                 size: A4 portrait;
               }
 
@@ -379,21 +380,122 @@ const PrintInspectionModal = ({
                 background: white;
                 font-size: 12px;
                 overflow: visible;
+                line-height: 1.4;
               }
-              .page-break { page-break-before: always; }
 
-              /* Prevent breaking inside category sections */
-              .category-section {
-                page-break-inside: avoid;
+              /* Compact all spacing in print */
+              .header {
+                padding: 5px 0 !important;
+                margin-bottom: 5px !important;
               }
+
+              .inspection-title {
+                font-size: 16px !important;
+                margin: 5px 0 !important;
+              }
+
+              .inspection-info {
+                gap: 8px !important;
+                margin-bottom: 8px !important;
+              }
+
+              .info-section {
+                margin-bottom: 0 !important;
+              }
+
+              .info-section h3 {
+                font-size: 13px !important;
+                margin-bottom: 4px !important;
+                padding-bottom: 3px !important;
+              }
+
+              .info-section p {
+                margin: 2px 0 !important;
+                font-size: 11px !important;
+                line-height: 1.3 !important;
+              }
+
+              .inspection-items {
+                margin: 5px 0 0 0 !important;
+              }
+
+              .section-title {
+                font-size: 13px !important;
+                margin: 5px 0 5px 0 !important;
+                padding-bottom: 3px !important;
+              }
+
+              .category-section {
+                margin-bottom: 8px !important;
+              }
+
+              .category-header {
+                padding: 5px 8px !important;
+                font-size: 12px !important;
+              }
+
+              .inspection-item {
+                padding: 5px 8px !important;
+                font-size: 11px !important;
+                line-height: 1.3 !important;
+              }
+
+              .item-name {
+                font-size: 11px !important;
+              }
+
+              .condition-circle {
+                width: 16px !important;
+                height: 16px !important;
+              }
+
+              .condition-label {
+                font-size: 9px !important;
+              }
+
+              .page-break { page-break-before: always; }
 
               /* Prevent breaking inside these elements */
               .header, .inspection-info, .info-section {
                 page-break-inside: avoid;
               }
 
+              /* CRITICAL: Force categories to stay on first page */
+              .inspection-items {
+                page-break-before: avoid !important;
+                break-before: avoid-page !important;
+                margin-top: 0 !important;
+              }
+
+              /* Prevent breaking inside category sections */
+              .category-section {
+                page-break-before: avoid !important;
+                break-before: avoid-page !important;
+                page-break-inside: auto;
+              }
+
+              .category-header {
+                page-break-after: avoid;
+              }
+
+              .inspection-item {
+                page-break-inside: avoid;
+              }
+
+              /* Prevent page break after info section */
+              .inspection-info {
+                page-break-after: avoid !important;
+              }
+
+              .info-section:last-child {
+                page-break-after: avoid !important;
+                margin-bottom: 5px !important;
+              }
+
               .notes {
                 page-break-inside: avoid;
+                margin-top: 20px;
+                padding: 15px;
               }
 
               /* Keep colors in print */
@@ -433,6 +535,12 @@ const PrintInspectionModal = ({
               .condition-circle.selected.poor {
                 background: #ef4444 !important;
                 border-color: #dc2626 !important;
+              }
+
+              /* Prevent orphans and widows for maximum flexibility */
+              p, li {
+                orphans: 1;
+                widows: 1;
               }
             }
           </style>
