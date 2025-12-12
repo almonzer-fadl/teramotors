@@ -72,17 +72,23 @@ export const POST = withTenantAuth(
 
     const body = await req.json();
 
-    // Check if customer with email already exists FOR THIS TENANT
-    const existingCustomer = await Customer.findOne({
-      tenantId,
-      email: body.email,
-    });
+    // If email is provided (and not an empty string), check for duplicates
+    if (body.email && body.email.trim() !== '') {
+      const existingCustomer = await Customer.findOne({
+        tenantId,
+        email: body.email.trim().toLowerCase(),
+      });
 
-    if (existingCustomer) {
-      return NextResponse.json(
-        { error: 'Customer with this email already exists' },
-        { status: 400 }
-      );
+      if (existingCustomer) {
+        return NextResponse.json(
+          { error: 'A customer with this email already exists for your workshop.' },
+          { status: 409 } // 409 Conflict is more appropriate
+        );
+      }
+    } else {
+      // If email is empty or just whitespace, ensure it is saved as null
+      // to work correctly with the sparse unique index.
+      body.email = null;
     }
 
     const customer = new Customer({
