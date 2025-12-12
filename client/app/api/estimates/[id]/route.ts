@@ -25,7 +25,8 @@ export async function GET(
     const estimate = await Estimate.findById(id)
       .populate('customerId', 'firstName lastName email phone')
       .populate('vehicleId', 'make model year licensePlate')
-      .populate('services.serviceId', 'name');
+      .populate('services.serviceId', 'name')
+      .populate('parts.partId', 'name partNumber description');
     
     if (!estimate) {
       return new Response(JSON.stringify({ error: 'Estimate not found' }), { status: 404 });
