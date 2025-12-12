@@ -1,9 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import Modal from '@/components/dashboard/Modal';
+import ModernizedModal from '@/components/ui/ModernizedModal';
 import { useTranslation } from 'react-i18next';
-import { Wrench, DollarSign, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Wrench, DollarSign, Clock, AlertCircle, RotateCw } from 'lucide-react';
+
+const generateServiceCode = () => {
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const random = Math.floor(Math.random() * 1000)
+    .toString()
+    .padStart(3, '0');
+  return `SVC-${timestamp}-${random}`;
+};
+
+const createInitialFormState = () => ({
+  code: generateServiceCode(),
+  name: '',
+  description: '',
+  category: '',
+  laborRate: 0,
+  laborHours: 1,
+  isActive: true,
+  isTemplate: false,
+});
 
 interface QuickCreateServiceProps {
   isOpen: boolean;
@@ -11,20 +31,22 @@ interface QuickCreateServiceProps {
   onCreated: (service: { _id: string; name: string; laborHours: number; laborRate: number }) => void;
 }
 
+const formVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
 export default function QuickCreateService({ isOpen, onClose, onCreated }: QuickCreateServiceProps) {
   const { t } = useTranslation('common');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const [form, setForm] = useState({
-    name: '',
-    description: '',
-    category: '',
-    laborRate: 0,
-    laborHours: 1,
-    isActive: true,
-    isTemplate: false,
-  });
+  const [form, setForm] = useState(createInitialFormState);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +54,15 @@ export default function QuickCreateService({ isOpen, onClose, onCreated }: Quick
     setError('');
 
     try {
+      const payload = {
+        ...form,
+        code: form.code?.trim() ? form.code.trim().toUpperCase() : generateServiceCode(),
+      };
+
       const response = await fetch('/api/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -56,37 +83,43 @@ export default function QuickCreateService({ isOpen, onClose, onCreated }: Quick
   };
 
   const handleClose = () => {
-    setForm({
-      name: '',
-      description: '',
-      category: '',
-      laborRate: 0,
-      laborHours: 1,
-      isActive: true,
-      isTemplate: false,
-    });
+    setForm(createInitialFormState());
     setError('');
     onClose();
   };
+  
+  const handleRegenerateCode = () => {
+    setForm((prev) => ({ ...prev, code: generateServiceCode() }));
+  };
 
   return (
-    <Modal
+    <ModernizedModal
       isOpen={isOpen}
       onClose={handleClose}
       title={t('services.quick_create_service')}
       size="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <motion.form
+        variants={formVariants}
+        initial="hidden"
+        animate="visible"
+        onSubmit={handleSubmit}
+        className="space-y-6"
+      >
         {error && (
-          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
-            <p className="text-sm text-red-800">{error}</p>
-          </div>
+          <motion.div
+            variants={itemVariants}
+            className="flex items-center gap-3 bg-red-500/10 dark:bg-red-500/20 border border-red-500/20 rounded-lg p-3"
+          >
+            <AlertCircle className="h-5 w-5 text-red-500" />
+            <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
+          </motion.div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Service Name */}
           <div className="md:col-span-2 space-y-2">
-            <label className="block text-sm font-bold text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('forms.service_name')} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -98,21 +131,46 @@ export default function QuickCreateService({ isOpen, onClose, onCreated }: Quick
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white"
+                className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 placeholder={t('forms.service_name_placeholder')}
               />
             </div>
           </div>
 
+          {/* Service Code */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('forms.service_code')} <span className="text-gray-400 font-normal">({t('forms.auto_generated_hint')})</span>
+            </label>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                value={form.code}
+                onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+                className="flex-1 w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-mono uppercase"
+                placeholder={t('forms.service_code_placeholder')}
+              />
+              <motion.button
+                type="button"
+                onClick={handleRegenerateCode}
+                className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <RotateCw className="h-4 w-4" />
+              </motion.button>
+            </div>
+          </div>
+
           {/* Category */}
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('forms.category')}
             </label>
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white"
+              className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none"
             >
               <option value="">{t('forms.select_category')}</option>
               <option value="maintenance">{t('services.categories.maintenance')}</option>
@@ -127,7 +185,7 @@ export default function QuickCreateService({ isOpen, onClose, onCreated }: Quick
 
           {/* Labor Hours */}
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('forms.labor_hours')} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -141,7 +199,7 @@ export default function QuickCreateService({ isOpen, onClose, onCreated }: Quick
                 step="0.5"
                 value={form.laborHours}
                 onChange={(e) => setForm({ ...form, laborHours: parseFloat(e.target.value) || 0 })}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white"
+                className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 placeholder="1.0"
               />
             </div>
@@ -149,7 +207,7 @@ export default function QuickCreateService({ isOpen, onClose, onCreated }: Quick
 
           {/* Labor Rate */}
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('forms.labor_rate')} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -163,7 +221,7 @@ export default function QuickCreateService({ isOpen, onClose, onCreated }: Quick
                 step="0.01"
                 value={form.laborRate}
                 onChange={(e) => setForm({ ...form, laborRate: parseFloat(e.target.value) || 0 })}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white"
+                className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                 placeholder="0.00"
               />
             </div>
@@ -171,63 +229,62 @@ export default function QuickCreateService({ isOpen, onClose, onCreated }: Quick
 
           {/* Description */}
           <div className="md:col-span-2 space-y-2">
-            <label className="block text-sm font-bold text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('forms.description')}
             </label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white resize-none"
+              className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
               placeholder={t('forms.description_placeholder')}
             />
           </div>
 
           {/* Active Status */}
-          <div className="md:col-span-2 space-y-2">
-            <label className="block text-sm font-bold text-gray-700">
-              {t('forms.status')}
+          <div className="md:col-span-2 space-y-2 flex items-center">
+            <input
+              id="service-active-toggle"
+              type="checkbox"
+              checked={form.isActive}
+              onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+              className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="service-active-toggle" className="ms-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('forms.service_active')}
             </label>
-            <div className="flex items-center h-12">
-              <input
-                type="checkbox"
-                checked={form.isActive}
-                onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                className="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="ms-3 text-sm text-gray-700">
-                {t('forms.service_active')}
-              </span>
-            </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
-          <p className="text-sm text-blue-800">
+        <motion.div variants={itemVariants} className="bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 rounded-lg p-3">
+          <p className="text-sm text-blue-700 dark:text-blue-300">
             {t('services.quick_create_note')}
           </p>
-        </div>
+        </motion.div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
-          <button
+        <motion.div variants={itemVariants} className="flex justify-end gap-4 pt-4 border-t border-black/10 dark:border-white/10">
+          <motion.button
             type="button"
             onClick={handleClose}
             disabled={loading}
-            className="px-6 py-3 border-2 border-gray-300 text-sm font-bold rounded-xl text-gray-700 bg-white hover:border-gray-400 hover:bg-gray-50 transition-all disabled:opacity-50"
+            className="px-6 py-3 text-sm font-bold rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200/50 dark:bg-gray-700/50 hover:bg-gray-300/50 dark:hover:bg-gray-600/50 transition-all disabled:opacity-50"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             {t('forms.cancel')}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="submit"
             disabled={loading}
-            className="px-6 py-3 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:shadow-lg hover:shadow-blue-600/25 disabled:opacity-50 transition-all"
+            className="px-6 py-3 text-sm font-bold rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             {loading ? t('forms.creating') : t('services.create_service')}
-          </button>
-        </div>
-      </form>
-    </Modal>
+          </motion.button>
+        </motion.div>
+      </motion.form>
+    </ModernizedModal>
   );
 }
-
