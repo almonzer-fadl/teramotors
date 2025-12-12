@@ -94,6 +94,8 @@ export default function JobCardForm({
   const [printModalData, setPrintModalData] = useState<{ invoice: any; jobCard?: any } | null>(null);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [printingInvoice, setPrintingInvoice] = useState(false);
+  const [updatingEstimate, setUpdatingEstimate] = useState(false);
+  const [updatingInvoice, setUpdatingInvoice] = useState(false);
   const [formData, setFormData] = useState<JobCardFormData>({
     appointmentId: "",
     customerId: "",
@@ -442,8 +444,8 @@ export default function JobCardForm({
     }
   };
 
-  const handleSaveAndCreateInvoice = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveAndCreateInvoice = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setLoading(true);
 
     try {
@@ -499,8 +501,35 @@ export default function JobCardForm({
     }
   };
 
-  const handleSaveAndCreateEstimate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveAndUpdateInvoice = async () => {
+    if (!isEditing) {
+      await handleSaveAndCreateInvoice();
+      return;
+    }
+
+    setUpdatingInvoice(true);
+    const savedJobCard = await persistJobCard();
+    if (!savedJobCard) {
+      setUpdatingInvoice(false);
+      return;
+    }
+
+    const invoiceId = linkedInvoiceId;
+    if (invoiceId) {
+      router.push(`/invoices/${invoiceId}/edit`);
+      setUpdatingInvoice(false);
+      return;
+    }
+
+    try {
+      await handleSaveAndCreateInvoice();
+    } finally {
+      setUpdatingInvoice(false);
+    }
+  };
+
+  const handleSaveAndCreateEstimate = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setLoading(true);
 
     try {
@@ -586,6 +615,93 @@ export default function JobCardForm({
     } finally {
       setPrintingInvoice(false);
     }
+  };
+
+  const handleSaveAndUpdateEstimate = async () => {
+    if (!isEditing) {
+      await handleSaveAndCreateEstimate();
+      return;
+    }
+
+    setUpdatingEstimate(true);
+    const savedJobCard = await persistJobCard();
+    if (!savedJobCard) {
+      setUpdatingEstimate(false);
+      return;
+    }
+
+    const currentEstimateId = savedJobCard.estimateId || formData.estimateId;
+    if (currentEstimateId) {
+      setFormData(prev => ({ ...prev, estimateId: currentEstimateId }));
+      router.push(`/estimates/${currentEstimateId}/edit`);
+      setUpdatingEstimate(false);
+      return;
+    }
+
+    try {
+      const jobCardIdentifier = jobCardId || savedJobCard._id;
+      if (!jobCardIdentifier) {
+        throw new Error('Missing job card id');
+      }
+
+      const estimateResponse = await fetch("/api/estimates", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jobCardId: jobCardIdentifier,
+          customerId: formData.customerId,
+          vehicleId: formData.vehicleId,
+          services: formData.services,
+          parts: formData.partsUsed,
+          validUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          status: "pending",
+          notes: formData.notes || "",
+        }),
+      });
+
+      if (!estimateResponse.ok) {
+        throw new Error('Failed to create estimate');
+      }
+
+      const estimateResult = await estimateResponse.json();
+      const newEstimateId = estimateResult.estimate?._id;
+      if (newEstimateId) {
+        setFormData(prev => ({ ...prev, estimateId: newEstimateId }));
+        router.push(`/estimates/${newEstimateId}/edit`);
+      } else {
+        router.push("/estimates");
+      }
+    } catch (error) {
+      console.error('Failed to create linked estimate:', error);
+      alert(t('estimates.failed_to_create_estimate'));
+    } finally {
+      setUpdatingEstimate(false);
+    }
+  };
+
+  const handleSaveAndUpdateInspection = async () => {
+    if (!isEditing) {
+      setInspectionModalOpen(true);
+      return;
+    }
+
+    setUpdatingInspection(true);
+    const savedJobCard = await persistJobCard();
+    if (!savedJobCard) {
+      setUpdatingInspection(false);
+      return;
+    }
+
+    const currentInspectionId = savedJobCard.inspectionId || formData.inspectionId;
+    if (currentInspectionId) {
+      setFormData(prev => ({ ...prev, inspectionId: currentInspectionId }));
+      router.push(`/inspections/${currentInspectionId}/edit`);
+    } else {
+      setInspectionModalOpen(true);
+    }
+    setUpdatingInspection(false);
   };
 
   const handleServiceChange = (index: number, field: string, value: any) => {
@@ -1346,6 +1462,24 @@ export default function JobCardForm({
                   {t('job_cards.save_and_create_estimate')}
                 </button>
               </>
+            )}
+
+            {isEditing && (
+              <button
+                type="button"
+                onClick={handleSaveAndUpdateEstimate}
+                disabled={updatingEstimate || loading}
+                className="inline-flex items-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200"
+              >
+                {updatingEstimate ? (
+                  <Loader2 className="me-2 h-5 w-5 animate-spin" />
+                ) : (
+                  <FileText className="me-2 h-5 w-5" />
+                )}
+                {formData.estimateId
+                  ? t('job_cards.save_and_update_estimate')
+                  : t('job_cards.save_and_create_estimate')}
+              </button>
             )}
 
             {isEditing && linkedInvoiceId && (

@@ -818,6 +818,11 @@
     "additional_details": "تفاصيل إضافية",
     "save_and_create_invoice": "حفظ وإنشاء فاتورة",
     "save_and_create_estimate": "حفظ وإنشاء عرض سعر",
+    "save_and_create_inspection": "حفظ وإنشاء فحص",
+    "save_and_update_estimate": "حفظ وتحديث عرض السعر",
+    "save_and_update_inspection": "حفظ وتحديث الفحص",
+    "no_estimate_linked": "لا يوجد عرض سعر مرتبط بهذه بطاقة العمل.",
+    "no_inspection_linked": "لا يوجد فحص مرتبط بهذه بطاقة العمل.",
     "job_card_saved_successfully": "تم حفظ كرت العمل بنجاح",
     "select_customer_first": "يرجى اختيار العميل أولاً قبل إضافة مركبة جديدة.",
     "pricing_summary": {

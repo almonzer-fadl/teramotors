@@ -57,7 +57,7 @@ export const PRINT_ESTIMATE_STYLES = `
   }
 
   .print-estimate-container .company-name .highlight {
-    color: var(--brand-orange);
+    color: var(--brand-navy);
     font-weight: 800;
   }
 
