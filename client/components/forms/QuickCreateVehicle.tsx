@@ -1,17 +1,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Modal from '@/components/dashboard/Modal';
+import ModernizedModal from '@/components/ui/ModernizedModal';
 import { useTranslation } from 'react-i18next';
-import { Car, Calendar, Hash } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Car, Calendar, Hash, AlertCircle } from 'lucide-react';
 import { CAR_MAKES, getModelsForMake } from '@/lib/data/carMakesModels';
 
 interface QuickCreateVehicleProps {
   isOpen: boolean;
   onClose: () => void;
-  customerId: string; // Pre-filled from job card form
+  customerId: string;
   onCreated: (vehicle: { _id: string; make: string; model: string; year: number }) => void;
 }
+
+const formVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
 export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCreated }: QuickCreateVehicleProps) {
   const { t } = useTranslation('common');
@@ -27,7 +38,7 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
     model: '',
     year: new Date().getFullYear(),
     licensePlate: '',
-    vin: '', // Empty string will be converted to null by the API
+    vin: '',
   });
 
   useEffect(() => {
@@ -40,7 +51,6 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
     if (form.make && !customMake) {
       const models = getModelsForMake(form.make);
       setAvailableModels(models);
-      // Reset model when make changes
       if (!models.includes(form.model)) {
         setForm(prev => ({ ...prev, model: '' }));
         setCustomModel(false);
@@ -48,7 +58,7 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
     } else {
       setAvailableModels([]);
     }
-  }, [form.make, customMake]);
+  }, [form.make, customMake, form.model]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,10 +66,8 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
     setError('');
 
     try {
-      // Generate a unique VIN if not provided to avoid duplicate key errors
       const submitData = { ...form };
       if (!submitData.vin || submitData.vin === '') {
-        // Generate a unique temporary VIN: QUICK-{timestamp}-{random}
         submitData.vin = `QUICK-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
       }
 
@@ -93,7 +101,7 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
       model: '',
       year: new Date().getFullYear(),
       licensePlate: '',
-      vin: '', // Empty string will be converted to null by the API
+      vin: '',
     });
     setCustomMake(false);
     setCustomModel(false);
@@ -122,65 +130,62 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
   };
 
   return (
-    <Modal
+    <ModernizedModal
       isOpen={isOpen}
       onClose={handleClose}
       title={t('vehicles.quick_create_vehicle')}
       size="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <motion.form
+        variants={formVariants}
+        initial="hidden"
+        animate="visible"
+        onSubmit={handleSubmit}
+        className="space-y-6"
+      >
         {error && (
-          <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
-            <p className="text-sm text-red-800">{error}</p>
-          </div>
+          <motion.div
+            variants={itemVariants}
+            className="flex items-center gap-3 bg-red-500/10 dark:bg-red-500/20 border border-red-500/20 rounded-lg p-3"
+          >
+            <AlertCircle className="h-5 w-5 text-red-500" />
+            <p className="text-sm font-medium text-red-600 dark:text-red-400">{error}</p>
+          </motion.div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Make */}
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('forms.make')} <span className="text-red-500">*</span>
             </label>
             {!customMake ? (
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Car className="h-5 w-5 text-gray-400" />
-                </div>
+                <Car className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <select
                   required
                   value={form.make}
                   onChange={(e) => handleMakeChange(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white"
+                  className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none"
                 >
                   <option value="">{t('forms.select_make')}</option>
                   {CAR_MAKES.map((make) => (
-                    <option key={make} value={make}>
-                      {make}
-                    </option>
+                    <option key={make} value={make}>{make}</option>
                   ))}
                   <option value="custom">{t('forms.custom_other')}</option>
                 </select>
               </div>
             ) : (
-              <div className="space-y-2">
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Car className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    value={form.make}
-                    onChange={(e) => setForm({ ...form, make: e.target.value })}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white"
-                    placeholder={t('forms.enter_custom_make')}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleMakeChange('')}
-                  className="text-sm text-blue-600 hover:text-blue-700"
-                >
+              <div>
+                <input
+                  type="text"
+                  required
+                  value={form.make}
+                  onChange={(e) => setForm({ ...form, make: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder={t('forms.enter_custom_make')}
+                />
+                <button type="button" onClick={() => handleMakeChange('')} className="text-sm text-blue-600 hover:underline mt-1">
                   {t('forms.select_from_list')}
                 </button>
               </div>
@@ -189,50 +194,37 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
 
           {/* Model */}
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('forms.model')} <span className="text-red-500">*</span>
             </label>
             {!customModel ? (
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Car className="h-5 w-5 text-gray-400" />
-                </div>
+                <Car className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <select
                   required
                   value={form.model}
                   onChange={(e) => handleModelChange(e.target.value)}
-                  disabled={!form.make}
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white disabled:opacity-50"
+                  disabled={!form.make || customMake}
+                  className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none disabled:opacity-50"
                 >
                   <option value="">{t('forms.select_model')}</option>
                   {availableModels.map((model) => (
-                    <option key={model} value={model}>
-                      {model}
-                    </option>
+                    <option key={model} value={model}>{model}</option>
                   ))}
                   <option value="custom">{t('forms.custom_other')}</option>
                 </select>
               </div>
             ) : (
-              <div className="space-y-2">
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Car className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    required
-                    value={form.model}
-                    onChange={(e) => setForm({ ...form, model: e.target.value })}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white"
-                    placeholder={t('forms.enter_custom_model')}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleModelChange('')}
-                  className="text-sm text-blue-600 hover:text-blue-700"
-                >
+              <div>
+                <input
+                  type="text"
+                  required
+                  value={form.model}
+                  onChange={(e) => setForm({ ...form, model: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder={t('forms.enter_custom_model')}
+                />
+                <button type="button" onClick={() => handleModelChange('')} className="text-sm text-blue-600 hover:underline mt-1">
                   {t('forms.select_from_list')}
                 </button>
               </div>
@@ -241,13 +233,11 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
 
           {/* Year */}
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('forms.year')} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Calendar className="h-5 w-5 text-gray-400" />
-              </div>
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="number"
                 required
@@ -255,58 +245,58 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
                 max={new Date().getFullYear() + 1}
                 value={form.year}
                 onChange={(e) => setForm({ ...form, year: parseInt(e.target.value) })}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white"
+                className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               />
             </div>
           </div>
 
           {/* License Plate */}
           <div className="space-y-2">
-            <label className="block text-sm font-bold text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('forms.license_plate')} <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Hash className="h-5 w-5 text-gray-400" />
-              </div>
+              <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
                 required
                 value={form.licensePlate}
                 onChange={(e) => setForm({ ...form, licensePlate: e.target.value.toUpperCase() })}
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-600 transition-all text-gray-900 bg-white uppercase"
+                className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all uppercase"
                 placeholder={t('forms.license_plate_placeholder')}
               />
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
-          <p className="text-sm text-blue-800">
+        <motion.div variants={itemVariants} className="bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 rounded-lg p-3">
+          <p className="text-sm text-blue-700 dark:text-blue-300">
             {t('vehicles.quick_create_note')}
           </p>
-        </div>
+        </motion.div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
-          <button
+        <motion.div variants={itemVariants} className="flex justify-end gap-4 pt-4 border-t border-black/10 dark:border-white/10">
+          <motion.button
             type="button"
             onClick={handleClose}
             disabled={loading}
-            className="px-6 py-3 border-2 border-gray-300 text-sm font-bold rounded-xl text-gray-700 bg-white hover:border-gray-400 hover:bg-gray-50 transition-all disabled:opacity-50"
+            className="px-6 py-3 text-sm font-bold rounded-lg text-gray-700 dark:text-gray-300 bg-gray-200/50 dark:bg-gray-700/50 hover:bg-gray-300/50 dark:hover:bg-gray-600/50 transition-all disabled:opacity-50"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             {t('forms.cancel')}
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="submit"
             disabled={loading || !customerId}
-            className="px-6 py-3 border border-transparent text-sm font-bold rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:shadow-lg hover:shadow-blue-600/25 disabled:opacity-50 transition-all"
+            className="px-6 py-3 text-sm font-bold rounded-lg text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-all"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             {loading ? t('forms.creating') : t('vehicles.create_vehicle')}
-          </button>
-        </div>
-      </form>
-    </Modal>
+          </motion.button>
+        </motion.div>
+      </motion.form>
+    </ModernizedModal>
   );
 }
-

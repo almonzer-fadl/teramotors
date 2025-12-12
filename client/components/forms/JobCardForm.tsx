@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { ArrowLeft, Save, X, Trash2, FileText, Wrench, Package, Plus, Loader2 } from "lucide-react";
 import { socketService } from "../../lib/services/socket";
 import { useTranslation } from "react-i18next";
@@ -835,40 +836,27 @@ export default function JobCardForm({
               </div>
 
               {/* Job Type Toggle Buttons */}
-              <div className="flex items-center gap-2 bg-gray-100 p-1.5 rounded-xl">
-                <button
-                  type="button"
-                  onClick={() => handleInputChange("type", "regular")}
-                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                    formData.type === "regular"
-                      ? "bg-white text-gray-900 shadow-md"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  {t("job_types.regular")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleInputChange("type", "inspection")}
-                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                    formData.type === "inspection"
-                      ? "bg-white text-gray-900 shadow-md"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  {t("job_types.inspection")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleInputChange("type", "repair")}
-                  className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
-                    formData.type === "repair"
-                      ? "bg-white text-gray-900 shadow-md"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  {t("job_types.repair")}
-                </button>
+              <div className="relative flex items-center gap-2 bg-gray-100 dark:bg-gray-800/50 p-1.5 rounded-2xl">
+                {['regular', 'inspection', 'repair'].map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => handleInputChange("type", type)}
+                    className="relative px-6 py-3 rounded-xl font-semibold text-sm transition-colors z-10 w-32 text-center"
+                  >
+                    {formData.type === type && (
+                      <motion.div
+                        layoutId="jobTypePill"
+                        className="absolute inset-0 bg-white dark:bg-gray-700 shadow-md rounded-xl"
+                        style={{ borderRadius: 12 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                    <span className={`relative z-20 ${formData.type === type ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                      {t(`job_types.${type}`)}
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
           </div>

@@ -4,20 +4,6 @@ import React from 'react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { motion, type Variants } from 'framer-motion';
-import {
-  Users,
-  Car,
-  Package,
-  BarChart3,
-  ClipboardList,
-  FileText,
-  CreditCard,
-  Search,
-  Calendar,
-  Clock,
-  Bell,
-  TrendingUp
-} from 'lucide-react';
 
 interface DashboardTile {
   title: string;
@@ -32,14 +18,12 @@ interface ModernDashboardWidgetProps {
   tiles: DashboardTile[];
 }
 
-// Animation variants
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1
+      staggerChildren: 0.05,
     }
   }
 };
@@ -55,14 +39,13 @@ const itemVariants: Variants = {
     y: 0,
     scale: 1,
     transition: {
-      type: "spring" as const,
-      stiffness: 400,
+      type: "spring",
+      stiffness: 300,
       damping: 25
     }
   }
 };
 
-// Color mapping to gradients for premium look
 const colorToGradient: Record<string, string> = {
   'bg-blue-600': 'from-blue-500 via-blue-600 to-blue-700',
   'bg-pink-500': 'from-pink-400 via-pink-500 to-pink-600',
@@ -86,7 +69,7 @@ const ModernDashboardWidget: React.FC<ModernDashboardWidgetProps> = ({
 
   return (
     <motion.div
-      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6"
+      className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -102,55 +85,37 @@ const ModernDashboardWidget: React.FC<ModernDashboardWidgetProps> = ({
           >
             <Link
               href={tile.route}
-              className="group flex flex-col items-center justify-center"
+              className="group flex flex-col items-center justify-center text-center"
             >
               <motion.div
                 className={`
-                  relative w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32
+                  relative w-20 h-20 sm:w-24 sm:h-24
+                  flex items-center justify-center
                   bg-gradient-to-br ${gradientClass}
-                  rounded-3xl flex items-center justify-center mb-3
+                  border border-white/20
+                  rounded-2xl
                   shadow-lg
                   overflow-hidden
                 `}
                 whileHover={{
                   scale: 1.08,
-                  rotate: 2,
                   transition: {
                     type: "spring",
-                    stiffness: 400,
-                    damping: 17
+                    stiffness: 300,
+                    damping: 15
                   }
                 }}
-                whileTap={{
-                  scale: 0.95,
-                  rotate: -1
-                }}
+                whileTap={{ scale: 0.95 }}
               >
-                {/* Shine overlay effect */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                {/* Glow effect on hover */}
-                <motion.div
-                  className="absolute inset-0 rounded-3xl"
-                  initial={{ boxShadow: "0 0 0 0 rgba(255,255,255,0)" }}
-                  whileHover={{
-                    boxShadow: "0 0 30px 5px rgba(255,255,255,0.3)",
-                    transition: { duration: 0.3 }
-                  }}
-                />
-
-                <Icon className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white drop-shadow-lg relative z-10" />
+                <div className="absolute inset-0 bg-black/10 rounded-2xl"></div>
+                <Icon className="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-lg relative z-10" />
               </motion.div>
 
-              <motion.div
-                className="text-center"
-                initial={{ opacity: 0.8 }}
-                whileHover={{ opacity: 1 }}
-              >
-                <span className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-200">
+              <div className="mt-2 w-full">
+                <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-200 truncate">
                   {isArabic ? tile.title : tile.titleEn}
                 </span>
-              </motion.div>
+              </div>
             </Link>
           </motion.div>
         );
