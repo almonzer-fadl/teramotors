@@ -824,6 +824,11 @@
     "additional_details": "Additional Details",
     "save_and_create_invoice": "Save & Create Invoice",
     "save_and_create_estimate": "Save & Create Estimate",
+    "save_and_create_inspection": "Save & Create Inspection",
+    "save_and_update_estimate": "Save & Update Estimate",
+    "save_and_update_inspection": "Save & Update Inspection",
+    "no_estimate_linked": "No estimate linked to this job card.",
+    "no_inspection_linked": "No inspection linked to this job card.",
     "job_card_saved_successfully": "Job card saved successfully",
     "select_customer_first": "Please select a customer before adding a vehicle.",
     "pricing_summary": {
