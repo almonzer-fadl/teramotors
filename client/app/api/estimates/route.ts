@@ -48,6 +48,7 @@ export async function GET(request: NextRequest) {
       .populate('vehicleId', 'make model year licensePlate')
       .populate('mechanicId', 'firstName lastName displayName')
       .populate('services.serviceId', 'name')
+      .populate('parts.partId', 'name partNumber')
       .sort(sort)
       .skip(skip)
       .limit(limit)
@@ -101,6 +102,7 @@ export async function POST(request: Request) {
     await connectToDatabase()
     
     const body = await request.json()
+    const tenantId = (session.user as any).tenantId;
     
     // Validate that job card exists (optional)
     if (body.jobCardId) {
@@ -192,8 +194,20 @@ export async function POST(request: Request) {
     const validUntil = new Date()
     validUntil.setDate(validUntil.getDate() + 30)
 
+    // Generate next estimate number
+    const lastEstimate = await Estimate.findOne({ tenantId })
+      .sort({ createdAt: -1 })
+      .select('estimateNumber');
+
+    let estimateNumber = 'EST-0001';
+    if (lastEstimate && lastEstimate.estimateNumber) {
+      const lastNumber = parseInt(lastEstimate.estimateNumber.split('-')[1]);
+      const nextNumber = (lastNumber + 1).toString().padStart(4, '0');
+      estimateNumber = `EST-${nextNumber}`;
+    }
 
     const estimate = new Estimate({
+      estimateNumber,
       jobCardId: body.jobCardId || null,
       inspectionId: body.inspectionId || null,
       customerId: body.customerId,
@@ -207,7 +221,7 @@ export async function POST(request: Request) {
       total,
       validUntil: body.validUntil ? new Date(body.validUntil) : validUntil,
       notes: body.notes || '',
-      tenantId: (session.user as any).tenantId
+      tenantId: tenantId
     })
 
     await estimate.save()

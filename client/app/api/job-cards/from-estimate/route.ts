@@ -1,114 +1,119 @@
-import { connectToDatabase } from '@/lib/db'
-import JobCard from '@/lib/models/JobCard'
-import Estimate from '@/lib/models/Estimate'
-import { getServerSession } from "@/lib/auth-server";
+import { NextRequest, NextResponse } from 'next/server';
+import { connectToDatabase } from '@/lib/db';
+import JobCard from '@/lib/models/JobCard';
+import VehicleInspection from '@/lib/models/VehicleInspection';
+import Estimate, { IEstimate } from '@/lib/models/Estimate';
+import Invoice, { IInvoice } from '@/lib/models/Invoice';
+import { getServerSession } from '@/lib/auth-server';
+import { INSPECTION_CONFIG } from '@/lib/config/inspection';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession()
-    if (!session) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    const session = await getServerSession();
+    if (!session?.user || (session.user as any).role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
-    const tenantId = (session.user as any)?.tenantId
+    const tenantId = (session.user as any)?.tenantId;
     if (!tenantId) {
-      return Response.json({ error: 'Unauthorized - No tenant assigned' }, { status: 401 })
+      return NextResponse.json({ error: 'Unauthorized - No tenant assigned' }, { status: 401 });
     }
 
-    await connectToDatabase()
-    
-    const body = await request.json()
-    const { estimateId } = body
-    
-    // Get the estimate
-    const estimate = await Estimate.findOne({ _id: estimateId, tenantId })
-      .populate('inspectionId', 'inspectionDate overallCondition')
-      .populate('customerId', 'firstName lastName')
-      .populate('vehicleId', 'make model year licensePlate')
-      .populate('mechanicId', 'userId')
-      .populate('services.serviceId', 'name description laborHours laborRate')
-      .populate('parts.partId', 'name partNumber cost')
-    
+    await connectToDatabase();
+
+    const body = await request.json();
+    const { estimateId } = body;
+
+    if (!estimateId) {
+      return NextResponse.json({ error: 'Estimate ID is required' }, { status: 400 });
+    }
+
+    // 1. Fetch the Estimate
+    const estimate = await Estimate.findOne({ _id: estimateId, tenantId }).lean<IEstimate>();
+
     if (!estimate) {
-      return Response.json({ error: 'Estimate not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Estimate not found' }, { status: 404 });
     }
 
-    const jobCardNumber = await JobCard.getNextJobCardNumber(tenantId)
-    const inspectionId = (estimate.inspectionId as any)?._id || estimate.inspectionId
-    const customerId = (estimate.customerId as any)?._id || estimate.customerId
-    const vehicleId = (estimate.vehicleId as any)?._id || estimate.vehicleId
-    const mechanicId = (estimate.mechanicId as any)?._id || estimate.mechanicId
+    const { inspectionId, customerId, vehicleId } = estimate;
 
-    // Convert estimate services to job card services
-    const jobCardServices = estimate.services.map((service: any) => {
-      // Get the populated service data
-      const serviceData = service.serviceId as any;
-      const laborHours = serviceData?.laborHours || 0;
-      const laborRate = serviceData?.laborRate || 0;
+    let parentJobCardInfo = { _id: null, jobCardNumber: '' };
+    let inspectionFeeDeducted = 0;
+    let notes = `This repair job card was generated from estimate #${estimate.estimateNumber}.`;
+
+    // 2. If linked to an inspection, fetch related data
+    if (inspectionId) {
+      const inspection = await VehicleInspection.findOne({ _id: inspectionId, tenantId })
+        .populate('jobCardId', 'jobCardNumber')
+        .lean();
       
-      return {
-        serviceId: service.serviceId._id || service.serviceId,
-        quantity: service.quantity,
-        laborHours: laborHours,
-        laborRate: laborRate
-      }
-    })
+      if (inspection && inspection.jobCardId) {
+        const parentJobCard = inspection.jobCardId as any;
+        parentJobCardInfo = { _id: parentJobCard._id, jobCardNumber: parentJobCard.jobCardNumber };
+        
+        const inspectionInvoice = await Invoice.findOne({ inspectionId: inspection._id, tenantId, isInspectionInvoice: true }).lean<IInvoice>();
+        if (inspectionInvoice) {
+            inspectionFeeDeducted = inspectionInvoice.totalAmount;
+        } else {
+            inspectionFeeDeducted = INSPECTION_CONFIG.DEFAULT_FEE;
+        }
 
-    // Convert estimate parts to job card parts
-    const jobCardParts = estimate.parts.map((part: any) => {
-      // Get the populated part data
-      const partData = part.partId as any;
-      const cost = partData?.cost || part.unitCost || 0;
-      
-      return {
-        partId: part.partId._id || part.partId,
-        quantity: part.quantity,
-        cost: cost
+        notes = `This repair job card was generated from estimate #${estimate.estimateNumber} (related to inspection #${parentJobCardInfo.jobCardNumber}).`;
       }
-    })
+    }
 
-    // Create the job card
-    const jobCard = new JobCard({
+    // 3. Map services and parts from the estimate
+    const servicesForJobCard = (estimate.services || []).map(s => ({
+        serviceId: s.serviceId,
+        quantity: s.quantity || 1,
+        laborHours: s.laborHours,
+        laborRate: s.laborRate,
+    }));
+
+    const partsForJobCard = (estimate.parts || []).map(p => ({
+        partId: p.partId,
+        quantity: p.quantity || 1,
+        cost: p.unitCost, // In Estimate it's unitCost, in JobCard it's cost
+    }));
+
+    // 4. Create the new 'repair' Job Card
+    const jobCardNumber = await JobCard.getNextJobCardNumber(tenantId);
+
+    const newJobCard = new JobCard({
       tenantId,
       jobCardNumber,
-      inspectionId,
-      customerId,
-      vehicleId,
-      mechanicId,
+      customerId: customerId,
+      vehicleId: vehicleId,
+      type: 'repair',
       status: 'pending',
       priority: 'medium',
-      services: jobCardServices,
-      partsUsed: jobCardParts,
-      notes: `Created from estimate - ${estimate.notes || 'No notes'}`,
-      discount: 0 // Default discount when creating from estimate
-    })
+      parentJobCardId: parentJobCardInfo._id,
+      inspectionId: inspectionId || null,
+      services: servicesForJobCard,
+      partsUsed: partsForJobCard,
+      notes: notes,
+      inspectionFeeDeducted: inspectionFeeDeducted,
+    });
 
-    await jobCard.save()
+    await newJobCard.save();
 
-    // Update estimate status to approved
-    await Estimate.findOneAndUpdate(
-      { _id: estimateId, tenantId }, 
-      { 
-        status: 'approved',
-        jobCardId: jobCard._id 
-      }
-    )
+    // 5. Update the estimate status to 'approved'
+    await Estimate.findOneAndUpdate({ _id: estimateId, tenantId }, { status: 'approved' });
 
-    // Populate the job card for response
-    const populatedJobCard = await JobCard.findById(jobCard._id)
-      .populate('inspectionId', 'inspectionDate overallCondition totalEstimatedCost items')
-      .populate('customerId', 'firstName lastName')
-      .populate('vehicleId', 'make model year licensePlate')
-      .populate('mechanicId', 'userId')
-      .populate('services.serviceId', 'name description laborHours laborRate')
-      .populate('partsUsed.partId', 'name partNumber cost')
+    const populatedJobCard = await JobCard.findById(newJobCard._id)
+        .populate('customerId', 'firstName lastName')
+        .populate('vehicleId', 'make model year')
+        .lean();
 
-    return Response.json({ 
-      success: true, 
-      jobCard: populatedJobCard
-    }, { status: 201 })
+    return NextResponse.json({
+      success: true,
+      message: 'Repair job card created successfully from estimate.',
+      jobCard: populatedJobCard,
+    }, { status: 201 });
+
   } catch (error) {
-    console.error('Error creating job card from estimate:', error)
-    return Response.json({ error: 'Failed to create job card from estimate' }, { status: 500 })
+    console.error('Error creating job card from estimate:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({ error: 'Failed to create job card from estimate', details: errorMessage }, { status: 500 });
   }
 }
