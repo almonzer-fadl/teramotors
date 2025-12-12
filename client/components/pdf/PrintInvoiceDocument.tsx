@@ -1,8 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { useState, useEffect } from 'react';
-import QRCode from 'qrcode';
+import { useEffect, useState } from 'react';
+import { PRINT_INVOICE_STYLES } from './printInvoiceStyles';
 
 interface PrintInvoiceDocumentProps {
   invoice: any;
@@ -11,28 +11,32 @@ interface PrintInvoiceDocumentProps {
   language?: string;
 }
 
-const PrintInvoiceDocument = ({ 
-  invoice, 
-  jobCard, 
-  qrCodeData, 
-  language = 'ar' 
+const PrintInvoiceDocument = ({
+  invoice,
+  jobCard,
+  qrCodeData,
+  language = 'ar'
 }: PrintInvoiceDocumentProps) => {
-  const isRTL = true; // Force Arabic RTL layout
-
-  // Calculate totals with discount and tax only on parts
-  const services = jobCard?.services || [];
-  const parts = jobCard?.partsUsed || [];
-  const servicesTotal = services.reduce((sum: number, s: any) => sum + (s.laborHours * s.laborRate), 0);
-  const partsTotal = parts.reduce((sum: number, p: any) => sum + (p.quantity * p.cost), 0);
+  const isRTL = language !== 'en';
+  const services = jobCard?.services || invoice?.services || [];
+  const parts = jobCard?.partsUsed || invoice?.parts || [];
+  const servicesTotal = services.reduce((sum: number, service: any) => {
+    const laborHours = Number(service.laborHours || 0);
+    const laborRate = Number(service.laborRate || 0);
+    return sum + laborHours * laborRate;
+  }, 0);
+  const partsTotal = parts.reduce((sum: number, part: any) => {
+    const quantity = Number(part.quantity || 0);
+    const unitCost = Number(part.cost ?? part.unitCost ?? 0);
+    return sum + quantity * unitCost;
+  }, 0);
   const subtotal = servicesTotal + partsTotal;
-  const tax = partsTotal * 0.15; // Tax only on parts
-  const discount = jobCard?.discount || invoice?.discount || 0;
+  const tax = partsTotal * 0.15;
+  const discount = typeof jobCard?.discount === 'number' ? jobCard.discount : (invoice?.discount || 0);
   const discountAmount = (subtotal + tax) * (discount / 100);
   const grandTotal = subtotal + tax - discountAmount;
 
-
-
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
 
   useEffect(() => {
     if (qrCodeData) {
@@ -42,76 +46,88 @@ const PrintInvoiceDocument = ({
 
   const translations = {
     ar: {
-      title: "فاتورة",
-      company: "تيرا فيجنز",
-      invoiceNumber: "رقم الفاتورة #",
-      date: "التاريخ",
-      dueDate: "تاريخ الاستحقاق",
-      customerInfo: "معلومات العميل",
-      customer: "العميل",
-      vehicleInfo: "معلومات المركبة",
-      vehicle: "المركبة",
-      year: "السنة",
-      licensePlate: "رقم اللوحة",
-      services: "الخدمات",
-      service: "الخدمة",
-      quantity: "الكمية",
-      laborHours: "الساعات",
-      laborRate: "المعدل",
-      total: "المجموع",
-      parts: "القطع",
-      partName: "اسم القطعة",
-      partNumber: "رقم القطعة",
-      unitCost: "تكلفة الوحدة",
-      servicesTotal: "مجموع الخدمات",
-      partsTotal: "مجموع القطع",
-      tax: "ضريبة القطع (15%)",
-      discount: "الخصم",
-      grandTotal: "المجموع الإجمالي",
-      notes: "ملاحظات",
-      generatedOn: "تم الإنشاء في",
-      systemName: "نظام إدارة صيانة السيارات تيرا موتورز",
-      status: "الحالة",
-      zatcaCompliant: "متوافق مع ZATCA"
+      title: 'فاتورة',
+      invoiceInfo: 'تفاصيل الفاتورة',
+      companyLabel: 'الشركة',
+      crNumber: 'رقم السجل التجاري',
+      vatNumber: 'الرقم الضريبي',
+      invoiceNumber: 'رقم الفاتورة #',
+      date: 'التاريخ',
+      dueDate: 'تاريخ الاستحقاق',
+      customerInfo: 'معلومات العميل',
+      customer: 'العميل',
+      noCustomerInfo: 'لا توجد معلومات للعميل',
+      vehicleInfo: 'معلومات المركبة',
+      vehicle: 'المركبة',
+      year: 'السنة',
+      licensePlate: 'رقم اللوحة',
+      noVehicleInfo: 'لا توجد معلومات للمركبة',
+      services: 'الخدمات',
+      service: 'الخدمة',
+      quantity: 'الكمية',
+      laborHours: 'الساعات',
+      laborRate: 'المعدل',
+      total: 'المجموع',
+      parts: 'القطع',
+      partName: 'اسم القطعة',
+      partNumber: 'رقم القطعة',
+      unitCost: 'تكلفة الوحدة',
+      servicesTotal: 'مجموع الخدمات',
+      partsTotal: 'مجموع القطع',
+      tax: 'ضريبة القطع (15%)',
+      discount: 'الخصم',
+      grandTotal: 'المجموع الإجمالي',
+      notes: 'ملاحظات',
+      generatedOn: 'تم الإنشاء في',
+      systemName: 'نظام إدارة صيانة السيارات تيرا موتورز',
+      status: 'الحالة',
+      zatcaCompliant: 'متوافق مع ZATCA'
     },
     en: {
-      title: "Invoice",
-      company: "TeraMotors Auto Repair",
-      invoiceNumber: "Invoice #",
-      date: "Date",
-      dueDate: "Due Date",
-      customerInfo: "Customer Information",
-      customer: "Customer",
-      vehicleInfo: "Vehicle Information",
-      vehicle: "Vehicle",
-      year: "Year",
-      licensePlate: "License Plate",
-      services: "Services",
-      service: "Service",
-      quantity: "Quantity",
-      laborHours: "Hours",
-      laborRate: "Rate",
-      total: "Total",
-      parts: "Parts",
-      partName: "Part Name",
-      partNumber: "Part #",
-      unitCost: "Unit Cost",
-      servicesTotal: "Services Total",
-      partsTotal: "Parts Total",
-      tax: "Tax on Parts (15%)",
-      discount: "Discount",
-      grandTotal: "Grand Total",
-      notes: "Notes",
-      generatedOn: "Generated on",
-      systemName: "TeraMotors Auto Repair Management System",
-      status: "Status",
-      zatcaCompliant: "ZATCA Compliant"
+      title: 'Invoice',
+      invoiceInfo: 'Invoice Details',
+      companyLabel: 'Company',
+      crNumber: 'C.R. Number',
+      vatNumber: 'VAT Number',
+      invoiceNumber: 'Invoice #',
+      date: 'Date',
+      dueDate: 'Due Date',
+      customerInfo: 'Customer Information',
+      customer: 'Customer',
+      noCustomerInfo: 'No customer information',
+      vehicleInfo: 'Vehicle Information',
+      vehicle: 'Vehicle',
+      year: 'Year',
+      licensePlate: 'License Plate',
+      noVehicleInfo: 'No vehicle information',
+      services: 'Services',
+      service: 'Service',
+      quantity: 'Qty',
+      laborHours: 'Hours',
+      laborRate: 'Rate',
+      total: 'Total',
+      parts: 'Parts',
+      partName: 'Part Name',
+      partNumber: 'Part #',
+      unitCost: 'Unit Cost',
+      servicesTotal: 'Services Total',
+      partsTotal: 'Parts Total',
+      tax: 'VAT on Parts (15%)',
+      discount: 'Discount',
+      grandTotal: 'Grand Total',
+      notes: 'Notes',
+      generatedOn: 'Generated on',
+      systemName: 'TeraMotors Auto Repair Management System',
+      status: 'Status',
+      zatcaCompliant: 'ZATCA Compliant'
     }
   };
 
   const t = translations[language as keyof typeof translations] || translations.ar;
+  const containerClass = isRTL ? 'print-invoice-container' : 'print-invoice-container ltr';
 
-  const formatDate = (date: any, isRTL: boolean) => {
+  const formatDate = (date?: string | number | Date) => {
+    if (!date) return '--/--/----';
     const d = new Date(date);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -119,11 +135,11 @@ const PrintInvoiceDocument = ({
     return `${day}/${month}/${year}`;
   };
 
-  const formatCurrency = (amount: number, isRTL: boolean) => {
-    return `ر.س ${amount.toFixed(2)}`;
+  const formatCurrency = (amount: number) => {
+    return isRTL ? `ر.س ${amount.toFixed(2)}` : `SAR ${amount.toFixed(2)}`;
   };
 
-  const getStatusText = (status: string, isRTL: boolean) => {
+  const getStatusText = (status?: string) => {
     const statusMap = {
       ar: {
         pending: 'معلق',
@@ -137,408 +153,91 @@ const PrintInvoiceDocument = ({
       }
     };
 
-    return statusMap[isRTL ? 'ar' : 'en'][status as keyof typeof statusMap.ar] || status;
+    const dictionary = statusMap[isRTL ? 'ar' : 'en'];
+    return status ? (dictionary[status as keyof typeof dictionary] || status) : dictionary.pending;
+  };
+
+  const renderCustomerName = () => {
+    if (!invoice?.customerId) return '';
+    const customer = invoice.customerId;
+    if (customer.companyName) return customer.companyName;
+    const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim();
+    return fullName || customer.name || '';
   };
 
   return (
-    <div className="print-invoice-container">
-      <style jsx>{`
-        .print-invoice-container {
-          font-family: ${isRTL ? "'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif" : "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"};
-          line-height: 1.6;
-          color: #333;
-          direction: ${isRTL ? 'rtl' : 'ltr'};
-          background: white;
-          width: 210mm;
-          margin: 0 auto;
-          padding: 20mm;
-          box-sizing: border-box;
-        }
-
-
-        .header {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-bottom: 2px solid #000;
-          padding: 20px 0;
-          margin-bottom: 30px;
-          position: relative;
-        }
-
-        .logo-container {
-          display: flex;
-          align-items: center;
-          flex-direction: column;
-          background: linear-gradient(to right, #063479, #052a5f);
-          border-radius: 12px;
-          padding: 20px;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .logo-image {
-          width: 48px;
-          height: 48px;
-          border-radius: 12px;
-          object-fit: contain;
-          background: white;
-          padding: 4px;
-          margin-bottom: 8px;
-        }
-
-        .company-name {
-          font-size: 24px;
-          font-weight: 800;
-          color: white;
-          margin: 0;
-          letter-spacing: 0.04em;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-
-        .company-name .highlight {
-          color: #F13F33;
-        }
-
-        .company-subtitle {
-          font-size: 10px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.15em;
-          color: white;
-          background: rgba(0, 0, 0, 0.4);
-          border-radius: 4px;
-          padding: 2px 8px;
-          margin-top: 4px;
-        }
-
-        .company-details {
-          position: absolute;
-          right: 20px;
-          top: 50%;
-          transform: translateY(-50%);
-          text-align: right;
-          color: #000;
-          font-size: 14px;
-          line-height: 1.6;
-        }
-
-        .invoice-title {
-          font-size: 20px;
-          font-weight: 600;
-          color: #000;
-          margin: 15px 0 0 0;
-          text-align: center;
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-        }
-
-        .qr-code {
-          position: absolute;
-          top: 0;
-          ${isRTL ? 'left: 0;' : 'right: 0;'}
-          width: 120px;
-          height: 120px;
-          text-align: center;
-          background: white;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          padding: 10px;
-        }
-
-        .qr-code img {
-          width: 100px;
-          height: 100px;
-          border-radius: 4px;
-        }
-
-        .qr-label {
-          font-size: 10px;
-          color: #666;
-          margin-top: 5px;
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-        }
-
-        .invoice-info {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 30px;
-          margin-bottom: 30px;
-        }
-
-        .info-section h3 {
-          font-size: 18px;
-          font-weight: 600;
-          color: #000;
-          margin-bottom: 15px;
-          border-bottom: 2px solid #e5e7eb;
-          padding-bottom: 5px;
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-        }
-
-        .info-section p {
-          margin: 8px 0;
-          color: #666;
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-        }
-
-        .services-table, .parts-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 20px 0;
-          font-size: 14px;
-        }
-
-        .services-table th, .parts-table th {
-          background: #1e3a8a;
-          color: white;
-          padding: 12px 8px;
-          text-align: ${isRTL ? 'right' : 'left'};
-          font-weight: 600;
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-        }
-
-        .services-table td, .parts-table td {
-          padding: 10px 8px;
-          border-bottom: 1px solid #e5e7eb;
-          text-align: ${isRTL ? 'right' : 'left'};
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-        }
-
-        .services-table tr:nth-child(even), .parts-table tr:nth-child(even) {
-          background-color: #f8f9fa;
-        }
-
-        .totals {
-          margin-top: 30px;
-          text-align: ${isRTL ? 'left' : 'right'};
-          border-top: 2px solid #000;
-          padding-top: 15px;
-        }
-
-        .total-row {
-          display: flex;
-          justify-content: space-between;
-          padding: 8px 0;
-          border-bottom: 1px solid #e5e7eb;
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-        }
-
-        .grand-total {
-          font-weight: 700;
-          font-size: 18px;
-          color: #000;
-          margin-top: 10px;
-          padding-top: 10px;
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-        }
-
-        .notes {
-          margin-top: 30px;
-          padding: 20px;
-          background: #f8f9fa;
-          border-radius: 8px;
-          border-${isRTL ? 'right' : 'left'}: 4px solid #000;
-        }
-
-        .notes h3 {
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-          font-weight: 600;
-          color: #000;
-          margin-bottom: 10px;
-        }
-
-        .notes p {
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-          color: #666;
-        }
-
-        .footer {
-          margin-top: 40px;
-          text-align: center;
-          color: #666;
-          font-size: 12px;
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-        }
-
-        .status-badge {
-          display: inline-block;
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 12px;
-          font-weight: 500;
-          ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
-        }
-
-        .status-pending {
-          background-color: #fef3c7;
-          color: #92400e;
-        }
-
-        .status-paid {
-          background-color: #d1fae5;
-          color: #065f46;
-        }
-
-        .status-cancelled {
-          background-color: #fee2e2;
-          color: #991b1b;
-        }
-
-        @media print {
-          @page {
-            size: A4;
-            margin: 15mm;
-          }
-
-          body {
-            margin: 0;
-            background: white;
-          }
-
-          .print-invoice-container {
-            padding: 0;
-            width: 100%;
-            margin: 0;
-            box-shadow: none;
-            background: white;
-            min-height: auto;
-          }
-
-          /* Allow page breaks */
-          .page-break {
-            page-break-before: always;
-          }
-
-          /* Prevent breaking inside these elements */
-          .header, .invoice-info, .info-section {
-            page-break-inside: avoid;
-          }
-
-          /* Allow tables to break across pages */
-          .services-table, .parts-table {
-            page-break-inside: auto;
-          }
-
-          .services-table tr, .parts-table tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
-          }
-
-          .services-table thead, .parts-table thead {
-            display: table-header-group;
-          }
-
-          .services-table tfoot, .parts-table tfoot {
-            display: table-footer-group;
-          }
-
-          /* Ensure all text is black in print */
-          * {
-            color: #000 !important;
-          }
-
-          /* Ensure table headers are deep blue in print */
-          .services-table th, .parts-table th {
-            background: #1e3a8a !important;
-            color: white !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-          }
-
-          /* Ensure company details are black in print */
-          .company-details {
-            color: #000 !important;
-          }
-
-          /* Ensure info section headers are black in print */
-          .info-section h3 {
-            color: #000 !important;
-          }
-
-          /* Ensure totals border is black in print */
-          .totals {
-            border-top: 2px solid #000 !important;
-          }
-
-          /* Ensure grand total is black in print */
-          .grand-total {
-            color: #000 !important;
-          }
-
-          /* Ensure notes border is black in print */
-          .notes {
-            border-${isRTL ? 'right' : 'left'}: 4px solid #000 !important;
-            page-break-inside: avoid;
-          }
-
-          /* Prevent orphans and widows */
-          p, li {
-            orphans: 3;
-            widows: 3;
-          }
-        }
-      `}</style>
+    <div className={containerClass}>
+      <style>{PRINT_INVOICE_STYLES}</style>
 
       <div className="header">
-          <div className="logo-container">
-            <img 
-              src="/icon.png" 
-              alt="TeraMotors Logo" 
-              className="logo-image"
-            />
-            <div className="company-name">
-              Tera<span className="highlight">Visions</span>
-            </div>
-            <div className="company-subtitle">Auto Repair</div>
+        <div className="logo-container">
+          <img src="/icon.png" alt="TeraMotors Logo" className="logo-image" />
+          <div>
+            <div className="company-name">Tera<span className="highlight">Visions</span></div>
+            <div className="company-subtitle">Auto Repair Solutions</div>
           </div>
-          
-          <div className="company-details">
-            <div>الرياض، صناعيه الرمال <br/>المملكه العربيه السعوديه</div>
-            <div>+966599006314</div>
-            <div>info@teramotors.com</div>
-          </div>
+        </div>
+        <div className="company-details">
+          <div><strong>{t.companyLabel}:</strong> تيرا فيجنز</div>
+          <div><strong>{t.crNumber}:</strong> 7051569718</div>
+          <div><strong>{t.vatNumber}:</strong> 314211338900003</div>
+          <div>الرياض، صناعية الرمال، المملكة العربية السعودية</div>
+          <div>+966 59 900 6314 · info@teramotors.com</div>
+        </div>
+      </div>
 
-          {qrCodeDataUrl && (
-            <div className="qr-code">
-              <img src={qrCodeDataUrl} alt="ZATCA QR" />
-              <div className="qr-label">{t.zatcaCompliant}</div>
-            </div>
+      <div className="document-title">
+        <h1>{t.title}</h1>
+        <p>{t.invoiceNumber}{invoice?.invoiceNumber || String(invoice?._id || '').slice(-6)}</p>
+      </div>
+
+      <div className="info-grid">
+        <div className="info-card">
+          <h3>{t.invoiceInfo}</h3>
+          <p><strong>{t.date}:</strong> {formatDate(invoice?.createdAt || Date.now())}</p>
+          <p><strong>{t.dueDate}:</strong> {formatDate(invoice?.dueDate || invoice?.createdAt)}</p>
+          <p>
+            <strong>{t.status}:</strong> <span className={`status-badge status-${invoice?.status || 'pending'}`}>{getStatusText(invoice?.status)}</span>
+          </p>
+        </div>
+
+        <div className="info-card">
+          <h3>{t.customerInfo}</h3>
+          {invoice?.customerId ? (
+            <>
+              <p><strong>{t.customer}:</strong> {renderCustomerName()}</p>
+              {invoice.customerId.email && <p><strong>Email:</strong> {invoice.customerId.email}</p>}
+              {invoice.customerId.phone && <p><strong>Phone:</strong> {invoice.customerId.phone}</p>}
+              {invoice.customerId.vatNumber && <p><strong>{t.vatNumber}:</strong> {invoice.customerId.vatNumber}</p>}
+            </>
+          ) : (
+            <p>{t.noCustomerInfo}</p>
           )}
         </div>
-        
-        <h2 className="invoice-title">{t.title} #{String(invoice._id || '').slice(-6)}</h2>
 
-        <div className="invoice-info">
-          <div className="info-section">
-            <h3>{t.date}</h3>
-            <p><strong>{t.date}:</strong> {formatDate(invoice.createdAt || Date.now(), isRTL)}</p>
-            <p><strong>{t.dueDate}:</strong> {formatDate(invoice.dueDate || Date.now(), isRTL)}</p>
-            <p><strong>{t.status}:</strong> <span className={`status-badge status-${invoice.status || 'pending'}`}>{getStatusText(invoice.status, isRTL)}</span></p>
-          </div>
-
-          <div className="info-section">
-            <h3>{t.customerInfo}</h3>
-            <p><strong>{t.customer}:</strong> {invoice.customerId?.companyName ? invoice.customerId.companyName : (invoice.customerId?.firstName || '') + ' ' + (invoice.customerId?.lastName || '')}</p>
-            {invoice.customerId?.email && <p><strong>Email:</strong> {invoice.customerId.email}</p>}
-            {invoice.customerId?.phone && <p><strong>Phone:</strong> {invoice.customerId.phone}</p>}
-            {invoice.customerId?.address && <p><strong>Address:</strong> ${invoice.customerId.address.street}, ${invoice.customerId.address.city}, ${invoice.customerId.address.country}</p>}
-            {invoice.customerId?.vatNumber && <p><strong>VAT Number:</strong> {invoice.customerId.vatNumber}</p>}
-            {invoice.customerId?.idNumber && <p><strong>ID Number:</strong> {invoice.customerId.idNumber}</p>}          </div>
-
-          <div className="info-section">
-            <h3>{t.vehicleInfo}</h3>
-            {invoice.vehicleId ? (
-              <>
-                <p><strong>{t.vehicle}:</strong> {invoice.vehicleId.year} {invoice.vehicleId.make} {invoice.vehicleId.model}</p>
-                {invoice.vehicleId.licensePlate && <p><strong>{t.licensePlate}:</strong> {invoice.vehicleId.licensePlate}</p>}
-              </>
-            ) : (
-              <p>No vehicle information</p>
-            )}
-          </div>
+        <div className="info-card">
+          <h3>{t.vehicleInfo}</h3>
+          {invoice?.vehicleId ? (
+            <>
+              <p><strong>{t.vehicle}:</strong> {invoice.vehicleId.year} {invoice.vehicleId.make} {invoice.vehicleId.model}</p>
+              {invoice.vehicleId.licensePlate && <p><strong>{t.licensePlate}:</strong> {invoice.vehicleId.licensePlate}</p>}
+            </>
+          ) : jobCard?.vehicleId ? (
+            <>
+              <p><strong>{t.vehicle}:</strong> {jobCard.vehicleId.year} {jobCard.vehicleId.make} {jobCard.vehicleId.model}</p>
+              {jobCard.vehicleId.licensePlate && <p><strong>{t.licensePlate}:</strong> {jobCard.vehicleId.licensePlate}</p>}
+            </>
+          ) : (
+            <p>{t.noVehicleInfo}</p>
+          )}
         </div>
 
-        {services.length > 0 && (
-          <table className="services-table">
+      </div>
+
+      {services.length > 0 && (
+        <div className="table-container">
+          <h2 className="table-title">{t.services}</h2>
+          <table className="custom-table">
             <thead>
               <tr>
                 <th>{t.service}</th>
@@ -549,21 +248,29 @@ const PrintInvoiceDocument = ({
               </tr>
             </thead>
             <tbody>
-              {services.map((s: any, index: number) => (
-                <tr key={index}>
-                  <td>{s.serviceId?.name || ''}</td>
-                  <td>{s.quantity}</td>
-                  <td>{s.laborHours}</td>
-                  <td>{s.laborRate.toFixed(2)}</td>
-                  <td>{(s.laborHours * s.laborRate).toFixed(2)}</td>
-                </tr>
-              ))}
+              {services.map((service: any, index: number) => {
+                const quantity = Number(service.quantity || 1);
+                const laborHours = Number(service.laborHours || 0);
+                const laborRate = Number(service.laborRate || 0);
+                return (
+                  <tr key={index}>
+                    <td>{service.serviceId?.name || service.name || '—'}</td>
+                    <td>{quantity}</td>
+                    <td>{laborHours.toFixed(2)}</td>
+                    <td>{formatCurrency(laborRate)}</td>
+                    <td>{formatCurrency(laborHours * laborRate)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-        )}
+        </div>
+      )}
 
-        {parts.length > 0 && (
-          <table className="parts-table">
+      {parts.length > 0 && (
+        <div className="table-container">
+          <h2 className="table-title">{t.parts}</h2>
+          <table className="custom-table">
             <thead>
               <tr>
                 <th>{t.partName}</th>
@@ -573,54 +280,72 @@ const PrintInvoiceDocument = ({
               </tr>
             </thead>
             <tbody>
-              {parts.map((p: any, index: number) => (
-                <tr key={index}>
-                  <td>{p.partId?.name || ''}</td>
-                  <td>{p.quantity}</td>
-                  <td>{p.cost.toFixed(2)}</td>
-                  <td>{(p.quantity * p.cost).toFixed(2)}</td>
-                </tr>
-              ))}
+              {parts.map((part: any, index: number) => {
+                const quantity = Number(part.quantity || 1);
+                const unitCost = Number(part.cost ?? part.unitCost ?? 0);
+                return (
+                  <tr key={index}>
+                    <td>{part.partId?.name || part.name || '—'}</td>
+                    <td>{quantity}</td>
+                    <td>{formatCurrency(unitCost)}</td>
+                    <td>{formatCurrency(quantity * unitCost)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
-        )}
+        </div>
+      )}
 
-        <div className="totals">
-          <div className="total-row">
-            <span>{t.servicesTotal}:</span>
-            <span>{formatCurrency(servicesTotal, isRTL)}</span>
-          </div>
-          <div className="total-row">
-            <span>{t.partsTotal}:</span>
-            <span>{formatCurrency(partsTotal, isRTL)}</span>
-          </div>
-          <div className="total-row">
-            <span>{t.tax}:</span>
-            <span>{formatCurrency(tax, isRTL)}</span>
-          </div>
-          {discount > 0 && (
+      <div className="bottom-row">
+        <div className="totals-section">
+          <div className="totals">
             <div className="total-row">
-              <span>{t.discount} ({discount}%):</span>
-              <span>-{formatCurrency(discountAmount, isRTL)}</span>
+              <span>{t.servicesTotal}:</span>
+              <span>{formatCurrency(servicesTotal)}</span>
             </div>
-          )}
-          <div className="total-row grand-total">
-            <span>{t.grandTotal}:</span>
-            <span>{formatCurrency(grandTotal, isRTL)}</span>
+            <div className="total-row">
+              <span>{t.partsTotal}:</span>
+              <span>{formatCurrency(partsTotal)}</span>
+            </div>
+            <div className="total-row">
+              <span>{t.tax}:</span>
+              <span>{formatCurrency(tax)}</span>
+            </div>
+            {discount > 0 && (
+              <div className="total-row">
+                <span>{t.discount} ({discount}%):</span>
+                <span>-{formatCurrency(discountAmount)}</span>
+              </div>
+            )}
+            <div className="total-row grand-total">
+              <span>{t.grandTotal}:</span>
+              <span>{formatCurrency(grandTotal)}</span>
+            </div>
           </div>
         </div>
 
-        {invoice.notes && (
-          <div className="notes">
-            <h3>{t.notes}</h3>
-            <p>{invoice.notes}</p>
+        {qrCodeDataUrl && (
+          <div className="qr-card-inline">
+            <div className="qr-code-wrapper">
+              <img src={qrCodeDataUrl} alt="ZATCA QR" />
+            </div>
+            <div className="qr-label">{t.zatcaCompliant}</div>
           </div>
         )}
+      </div>
 
-        <div className="footer">
-          <p>{t.generatedOn} {formatDate(new Date(), isRTL)}</p>
-          <p>{t.systemName}</p>
+      {invoice?.notes && (
+        <div className="notes">
+          <h3>{t.notes}</h3>
+          <p>{invoice.notes}</p>
         </div>
+      )}
+
+      <div className="footer">
+        <p>{t.generatedOn} {formatDate(new Date())}</p>
+        <p>{t.systemName}</p>
+      </div>
     </div>
   );
 };
