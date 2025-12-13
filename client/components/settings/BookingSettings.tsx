@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Settings as SettingsIcon, Check, Copy, ExternalLink } from 'lucide-react';
 import { fadeInUp } from '@/lib/dashboard-animations';
+import { useTranslation } from 'react-i18next';
 
 interface WorkingHours {
   start: string;
@@ -29,6 +30,8 @@ interface BookingSettingsData {
 }
 
 export default function BookingSettings() {
+  const { t, i18n } = useTranslation('common');
+  const isRTL = i18n.language === 'ar';
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -155,17 +158,17 @@ export default function BookingSettings() {
   const bookingUrl = tenantSlug ? `${typeof window !== 'undefined' ? window.location.origin : ''}/book/${tenantSlug}` : '';
 
   const days = [
-    { key: 'monday', label: 'Monday' },
-    { key: 'tuesday', label: 'Tuesday' },
-    { key: 'wednesday', label: 'Wednesday' },
-    { key: 'thursday', label: 'Thursday' },
-    { key: 'friday', label: 'Friday' },
-    { key: 'saturday', label: 'Saturday' },
-    { key: 'sunday', label: 'Sunday' },
+    { key: 'monday', labelKey: 'settings.booking.monday', label: 'Monday' },
+    { key: 'tuesday', labelKey: 'settings.booking.tuesday', label: 'Tuesday' },
+    { key: 'wednesday', labelKey: 'settings.booking.wednesday', label: 'Wednesday' },
+    { key: 'thursday', labelKey: 'settings.booking.thursday', label: 'Thursday' },
+    { key: 'friday', labelKey: 'settings.booking.friday', label: 'Friday' },
+    { key: 'saturday', labelKey: 'settings.booking.saturday', label: 'Saturday' },
+    { key: 'sunday', labelKey: 'settings.booking.sunday', label: 'Sunday' },
   ] as const;
 
   return (
-    <motion.div variants={fadeInUp} className="space-y-6">
+    <motion.div variants={fadeInUp} className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 px-4 py-3 rounded-xl">
           {error}
@@ -175,7 +178,7 @@ export default function BookingSettings() {
       {success && (
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-300 px-4 py-3 rounded-xl flex items-center">
           <Check className="w-5 h-5 me-2" />
-          Settings saved successfully!
+          {t('settings.booking.settings_saved', 'Settings saved successfully!')}
         </div>
       )}
 
@@ -188,9 +191,9 @@ export default function BookingSettings() {
                 <Calendar className="w-6 h-6 text-[#F97402]" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Enable Online Booking</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.booking.enable_online_booking', 'Enable Online Booking')}</h2>
                 <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-                  Allow customers to book appointments online 24/7
+                  {t('settings.booking.enable_online_booking_description', 'Allow customers to book appointments online 24/7')}
                 </p>
               </div>
             </div>
@@ -207,7 +210,7 @@ export default function BookingSettings() {
 
           {settings.enabled && bookingUrl && (
             <div className="mt-6 p-4 bg-gradient-to-r from-[#F97402]/5 to-[#F13F33]/5 rounded-xl border border-[#F97402]/20">
-              <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Your Booking URL:</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">{t('settings.booking.your_booking_url', 'Your Booking URL:')}</p>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -221,7 +224,7 @@ export default function BookingSettings() {
                   className="px-4 py-2 bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white rounded-lg hover:opacity-90 transition-opacity text-sm flex items-center gap-2"
                 >
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? t('settings.booking.copied', 'Copied!') : t('settings.booking.copy', 'Copy')}
                 </button>
                 <a
                   href={bookingUrl}
@@ -230,7 +233,7 @@ export default function BookingSettings() {
                   className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm flex items-center gap-2"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Open
+                  {t('settings.booking.open', 'Open')}
                 </a>
               </div>
             </div>
@@ -243,13 +246,13 @@ export default function BookingSettings() {
             <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl">
               <SettingsIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">General Settings</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.booking.general_settings', 'General Settings')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Appointment Duration (minutes)
+                {t('settings.booking.appointment_duration', 'Appointment Duration (minutes)')}
               </label>
               <input
                 type="number"
@@ -265,7 +268,7 @@ export default function BookingSettings() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Buffer Time (minutes)
+                {t('settings.booking.buffer_time', 'Buffer Time (minutes)')}
               </label>
               <input
                 type="number"
@@ -281,7 +284,7 @@ export default function BookingSettings() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Advance Booking Days
+                {t('settings.booking.advance_booking_days', 'Advance Booking Days')}
               </label>
               <input
                 type="number"
@@ -305,8 +308,8 @@ export default function BookingSettings() {
                   }
                   className="w-5 h-5 text-[#F97402] border-gray-300 rounded focus:ring-[#F97402]"
                 />
-                <span className="ms-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Require Manual Approval
+                <span className={`${isRTL ? 'me-3' : 'ms-3'} text-sm font-medium text-gray-700 dark:text-gray-300`}>
+                  {t('settings.booking.require_manual_approval', 'Require Manual Approval')}
                 </span>
               </label>
             </div>
@@ -319,11 +322,11 @@ export default function BookingSettings() {
             <div className="p-3 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl">
               <Clock className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Working Hours</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('settings.booking.working_hours', 'Working Hours')}</h2>
           </div>
 
           <div className="space-y-4">
-            {days.map(({ key, label }) => (
+            {days.map(({ key, labelKey, label }) => (
               <div key={key} className="flex items-center gap-4">
                 <div className="w-32">
                   <label className="flex items-center cursor-pointer">
@@ -335,7 +338,7 @@ export default function BookingSettings() {
                       }
                       className="w-4 h-4 text-[#F97402] border-gray-300 rounded focus:ring-[#F97402]"
                     />
-                    <span className="ms-2 font-medium text-gray-700 dark:text-gray-300">{label}</span>
+                    <span className={`${isRTL ? 'me-2' : 'ms-2'} font-medium text-gray-700 dark:text-gray-300`}>{t(labelKey, label)}</span>
                   </label>
                 </div>
 
@@ -350,7 +353,7 @@ export default function BookingSettings() {
                         }
                         className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#F97402] bg-white dark:bg-gray-900"
                       />
-                      <span className="text-gray-500">to</span>
+                      <span className="text-gray-500">{t('settings.booking.to', 'to')}</span>
                       <input
                         type="time"
                         value={settings.workingHours[key].end}
@@ -364,13 +367,13 @@ export default function BookingSettings() {
                       onClick={() => copyToAllDays(key)}
                       className="text-sm text-[#F97402] hover:text-[#F13F33] font-medium transition-colors"
                     >
-                      Copy to all
+                      {t('settings.booking.copy_to_all', 'Copy to all')}
                     </button>
                   </>
                 )}
 
                 {settings.workingHours[key].closed && (
-                  <span className="text-gray-500 italic">Closed</span>
+                  <span className="text-gray-500 italic">{t('settings.booking.closed', 'Closed')}</span>
                 )}
               </div>
             ))}
@@ -378,7 +381,7 @@ export default function BookingSettings() {
         </div>
 
         {/* Save Button */}
-        <div className="flex justify-end">
+        <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
           <button
             type="submit"
             disabled={isSaving}
@@ -387,7 +390,7 @@ export default function BookingSettings() {
             {isSaving && (
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
             )}
-            {isSaving ? 'Saving...' : 'Save Settings'}
+            {isSaving ? t('forms.saving', 'Saving...') : t('settings.save_changes', 'Save Settings')}
           </button>
         </div>
       </form>

@@ -64,21 +64,6 @@ export function useNotifications() {
   }, []);
 
   // Handle connection status changes with notifications
-  useEffect(() => {
-    if (state.isConnected) {
-      addNotification({
-        type: 'success',
-        title: 'Connected',
-        message: 'Real-time updates are now active',
-      });
-    } else if (state.isConnected === false) {
-      addNotification({
-        type: 'error',
-        title: 'Disconnected',
-        message: 'Real-time updates are temporarily unavailable',
-      });
-    }
-  }, [state.isConnected, addNotification]);
 
   const markAsRead = useCallback((notificationId: string) => {
     setState(prev => ({

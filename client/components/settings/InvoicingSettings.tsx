@@ -17,7 +17,8 @@ const FormLabel = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function InvoicingSettings() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
+    const isRTL = i18n.language === 'ar';
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -63,7 +64,7 @@ export default function InvoicingSettings() {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to save settings');
             }
-            toast.success('Invoicing settings saved!');
+            toast.success(t('settings.invoicing.settings_saved', 'Invoicing settings saved!'));
         } catch (error) {
             console.error("Error saving invoicing settings", error);
             toast.error(`Failed to save: ${(error as Error).message}`);
@@ -71,38 +72,38 @@ export default function InvoicingSettings() {
             setSaving(false);
         }
     };
-    
+
     if (loading) {
         return <div className="flex justify-center items-center p-8"><Loader2 className="animate-spin" /></div>;
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><FileText className="w-6 h-6 me-3 text-[#F97402]" /> Invoicing & Estimates</h2>
+                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><FileText className="w-6 h-6 me-3 text-[#F97402]" /> {t('settings.invoicing.title', 'Invoicing & Estimates')}</h2>
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <FormLabel>Invoice Prefix</FormLabel>
-                            <FormInput name="invoicePrefix" value={formData.invoicePrefix} onChange={handleInputChange} placeholder="e.g., INV-" />
+                            <FormLabel>{t('settings.invoicing.invoice_prefix', 'Invoice Prefix')}</FormLabel>
+                            <FormInput name="invoicePrefix" value={formData.invoicePrefix} onChange={handleInputChange} placeholder={t('settings.invoicing.invoice_prefix_placeholder', 'e.g., INV-')} />
                         </div>
                         <div>
-                            <FormLabel>Estimate Prefix</FormLabel>
-                            <FormInput name="estimatePrefix" value={formData.estimatePrefix} onChange={handleInputChange} placeholder="e.g., EST-" />
+                            <FormLabel>{t('settings.invoicing.estimate_prefix', 'Estimate Prefix')}</FormLabel>
+                            <FormInput name="estimatePrefix" value={formData.estimatePrefix} onChange={handleInputChange} placeholder={t('settings.invoicing.estimate_prefix_placeholder', 'e.g., EST-')} />
                         </div>
                     </div>
                     <div>
-                        <FormLabel>Default Payment Terms</FormLabel>
-                        <FormTextarea name="defaultPaymentTerms" value={formData.defaultPaymentTerms} onChange={handleInputChange} rows={3} placeholder="e.g., Payment due within 30 days." />
+                        <FormLabel>{t('settings.invoicing.default_payment_terms', 'Default Payment Terms')}</FormLabel>
+                        <FormTextarea name="defaultPaymentTerms" value={formData.defaultPaymentTerms} onChange={handleInputChange} rows={3} placeholder={t('settings.invoicing.default_payment_terms_placeholder', 'e.g., Payment due within 30 days.')} />
                     </div>
                     <div>
-                        <FormLabel>Default Invoice Notes</FormLabel>
-                        <FormTextarea name="defaultInvoiceNotes" value={formData.defaultInvoiceNotes} onChange={handleInputChange} rows={3} placeholder="e.g., Thank you for your business!" />
+                        <FormLabel>{t('settings.invoicing.default_invoice_notes', 'Default Invoice Notes')}</FormLabel>
+                        <FormTextarea name="defaultInvoiceNotes" value={formData.defaultInvoiceNotes} onChange={handleInputChange} rows={3} placeholder={t('settings.invoicing.default_invoice_notes_placeholder', 'e.g., Thank you for your business!')} />
                     </div>
                 </div>
-                 <div className="flex justify-end mt-8">
+                 <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} mt-8`}>
                      <button type="submit" disabled={saving} className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200">
-                        {saving ? <><Loader2 className="me-2 h-5 w-5 animate-spin" />{t("forms.saving")}</> : <><Save className="me-2 h-5 w-5" /> Save Changes</>}
+                        {saving ? <><Loader2 className="h-5 w-5 animate-spin me-2" />{t("forms.saving")}</> : <><Save className="h-5 w-5 me-2" /> {t('settings.save_changes', 'Save Changes')}</>}
                     </button>
                 </div>
             </div>

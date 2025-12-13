@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useScroll, useTransform, useInView, AnimatePresence, type Variants } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import LanguageSwitcher from "@/components/dashboard/LanguageSwitcher";
 import {
-  Wrench,
   Car,
   Users,
   FileText,
@@ -171,9 +171,14 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-xl flex items-center justify-center shadow-lg shadow-[#F97402]/25">
-                <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </div>
+              <Image
+                src="/icon.png"
+                alt={t('marketing.header.company_name')}
+                width={44}
+                height={44}
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-contain"
+                priority
+              />
               <span className="ms-2 sm:ms-3 text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                 TeraMotors
               </span>
@@ -195,7 +200,7 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center gap-4">
               <LanguageSwitcher />
               <ThemeToggle />
-              <Link href="/login">
+              <Link href="#hero">
                 <motion.button
                   className="text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white transition-colors"
                   whileHover={{ scale: 1.02 }}
@@ -262,7 +267,7 @@ export default function LandingPage() {
                   {t('marketing.navigation.testimonials')}
                 </a>
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-800 space-y-3">
-                  <Link href="/login" className="block">
+                  <Link href="#hero" className="block" onClick={() => setMobileMenuOpen(false)}>
                     <button className="w-full py-3 text-gray-700 dark:text-gray-300 font-semibold hover:text-gray-900 dark:hover:text-white transition-colors text-center">
                       {t('marketing.navigation.sign_in')}
                     </button>
@@ -280,7 +285,7 @@ export default function LandingPage() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section ref={heroRef} className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+      <section id="hero" ref={heroRef} className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-orange-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950" />
 
@@ -383,17 +388,29 @@ export default function LandingPage() {
           >
             <div className="relative mx-auto max-w-5xl">
               <div className="bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-2xl sm:rounded-3xl p-2 sm:p-3 shadow-2xl">
-                <div className="bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden aspect-video flex items-center justify-center">
-                  <div className="text-center p-6 sm:p-12">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-xl">
-                      <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
+                <div className="bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden">
+                  <div className="relative aspect-[16/9]">
+                    <Image
+                      src="/Dashboardpreview.png"
+                      alt={t('marketing.hero.dashboard_preview_alt')}
+                      fill
+                      priority
+                      sizes="(min-width: 1280px) 960px, (min-width: 768px) 80vw, 100vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-t border-gray-100 dark:border-gray-800 px-5 py-4">
+                    <div>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {t('marketing.hero.dashboard_preview')}
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {t('marketing.hero.dashboard_subtitle')}
+                      </p>
                     </div>
-                    <p className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">
-                      Dashboard Preview
-                    </p>
-                    <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1 sm:mt-2">
-                      Beautiful, intuitive interface
-                    </p>
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-2xl flex items-center justify-center shadow-lg shadow-[#F97402]/25">
+                      <BarChart3 className="w-6 h-6 text-white" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -726,9 +743,13 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
             <div>
               <div className="flex items-center mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-xl flex items-center justify-center">
-                  <Wrench className="w-5 h-5 text-white" />
-                </div>
+                <Image
+                  src="/icon.png"
+                  alt={t('marketing.header.company_name')}
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 rounded-2xl object-contain"
+                />
                 <span className="ms-3 text-xl font-bold text-white">TeraMotors</span>
               </div>
               <p className="text-sm dark:text-gray-300">
