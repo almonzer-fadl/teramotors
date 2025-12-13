@@ -128,7 +128,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
         return (
             <div className="flex flex-col items-center justify-center h-full min-h-[100px] text-gray-500 dark:text-gray-400 text-sm text-center">
                 <HelpCircle className="h-6 w-6 mb-1" />
-                No data for summary
+                {t('reports.no_data', 'No data for summary')}
             </div>
         );
     }
@@ -169,7 +169,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Total Revenue: {formatCurrency(totalRevenue)}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{t('reports.pnl.total_revenue', 'Total Revenue')}: {formatCurrency(totalRevenue)}</p>
         </div>
       );
     }
@@ -197,7 +197,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Top services by sales</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{t('reports.sales.top_services', 'Top services by sales')}</p>
         </div>
       );
     }
@@ -218,7 +218,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
             <div className="space-y-1 mt-2">
                 {buckets.map(bucket => (
                     <div key={bucket.label} className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
-                        <span>{bucket.label} Days</span>
+                        <span>{bucket.label} {t('reports.ar_aging.days', 'Days')}</span>
                         <span className="font-medium">{formatCurrency(bucket.value)}</span>
                     </div>
                 ))}
@@ -235,7 +235,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t(titleKey)}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalVatCollected)}</p>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Total VAT collected in last 30 days.</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{t('reports.vat.total_collected', 'Total VAT collected in last 30 days.')}</p>
         </div>
       );
     }
@@ -248,7 +248,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t(titleKey)}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalPaymentsReceived)}</p>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Total payments received in last 30 days.</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{t('reports.payments.total_received', 'Total payments received in last 30 days.')}</p>
         </div>
       );
     }
@@ -261,7 +261,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t(titleKey)}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{formatCurrency(totalInventoryValue)}</p>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Total value of all parts in stock.</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{t('reports.inventory_valuation.total_value', 'Total value of all parts in stock.')}</p>
         </div>
       );
     }
@@ -287,7 +287,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
                 </BarChart>
                 </ResponsiveContainer>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Top technician by revenue (last 30 days).</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{t('reports.technician_performance.top_tech', 'Top technician by revenue (last 30 days).')}</p>
             </div>
         );
     }
@@ -327,10 +327,11 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
 };
 
 export default function ReportsPage() {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+  const isRTL = i18n.language === 'ar';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800" dir={isRTL ? 'rtl' : 'ltr'}>
       <motion.div
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
         variants={staggerContainer}

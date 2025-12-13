@@ -19,21 +19,22 @@ import { InventoryValuationReport } from '@/components/reports/InventoryValuatio
 import { TechnicianPerformanceReport } from '@/components/reports/TechnicianPerformanceReport'; // New import
 
 // Placeholder for report-specific components
-const ReportPlaceholder = ({ title }: { title: string }) => (
+const ReportPlaceholder = ({ title, t }: { title: string; t: any }) => (
     <div className="text-center py-20 bg-gray-100/50 dark:bg-gray-800/20 rounded-2xl">
         <BarChart2 className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
         <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
-            {title} Report
+            {title} {t('reports.report', 'Report')}
         </h3>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            This report is under construction.
+            {t('reports.under_construction', 'This report is under construction.')}
         </p>
     </div>
 );
 
 
 export default function DetailedReportPage() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
+    const isRTL = i18n.language === 'ar';
     const router = useRouter();
     const params = useParams();
     const reportName = params.reportName as string;
@@ -100,7 +101,7 @@ export default function DetailedReportPage() {
             if (reportName === 'payments-received') return <PaymentsReceivedReport data={null} />;
             if (reportName === 'inventory-valuation') return <InventoryValuationReport data={null} />;
             if (reportName === 'technician-performance') return <TechnicianPerformanceReport data={null} />;
-            return <ReportPlaceholder title={reportTitle} />;
+            return <ReportPlaceholder title={reportTitle} t={t} />;
         }
 
         switch(reportName) {
@@ -119,12 +120,12 @@ export default function DetailedReportPage() {
             case 'technician-performance':
                 return <TechnicianPerformanceReport data={data} />;
             default:
-                return <ReportPlaceholder title={reportTitle} />;
+                return <ReportPlaceholder title={reportTitle} t={t} />;
         }
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800" dir={isRTL ? 'rtl' : 'ltr'}>
             <motion.div
                 className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6"
                 variants={staggerContainer}
