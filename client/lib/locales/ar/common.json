@@ -188,6 +188,80 @@
       }
     }
   },
+  "whatsapp": {
+    "title": "رسائل الواتساب",
+    "subtitle": "أرسل التحديثات والفواتير والتنبيهات مباشرة من الورشة عبر الواتساب.",
+    "description": "إدارة وإرسال رسائل واتساب للعملاء",
+    "send_test_message": "إرسال رسالة تجريبية",
+    "message_type": "نوع الرسالة",
+    "language": "اللغة",
+    "customer": "العميل",
+    "select_customer": "اختر العميل",
+    "custom_message": "رسالة مخصصة (اختياري)",
+    "custom_message_placeholder": "اتركها فاضية لو تبي نرسل الرسالة الجاهزة",
+    "preview": "المعاينة:",
+    "message_statistics": "إحصائيات الرسائل",
+    "delivered": "تم التسليم",
+    "sent": "تم الإرسال",
+    "failed": "فشل",
+    "total": "الإجمالي",
+    "message_history": "سجل الرسائل",
+    "recent_messages": "آخر رسائل واتساب تم إرسالها للعملاء",
+    "no_messages": "ما فيه رسائل مرسلة للحين",
+    "phone": "الجوال:",
+    "error": "الخطأ:",
+    "auto_send_enabled": "الإرسال التلقائي مفعّل",
+    "message_templates": {
+      "welcome": "ترحيب",
+      "job_started": "تم فتح كرت العمل",
+      "job_completed": "انتهى العمل",
+      "invoice_ready": "الفاتورة جاهزة",
+      "advertisement": "إعلان"
+    },
+    "status": {
+      "pending": "قيد الإرسال",
+      "sent": "تم الإرسال",
+      "delivered": "تم التسليم",
+      "failed": "فشل"
+    },
+    "stats": {
+      "total": "إجمالي الرسائل",
+      "sent": "تم إرسالها",
+      "failed": "فشلت"
+    },
+    "integration": {
+      "badge": "حالة التكامل",
+      "status_online": "الواتساب متصل",
+      "status_offline": "الواتساب غير متصل",
+      "status_missing": "التكامل غير مفعّل",
+      "not_configured": "اربط حساب Ultramsg علشان تقدر ترسل رسائل واتساب من تيرا موتورز.",
+      "not_configured_detail": "ربط الواتساب غير مهيأ لهذا التينانت.",
+      "not_configured_short": "غير مُعد",
+      "configured_label": "مهيأ",
+      "connected": "اتصال الواتساب ممتاز.",
+      "configured_only": "البيانات محفوظة لكن الحالة غير متصلة.",
+      "test_failed": "ما قدرنا نتأكد من اتصال الواتساب، حاول مرة ثانية.",
+      "testing": "جارٍ الاختبار...",
+      "test_button": "اختبار الاتصال"
+    },
+    "composer": {
+      "title": "إرسال رسالة واتساب",
+      "customer": "العميل",
+      "message": "الرسالة",
+      "placeholder": "اكتب الرسالة هنا...",
+      "select_customer": "اختر العميل...",
+      "send": "إرسال الرسالة"
+    },
+    "history": {
+      "title": "سجل الرسائل",
+      "empty": "ما تم إرسال أي رسائل واتساب حتى الآن.",
+      "status_sent": "تم الإرسال",
+      "status_failed": "فشل"
+    },
+    "notifications": {
+      "sent_success": "تم إرسال الرسالة بنجاح."
+    }
+  },
   "forms": {
     "part_details": "تفاصيل القطعة",
     "service_details": "تفاصيل الخدمة",

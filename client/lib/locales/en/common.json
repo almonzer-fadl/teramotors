@@ -1820,6 +1820,7 @@
   },
   "whatsapp": {
     "title": "WhatsApp Messages",
+    "subtitle": "Send real-time updates, invoices, and reminders directly from your workshop.",
     "description": "Manage and send WhatsApp messages to customers",
     "send_test_message": "Send Test Message",
     "message_type": "Message Type",
@@ -1852,6 +1853,43 @@
       "sent": "Sent",
       "delivered": "Delivered",
       "failed": "Failed"
+    },
+    "stats": {
+      "total": "Total Messages",
+      "sent": "Delivered Successfully",
+      "failed": "Failed to Send"
+    },
+    "integration": {
+      "badge": "Integration Health",
+      "status_online": "WhatsApp Connected",
+      "status_offline": "WhatsApp Offline",
+      "status_missing": "Integration Missing",
+      "not_configured": "Connect your Ultramsg account to send WhatsApp messages from TeraMotors.",
+      "not_configured_detail": "WhatsApp integration is not configured for this tenant.",
+      "configured_label": "Configured",
+      "not_configured_short": "Not Configured",
+      "test_button": "Run Connectivity Test",
+      "testing": "Testing...",
+      "connected": "WhatsApp connection looks good.",
+      "configured_only": "Credentials saved but instance is offline.",
+      "test_failed": "Failed to verify WhatsApp connection. Please try again."
+    },
+    "notifications": {
+      "sent_success": "Message sent successfully."
+    },
+    "composer": {
+      "title": "Send WhatsApp Message",
+      "customer": "Customer",
+      "select_customer": "Select a customer",
+      "message": "Message",
+      "placeholder": "Type your message here...",
+      "send": "Send Message"
+    },
+    "history": {
+      "title": "Message History",
+      "empty": "No WhatsApp messages have been sent yet.",
+      "status_sent": "Sent",
+      "status_failed": "Failed"
     }
   }
 }
