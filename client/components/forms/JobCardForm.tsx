@@ -96,6 +96,7 @@ export default function JobCardForm({
   const [printingInvoice, setPrintingInvoice] = useState(false);
   const [updatingEstimate, setUpdatingEstimate] = useState(false);
   const [updatingInvoice, setUpdatingInvoice] = useState(false);
+  const [updatingInspection, setUpdatingInspection] = useState(false);
   const [formData, setFormData] = useState<JobCardFormData>({
     appointmentId: "",
     customerId: "",

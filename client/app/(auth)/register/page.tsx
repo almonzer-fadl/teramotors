@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
@@ -21,13 +22,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-
-// Step configuration
-const STEPS = [
-  { id: 1, title: "Business Info", description: "Tell us about your workshop" },
-  { id: 2, title: "Account Details", description: "Create your admin account" },
-  { id: 3, title: "Confirmation", description: "Review and confirm" },
-];
+import { signIn } from "@/lib/simple-auth-client";
 
 // Animation variants
 const containerVariants: Variants = {
@@ -96,6 +91,16 @@ interface FormData {
 function RegisterForm() {
   const { t } = useTranslation('common');
   const router = useRouter();
+  const steps = useMemo(() => [
+    { id: 1, title: t('register.steps.business.title'), description: t('register.steps.business.description') },
+    { id: 2, title: t('register.steps.account.title'), description: t('register.steps.account.description') },
+    { id: 3, title: t('register.steps.confirm.title'), description: t('register.steps.confirm.description') },
+  ], [t]);
+  const featureStats = useMemo(() => [
+    { value: t('register.features.trial_value'), label: t('register.features.trial_label') },
+    { value: t('register.features.fee_value'), label: t('register.features.fee_label') },
+    { value: t('register.features.support_value'), label: t('register.features.support_label') },
+  ], [t]);
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -124,29 +129,29 @@ function RegisterForm() {
     switch (step) {
       case 1:
         if (!formData.businessName.trim()) {
-          setError("Business name is required");
+          setError(t('register.errors.business_name'));
           return false;
         }
         if (!formData.businessEmail.trim() || !formData.businessEmail.includes("@")) {
-          setError("Valid business email is required");
+          setError(t('register.errors.business_email'));
           return false;
         }
         return true;
       case 2:
         if (!formData.firstName.trim() || !formData.lastName.trim()) {
-          setError("First and last name are required");
+          setError(t('register.errors.admin_name'));
           return false;
         }
         if (!formData.email.trim() || !formData.email.includes("@")) {
-          setError("Valid email is required");
+          setError(t('register.errors.admin_email'));
           return false;
         }
         if (formData.password.length < 8) {
-          setError("Password must be at least 8 characters");
+          setError(t('register.errors.password_length'));
           return false;
         }
         if (formData.password !== formData.confirmPassword) {
-          setError("Passwords do not match");
+          setError(t('register.errors.password_match'));
           return false;
         }
         return true;
@@ -199,20 +204,22 @@ function RegisterForm() {
       if (response.ok) {
         // After successful creation, immediately log the user in to start the onboarding
         // This requires a separate login API call
-        const loginResponse = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: formData.email, password: formData.password }),
-        });
+        const loginResult = await signIn(formData.email, formData.password);
 
-        if (loginResponse.ok && data.needsOnboarding) {
-            router.push("/onboarding");
-        } else if (loginResponse.ok) {
-            router.push("/dashboard");
-        }
-        else {
-            // If login fails, redirect to login page with a success message
-            router.push("/login?registered=true");
+        if (loginResult.success) {
+          try {
+            await fetch("/api/onboarding/status", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ completed: true })
+            });
+          } catch (onboardingError) {
+            console.error("Failed to update onboarding status", onboardingError);
+          }
+          router.push("/dashboard?welcome=1");
+        } else {
+          // If login fails, redirect to login page with a success message
+          router.push("/login?registered=true");
         }
       } else {
         setError(data.error || "Registration failed. Please try again.");
@@ -239,7 +246,7 @@ function RegisterForm() {
           className="absolute -top-12 left-0 flex items-center text-white/80 hover:text-white transition-colors group"
         >
           <ArrowLeft className="w-5 h-5 me-2 group-hover:-translate-x-1 transition-transform" />
-          Back to login
+          {t('register.back_to_login')}
         </Link>
 
         <motion.div
@@ -261,19 +268,26 @@ function RegisterForm() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
             >
-              <Building2 className="w-10 h-10 text-white" />
+              <Image
+                src="/icon.png"
+                alt="TeraMotors Logo"
+                width={64}
+                height={64}
+                className="w-14 h-14 object-contain rounded-xl"
+                priority
+              />
             </motion.div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Create Your Workshop
+              {t('register.heading')}
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              Start your free trial today
+              {t('register.subheading')}
             </p>
           </div>
 
           {/* Progress Steps */}
           <div className="flex items-center justify-between mb-8 px-4">
-            {STEPS.map((step, index) => (
+            {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">
                 <motion.div
                   className={`
@@ -295,7 +309,7 @@ function RegisterForm() {
                     step.id
                   )}
                 </motion.div>
-                {index < STEPS.length - 1 && (
+                {index < steps.length - 1 && (
                   <div
                     className={`w-12 sm:w-20 h-1 mx-2 rounded-full transition-colors duration-300 ${
                       currentStep > step.id ? "bg-[#F97402]" : "bg-gray-200 dark:bg-gray-700"
@@ -335,7 +349,7 @@ function RegisterForm() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Building2 className="w-4 h-4 inline-block me-2" />
-                    Workshop Name *
+                    {t('register.fields.workshop_name')}
                   </label>
                   <input
                     name="businessName"
@@ -344,14 +358,14 @@ function RegisterForm() {
                     type="text"
                     required
                     className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
-                    placeholder="e.g. Quick Fix Auto Repairs"
+                    placeholder={t('register.placeholders.workshop_name')}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Mail className="w-4 h-4 inline-block me-2" />
-                    Business Email *
+                    {t('register.fields.business_email')}
                   </label>
                   <input
                     name="businessEmail"
@@ -360,14 +374,14 @@ function RegisterForm() {
                     type="email"
                     required
                     className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
-                    placeholder="contact@yourworkshop.com"
+                    placeholder={t('register.placeholders.business_email')}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Phone className="w-4 h-4 inline-block me-2" />
-                    Phone Number
+                    {t('register.fields.business_phone')}
                   </label>
                   <input
                     name="businessPhone"
@@ -375,14 +389,14 @@ function RegisterForm() {
                     onChange={handleInputChange}
                     type="tel"
                     className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
-                    placeholder="+966 50 123 4567"
+                    placeholder={t('register.placeholders.business_phone')}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Globe className="w-4 h-4 inline-block me-2" />
-                    Website (Optional)
+                    {t('register.fields.website_optional')}
                   </label>
                   <input
                     name="website"
@@ -390,7 +404,7 @@ function RegisterForm() {
                     onChange={handleInputChange}
                     type="url"
                     className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
-                    placeholder="https://yourworkshop.com"
+                    placeholder={t('register.placeholders.website')}
                   />
                 </div>
               </motion.div>
@@ -409,7 +423,7 @@ function RegisterForm() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                      First Name *
+                      {t('register.fields.first_name')}
                     </label>
                     <input
                       name="firstName"
@@ -418,12 +432,12 @@ function RegisterForm() {
                       type="text"
                       required
                       className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
-                      placeholder="John"
+                      placeholder={t('register.placeholders.first_name')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
-                      Last Name *
+                      {t('register.fields.last_name')}
                     </label>
                     <input
                       name="lastName"
@@ -432,7 +446,7 @@ function RegisterForm() {
                       type="text"
                       required
                       className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
-                      placeholder="Doe"
+                      placeholder={t('register.placeholders.last_name')}
                     />
                   </div>
                 </div>
@@ -440,7 +454,7 @@ function RegisterForm() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Mail className="w-4 h-4 inline-block me-2" />
-                    Your Email *
+                    {t('register.fields.admin_email')}
                   </label>
                   <input
                     name="email"
@@ -449,14 +463,14 @@ function RegisterForm() {
                     type="email"
                     required
                     className="w-full px-4 py-4 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
-                    placeholder="you@email.com"
+                    placeholder={t('register.placeholders.admin_email')}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Lock className="w-4 h-4 inline-block me-2" />
-                    Password *
+                    {t('register.fields.password')}
                   </label>
                   <div className="relative">
                     <input
@@ -466,7 +480,7 @@ function RegisterForm() {
                       type={showPassword ? "text" : "password"}
                       required
                       className="w-full px-4 py-4 pr-12 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
-                      placeholder="Min. 8 characters"
+                      placeholder={t('register.placeholders.password')}
                     />
                     <button
                       type="button"
@@ -481,7 +495,7 @@ function RegisterForm() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
                     <Lock className="w-4 h-4 inline-block me-2" />
-                    Confirm Password *
+                    {t('register.fields.confirm_password')}
                   </label>
                   <div className="relative">
                     <input
@@ -491,7 +505,7 @@ function RegisterForm() {
                       type={showConfirmPassword ? "text" : "password"}
                       required
                       className="w-full px-4 py-4 pr-12 border-2 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all duration-300 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 bg-white/80 dark:bg-gray-800"
-                      placeholder="Confirm your password"
+                      placeholder={t('register.placeholders.confirm_password')}
                     />
                     <button
                       type="button"
@@ -529,14 +543,14 @@ function RegisterForm() {
                   transition={{ delay: 0.4 }}
                 >
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                    Welcome to TeraMotors!
+                    {t('register.success.title')}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Your workshop <span className="font-semibold text-[#F97402]">{formData.businessName}</span> has been created.
+                    {t('register.success.description', { workshop: formData.businessName || t('register.success.default_workshop') })}
                   </p>
                   <div className="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
                     <Sparkles className="w-4 h-4 me-2 text-[#F97402]" />
-                    Redirecting to login...
+                    {t('register.success.redirect')}
                   </div>
                 </motion.div>
               </motion.div>
@@ -557,7 +571,7 @@ function RegisterForm() {
                 }`}
               >
                 <ArrowLeft className="w-4 h-4 me-2" />
-                Back
+                {t('register.buttons.back')}
               </button>
 
               {currentStep === 2 ? (
@@ -572,11 +586,11 @@ function RegisterForm() {
                   {isLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 me-2 animate-spin" />
-                      Creating...
+                      {t('register.buttons.submitting')}
                     </>
                   ) : (
                     <>
-                      Create Workshop
+                      {t('register.buttons.submit')}
                       <Sparkles className="w-4 h-4 ms-2" />
                     </>
                   )}
@@ -589,7 +603,7 @@ function RegisterForm() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  Continue
+                  {t('register.buttons.continue')}
                   <ArrowRight className="w-4 h-4 ms-2" />
                 </motion.button>
               )}
@@ -599,9 +613,9 @@ function RegisterForm() {
           {/* Footer */}
           {currentStep < 3 && (
             <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-              Already have an account?{" "}
+              {t('register.footer.prompt')}{" "}
               <Link href="/login" className="text-[#F97402] dark:text-[#F97402] font-semibold hover:text-[#F13F33] dark:hover:text-[#F13F33] transition-colors">
-                Sign in
+                {t('register.footer.sign_in')}
               </Link>
             </p>
           )}
@@ -614,17 +628,13 @@ function RegisterForm() {
           initial="hidden"
           animate="visible"
         >
-          {[
-            { icon: "14", label: "Day Free Trial" },
-            { icon: "0", label: "Setup Fees" },
-            { icon: "24/7", label: "Support" },
-          ].map((feature, index) => (
+          {featureStats.map((feature, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
               className="text-white/80"
             >
-              <div className="text-2xl font-bold text-white">{feature.icon}</div>
+              <div className="text-2xl font-bold text-white">{feature.value}</div>
               <div className="text-xs">{feature.label}</div>
             </motion.div>
           ))}

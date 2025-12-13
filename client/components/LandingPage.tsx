@@ -216,24 +216,25 @@ export default function LandingPage() {
   const leftTestimonial = {
     src: '/Testimonials/2.png',
     alt: t('landing_missing.testimonial_2'),
-    className: 'w-full max-w-sm'
+    className: 'w-full max-w-md'
   };
 
-  const rightTestimonials = [
-    {
-      src: '/Testimonials/1.png',
-      alt: t('landing_missing.testimonial_1'),
-      className: 'w-full max-w-xs'
-    },
+  const rightTopTestimonial = {
+    src: '/Testimonials/1.png',
+    alt: t('landing_missing.testimonial_1'),
+    className: 'w-full'
+  };
+
+  const rightBottomTestimonials = [
     {
       src: '/Testimonials/3.png',
       alt: t('landing_missing.testimonial_3'),
-      className: 'w-full max-w-xs'
+      className: 'w-full'
     },
     {
       src: '/Testimonials/4.png',
       alt: t('landing.testimonials.alt_4'),
-      className: 'w-full max-w-xs'
+      className: 'w-full'
     }
   ];
 
@@ -673,12 +674,10 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          {/* Left-Right Layout */}
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
-            {/* Left side - Image 2 */}
+          <div className="flex flex-col lg:flex-row gap-8 items-center">
             <motion.div
-              className="flex-shrink-0"
-              initial={{ opacity: 0, scale: 0.8 }}
+              className="flex-shrink-0 w-full lg:w-2/5"
+              initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true, margin: "-100px" }}
@@ -686,30 +685,36 @@ export default function LandingPage() {
               <TestimonialImage
                 src={leftTestimonial.src}
                 alt={leftTestimonial.alt}
-                className={leftTestimonial.className}
+                className={`${leftTestimonial.className} h-full`}
               />
             </motion.div>
 
-            {/* Right side - Images 1, 3, 4 */}
             <motion.div
-              className="flex flex-wrap justify-center items-center gap-4"
+              className="flex-1 w-full"
               variants={staggerContainer}
               initial="initial"
               whileInView="animate"
               viewport={{ once: true, margin: "-100px" }}
             >
-              {rightTestimonials.map((image, index) => (
-                <motion.div
-                  key={index}
-                  variants={staggerItem}
-                >
-                  <TestimonialImage
-                    src={image.src}
-                    alt={image.alt}
-                    className={image.className}
-                  />
-                </motion.div>
-              ))}
+              <motion.div variants={staggerItem}>
+                <TestimonialImage
+                  src={rightTopTestimonial.src}
+                  alt={rightTopTestimonial.alt}
+                  className={`${rightTopTestimonial.className} mb-4`}
+                />
+              </motion.div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {rightBottomTestimonials.map((image, index) => (
+                  <motion.div key={index} variants={staggerItem}>
+                    <TestimonialImage
+                      src={image.src}
+                      alt={image.alt}
+                      className={image.className}
+                    />
+                  </motion.div>
+                ))}
+              </div>
             </motion.div>
           </div>
         </div>

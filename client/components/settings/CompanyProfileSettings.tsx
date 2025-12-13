@@ -14,7 +14,8 @@ const FormLabel = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function CompanyProfileSettings() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
+    const isRTL = i18n.language === 'ar';
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     
@@ -170,25 +171,25 @@ export default function CompanyProfileSettings() {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8" dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Business Details */}
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Building className="w-6 h-6 me-3 text-[#F97402]" /> Business Details</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Building className="w-6 h-6 me-3 text-[#F97402]" /> {t('settings.company_profile.business_details', 'Business Details')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <FormLabel>Company Name (English)</FormLabel>
+                        <FormLabel>{t('settings.company_profile.company_name_en', 'Company Name (English)')}</FormLabel>
                         <FormInput name="name" value={formData.companyInfo.name} onChange={handleInfoChange} />
                     </div>
                     <div>
-                        <FormLabel>Company Name (Arabic)</FormLabel>
+                        <FormLabel>{t('settings.company_profile.company_name_ar', 'Company Name (Arabic)')}</FormLabel>
                         <FormInput name="nameAr" value={formData.companyInfo.nameAr} onChange={handleInfoChange} dir="rtl" />
                     </div>
                      <div>
-                        <FormLabel>VAT Number</FormLabel>
+                        <FormLabel>{t('settings.company_profile.vat_number', 'VAT Number')}</FormLabel>
                         <FormInput name="vatNumber" value={formData.companyInfo.vatNumber} onChange={handleInfoChange} />
                     </div>
                      <div>
-                        <FormLabel>Commercial Registration No.</FormLabel>
+                        <FormLabel>{t('settings.company_profile.cr_number', 'Commercial Registration No.')}</FormLabel>
                         <FormInput name="crNumber" value={formData.companyInfo.crNumber} onChange={handleInfoChange} />
                     </div>
                 </div>
@@ -196,23 +197,23 @@ export default function CompanyProfileSettings() {
 
              {/* Address Details */}
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Mail className="w-6 h-6 me-3 text-[#F97402]" /> Address Details</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Mail className="w-6 h-6 me-3 text-[#F97402]" /> {t('settings.company_profile.address_details', 'Address Details')}</h2>
                  <div className="space-y-6">
                      <div>
-                        <FormLabel>Street Address</FormLabel>
+                        <FormLabel>{t('settings.company_profile.street_address', 'Street Address')}</FormLabel>
                         <FormInput name="street" value={formData.companyInfo.address.street} onChange={handleAddressChange} />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <FormLabel>City</FormLabel>
+                            <FormLabel>{t('settings.company_profile.city', 'City')}</FormLabel>
                             <FormInput name="city" value={formData.companyInfo.address.city} onChange={handleAddressChange} />
                         </div>
                         <div>
-                            <FormLabel>District</FormLabel>
+                            <FormLabel>{t('settings.company_profile.district', 'District')}</FormLabel>
                             <FormInput name="district" value={formData.companyInfo.address.district} onChange={handleAddressChange} />
                         </div>
                          <div>
-                            <FormLabel>Postal Code</FormLabel>
+                            <FormLabel>{t('settings.company_profile.postal_code', 'Postal Code')}</FormLabel>
                             <FormInput name="postalCode" value={formData.companyInfo.address.postalCode} onChange={handleAddressChange} />
                         </div>
                     </div>
@@ -221,24 +222,24 @@ export default function CompanyProfileSettings() {
 
              {/* Contact & Branding */}
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Palette className="w-6 h-6 me-3 text-[#F97402]" /> Contact & Branding</h2>
+                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Palette className="w-6 h-6 me-3 text-[#F97402]" /> {t('settings.company_profile.contact_branding', 'Contact & Branding')}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel>{t('settings.company_profile.phone', 'Phone Number')}</FormLabel>
                         <FormInput name="phone" value={formData.companyInfo.phone} onChange={handleInfoChange} />
                     </div>
                     <div>
-                        <FormLabel>Email Address</FormLabel>
+                        <FormLabel>{t('settings.company_profile.email', 'Email Address')}</FormLabel>
                         <FormInput name="email" type="email" value={formData.companyInfo.email} onChange={handleInfoChange} />
                     </div>
                     <div>
-                        <FormLabel>Website</FormLabel>
+                        <FormLabel>{t('settings.company_profile.website', 'Website')}</FormLabel>
                         <FormInput name="website" type="url" value={formData.companyInfo.website} onChange={handleInfoChange} placeholder="https://example.com" />
                     </div>
                      <div>
-                        <FormLabel>Company Logo</FormLabel>
+                        <FormLabel>{t('settings.company_profile.logo', 'Company Logo')}</FormLabel>
                         <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*" />
-                        <div className="flex items-center space-x-4">
+                        <div className={`flex items-center ${isRTL ? 'space-x-reverse' : ''} space-x-4`}>
                             {previewUrl && (
                                 <img src={previewUrl} alt="Logo Preview" className="h-20 w-20 object-contain rounded-xl border border-gray-200 dark:border-gray-700" />
                             )}
@@ -248,7 +249,7 @@ export default function CompanyProfileSettings() {
                                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
                                 disabled={uploadingLogo}
                             >
-                                {selectedFile ? 'Change File' : 'Select Logo'}
+                                {selectedFile ? t('settings.company_profile.change_file', 'Change File') : t('settings.company_profile.select_logo', 'Select Logo')}
                             </button>
                             {selectedFile && (
                                 <button
@@ -257,20 +258,20 @@ export default function CompanyProfileSettings() {
                                     className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50"
                                     disabled={uploadingLogo}
                                 >
-                                    {uploadingLogo ? <Loader2 className="me-2 h-5 w-5 animate-spin" /> : 'Upload'}
+                                    {uploadingLogo ? <Loader2 className="h-5 w-5 animate-spin me-2" /> : t('settings.company_profile.upload', 'Upload')}
                                 </button>
                             )}
                             {!selectedFile && formData.branding.logoUrl && (
-                                <a href={formData.branding.logoUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline">View Current</a>
+                                <a href={formData.branding.logoUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline">{t('settings.company_profile.view_current', 'View Current')}</a>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
                  <button type="submit" disabled={saving || uploadingLogo} className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200">
-                    {saving ? <><Loader2 className="me-2 h-5 w-5 animate-spin" />{t("forms.saving")}</> : <><Save className="me-2 h-5 w-5" /> Save Changes</>}
+                    {saving ? <><Loader2 className="h-5 w-5 animate-spin me-2" />{t("forms.saving")}</> : <><Save className="h-5 w-5 me-2" /> {t('settings.save_changes', 'Save Changes')}</>}
                 </button>
             </div>
         </form>

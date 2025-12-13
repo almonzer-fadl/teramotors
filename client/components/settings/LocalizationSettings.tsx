@@ -14,7 +14,8 @@ const FormLabel = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function LocalizationSettings() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
+    const isRTL = i18n.language === 'ar';
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -60,7 +61,7 @@ export default function LocalizationSettings() {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to save settings');
             }
-            toast.success('Localization settings saved!');
+            toast.success(t('settings.localization.settings_saved', 'Localization settings saved!'));
         } catch (error) {
             console.error("Error saving localization settings", error);
             toast.error(`Failed to save: ${(error as Error).message}`);
@@ -68,43 +69,42 @@ export default function LocalizationSettings() {
             setSaving(false);
         }
     };
-    
+
     if (loading) {
         return <div className="flex justify-center items-center p-8"><Loader2 className="animate-spin" /></div>;
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Globe className="w-6 h-6 me-3 text-[#F97402]" /> Localization</h2>
+                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Globe className="w-6 h-6 me-3 text-[#F97402]" /> {t('settings.localization.title', 'Localization')}</h2>
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <FormLabel>Timezone</FormLabel>
+                            <FormLabel>{t('settings.localization.timezone', 'Timezone')}</FormLabel>
                             <FormSelect name="timezone" value={formData.timezone} onChange={handleInputChange}>
                                 <option value="Asia/Riyadh">Asia/Riyadh (GMT+3)</option>
-                                {/* Add other timezones as needed */}
                             </FormSelect>
                         </div>
                         <div>
-                            <FormLabel>Currency</FormLabel>
+                            <FormLabel>{t('settings.localization.currency', 'Currency')}</FormLabel>
                             <FormSelect name="currency" value={formData.currency} onChange={handleInputChange}>
-                                <option value="SAR">SAR - Saudi Riyal</option>
-                                <option value="USD">USD - US Dollar</option>
-                                <option value="EUR">EUR - Euro</option>
+                                <option value="SAR">{t('settings.localization.sar', 'SAR - Saudi Riyal')}</option>
+                                <option value="USD">{t('settings.localization.usd', 'USD - US Dollar')}</option>
+                                <option value="EUR">{t('settings.localization.eur', 'EUR - Euro')}</option>
                             </FormSelect>
                         </div>
                     </div>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <FormLabel>Default Language</FormLabel>
+                            <FormLabel>{t('settings.localization.default_language', 'Default Language')}</FormLabel>
                              <FormSelect name="locale" value={formData.locale} onChange={handleInputChange}>
-                                <option value="ar-SA">Arabic (Saudi Arabia)</option>
-                                <option value="en-US">English (US)</option>
+                                <option value="ar-SA">{t('settings.localization.arabic_saudi', 'Arabic (Saudi Arabia)')}</option>
+                                <option value="en-US">{t('settings.localization.english_us', 'English (US)')}</option>
                             </FormSelect>
                         </div>
                         <div>
-                            <FormLabel>Date Format</FormLabel>
+                            <FormLabel>{t('settings.localization.date_format', 'Date Format')}</FormLabel>
                              <FormSelect name="dateFormat" value={formData.dateFormat} onChange={handleInputChange}>
                                 <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                                 <option value="MM/DD/YYYY">MM/DD/YYYY</option>
@@ -113,9 +113,9 @@ export default function LocalizationSettings() {
                         </div>
                     </div>
                 </div>
-                 <div className="flex justify-end mt-8">
+                 <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} mt-8`}>
                      <button type="submit" disabled={saving} className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200">
-                        {saving ? <><Loader2 className="me-2 h-5 w-5 animate-spin" />{t("forms.saving")}</> : <><Save className="me-2 h-5 w-5" /> Save Changes</>}
+                        {saving ? <><Loader2 className="h-5 w-5 animate-spin me-2" />{t("forms.saving")}</> : <><Save className="h-5 w-5 me-2" /> {t('settings.save_changes', 'Save Changes')}</>}
                     </button>
                 </div>
             </div>

@@ -14,7 +14,8 @@ const FormLabel = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function IntegrationsSettings() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
+    const isRTL = i18n.language === 'ar';
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -75,7 +76,7 @@ export default function IntegrationsSettings() {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to save settings');
             }
-            toast.success('Integrations settings saved!');
+            toast.success(t('settings.integrations.settings_saved', 'Integrations settings saved!'));
         } catch (error) {
             console.error("Error saving integrations settings", error);
             toast.error(`Failed to save: ${(error as Error).message}`);
@@ -83,60 +84,60 @@ export default function IntegrationsSettings() {
             setSaving(false);
         }
     };
-    
+
     if (loading) {
         return <div className="flex justify-center items-center p-8"><Loader2 className="animate-spin" /></div>;
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-8" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Mail className="w-6 h-6 me-3 text-[#F97402]" /> SMTP (Email) Settings</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Mail className="w-6 h-6 me-3 text-[#F97402]" /> {t('settings.integrations.smtp_settings', 'SMTP (Email) Settings')}</h2>
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <FormLabel>SMTP Host</FormLabel>
-                            <FormInput name="host" value={formData.smtp.host} onChange={handleSmtpChange} placeholder="smtp.example.com" />
+                            <FormLabel>{t('settings.integrations.smtp_host', 'SMTP Host')}</FormLabel>
+                            <FormInput name="host" value={formData.smtp.host} onChange={handleSmtpChange} placeholder={t('settings.integrations.smtp_host_placeholder', 'smtp.example.com')} />
                         </div>
                         <div>
-                            <FormLabel>SMTP Port</FormLabel>
-                            <FormInput name="port" type="number" value={formData.smtp.port} onChange={handleSmtpChange} placeholder="587" />
+                            <FormLabel>{t('settings.integrations.smtp_port', 'SMTP Port')}</FormLabel>
+                            <FormInput name="port" type="number" value={formData.smtp.port} onChange={handleSmtpChange} placeholder={t('settings.integrations.smtp_port_placeholder', '587')} />
                         </div>
                     </div>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <FormLabel>Username</FormLabel>
+                            <FormLabel>{t('settings.integrations.username', 'Username')}</FormLabel>
                             <FormInput name="user" value={formData.smtp.user} onChange={handleSmtpChange} />
                         </div>
                         <div>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel>{t('settings.integrations.password', 'Password')}</FormLabel>
                             <FormInput name="password" type="password" value={formData.smtp.password} onChange={handleSmtpChange} />
                         </div>
                     </div>
                     <div>
-                        <FormLabel>From Email</FormLabel>
-                        <FormInput name="fromEmail" type="email" value={formData.smtp.fromEmail} onChange={handleSmtpChange} placeholder="noreply@example.com" />
+                        <FormLabel>{t('settings.integrations.from_email', 'From Email')}</FormLabel>
+                        <FormInput name="fromEmail" type="email" value={formData.smtp.fromEmail} onChange={handleSmtpChange} placeholder={t('settings.integrations.from_email_placeholder', 'noreply@example.com')} />
                     </div>
                 </div>
             </div>
 
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><MessageSquare className="w-6 h-6 me-3 text-[#F97402]" /> WhatsApp (Ultramsg) Settings</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><MessageSquare className="w-6 h-6 me-3 text-[#F97402]" /> {t('settings.integrations.whatsapp_settings', 'WhatsApp (Ultramsg) Settings')}</h2>
                 <div className="space-y-6">
                     <div>
-                        <FormLabel>Ultramsg Instance ID</FormLabel>
-                        <FormInput name="instanceId" value={formData.whatsapp.instanceId} onChange={handleWhatsappChange} placeholder="instance12345" />
+                        <FormLabel>{t('settings.integrations.ultramsg_instance_id', 'Ultramsg Instance ID')}</FormLabel>
+                        <FormInput name="instanceId" value={formData.whatsapp.instanceId} onChange={handleWhatsappChange} placeholder={t('settings.integrations.ultramsg_instance_placeholder', 'instance12345')} />
                     </div>
                     <div>
-                        <FormLabel>Ultramsg Token</FormLabel>
+                        <FormLabel>{t('settings.integrations.ultramsg_token', 'Ultramsg Token')}</FormLabel>
                         <FormInput name="token" type="password" value={formData.whatsapp.token} onChange={handleWhatsappChange} />
                     </div>
                 </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
                  <button type="submit" disabled={saving} className="inline-flex items-center justify-center px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200">
-                    {saving ? <><Loader2 className="me-2 h-5 w-5 animate-spin" />{t("forms.saving")}</> : <><Save className="me-2 h-5 w-5" /> Save Changes</>}
+                    {saving ? <><Loader2 className="h-5 w-5 animate-spin me-2" />{t("forms.saving")}</> : <><Save className="h-5 w-5 me-2" /> {t('settings.save_changes', 'Save Changes')}</>}
                 </button>
             </div>
         </form>

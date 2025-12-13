@@ -2,10 +2,11 @@
 
 import { signIn } from "@/lib/simple-auth-client";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { Wrench, ArrowLeft, Eye, EyeOff, Loader2, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Loader2, CheckCircle2, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
@@ -155,10 +156,17 @@ function LoginForm() {
             <motion.div
               className="w-20 h-20 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#F97402]/25"
               variants={itemVariants}
-              whileHover={{ scale: 1.05, rotate: 5 }}
+              whileHover={{ scale: 1.05, rotate: 2 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <Wrench className="w-10 h-10 text-white" />
+              <Image
+                src="/icon.png"
+                alt="TeraMotors Logo"
+                width={64}
+                height={64}
+                className="w-14 h-14 object-contain rounded-xl"
+                priority
+              />
             </motion.div>
             <motion.h1
               className="text-3xl font-bold text-gray-900 dark:text-white mb-3"

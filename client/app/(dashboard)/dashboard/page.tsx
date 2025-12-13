@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Users,
@@ -30,6 +31,7 @@ import ModernDashboardWidget from "@/components/dashboard/ModernDashboardWidget"
 import { socketService } from "@/lib/services/socket";
 import { useTranslation } from "react-i18next";
 import { useSession } from "@/lib/hooks/useSession";
+import { launchDashboardTour } from "@/components/dashboard/Tour";
 
 interface DashboardStats {
   totalCustomers: number;
@@ -123,6 +125,8 @@ const LoadingSpinner = () => (
 export default function DashboardPage() {
   const { t } = useTranslation("common");
   const { user, isLoading, isAuthenticated } = useSession();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const isAdmin = user?.role === 'admin';
   const [stats, setStats] = useState<DashboardStats>({
     totalCustomers: 0,
@@ -155,6 +159,8 @@ export default function DashboardPage() {
   ];
 
   const [loading, setLoading] = useState(true);
+  const [showWelcomeCard, setShowWelcomeCard] = useState(false);
+  const [taskCompletion, setTaskCompletion] = useState<Record<string, boolean>>({});
   const [modernWidgetData, setModernWidgetData] = useState<ModernWidgetData>({
     tiles: [],
     activeJobCards: [],
@@ -165,6 +171,89 @@ export default function DashboardPage() {
       dueAmount: '0'
     }
   });
+  const welcomeTasks = useMemo(() => [
+    {
+      id: 'profile',
+      icon: Settings,
+      title: t('dashboard_welcome.tasks.profile.title'),
+      description: t('dashboard_welcome.tasks.profile.description'),
+      actionLabel: t('dashboard_welcome.tasks.profile.action'),
+      href: '/settings/organization'
+    },
+    {
+      id: 'customer',
+      icon: Users,
+      title: t('dashboard_welcome.tasks.customer.title'),
+      description: t('dashboard_welcome.tasks.customer.description'),
+      actionLabel: t('dashboard_welcome.tasks.customer.action'),
+      href: '/customers/new'
+    },
+    {
+      id: 'jobcard',
+      icon: ClipboardList,
+      title: t('dashboard_welcome.tasks.jobcard.title'),
+      description: t('dashboard_welcome.tasks.jobcard.description'),
+      actionLabel: t('dashboard_welcome.tasks.jobcard.action'),
+      href: '/job-cards/new'
+    }
+  ], [t]);
+  const allTasksComplete = welcomeTasks.every(task => taskCompletion[task.id]);
+
+  const handleToggleTask = (id: string) => {
+    setTaskCompletion(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const handleSkipWelcome = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('dashboard-welcome-dismissed', 'true');
+    }
+    setShowWelcomeCard(false);
+  };
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (typeof window === 'undefined') return;
+    const storedTasks = localStorage.getItem('dashboard-welcome-tasks');
+    if (storedTasks) {
+      try {
+        setTaskCompletion(JSON.parse(storedTasks));
+      } catch (err) {
+        console.error("Failed to parse welcome tasks", err);
+      }
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('dashboard-welcome-tasks', JSON.stringify(taskCompletion));
+  }, [taskCompletion]);
+
+  useEffect(() => {
+    if (allTasksComplete && showWelcomeCard) {
+      handleSkipWelcome();
+    }
+  }, [allTasksComplete]);
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (typeof window === 'undefined') return;
+    const welcomeFlag = searchParams?.get('welcome');
+    const dismissed = localStorage.getItem('dashboard-welcome-dismissed') === 'true';
+
+    if (welcomeFlag === '1') {
+      if (!dismissed) {
+        setShowWelcomeCard(true);
+        launchDashboardTour();
+      }
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('welcome');
+      const query = params.toString();
+      router.replace(`/dashboard${query ? `?${query}` : ''}`);
+    }
+  }, [searchParams, router, isLoading]);
 
   useEffect(() => {
     // Only fetch stats and generate tiles when user session is loaded
@@ -369,6 +458,67 @@ export default function DashboardPage() {
           tiles={modernWidgetData.tiles}
         />
       </motion.div>
+
+      {showWelcomeCard && !allTasksComplete && (
+        <motion.div
+          className="mb-10 rounded-3xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-6 shadow-xl shadow-gray-200/40 dark:shadow-none"
+          variants={sectionVariants}
+          initial="initial"
+          animate="animate"
+        >
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-gray-500 dark:text-gray-400">{t('dashboard_welcome.badge')}</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{t('dashboard_welcome.title')}</h2>
+              <p className="text-gray-600 dark:text-gray-300">{t('dashboard_welcome.subtitle')}</p>
+            </div>
+            <button
+              onClick={handleSkipWelcome}
+              className="text-sm font-semibold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+            >
+              {t('dashboard_welcome.skip')}
+            </button>
+          </div>
+          <div className="grid gap-4">
+            {welcomeTasks.map(task => {
+              const Icon = task.icon;
+              const done = !!taskCompletion[task.id];
+              return (
+                <div key={task.id} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border border-gray-100 dark:border-gray-800 rounded-2xl p-4">
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${done ? 'bg-emerald-500/10 text-emerald-600' : 'bg-primary/10 text-primary'}`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white">{task.title}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{task.description}</p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          onClick={() => handleToggleTask(task.id)}
+                          className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${
+                            done
+                              ? 'border-emerald-500/40 text-emerald-600 bg-emerald-500/10'
+                              : 'border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-primary hover:text-primary'
+                          }`}
+                        >
+                          {done ? t('dashboard_welcome.completed') : t('dashboard_welcome.mark_done')}
+                        </button>
+                        <Link
+                          href={task.href}
+                          className="text-xs font-semibold text-primary hover:text-[#F13F33] inline-flex items-center gap-1"
+                        >
+                          {task.actionLabel}
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
 
       {/* Active Job Cards Section */}
       <motion.div

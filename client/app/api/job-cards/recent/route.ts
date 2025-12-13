@@ -1,17 +1,24 @@
 import { NextResponse } from 'next/server'
 import { connectToDatabase } from '@/lib/db'
-import { JobCard, Service, Customer, Vehicle } from '@/lib/models'
+import { JobCard } from '@/lib/models'
 import mongoose from 'mongoose'
+import { getServerSession } from '@/lib/auth-server'
 
 export async function GET() {
   try {
+    const session = await getServerSession();
+    if (!session || !(session.user as any)?.tenantId) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
     await connectToDatabase()
 
     // Ensure all models are registered
     console.log('Available models:', Object.keys(mongoose.models));
 
     const recent = await JobCard.find({
-      status: { $in: ['pending', 'in-progress'] }
+      status: { $in: ['pending', 'in-progress'] },
+      tenantId: (session.user as any).tenantId
     })
       .sort({ createdAt: -1 })
       .limit(9)

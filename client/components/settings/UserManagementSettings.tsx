@@ -45,7 +45,8 @@ const FormLabel = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function UserManagementSettings() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
+    const isRTL = i18n.language === 'ar';
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState<any[]>([]);
 
@@ -63,9 +64,12 @@ export default function UserManagementSettings() {
             const response = await fetch('/api/users');
             if (response.ok) {
                 const data = await response.json();
-                setUsers(data);
+                console.log('Fetched users:', data); // Debug log
+                setUsers(Array.isArray(data) ? data : []);
             } else {
-                 toast.error("Failed to load users.");
+                const errorData = await response.json();
+                console.error("Failed to load users:", errorData);
+                toast.error(errorData.error || "Failed to load users.");
             }
         } catch (error) {
             console.error("Failed to fetch users:", error);
@@ -80,7 +84,7 @@ export default function UserManagementSettings() {
     }, []);
     
     const handleResetPassword = async (userId: string) => {
-        if (confirm('Are you sure you want to reset the password for this user? They will receive "TempPass123!"')) {
+        if (confirm(t('settings.user_management.confirm_reset_password', 'Are you sure you want to reset the password for this user? They will receive "TempPass123!"'))) {
             try {
                 const response = await fetch(`/api/users/${userId}/reset-password`, {
                     method: 'POST',
@@ -89,7 +93,7 @@ export default function UserManagementSettings() {
                 if (response.ok) {
                     toast.success(data.message);
                 } else {
-                    throw new Error(data.error || 'Failed to reset password');
+                    throw new Error(data.error || t('settings.user_management.reset_password_failed', 'Failed to reset password'));
                 }
             } catch (error) {
                 console.error("Error resetting password:", error);
@@ -112,11 +116,11 @@ export default function UserManagementSettings() {
             });
             const data = await response.json();
             if (response.ok) {
-                toast.success('User added successfully!');
+                toast.success(t('settings.user_management.user_added', 'User added successfully!'));
                 setShowAddUserModal(false);
                 fetchUsers();
             } else {
-                throw new Error(data.error || 'Failed to add user');
+                throw new Error(data.error || t('settings.user_management.add_user_failed', 'Failed to add user'));
             }
         } catch (error) {
             console.error("Error adding user:", error);
@@ -137,11 +141,11 @@ export default function UserManagementSettings() {
             });
             const data = await response.json();
             if (response.ok) {
-                toast.success(`Role updated for ${userToEditRole.firstName}.`);
+                toast.success(t('settings.user_management.role_updated', `Role updated for ${userToEditRole.firstName}.`));
                 setShowEditRoleModal(false);
                 fetchUsers();
             } else {
-                throw new Error(data.error || 'Failed to update role');
+                throw new Error(data.error || t('settings.user_management.update_role_failed', 'Failed to update role'));
             }
         } catch (error) {
             console.error("Error updating role:", error);
@@ -153,7 +157,7 @@ export default function UserManagementSettings() {
 
     const handleToggleStatus = async (userId: string, currentStatus: string) => {
         const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-        if (confirm(`Are you sure you want to ${newStatus} this user?`)) {
+        if (confirm(t('settings.user_management.confirm_toggle_status', `Are you sure you want to ${newStatus} this user?`))) {
             try {
                 const response = await fetch(`/api/users/${userId}/status`, {
                     method: 'PUT',
@@ -162,10 +166,10 @@ export default function UserManagementSettings() {
                 });
                 const data = await response.json();
                 if (response.ok) {
-                    toast.success(`User status updated to ${newStatus}.`);
+                    toast.success(t('settings.user_management.status_updated', `User status updated to ${newStatus}.`));
                     fetchUsers();
                 } else {
-                    throw new Error(data.error || 'Failed to update status');
+                    throw new Error(data.error || t('settings.user_management.update_status_failed', 'Failed to update status'));
                 }
             } catch (error) {
                 console.error("Error updating status:", error);
@@ -175,17 +179,17 @@ export default function UserManagementSettings() {
     };
 
     const handleDeleteUser = async (userId: string) => {
-        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        if (confirm(t('settings.user_management.confirm_delete', 'Are you sure you want to delete this user? This action cannot be undone.'))) {
             try {
                 const response = await fetch(`/api/users/${userId}`, {
                     method: 'DELETE',
                 });
                 const data = await response.json();
                 if (response.ok) {
-                    toast.success('User deleted successfully.');
+                    toast.success(t('settings.user_management.user_deleted', 'User deleted successfully.'));
                     fetchUsers();
                 } else {
-                    throw new Error(data.error || 'Failed to delete user');
+                    throw new Error(data.error || t('settings.user_management.delete_failed', 'Failed to delete user'));
                 }
             } catch (error) {
                 console.error("Error deleting user:", error);
@@ -199,77 +203,86 @@ export default function UserManagementSettings() {
     }
 
     return (
-         <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
+         <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center"><Users className="w-6 h-6 me-3 text-[#F97402]" /> User Management</h2>
-                 <button 
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center"><Users className="w-6 h-6 me-3 text-[#F97402]" /> {t('settings.user_management.title', 'User Management')}</h2>
+                 <button
                     onClick={() => setShowAddUserModal(true)}
                     className="inline-flex items-center justify-center px-4 py-2 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
                 >
                     <UserPlus className="w-5 h-5 me-2" />
-                    Add User
+                    {t('settings.user_management.add_user', 'Add User')}
                 </button>
             </div>
             <div className="overflow-x-auto">
                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead className="bg-gray-50/80 dark:bg-gray-800/80">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                            <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider`}>{t('settings.user_management.user', 'User')}</th>
+                            <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider`}>{t('settings.user_management.role', 'Role')}</th>
+                            <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider`}>{t('settings.user_management.status', 'Status')}</th>
+                            <th className={`px-6 py-3 ${isRTL ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider`}>{t('settings.user_management.actions', 'Actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-                        {users.map((user) => (
-                            <tr key={user._id}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-medium text-gray-900 dark:text-white">{user.firstName} {user.lastName}</div>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 capitalize">{user.role}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <StatBadge status={user.status} />
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-4">
-                                    <button 
-                                        onClick={() => { setUserToEditRole(user); setNewRole(user.role); setShowEditRoleModal(true); }}
-                                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" title="Edit Role"><Edit className="w-5 h-5" /></button>
-                                    <button onClick={() => handleResetPassword(user._id)} className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300" title="Reset Password"><Key className="w-5 h-5" /></button>
-                                    <button 
-                                        onClick={() => handleToggleStatus(user._id, user.status)}
-                                        className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200" title={user.status === 'active' ? 'Deactivate' : 'Activate'}>
-                                        {user.status === 'active' ? <ToggleLeft className="w-5 h-5" /> : <ToggleRight className="w-5 h-5" />}
-                                    </button>
-                                    <button 
-                                        onClick={() => handleDeleteUser(user._id)}
-                                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" title="Delete User"><Trash2 className="w-5 h-5" /></button>
+                        {users.length === 0 ? (
+                            <tr>
+                                <td colSpan={4} className="px-6 py-12 text-center">
+                                    <Users className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                                    <p className="text-gray-500 dark:text-gray-400">{t('settings.user_management.no_users', 'No users found. Add a user to get started.')}</p>
                                 </td>
                             </tr>
-                        ))}
+                        ) : (
+                            users.map((user) => (
+                                <tr key={user._id}>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm font-medium text-gray-900 dark:text-white">{user.firstName} {user.lastName}</div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 capitalize">{user.role}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <StatBadge status={user.status} />
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-4">
+                                        <button
+                                            onClick={() => { setUserToEditRole(user); setNewRole(user.role); setShowEditRoleModal(true); }}
+                                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300" title={t('settings.user_management.edit_role', 'Edit Role')}><Edit className="w-5 h-5" /></button>
+                                        <button onClick={() => handleResetPassword(user._id)} className="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300" title={t('settings.user_management.reset_password', 'Reset Password')}><Key className="w-5 h-5" /></button>
+                                        <button
+                                            onClick={() => handleToggleStatus(user._id, user.status)}
+                                            className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200" title={user.status === 'active' ? t('settings.user_management.deactivate', 'Deactivate') : t('settings.user_management.activate', 'Activate')}>
+                                            {user.status === 'active' ? <ToggleLeft className="w-5 h-5" /> : <ToggleRight className="w-5 h-5" />}
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteUser(user._id)}
+                                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300" title={t('settings.user_management.delete_user', 'Delete User')}><Trash2 className="w-5 h-5" /></button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                     </tbody>
                 </table>
             </div>
 
             {/* Add User Modal */}
-            <Modal isOpen={showAddUserModal} onClose={() => setShowAddUserModal(false)} title="Add New User">
+            <Modal isOpen={showAddUserModal} onClose={() => setShowAddUserModal(false)} title={t('settings.user_management.add_new_user', 'Add New User')}>
                 <form onSubmit={handleAddUser} className="space-y-4">
                     <div>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>{t('settings.user_management.first_name', 'First Name')}</FormLabel>
                         <FormInput name="firstName" required />
                     </div>
                     <div>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>{t('settings.user_management.last_name', 'Last Name')}</FormLabel>
                         <FormInput name="lastName" required />
                     </div>
                     <div>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t('settings.user_management.email', 'Email')}</FormLabel>
                         <FormInput name="email" type="email" required />
                     </div>
                     <div>
-                        <FormLabel>Role</FormLabel>
-                        <select 
-                            name="role" 
+                        <FormLabel>{t('settings.user_management.role', 'Role')}</FormLabel>
+                        <select
+                            name="role"
                             defaultValue="mechanic"
                             className="w-full px-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
                             required
@@ -277,25 +290,25 @@ export default function UserManagementSettings() {
                             {roles.map(r => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
                         </select>
                     </div>
-                    <div className="flex justify-end">
-                        <button 
-                            type="submit" 
+                    <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
+                        <button
+                            type="submit"
                             disabled={submitting}
                             className="inline-flex items-center justify-center px-4 py-2 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
                         >
                             {submitting ? <Loader2 className="me-2 h-5 w-5 animate-spin" /> : <UserPlus className="w-5 h-5 me-2" />}
-                            Add User
+                            {t('settings.user_management.add_user', 'Add User')}
                         </button>
                     </div>
                 </form>
             </Modal>
 
             {/* Edit Role Modal */}
-            <Modal isOpen={showEditRoleModal} onClose={() => setShowEditRoleModal(false)} title={`Edit Role for ${userToEditRole?.firstName || ''} ${userToEditRole?.lastName || ''}`}>
+            <Modal isOpen={showEditRoleModal} onClose={() => setShowEditRoleModal(false)} title={t('settings.user_management.edit_role_for', `Edit Role for ${userToEditRole?.firstName || ''} ${userToEditRole?.lastName || ''}`)}>
                 <div className="space-y-4">
                     <div>
-                        <FormLabel>New Role</FormLabel>
-                        <select 
+                        <FormLabel>{t('settings.user_management.new_role', 'New Role')}</FormLabel>
+                        <select
                             value={newRole}
                             onChange={(e) => setNewRole(e.target.value)}
                             className="w-full px-4 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
@@ -304,14 +317,14 @@ export default function UserManagementSettings() {
                             {roles.map(r => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
                         </select>
                     </div>
-                    <div className="flex justify-end">
-                        <button 
+                    <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'}`}>
+                        <button
                             onClick={handleEditRole}
                             disabled={submitting}
                             className="inline-flex items-center justify-center px-4 py-2 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-200"
                         >
                             {submitting ? <Loader2 className="me-2 h-5 w-5 animate-spin" /> : <Edit className="w-5 h-5 me-2" />}
-                            Update Role
+                            {t('settings.user_management.update_role', 'Update Role')}
                         </button>
                     </div>
                 </div>

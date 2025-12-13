@@ -207,7 +207,7 @@ const PrintInspectionDocument = ({
                   {category}
                 </div>
                 <div className="category-items">
-                  {groupedItems[category].map((item, index) => (
+                  {groupedItems[category].map((item: any, index: number) => (
                     <div key={index} className="inspection-item">
                       <div className="item-content">
                         <div className="item-name">{item.name}</div>

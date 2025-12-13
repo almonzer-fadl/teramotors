@@ -46,11 +46,29 @@
     "creating_account": "Creating account...",
     "already_have_account": "Already have an account? Sign in",
     "forgot_your_password": "Forgot your password?",
-    "forgot_password_prompt": "Enter your email and we'll send you a reset link.",
-    "reset_link_sent": "If an account exists for this email, a reset link has been sent.",
-    "send_reset_link": "Send Reset Link",
+    "forgot_password_prompt": "Type the email you use with TeraMotors and we will send secure reset instructions.",
+    "reset_link_sent": "If this email exists in our system, a reset link has been delivered.",
+    "send_reset_link": "Send reset link",
     "sending": "Sending...",
     "back_to_login": "Back to login",
+    "reset_access_heading": "Reset your access",
+    "reset_access_description": "Confirm the email you registered with and we’ll send a secure link so you can sign back in within seconds.",
+    "forgot_highlight_secure_title": "Secure verification",
+    "forgot_highlight_secure_desc": "Every request is validated and protected with bank-grade encryption.",
+    "forgot_highlight_support_title": "Arabic support",
+    "forgot_highlight_support_desc": "A Riyadh-based team is ready 7 days a week to help you finish the reset.",
+    "forgot_highlight_fast_title": "Fast delivery",
+    "forgot_highlight_fast_desc": "Reset instructions are dispatched instantly and stay valid for 30 minutes.",
+    "support_stat_label": "WhatsApp & phone support",
+    "support_stat_value": "24/7",
+    "response_stat_label": "Avg. response time",
+    "response_stat_value": "15 min",
+    "check_inbox_title": "Check your inbox",
+    "check_inbox_description": "If {{email}} is registered with us, you’ll find a link waiting for you. It expires in 30 minutes for security.",
+    "cta_return_login": "Back to sign-in",
+    "need_help": "Need help with your account?",
+    "contact_support": "Contact support",
+    "reset_link_error": "We couldn’t send the link right now. Please try again or contact support.",
     "reset_password": "Reset Password",
     "password_reset_success": "Your password has been reset.",
     "new_password": "New Password",
@@ -70,6 +88,104 @@
       "workshops_value": "500+",
       "uptime_value": "99.9%",
       "support_value": "24/7"
+    }
+  },
+  "register": {
+    "back_to_login": "Back to login",
+    "heading": "Create your workshop",
+    "subheading": "Start your free trial today",
+    "steps": {
+      "business": {
+        "title": "Business info",
+        "description": "Tell us about your workshop"
+      },
+      "account": {
+        "title": "Account details",
+        "description": "Create your admin account"
+      },
+      "confirm": {
+        "title": "Confirmation",
+        "description": "Review and confirm"
+      }
+    },
+    "fields": {
+      "workshop_name": "Workshop name *",
+      "business_email": "Business email *",
+      "business_phone": "Phone number",
+      "website_optional": "Website (optional)",
+      "first_name": "First name *",
+      "last_name": "Last name *",
+      "admin_email": "Your email *",
+      "password": "Password *",
+      "confirm_password": "Confirm password *"
+    },
+    "placeholders": {
+      "workshop_name": "e.g., Quick Fix Auto Repairs",
+      "business_email": "contact@yourworkshop.com",
+      "business_phone": "+966 50 123 4567",
+      "website": "https://yourworkshop.com",
+      "first_name": "John",
+      "last_name": "Doe",
+      "admin_email": "you@email.com",
+      "password": "Min. 8 characters",
+      "confirm_password": "Confirm your password"
+    },
+    "errors": {
+      "business_name": "Workshop name is required",
+      "business_email": "A valid business email is required",
+      "admin_name": "First and last name are required",
+      "admin_email": "A valid email is required",
+      "password_length": "Password must be at least 8 characters",
+      "password_match": "Passwords do not match"
+    },
+    "buttons": {
+      "back": "Back",
+      "continue": "Continue",
+      "submit": "Create workshop",
+      "submitting": "Creating..."
+    },
+    "success": {
+      "title": "Welcome to TeraMotors!",
+      "description": "Your workshop {{workshop}} has been created.",
+      "default_workshop": "your workshop",
+      "redirect": "Redirecting to login..."
+    },
+    "footer": {
+      "prompt": "Already have an account?",
+      "sign_in": "Sign in"
+    },
+    "features": {
+      "trial_value": "14",
+      "trial_label": "Day free trial",
+      "fee_value": "0",
+      "fee_label": "Setup fees",
+      "support_value": "24/7",
+      "support_label": "Support"
+    }
+  },
+  "dashboard_welcome": {
+    "badge": "JUST REGISTERED",
+    "title": "Let’s get your workshop ready",
+    "subtitle": "Complete these quick tasks or skip and come back later.",
+    "skip": "Skip checklist",
+    "mark_done": "Mark as done",
+    "completed": "Completed",
+    "tasks": {
+      "profile": {
+        "title": "Finish company profile",
+        "description": "Add your logo, address, VAT, and preferred languages so invoices look perfect.",
+        "action": "Open company profile"
+      },
+      "customer": {
+        "title": "Add your first customer",
+        "description": "Create a customer and link a vehicle so you can send estimates immediately.",
+        "action": "Add customer"
+      },
+      "jobcard": {
+        "title": "Create your first job card",
+        "description": "Log a service request and track it from inspection to invoice.",
+        "action": "Create job card"
+      }
     }
   },
   "forms": {
@@ -1462,8 +1578,9 @@
       "floating_just_now": "Just now",
       "floating_vehicles": "+15 Vehicles",
       "floating_this_week": "This week",
-      "dashboard_preview": "Dashboard Preview",
-      "dashboard_subtitle": "Beautiful, intuitive interface"
+      "dashboard_preview": "Live dashboard preview",
+      "dashboard_subtitle": "Track revenue, active job cards, and WhatsApp status from one screen.",
+      "dashboard_preview_alt": "Preview of the TeraMotors workshop dashboard"
     },
     "stats": {
       "workshops": "Auto Repair Shops",
