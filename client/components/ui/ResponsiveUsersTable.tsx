@@ -43,7 +43,6 @@ interface ResponsiveUsersTableProps {
   onEditRole: (user: User) => void
   onToggleStatus: (userId: string, isActive: boolean) => void
   onDeleteUser: (userId: string) => void
-  roleDisplayNames: Record<string, string>
 }
 
 export default function ResponsiveUsersTable({
@@ -52,8 +51,7 @@ export default function ResponsiveUsersTable({
   onResetPassword,
   onEditRole,
   onToggleStatus,
-  onDeleteUser,
-  roleDisplayNames
+  onDeleteUser
 }: ResponsiveUsersTableProps) {
   const { t } = useTranslation()
   const [expandedUser, setExpandedUser] = useState<string | null>(null)
@@ -129,7 +127,7 @@ export default function ResponsiveUsersTable({
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${roleMeta[user.role].badge}`}>
                     {roleMeta[user.role].icon}
-                    {roleDisplayNames[user.role]}
+                    {t(`roles.${user.role}.name`, user.role)}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -245,7 +243,7 @@ export default function ResponsiveUsersTable({
               <div className="flex items-center flex-wrap gap-2">
                 <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${roleMeta[user.role].badge}`}>
                   {roleMeta[user.role].icon}
-                  {roleDisplayNames[user.role]}
+                  {t(`roles.${user.role}.name`, user.role)}
                 </span>
                 <div className="flex items-center gap-2">
                   {user.isActive ? statusMeta.active.icon : statusMeta.inactive.icon}

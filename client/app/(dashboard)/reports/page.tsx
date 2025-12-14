@@ -136,8 +136,8 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
     if (type === "pnl" && summaryData) {
       const { grossProfit, totalRevenue, totalCogs } = summaryData;
       const data = [
-        { name: 'Gross Profit', value: grossProfit || 0 },
-        { name: 'COGS', value: totalCogs || 0 },
+        { name: t('reports.pnl.chart_gross_profit', 'Gross Profit'), value: grossProfit || 0 },
+        { name: t('reports.pnl.chart_cogs', 'COGS'), value: totalCogs || 0 },
       ];
       const COLORS = ['#10b981', '#ef4444']; // Green for profit, Red for COGS
 
@@ -178,7 +178,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
       const { totalSales, salesByServiceCategory } = summaryData;
       const chartData = salesByServiceCategory.map((item: any) => ({
         name: item.category,
-        Sales: item.amount,
+        [t('reports.sales.chart_sales', 'Sales')]: item.amount,
       }));
 
       return (
@@ -193,7 +193,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
                 <XAxis dataKey="name" hide />
                 <YAxis hide />
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Bar dataKey="Sales" fill="#82ca9d" animationDuration={500} />
+                <Bar dataKey={t('reports.sales.chart_sales', 'Sales')} fill="#82ca9d" animationDuration={500} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -269,7 +269,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
     if (type === "tech" && summaryData) {
         const chartData = summaryData.map((item: any) => ({
             name: item.mechanicName,
-            Revenue: item.totalRevenue,
+            [t('reports.technician_performance.chart_revenue', 'Revenue')]: item.totalRevenue,
         }));
         return (
             <div className="flex flex-col h-full justify-between">
@@ -283,7 +283,7 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
                     <XAxis dataKey="name" hide />
                     <YAxis hide />
                     <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                    <Bar dataKey="Revenue" fill="#8884d8" animationDuration={500} />
+                    <Bar dataKey={t('reports.technician_performance.chart_revenue', 'Revenue')} fill="#8884d8" animationDuration={500} />
                 </BarChart>
                 </ResponsiveContainer>
             </div>

@@ -1024,12 +1024,19 @@
     "inspections": "Inspections",
     "services": "Services",
     "whatsapp": "WhatsApp",
+    "reports": "Reports",
     "users": "User Management",
     "settings": "Settings",
+    "admin": "Admin Panel",
     "system": "System Administration",
+    "migration": "Database Migration",
     "admin_settings": "Super Admin Settings"
   },
   "roles": {
+    "SUPER_ADMIN": {
+      "name": "Super Administrator",
+      "description": "System-wide access. Can manage all tenants, run migrations, and access admin panel. Reserved for platform administrators."
+    },
     "admin": {
       "name": "Administrator",
       "description": "Full system access including user management, settings, and reports. Can delete any data."
@@ -1118,41 +1125,37 @@
     "title": "Financial Reports",
     "description": "Comprehensive financial analysis and accounting reports for your auto repair business.",
     "view_report": "View Report",
+    "no_data": "No data for summary",
+    "no_data_available": "No Data Available",
+    "summary": "Summary",
+    "how_to_read": "How to Read This Report",
     "pnl": {
       "title": "Profit & Loss",
-      "description": "Analyze revenue, costs, and gross profit over any period."
+      "description": "Analyze revenue, costs, and gross profit over any period.",
+      "no_invoices": "There are no invoices within the selected date range to generate this report.",
+      "total_revenue": "Total Revenue",
+      "total_revenue_tooltip": "Sum of all invoice totals (services + parts).",
+      "total_revenue_explanation": "This is the total amount of money invoiced to customers for both services and parts within the selected date range. It represents the total income before any expenses are deducted.",
+      "cogs": "Cost of Goods Sold (COGS)",
+      "cogs_tooltip": "Total cost of parts used in completed jobs.",
+      "cogs_explanation": "This figure represents the direct cost of the parts sold to customers to perform repairs. It is the sum of the 'cost' price of all parts listed on the job cards associated with the invoices in this period.",
+      "gross_profit": "Gross Profit",
+      "gross_profit_tooltip": "Total Revenue minus Cost of Goods Sold.",
+      "gross_profit_explanation": "This is the profit made directly from selling services and parts. It is calculated by subtracting the COGS from the Total Revenue. This number does not account for operational expenses like rent, salaries, or utilities.",
+      "gross_profit_margin": "Gross Profit Margin",
+      "service_revenue": "Service Revenue",
+      "parts_revenue": "Parts Revenue",
+      "revenue_breakdown": "Revenue Breakdown",
+      "chart_gross_profit": "Gross Profit",
+      "chart_cogs": "COGS"
     },
     "sales": {
       "title": "Sales Report",
-      "description": "A detailed breakdown of all sales from services and parts."
-    },
-    "ar_aging": {
-      "title": "A/R Aging",
-      "description": "Track outstanding invoices and manage accounts receivable."
-    },
-    "vat": {
-      "title": "VAT Report",
-      "description": "Summarize collected VAT for easy tax filing and compliance."
-    },
-    "payments": {
-      "title": "Payments Received",
-      "description": "Monitor cash flow by tracking all incoming payments."
-    },
-    "inventory_valuation": {
-      "title": "Inventory Valuation",
-      "description": "Get the total current value of your parts inventory."
-    },
-    "technician_performance": {
-      "title": "Technician Performance",
-      "description": "Measure revenue and efficiency for each technician."
-    },
-    "disclaimer": {
-        "title": "Disclaimer",
-        "description": "Reports are generated based on data entered into the system (invoices, payments, part costs). They do not include external operational expenses like salaries or rent unless manually accounted for."
-    },
-    "sales": {
+      "description": "A detailed breakdown of all sales from services and parts.",
+      "no_sales": "There are no sales within the selected date range to generate this report.",
       "total_sales": "Total Sales",
       "total_sales_tooltip": "The total revenue generated from all services and parts sales within the selected period.",
+      "total_sales_explanation": "The total revenue from services and parts before VAT is added. This represents your gross sales.",
       "total_service_categories": "Total Service Categories",
       "total_service_categories_tooltip": "The number of distinct service categories that generated sales.",
       "total_part_categories": "Total Part Categories",
@@ -1169,7 +1172,113 @@
       "top_selling_parts_explanation": "A list of the parts that generated the most estimated revenue, along with the quantity sold. (Note: Parts revenue is an estimation based on a standard markup over cost).",
       "part_name": "Part Name",
       "total_revenue": "Total Revenue",
-      "how_to_read_this_report": "How to Read This Report"
+      "how_to_read_this_report": "How to Read This Report",
+      "top_services": "Top services by sales",
+      "chart_sales": "Sales"
+    },
+    "ar_aging": {
+      "title": "A/R Aging",
+      "description": "Track outstanding invoices and manage accounts receivable.",
+      "no_outstanding": "No Outstanding Invoices",
+      "all_paid": "All invoices are paid up. Great job!",
+      "summary": "A/R Aging Summary",
+      "total_outstanding": "Total Outstanding",
+      "customer_breakdown": "Customer Breakdown",
+      "overdue_invoices": "Overdue Invoices",
+      "invoice_number": "Invoice #",
+      "due_date": "Due Date",
+      "days_overdue": "Days Overdue",
+      "amount": "Amount",
+      "customer": "Customer",
+      "current": "Current",
+      "current_explanation": "Invoices that are not yet past their due date.",
+      "1_30_days": "1-30 Days",
+      "31_60_days": "31-60 Days",
+      "61_90_days": "61-90 Days",
+      "91_plus_days": "91+ Days",
+      "aging_buckets": "1-91+ Days",
+      "aging_buckets_explanation": "Invoices that are past their due date, grouped into buckets. High numbers in the older buckets (e.g., 61-90 or 91+ days) may require immediate collection efforts.",
+      "total_outstanding_explanation": "The total amount of money owed to your business from all unpaid invoices.",
+      "intro": "The Accounts Receivable (A/R) Aging Report categorizes unpaid customer invoices by the length of time they have been outstanding. It is a critical tool for understanding the financial health of your receivables and managing cash flow.",
+      "days": "Days"
+    },
+    "vat": {
+      "title": "VAT Report",
+      "description": "Summarize collected VAT for easy tax filing and compliance.",
+      "no_invoices": "There are no invoices within the selected date range to generate this report.",
+      "total_collected": "Total VAT Collected",
+      "total_collected_tooltip": "Sum of VAT from all invoices in the period.",
+      "total_collected_explanation": "The sum of all VAT amounts from every invoice in the selected period. This is the amount you are required to report and remit to the tax authorities.",
+      "total_sales_excl_vat": "Total Sales (excl. VAT)",
+      "total_sales_tooltip": "Total revenue minus the VAT amount.",
+      "total_sales_explanation": "The total revenue from services and parts before VAT is added. This represents your net sales.",
+      "total_invoices": "Total Invoices",
+      "total_invoices_tooltip": "Total number of invoices issued in the period.",
+      "invoice_breakdown": "Invoice Breakdown",
+      "invoice_number": "Invoice #",
+      "date": "Date",
+      "total_amount": "Total Amount",
+      "vat_amount": "VAT Amount",
+      "intro": "This report summarizes the Value Added Tax (VAT) collected from customers, which is essential for tax filing purposes."
+    },
+    "payments": {
+      "title": "Payments Received",
+      "description": "Monitor cash flow by tracking all incoming payments.",
+      "no_payments": "There are no completed payments within the selected date range.",
+      "total_received": "Total Payments Received",
+      "total_received_tooltip": "Sum of all completed payments in the period.",
+      "total_transactions": "Total Transactions",
+      "total_transactions_tooltip": "Total number of completed payment transactions.",
+      "by_method": "Payments by Method",
+      "detailed_list": "Detailed Payments List",
+      "date": "Date",
+      "invoice_number": "Invoice #",
+      "amount": "Amount",
+      "method": "Method",
+      "not_available": "N/A"
+    },
+    "inventory": {
+      "title": "Inventory Valuation",
+      "description": "Get the total current value of your parts inventory.",
+      "no_data": "No Inventory Data",
+      "no_parts": "There are no parts in the inventory to generate this report.",
+      "total_value": "Total Inventory Value",
+      "total_value_tooltip": "Total cost value of all parts currently in stock.",
+      "unique_parts": "Total Unique Parts",
+      "unique_parts_tooltip": "Total number of unique part types in inventory.",
+      "value_by_category": "Value by Category",
+      "details": "Inventory Details",
+      "part_name": "Part Name",
+      "stock": "Stock",
+      "cost_price": "Cost Price"
+    },
+    "technician": {
+      "title": "Technician Performance",
+      "description": "Measure revenue and efficiency for each technician.",
+      "no_data": "No Performance Data Available",
+      "no_jobs": "There are no completed jobs by technicians within the selected date range.",
+      "revenue_by_technician": "Revenue by Technician",
+      "performance_details": "Performance Details",
+      "technician": "Technician",
+      "jobs_completed": "Jobs Completed",
+      "avg_job_time": "Avg. Job Time",
+      "total_revenue_generated": "Total Revenue Generated",
+      "total_revenue": "Total Revenue",
+      "chart_revenue": "Revenue",
+      "top_tech": "Top technician by revenue (last 30 days)."
+    },
+    "technician_performance": {
+      "title": "Technician Performance",
+      "description": "Measure revenue and efficiency for each technician.",
+      "chart_revenue": "Revenue",
+      "top_tech": "Top technician by revenue (last 30 days)."
+    },
+    "inventory_valuation": {
+      "total_value": "Total value of all parts in stock."
+    },
+    "disclaimer": {
+      "title": "Disclaimer",
+      "description": "Reports are generated based on data entered into the system (invoices, payments, part costs). They do not include external operational expenses like salaries or rent unless manually accounted for."
     }
   },
   "services": {
