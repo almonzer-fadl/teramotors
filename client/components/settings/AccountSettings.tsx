@@ -6,7 +6,6 @@ import { LogOut, User, Shield } from 'lucide-react';
 import { fadeInUp } from '@/lib/dashboard-animations';
 import { useSession } from '@/lib/hooks/useSession';
 import { signOut } from '@/lib/simple-auth-client';
-import { roleDisplayNames } from '@/lib/roles';
 import { useTranslation } from 'react-i18next';
 
 export default function AccountSettings() {
@@ -63,7 +62,7 @@ export default function AccountSettings() {
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.account.role', 'Role')}</p>
               <p className="font-medium text-gray-900 dark:text-white">
-                {roleDisplayNames[user?.role as keyof typeof roleDisplayNames] || user?.role}
+                {user?.role ? t(`roles.${user.role}.name`, user.role) : user?.role}
               </p>
             </div>
             <Shield className="w-5 h-5 text-blue-500" />

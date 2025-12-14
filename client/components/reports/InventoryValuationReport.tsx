@@ -26,17 +26,18 @@ const StatCard = ({ title, value, icon, color, tooltip }: { title: string; value
 );
 
 export const InventoryValuationReport = ({ data }: { data: any }) => {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
+    const isRTL = i18n.language === 'ar';
 
     if (!data || data.partCount === 0) {
         return (
             <div className="text-center py-20 bg-gray-100/50 dark:bg-gray-800/20 rounded-2xl">
                 <HelpCircle className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
                 <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
-                    No Inventory Data
+                    {t('reports.inventory.no_data', 'No Inventory Data')}
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    There are no parts in the inventory to generate this report.
+                    {t('reports.inventory.no_parts', 'There are no parts in the inventory to generate this report.')}
                 </p>
             </div>
         );
@@ -46,29 +47,29 @@ export const InventoryValuationReport = ({ data }: { data: any }) => {
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF19A6', '#A4DE6C', '#D0ED57'];
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <StatCard 
-                    title="Total Inventory Value" 
-                    value={formatCurrency(totalInventoryValue)} 
+                <StatCard
+                    title={t('reports.inventory.total_value', 'Total Inventory Value')}
+                    value={formatCurrency(totalInventoryValue)}
                     icon={<DollarSign className="w-7 h-7 text-white" />}
                     color="bg-gradient-to-br from-cyan-500 to-sky-600"
-                    tooltip="Total cost value of all parts currently in stock."
+                    tooltip={t('reports.inventory.total_value_tooltip', 'Total cost value of all parts currently in stock.')}
                 />
-                <StatCard 
-                    title="Total Unique Parts" 
-                    value={partCount.toString()} 
+                <StatCard
+                    title={t('reports.inventory.unique_parts', 'Total Unique Parts')}
+                    value={partCount.toString()}
                     icon={<Package className="w-7 h-7 text-white" />}
                     color="bg-gradient-to-br from-blue-500 to-indigo-600"
-                    tooltip="Total number of unique part types in inventory."
+                    tooltip={t('reports.inventory.unique_parts_tooltip', 'Total number of unique part types in inventory.')}
                 />
             </div>
 
             {/* Chart and Table */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-6 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Value by Category</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('reports.inventory.value_by_category', 'Value by Category')}</h3>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
                             <Pie
@@ -97,15 +98,15 @@ export const InventoryValuationReport = ({ data }: { data: any }) => {
                 </div>
 
                 <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white p-6">Inventory Details</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white p-6">{t('reports.inventory.details', 'Inventory Details')}</h3>
                     <div className="overflow-y-auto h-[300px]">
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead className="bg-gray-50/80 dark:bg-gray-800/80 sticky top-0">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Part Name</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cost Price</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Value</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('reports.inventory.part_name', 'Part Name')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('reports.inventory.stock', 'Stock')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('reports.inventory.cost_price', 'Cost Price')}</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('reports.inventory.total_value', 'Total Value')}</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
