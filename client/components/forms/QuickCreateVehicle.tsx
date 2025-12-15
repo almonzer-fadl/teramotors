@@ -48,17 +48,21 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
   }, [customerId]);
 
   useEffect(() => {
+    // Only update available models when using predefined makes (not custom)
     if (form.make && !customMake) {
       const models = getModelsForMake(form.make);
       setAvailableModels(models);
-      if (!models.includes(form.model)) {
+      // Only reset model field if:
+      // 1. We're not in custom model mode
+      // 2. The current model isn't in the available models list
+      if (!customModel && form.model && !models.includes(form.model)) {
         setForm(prev => ({ ...prev, model: '' }));
-        setCustomModel(false);
       }
     } else {
+      // Clear available models when in custom make mode or no make selected
       setAvailableModels([]);
     }
-  }, [form.make, customMake, form.model]);
+  }, [form.make, customMake]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
