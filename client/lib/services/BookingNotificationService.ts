@@ -35,7 +35,6 @@ export class BookingNotificationService {
         text: emailContent.text,
       });
     } catch (error) {
-      console.error('Failed to send customer confirmation email:', error);
     }
   }
 
@@ -71,7 +70,6 @@ export class BookingNotificationService {
         });
       }
     } catch (error) {
-      console.error('Failed to send admin notification email:', error);
     }
   }
 

@@ -64,15 +64,12 @@ export default function UserManagementSettings() {
             const response = await fetch('/api/users');
             if (response.ok) {
                 const data = await response.json();
-                console.log('Fetched users:', data); // Debug log
                 setUsers(Array.isArray(data) ? data : []);
             } else {
                 const errorData = await response.json();
-                console.error("Failed to load users:", errorData);
                 toast.error(errorData.error || "Failed to load users.");
             }
         } catch (error) {
-            console.error("Failed to fetch users:", error);
             toast.error("Failed to load users.");
         } finally {
             setLoading(false);
@@ -96,7 +93,6 @@ export default function UserManagementSettings() {
                     throw new Error(data.error || t('settings.user_management.reset_password_failed', 'Failed to reset password'));
                 }
             } catch (error) {
-                console.error("Error resetting password:", error);
                 toast.error((error as Error).message);
             }
         }
@@ -123,7 +119,6 @@ export default function UserManagementSettings() {
                 throw new Error(data.error || t('settings.user_management.add_user_failed', 'Failed to add user'));
             }
         } catch (error) {
-            console.error("Error adding user:", error);
             toast.error((error as Error).message);
         } finally {
             setSubmitting(false);
@@ -148,7 +143,6 @@ export default function UserManagementSettings() {
                 throw new Error(data.error || t('settings.user_management.update_role_failed', 'Failed to update role'));
             }
         } catch (error) {
-            console.error("Error updating role:", error);
             toast.error((error as Error).message);
         } finally {
             setSubmitting(false);
@@ -172,7 +166,6 @@ export default function UserManagementSettings() {
                     throw new Error(data.error || t('settings.user_management.update_status_failed', 'Failed to update status'));
                 }
             } catch (error) {
-                console.error("Error updating status:", error);
                 toast.error((error as Error).message);
             }
         }
@@ -192,7 +185,6 @@ export default function UserManagementSettings() {
                     throw new Error(data.error || t('settings.user_management.delete_failed', 'Failed to delete user'));
                 }
             } catch (error) {
-                console.error("Error deleting user:", error);
                 toast.error((error as Error).message);
             }
         }

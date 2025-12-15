@@ -6,26 +6,23 @@ import { getServerSession } from "@/lib/auth-server";
 import { uploadRateLimit } from '@/lib/middleware/rate-limit';
 
 export async function POST(req: NextRequest) {
-  console.log('Services import API called');
   try {
     // Temporarily disable rate limiting for debugging
     // const rateLimitResponse = uploadRateLimit(req);
     // if (rateLimitResponse) {
-    //   console.log('Rate limit exceeded');
+    //   // console.log('Rate limit exceeded');
     //   return rateLimitResponse;
     // }
 
     // Check authentication
     const session = await getServerSession();
     if (!session) {
-      console.log('No session found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const formData = await req.formData();
     const file = formData.get('file') as File;
 
-    console.log('File received:', file?.name, file?.size);
 
     if (!file) {
       return NextResponse.json({ success: false, error: { message: 'No file uploaded' } }, { status: 400 });
@@ -43,7 +40,6 @@ export async function POST(req: NextRequest) {
 
     try {
       await connectToDatabase();
-      console.log('Database connected successfully');
 
       const buffer = Buffer.from(await file.arrayBuffer());
       const workbook = XLSX.read(buffer, { type: 'buffer' });
@@ -52,7 +48,6 @@ export async function POST(req: NextRequest) {
 
       // Read as array-of-arrays to preserve headers as-is (handles RTL/Arabic)
       const rows: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' }) as any[];
-      console.log('Excel rows parsed:', rows.length);
 
       // Helper: normalize bidi and whitespace and lowercase
       const stripBidi = (s: string) => s.replace(/[\u200E\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '');
@@ -112,7 +107,6 @@ export async function POST(req: NextRequest) {
       }
 
       const dataRows = rows.slice(headerRowIndex + 1);
-      console.log('Detected columns -> name:', nameCol, 'price:', priceCol, 'data rows:', dataRows.length);
 
       const services = dataRows
         .map((r, idx) => {
@@ -142,7 +136,6 @@ export async function POST(req: NextRequest) {
         })
         .filter(Boolean) as any[];
 
-      console.log('Services prepared:', services.length);
 
       // Insert services in batches to avoid memory issues
       const batchSize = 100;
@@ -152,24 +145,20 @@ export async function POST(req: NextRequest) {
         const batch = services.slice(i, i + batchSize);
         await Service.insertMany(batch);
         importedCount += batch.length;
-        console.log(`Imported batch ${Math.floor(i/batchSize) + 1}: ${batch.length} services`);
       }
 
-      console.log('Import completed:', importedCount, 'services');
 
       return NextResponse.json({ 
         success: true, 
         message: `${importedCount} services imported successfully` 
       });
     } catch (dbError) {
-      console.error('Database error:', dbError);
       return NextResponse.json({ 
         success: false, 
         error: { message: 'Database error: ' + (dbError instanceof Error ? dbError.message : 'Unknown error') } 
       }, { status: 500 });
     }
   } catch (error: any) {
-    console.error('Error importing services:', error);
     return NextResponse.json({ 
       success: false, 
       error: { message: error.message || 'Error importing services' } 

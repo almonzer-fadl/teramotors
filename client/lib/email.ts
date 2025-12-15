@@ -20,7 +20,6 @@ export async function sendEmail({ to, subject, text, html }: EmailOptions) {
   try {
     // Check if API key is properly configured
     if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'dummy-key') {
-      console.warn('Resend API key not configured. Email sending disabled.');
       return { id: 'mock-email-id', message: 'Email sending disabled - no API key configured' };
     }
 
@@ -33,13 +32,11 @@ export async function sendEmail({ to, subject, text, html }: EmailOptions) {
     });
 
     if (error) {
-      console.error('Email sending error:', error);
       throw new Error(`Failed to send email: ${error.message}`);
     }
 
     return data;
   } catch (error) {
-    console.error('Email service error:', error);
     throw error;
   }
 }

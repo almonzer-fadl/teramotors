@@ -48,7 +48,6 @@ export function Combobox({
         >
           {(() => {
             const selectedOption = options.find((option) => option.value === value);
-            console.log('Combobox display:', { value, selectedOption, allOptions: options });
             return value ? selectedOption?.label : placeholder;
           })()}
           <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
@@ -64,10 +63,8 @@ export function Combobox({
                 key={option.value}
                 value={option.value}
                 onSelect={(currentValue) => {
-                  console.log('Combobox selection:', { currentValue, optionValue: option.value, currentFormValue: value });
                   // Use option.value instead of currentValue since CommandItem might not pass the value correctly
                   const selectedValue = option.value;
-                  console.log('Selected value:', selectedValue);
                   onChange(selectedValue === value ? '' : selectedValue)
                   setOpen(false)
                 }}

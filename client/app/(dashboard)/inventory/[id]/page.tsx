@@ -57,7 +57,6 @@ export default function PartDetailsPage() {
           setUsage(usageData.data);
         }
       } catch (error) {
-        console.error('Failed to fetch part data:', error);
       } finally {
         setLoading(false);
       }

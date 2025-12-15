@@ -141,7 +141,6 @@ export async function GET(req: NextRequest) {
       }
     });
   } catch (error: any) {
-    console.error('Dashboard error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to load dashboard' },
       { status: 500 }

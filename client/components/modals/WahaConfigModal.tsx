@@ -34,7 +34,6 @@ export function WahaConfigModal({ isOpen, onClose }: WahaConfigModalProps) {
         }
       }
     } catch (err) {
-      console.error('Error fetching session status:', err);
     }
   };
 
@@ -46,7 +45,6 @@ export function WahaConfigModal({ isOpen, onClose }: WahaConfigModalProps) {
         setQrCode(data.qr);
       }
     } catch (err) {
-      console.error('Error fetching QR code:', err);
     }
   };
 

@@ -75,7 +75,6 @@ export default function InventoryPage() {
         setParts([]);
       }
     } catch (error) {
-      console.error("Failed to fetch parts:", error);
       setParts([]);
     } finally {
       setInitialLoading(false);
@@ -149,7 +148,6 @@ export default function InventoryPage() {
         return { success: false, message: result.error?.message || 'Import failed' };
       }
     } catch (error) {
-      console.error('Import error:', error);
       return { success: false, message: 'Failed to import parts' };
     }
   };
@@ -164,7 +162,6 @@ export default function InventoryPage() {
           setParts(parts.filter((p) => p._id !== id));
         }
       } catch (error) {
-        console.error("Failed to delete part:", error);
       }
     }
   };

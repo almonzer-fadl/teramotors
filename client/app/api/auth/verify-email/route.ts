@@ -21,7 +21,6 @@ export async function POST(request: Request) {
 
     return Response.json({ success: true })
   } catch (error) {
-    console.error('Error verifying email:', error)
     return Response.json({ error: 'Failed to verify email' }, { status: 500 })
   }
 }

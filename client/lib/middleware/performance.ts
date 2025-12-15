@@ -77,12 +77,10 @@ export function measurePerformance<T>(
   if (result instanceof Promise) {
     return result.then((value) => {
       const end = performance.now();
-      console.log(`Performance [${name}]: ${end - start}ms`);
       return value;
     });
   } else {
     const end = performance.now();
-    console.log(`Performance [${name}]: ${end - start}ms`);
     return result;
   }
 }

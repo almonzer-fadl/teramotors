@@ -110,7 +110,6 @@ export default function JobCardsPage() {
         setJobCards(Array.isArray(data) ? data : (data.jobCards || []));
       }
     } catch (error) {
-      console.error("Failed to fetch job cards:", error);
       setJobCards([]); // Set empty array on error
     } finally {
       setLoading(false);
@@ -164,7 +163,6 @@ export default function JobCardsPage() {
         );
       }
     } catch (error) {
-      console.error("Failed to update job card status:", error);
     }
   };
 
@@ -186,7 +184,6 @@ export default function JobCardsPage() {
         alert(error.error || t("job_cards.failed_to_delete"));
       }
     } catch (error) {
-      console.error("Failed to delete job card:", error);
       alert(t("job_cards.failed_to_delete"));
     }
   };

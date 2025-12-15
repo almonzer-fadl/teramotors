@@ -32,7 +32,6 @@ export default function TopBarLogo() {
                         }
                     }
                 } catch (error) { 
-                    console.error("Failed to fetch tenant branding", error); 
                 } finally {
                     setLoading(false);
                 }

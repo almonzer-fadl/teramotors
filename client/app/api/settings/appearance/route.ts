@@ -14,7 +14,6 @@ export const GET = withTenantAuth(
       }
       return NextResponse.json({ theme: tenant.settings?.theme || 'default' });
     } catch (error) {
-      console.error('Error fetching appearance settings:', error);
       return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
     }
   },
@@ -46,7 +45,6 @@ export const PUT = withTenantAuth(
         return NextResponse.json({ theme: updatedTenant.settings?.theme });
 
     } catch (error) {
-      console.error('Error updating appearance settings:', error);
       return NextResponse.json({ error: 'Failed to update appearance settings' }, { status: 500 });
     }
   },

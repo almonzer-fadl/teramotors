@@ -87,7 +87,6 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
         });
       }
     } catch (error) {
-      console.error("Failed to fetch customer:", error);
     } finally {
       setFetchingCustomer(false);
     }
@@ -125,7 +124,6 @@ export default function CustomerForm({ customerId }: { customerId?: string }) {
         alert(error.message || t('forms.failed_to_save_customer'));
       }
     } catch (error) {
-      console.error("Failed to save customer:", error);
       alert(t('forms.failed_to_save_customer'));
     } finally {
       setLoading(false);

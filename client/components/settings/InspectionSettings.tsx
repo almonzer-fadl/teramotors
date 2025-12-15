@@ -47,7 +47,6 @@ export default function InspectionSettings() {
         }
       }
     } catch (error) {
-      console.error('Failed to fetch inspection settings:', error);
     } finally {
       setLoading(false);
     }
@@ -69,7 +68,6 @@ export default function InspectionSettings() {
         setMessage({ type: 'error', text: t('settings.inspection.settings_saved_error', 'Failed to save settings. Please try again.') });
       }
     } catch (error) {
-      console.error('Error saving inspection settings:', error);
       setMessage({ type: 'error', text: t('settings.inspection.error_occurred', 'An error occurred while saving settings.') });
     } finally {
       setSaving(false);

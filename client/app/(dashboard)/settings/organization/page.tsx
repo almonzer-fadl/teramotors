@@ -98,7 +98,6 @@ export default function OrganizationPage() {
           crNumber: "1234567890",
         });
       } catch (error) {
-        console.error('Error fetching organization:', error);
       } finally {
         setLoading(false);
       }

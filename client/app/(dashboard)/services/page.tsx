@@ -78,7 +78,6 @@ export default function ServicesPage() {
         setCategories(await response.json());
       }
     } catch (error) {
-      console.error("Failed to fetch categories:", error);
     }
   };
 
@@ -96,7 +95,6 @@ export default function ServicesPage() {
         setServices(data);
       }
     } catch (error) {
-      console.error("Failed to fetch services:", error);
     } finally {
       setInitialLoading(false);
     }
@@ -143,7 +141,6 @@ export default function ServicesPage() {
           setServices(services.filter((s) => s._id !== id));
         }
       } catch (error) {
-        console.error("Failed to delete service:", error);
       }
     }
   };
@@ -178,28 +175,22 @@ export default function ServicesPage() {
   };
 
   const handleImport = async (file: File) => {
-    console.log('Starting import for file:', file.name);
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      console.log('Sending request to /api/services/import');
       const response = await fetch('/api/services/import', {
         method: 'POST',
         body: formData,
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Response error:', errorText);
         return { success: false, message: `Server error: ${response.status}` };
       }
 
       const result = await response.json();
-      console.log('Import result:', result);
       
       if (result.success) {
         // Refresh the services list
@@ -209,7 +200,6 @@ export default function ServicesPage() {
         return { success: false, message: result.error?.message || 'Import failed' };
       }
     } catch (error) {
-      console.error('Import error:', error);
       return { success: false, message: `Failed to import services: ${error instanceof Error ? error.message : 'Unknown error'}` };
     }
   };

@@ -30,7 +30,6 @@ export async function POST(request: Request) {
 
     return Response.json({ success: true })
   } catch (error) {
-    console.error('Error issuing reset token:', error)
     return Response.json({ error: 'Failed to issue reset token' }, { status: 500 })
   }
 }

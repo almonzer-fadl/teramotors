@@ -34,7 +34,6 @@ export async function GET(
     return NextResponse.json({ messages });
 
   } catch (error) {
-    console.error('Error getting customer messages:', error);
     return NextResponse.json({
       error: 'Internal server error',
       details: error instanceof Error ? error.message : 'Unknown error'

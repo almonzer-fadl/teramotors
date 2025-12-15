@@ -105,7 +105,6 @@ export default function InspectionsPage() {
         setInspections([]);
       }
     } catch (error) {
-      console.error("Failed to fetch data:", error);
       setInspections([]);
     } finally {
       setLoading(false);
@@ -120,7 +119,6 @@ export default function InspectionsPage() {
       // Open PDF in new tab for viewing with language parameter
       window.open(`/api/inspections/${inspectionId}/pdf?lang=${currentLanguage}`, '_blank');
     } catch (error) {
-      console.error("Failed to generate PDF:", error);
       alert(t("inspections.failed_to_generate_pdf"));
     } finally {
       setGeneratingPDF(null);

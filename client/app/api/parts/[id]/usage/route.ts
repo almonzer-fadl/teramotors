@@ -13,7 +13,6 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
 
     return NextResponse.json({ success: true, data: jobCards });
   } catch (error) {
-    console.error('Error fetching part usage:', error);
     return NextResponse.json({ success: false, error: { message: 'Error fetching part usage' } }, { status: 500 });
   }
 }

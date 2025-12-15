@@ -38,7 +38,6 @@ export const GET = withTenantAuth(
       });
 
     } catch (error) {
-      console.error('Error fetching MRR analytics:', error);
       return NextResponse.json({ error: 'Failed to fetch MRR analytics' }, { status: 500 });
     }
   },

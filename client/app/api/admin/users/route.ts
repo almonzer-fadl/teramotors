@@ -44,7 +44,6 @@ export async function GET(request: Request) {
     });
 
   } catch (error) {
-    console.error('Error fetching users:', error);
     return NextResponse.json({ message: 'An error occurred while fetching users' }, { status: 500 });
   }
 }

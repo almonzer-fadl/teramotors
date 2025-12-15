@@ -162,7 +162,6 @@ export const useReferenceDataStore = create<ReferenceDataState>()(
           const data = await response.json();
           get().setCustomers(data.customers || data);
         } catch (error) {
-          console.error('Error fetching customers:', error);
         } finally {
           set({ customersLoading: false });
         }
@@ -179,7 +178,6 @@ export const useReferenceDataStore = create<ReferenceDataState>()(
           const data = await response.json();
           get().setVehicles(data.vehicles || data);
         } catch (error) {
-          console.error('Error fetching vehicles:', error);
         } finally {
           set({ vehiclesLoading: false });
         }
@@ -196,7 +194,6 @@ export const useReferenceDataStore = create<ReferenceDataState>()(
           const data = await response.json();
           get().setServices(data.services || data);
         } catch (error) {
-          console.error('Error fetching services:', error);
         } finally {
           set({ servicesLoading: false });
         }
@@ -213,7 +210,6 @@ export const useReferenceDataStore = create<ReferenceDataState>()(
           const data = await response.json();
           get().setParts(data.parts || data);
         } catch (error) {
-          console.error('Error fetching parts:', error);
         } finally {
           set({ partsLoading: false });
         }
@@ -230,7 +226,6 @@ export const useReferenceDataStore = create<ReferenceDataState>()(
           const data = await response.json();
           get().setInvoices(data.invoices || data);
         } catch (error) {
-          console.error('Error fetching invoices:', error);
         } finally {
           set({ invoicesLoading: false });
         }

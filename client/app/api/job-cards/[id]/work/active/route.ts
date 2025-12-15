@@ -26,7 +26,6 @@ export async function GET(
 
     return Response.json({ logs })
   } catch (e) {
-    console.error('Error fetching active logs:', e)
     return Response.json({ error: 'Failed to fetch active logs' }, { status: 500 })
   }
 }

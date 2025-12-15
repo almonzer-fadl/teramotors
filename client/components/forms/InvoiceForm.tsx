@@ -95,7 +95,6 @@ export default function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
           setJobCards(Array.isArray(data.jobCards) ? data.jobCards : Array.isArray(data) ? data : []);
         }
       } catch (error) {
-        console.error("Failed to fetch job cards", error);
       }
     };
     fetchJobCards();
@@ -135,7 +134,6 @@ export default function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
             setMode("manual"); // Editing always defaults to manual
           }
         } catch (error) {
-          console.error("Failed to fetch invoice:", error);
         } finally {
           setInitialLoading(false);
         }
@@ -182,7 +180,6 @@ export default function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
         setDiscount(jobCard.discount || 0);
       }
     } catch (error) {
-      console.error("Failed to fetch job card details:", error);
     }
   };
 
@@ -235,7 +232,6 @@ export default function InvoiceForm({ invoiceId }: { invoiceId?: string }) {
         alert(error.message || "Failed to save invoice.");
       }
     } catch (error) {
-      console.error("Failed to save invoice:", error);
       alert("An unexpected error occurred.");
     } finally {
       setLoading(false);

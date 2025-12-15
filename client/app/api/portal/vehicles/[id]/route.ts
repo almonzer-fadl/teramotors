@@ -54,7 +54,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
         return NextResponse.json(updatedVehicle);
     } catch (error) {
-        console.error('Error updating vehicle:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
@@ -79,7 +78,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
         return NextResponse.json({ message: 'Vehicle deleted' });
     } catch (error) {
-        console.error('Error deleting vehicle:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

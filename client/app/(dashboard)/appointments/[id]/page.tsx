@@ -48,7 +48,6 @@ export default function AppointmentDetailPage() {
       const data = await res.json();
       setAppointment(data);
     } catch (error) {
-      console.error('Failed to fetch appointment', error);
     } finally {
       setLoading(false);
     }
@@ -71,7 +70,6 @@ export default function AppointmentDetailPage() {
         addToast(t('appointments.failed_to_cancel_appointment'), 'error');
       }
     } catch (error) {
-      console.error('Failed to cancel appointment', error);
       addToast(t('appointments.failed_to_cancel_appointment'), 'error');
     } finally {
       setCancelModalOpen(false);

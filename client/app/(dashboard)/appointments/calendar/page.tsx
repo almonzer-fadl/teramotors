@@ -38,7 +38,6 @@ export default function AppointmentsCalendarPage() {
         setEvents(formattedEvents);
       }
     } catch (error) {
-      console.error('Failed to fetch appointments:', error);
     } finally {
       setLoading(false);
     }

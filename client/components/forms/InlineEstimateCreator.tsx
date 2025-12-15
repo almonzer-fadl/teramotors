@@ -146,7 +146,6 @@ export default function InlineEstimateCreator({ isOpen, onClose, jobCardId, onCr
         }));
       }
     } catch (e) {
-      console.error('Failed to fetch initial data:', e);
     }
   };
 

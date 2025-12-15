@@ -97,7 +97,6 @@ export default function AppointmentForm({
         });
       }
     } catch (error) {
-      console.error("Failed to fetch appointment:", error);
     }
   };
 
@@ -144,7 +143,6 @@ export default function AppointmentForm({
         setMechanics(mechanicsArray);
       }
     } catch (error) {
-      console.error("Failed to fetch initial data:", error);
     }
   };
 
@@ -164,7 +162,6 @@ export default function AppointmentForm({
         setAvailableSlots(data.data);
       }
     } catch (error) {
-      console.error("Failed to fetch available slots:", error);
     }
   };
 
@@ -194,7 +191,6 @@ export default function AppointmentForm({
         alert(error.message || t('forms.failed_to_save_appointment'));
       }
     } catch (error) {
-      console.error("Failed to save appointment:", error);
       alert(t('forms.failed_to_save_appointment'));
     } finally {
       setLoading(false);

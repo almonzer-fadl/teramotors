@@ -269,7 +269,6 @@ export class SearchService {
         .slice(0, limit);
 
     } catch (error) {
-      console.error('Search error:', error);
       return [];
     }
   }
@@ -332,7 +331,6 @@ export class SearchService {
       return suggestions.slice(0, limit);
 
     } catch (error) {
-      console.error('Search suggestions error:', error);
       return [];
     }
   }

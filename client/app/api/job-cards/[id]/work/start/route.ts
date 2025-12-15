@@ -36,7 +36,6 @@ export async function POST(
 
     return Response.json({ success: true, workLog: log })
   } catch (e) {
-    console.error('Error starting work log:', e)
     return Response.json({ error: 'Failed to start work' }, { status: 500 })
   }
 }

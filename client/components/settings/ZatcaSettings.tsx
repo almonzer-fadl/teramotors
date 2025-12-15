@@ -42,7 +42,6 @@ export default function ZatcaSettings() {
                     setFormData(prev => ({ ...prev, ...data }));
                 }
             } catch (error) {
-                console.error("Failed to fetch ZATCA settings", error);
             } finally {
                 setLoading(false);
             }
@@ -80,7 +79,6 @@ export default function ZatcaSettings() {
             }
             toast.success('ZATCA settings saved!');
         } catch (error) {
-            console.error("Error saving ZATCA settings", error);
             toast.error(`Failed to save: ${(error as Error).message}`);
         } finally {
             setSaving(false);

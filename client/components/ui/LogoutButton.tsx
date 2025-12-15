@@ -17,7 +17,6 @@ export default function LogoutButton() {
       toast.success('You have been logged out.');
       router.push('/login'); // Redirect to login page
     } catch (error) {
-      console.error('Failed to sign out', error);
       toast.error('Failed to log out. Please try again.');
     } finally {
       setLoading(false);

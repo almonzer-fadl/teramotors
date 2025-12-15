@@ -25,7 +25,6 @@ class SocketService {
     // If URL is not configured, skip socket initialization (avoid dev console noise)
     if (!URL) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('[Socket] NEXT_PUBLIC_SOCKET_URL not set; skipping socket connection');
       }
       return;
     }
@@ -33,7 +32,6 @@ class SocketService {
     // If we've already failed to connect multiple times, don't keep trying
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       if (process.env.NODE_ENV === 'development' && !this.hasLoggedReconnectFailed) {
-        console.warn('[Socket] Max reconnection attempts reached; skipping connection');
         this.hasLoggedReconnectFailed = true;
       }
       return;
@@ -68,7 +66,6 @@ class SocketService {
     if (!this.socket) return;
 
     this.socket.on('connect', () => {
-      console.log('[Socket] Connected to server');
       this.reconnectAttempts = 0;
       // Reset error flags on successful connection
       this.hasLoggedConnectionError = false;
@@ -77,16 +74,13 @@ class SocketService {
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('[Socket] Disconnected:', reason);
     });
 
     this.socket.on('connect_error', (error) => {
       // Only log timeout errors in development, and only once per session
       if (process.env.NODE_ENV === 'development' && !this.hasLoggedConnectionError) {
         if (error?.message === 'timeout') {
-          console.warn('[Socket] Connection timeout - server may not be running');
         } else {
-          console.error('[Socket] Connection error:', error?.message || error);
         }
         this.hasLoggedConnectionError = true;
       }
@@ -94,16 +88,13 @@ class SocketService {
     });
 
     this.socket.on('reconnect', (attemptNumber) => {
-      console.log('[Socket] Reconnected after', attemptNumber, 'attempts');
     });
 
     this.socket.on('reconnect_error', (error) => {
       // Only log reconnection errors in development, and only once per session
       if (process.env.NODE_ENV === 'development' && !this.hasLoggedReconnectError) {
         if (error?.message === 'timeout') {
-          console.warn('[Socket] Reconnection timeout - server may not be running');
         } else {
-          console.error('[Socket] Reconnection error:', error?.message || error);
         }
         this.hasLoggedReconnectError = true;
       }
@@ -111,7 +102,6 @@ class SocketService {
 
     this.socket.on('reconnect_failed', () => {
       if (process.env.NODE_ENV === 'development' && !this.hasLoggedReconnectFailed) {
-        console.warn('[Socket] Failed to reconnect after', this.maxReconnectAttempts, 'attempts - server may not be running');
         this.hasLoggedReconnectFailed = true;
       }
     });

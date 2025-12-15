@@ -53,7 +53,6 @@ export class FileUploadService {
         size: result.bytes
       };
     } catch (error) {
-      console.error('Cloudinary upload error:', error);
       throw new Error('Failed to upload file');
     }
   }
@@ -68,7 +67,6 @@ export class FileUploadService {
         files: results
       };
     } catch (error) {
-      console.error('Multiple file upload error:', error);
       throw new Error('Failed to upload files');
     }
   }
@@ -81,7 +79,6 @@ export class FileUploadService {
         result: result.result
       };
     } catch (error) {
-      console.error('Cloudinary delete error:', error);
       throw new Error('Failed to delete file');
     }
   }
@@ -117,7 +114,6 @@ export class FileUploadService {
       
       return url;
     } catch (error) {
-      console.error('Cloudinary URL generation error:', error);
       throw new Error('Failed to generate optimized URL');
     }
   }
@@ -134,7 +130,6 @@ export class FileUploadService {
       
       return url;
     } catch (error) {
-      console.error('Thumbnail generation error:', error);
       throw new Error('Failed to generate thumbnail');
     }
   }

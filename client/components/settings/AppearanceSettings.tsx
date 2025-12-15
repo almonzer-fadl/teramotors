@@ -41,7 +41,6 @@ export default function AppearanceSettings() {
             }
             toast.success(t('settings.appearance.theme_updated', 'Theme updated successfully!'));
         } catch (error) {
-            console.error("Error saving theme:", error);
             toast.error(t('settings.appearance.theme_update_failed', 'Failed to save theme'));
             // Revert theme on error
             setColorTheme(colorTheme);

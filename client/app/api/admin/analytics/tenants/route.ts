@@ -42,7 +42,6 @@ export const GET = withTenantAuth(
       });
 
     } catch (error) {
-      console.error('Error fetching tenant analytics:', error);
       return NextResponse.json({ error: 'Failed to fetch tenant analytics' }, { status: 500 });
     }
   },

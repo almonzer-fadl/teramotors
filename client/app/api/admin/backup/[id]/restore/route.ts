@@ -30,7 +30,6 @@ export const POST = withTenantAuth(
       return NextResponse.json({ message: 'Restore process initiated successfully' }, { status: 200 });
 
     } catch (error) {
-      console.error('Error initiating backup restore:', error);
       return NextResponse.json({ error: 'Failed to initiate backup restore' }, { status: 500 });
     }
   },

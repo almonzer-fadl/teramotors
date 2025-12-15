@@ -95,10 +95,6 @@ export const PUT = withTenantAuth(
           );
         }
       } catch (whatsappError) {
-        console.error(
-          'Error sending job completed WhatsApp message:',
-          whatsappError
-        );
       }
     }
 

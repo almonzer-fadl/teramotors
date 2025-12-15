@@ -214,7 +214,6 @@ function RegisterForm() {
               body: JSON.stringify({ completed: true })
             });
           } catch (onboardingError) {
-            console.error("Failed to update onboarding status", onboardingError);
           }
           router.push("/dashboard?welcome=1");
         } else {

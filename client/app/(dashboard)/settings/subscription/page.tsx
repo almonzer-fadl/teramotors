@@ -116,7 +116,6 @@ export default function SubscriptionPage() {
           }
         });
       } catch (error) {
-        console.error('Error fetching subscription:', error);
       } finally {
         setLoading(false);
       }

@@ -53,7 +53,6 @@ export async function POST(request: NextRequest) {
     }, { status: 200 });
 
   } catch (error) {
-    console.error('Error sending WhatsApp notification for inspection completion:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({
       error: 'Failed to send WhatsApp notification',

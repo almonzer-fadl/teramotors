@@ -163,7 +163,6 @@ export default function AdminTenantsPage() {
           },
         ]);
       } catch (error) {
-        console.error('Error fetching tenants:', error);
       } finally {
         setLoading(false);
       }

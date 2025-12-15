@@ -21,7 +21,6 @@ export const GET = withTenantAuth(
       return NextResponse.json({ messages });
 
     } catch (error) {
-      console.error('Error fetching WhatsApp history:', error);
       return NextResponse.json({ error: 'Failed to fetch history' }, { status: 500 });
     }
   },

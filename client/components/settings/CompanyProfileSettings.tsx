@@ -65,7 +65,6 @@ export default function CompanyProfileSettings() {
                     }
                 }
             } catch (error) {
-                console.error("Failed to fetch company profile", error);
             } finally {
                 setLoading(false);
             }
@@ -136,7 +135,6 @@ export default function CompanyProfileSettings() {
             toast.success('Logo uploaded! Click "Save Changes" to apply it to your profile.');
 
         } catch (error) {
-            console.error("Error uploading logo", error);
             toast.error(`Logo upload failed: ${(error as Error).message}`);
         } finally {
             setUploadingLogo(false);
@@ -159,7 +157,6 @@ export default function CompanyProfileSettings() {
             }
             toast.success('Profile saved successfully!');
         } catch (error) {
-            console.error("Error saving company profile", error);
             toast.error(`Failed to save profile: ${(error as Error).message}`);
         } finally {
             setSaving(false);

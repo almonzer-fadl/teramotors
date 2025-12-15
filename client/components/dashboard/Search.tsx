@@ -114,7 +114,6 @@ export default function Search({
       
       setShowResults(true);
     } catch (error) {
-      console.error('Search error:', error);
     } finally {
       setLoading(false);
     }
@@ -138,9 +137,7 @@ export default function Search({
   const handleExport = async (type: string, format: 'csv' | 'excel' | 'pdf') => {
     try {
       // TODO: Implement export via API route
-      console.log('Export functionality', type, format);
     } catch (error) {
-      console.error('Export error:', error);
     }
   };
 

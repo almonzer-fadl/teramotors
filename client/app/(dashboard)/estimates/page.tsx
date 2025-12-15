@@ -78,7 +78,6 @@ export default function EstimatesPage() {
         setEstimates([]);
       }
     } catch (error) {
-      console.error("Failed to fetch estimates:", error);
       setEstimates([]);
     } finally {
       setLoading(false);

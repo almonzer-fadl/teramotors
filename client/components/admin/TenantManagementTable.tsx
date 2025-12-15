@@ -46,7 +46,6 @@ export default function TenantManagementTable() {
       setTotalTenants(data.total);
     } catch (err: any) {
       toast.error(err.message);
-      console.error('Error fetching tenants:', err);
       setTenants([]);
       setTotalTenants(0);
     } finally {

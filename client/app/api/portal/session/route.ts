@@ -30,7 +30,6 @@ export async function GET(request: NextRequest) {
         }
     });
   } catch (error) {
-    console.error('Error fetching portal session:', error);
     return NextResponse.json({ isAuthenticated: false }, { status: 500 });
   }
 }

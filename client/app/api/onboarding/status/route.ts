@@ -37,7 +37,6 @@ export const PUT = withTenantAuth(
         return NextResponse.json(updatedTenant.settings?.onboardingState);
 
     } catch (error) {
-      console.error('Error updating onboarding status:', error);
       return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
     }
   },

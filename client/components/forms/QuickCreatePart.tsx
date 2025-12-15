@@ -77,7 +77,6 @@ export default function QuickCreatePart({ isOpen, onClose, onCreated }: QuickCre
         setError(errorData.message || t('forms.failed_to_create_part'));
       }
     } catch (err) {
-      console.error('Failed to create part:', err);
       setError(t('forms.failed_to_create_part'));
     } finally {
       setLoading(false);

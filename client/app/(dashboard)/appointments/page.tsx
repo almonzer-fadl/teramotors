@@ -153,7 +153,6 @@ export default function AppointmentsPage() {
         });
       }
     } catch (error) {
-      console.error("Failed to fetch appointments:", error);
       setAppointments([]);
       setPagination({
         currentPage: 1,

@@ -68,7 +68,6 @@ export async function GET(request: NextRequest) {
       }
     }));
   } catch (error) {
-    console.error('Error fetching parts:', error);
     // Return empty array when database is unavailable
     return new Response(JSON.stringify({
       parts: [],
@@ -111,7 +110,6 @@ export async function POST(request: Request) {
 
     return new Response(JSON.stringify({ success: true, part }), { status: 201 });
   } catch (error) {
-    console.error('Error creating part:', error);
     return new Response(JSON.stringify({ error: 'Failed to create part' }), { status: 500 });
   }
 }

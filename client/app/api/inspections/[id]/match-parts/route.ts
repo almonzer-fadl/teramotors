@@ -53,7 +53,6 @@ export async function POST(
 
     return NextResponse.json({ data: matchedParts });
   } catch (error) {
-    console.error('Error matching parts for inspection:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return NextResponse.json({ error: 'Failed to match parts', details: errorMessage }, { status: 500 });
   }

@@ -43,14 +43,12 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
           );
         }
       } catch (whatsappError) {
-        console.error('Error sending job completed WhatsApp message:', whatsappError);
         // Don't fail the status update if WhatsApp fails
       }
     }
 
     return new Response(JSON.stringify({ success: true, jobCard: updatedJobCard }));
   } catch (error) {
-    console.error('Error updating job card status:', error);
     return new Response(JSON.stringify({ error: 'Failed to update job card status' }), { status: 500 });
   }
 }

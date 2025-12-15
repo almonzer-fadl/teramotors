@@ -64,7 +64,6 @@ export default function WhatsAppPage() {
                 setMessages(messagesData.messages || []);
             }
         } catch (error) {
-            console.error("Failed to fetch data", error);
         } finally {
             setLoading(false);
         }
@@ -92,7 +91,6 @@ export default function WhatsAppPage() {
                 }
             }
         } catch (error) {
-            console.error('Failed to test integration', error);
             if (showToast) {
                 toast.error(t('whatsapp.integration.test_failed'));
             }
@@ -131,7 +129,6 @@ export default function WhatsAppPage() {
             }
 
         } catch (error) {
-            console.error("Error sending message", error);
             toast.error((error as Error).message);
         } finally {
             setSending(false);

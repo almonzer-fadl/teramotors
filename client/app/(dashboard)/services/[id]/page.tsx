@@ -55,7 +55,6 @@ export default function ServiceDetailsPage() {
           setUsage(usageData.data || []);
         }
       } catch (error) {
-        console.error('Failed to fetch service data:', error);
       } finally {
         setLoading(false);
       }

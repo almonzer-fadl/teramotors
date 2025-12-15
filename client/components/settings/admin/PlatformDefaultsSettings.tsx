@@ -29,7 +29,6 @@ export default function PlatformDefaultsSettings() {
         // const data = await response.json();
         // setConfig(data);
       } catch (error) {
-        console.error('Failed to fetch global defaults:', error);
       } finally {
         setLoading(false);
       }
@@ -49,7 +48,6 @@ export default function PlatformDefaultsSettings() {
       // if (!response.ok) throw new Error('Failed to save global defaults');
       toast.success('Platform default settings saved successfully!');
     } catch (error) {
-      console.error('Error saving global defaults:', error);
       toast.error('Failed to save platform default settings.');
     } finally {
       setSaving(false);

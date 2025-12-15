@@ -112,7 +112,6 @@ export function TenantProvider({ children }: TenantProviderProps) {
         })
       }
     } catch (err) {
-      console.error('Error fetching tenant:', err)
       setError(err instanceof Error ? err.message : 'Failed to load tenant')
     } finally {
       setIsLoading(false)
@@ -141,7 +140,6 @@ export function TenantProvider({ children }: TenantProviderProps) {
 
       setBranding(prev => ({ ...prev, ...newBranding }))
     } catch (err) {
-      console.error('Error updating branding:', err)
       throw err
     }
   }, [tenant])

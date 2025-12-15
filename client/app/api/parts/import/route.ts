@@ -100,7 +100,6 @@ export async function POST(req: NextRequest) {
       message: `${importedCount} parts imported successfully` 
     });
   } catch (error: any) {
-    console.error('Error importing parts:', error);
     return NextResponse.json({ 
       success: false, 
       error: { message: error.message || 'Error importing parts' } 

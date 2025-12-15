@@ -25,7 +25,6 @@ export async function GET(
 
     if (!serverResponse.ok) {
       const errorText = await serverResponse.text();
-      console.error('Server error:', errorText);
       throw new Error(`Server responded with status: ${serverResponse.status} - ${errorText}`);
     }
 
@@ -42,7 +41,6 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error generating Arabic PDF:', error);
     return NextResponse.json({
       error: 'Failed to generate PDF',
       details: error instanceof Error ? error.message : 'Unknown error'

@@ -91,7 +91,6 @@ export default function AnalyticsDashboardPage() {
 
     } catch (err: any) {
       setError(err.message);
-      console.error('Error fetching analytics data:', err);
     } finally {
       setLoading(false);
     }

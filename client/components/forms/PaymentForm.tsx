@@ -70,7 +70,6 @@ export default function PaymentForm({ paymentId }: { paymentId?: string }) {
             });
           }
         } catch (error) {
-          console.error("Failed to fetch payment:", error);
         } finally {
           setInitialLoading(false);
         }
@@ -113,7 +112,6 @@ export default function PaymentForm({ paymentId }: { paymentId?: string }) {
         alert(error.message || "Failed to save payment.");
       }
     } catch (error) {
-      console.error("Failed to save payment:", error);
       alert("An unexpected error occurred.");
     } finally {
       setLoading(false);

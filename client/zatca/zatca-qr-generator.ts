@@ -22,13 +22,6 @@ export class ZATCAQRGenerator {
     
     // Validate company info (do not throw at import/build time)
     if (!ZATCAUtils.isValidSaudiVATNumber(this.companyVATNumber)) {
-      console.warn(
-        'Invalid company VAT number detected in ZATCAQRGenerator constructor:',
-        this.companyVATNumber,
-        'Length:',
-        this.companyVATNumber.length,
-        '- using placeholder to avoid build-time failures.'
-      );
       // Use a safe placeholder to avoid hard failures during build. Real validation happens on generate.
       this.companyVATNumber = '314211338900003';
     }
@@ -223,7 +216,6 @@ export class ZATCAQRGenerator {
         }
       });
     } catch (error) {
-      console.error('Failed to generate QR code image:', error);
       // Return a placeholder if QR generation fails
       return `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==`;
     }

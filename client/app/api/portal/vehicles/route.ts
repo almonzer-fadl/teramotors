@@ -41,7 +41,6 @@ export async function GET(request: NextRequest) {
     const vehicles = await Vehicle.find({ customerId });
     return NextResponse.json(vehicles);
   } catch (error) {
-    console.error('Error fetching vehicles:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
@@ -80,7 +79,6 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(newVehicle, { status: 201 });
     } catch (error) {
-      console.error('Error creating vehicle:', error);
       return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
   }

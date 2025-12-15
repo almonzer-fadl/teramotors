@@ -40,10 +40,8 @@ export default function UsersPage() {
         const data = await response.json();
         setUsers(data);
       } else {
-        console.error('Failed to fetch users');
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
     }
@@ -78,7 +76,6 @@ export default function UsersPage() {
         alert(error.message || 'Failed to update user');
       }
     } catch (error) {
-      console.error('Error updating user:', error);
       alert('Failed to update user');
     }
   };

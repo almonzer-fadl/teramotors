@@ -33,10 +33,8 @@ export const GET = withTenantAuth(
 
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-        console.error('Backup file not found on disk:', error);
         return NextResponse.json({ error: 'Backup file not found on disk' }, { status: 404 });
       }
-      console.error('Error downloading backup:', error);
       return NextResponse.json({ error: 'Failed to download backup' }, { status: 500 });
     }
   },

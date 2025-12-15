@@ -36,7 +36,6 @@ export async function signOut(): Promise<void> {
     await fetch("/api/auth/signout", { method: "POST" })
     window.location.href = "/login"
   } catch (error) {
-    console.error("Sign out error:", error)
   }
 }
 

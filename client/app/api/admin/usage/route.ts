@@ -37,7 +37,6 @@ export const GET = withTenantAuth(
 
       return NextResponse.json(usageData);
     } catch (error) {
-      console.error('Error fetching usage data:', error);
       return NextResponse.json({ error: 'Failed to fetch usage data' }, { status: 500 });
     }
   },

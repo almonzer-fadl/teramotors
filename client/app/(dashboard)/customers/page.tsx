@@ -116,7 +116,6 @@ export default function CustomersPage() {
         });
       }
     } catch (error) {
-      console.error("Failed to fetch customers:", error);
       setCustomers([]);
       setPagination({
         currentPage: 1,
@@ -172,7 +171,6 @@ export default function CustomersPage() {
         return items as Customer[];
       }
     } catch (error) {
-      console.error("Failed to fetch customer suggestions:", error);
     }
     return [];
   };
@@ -227,7 +225,6 @@ export default function CustomersPage() {
           alert(errorData.error || t("customers.delete_error"));
         }
       } catch (error) {
-        console.error("Failed to delete customer:", error);
         alert(t("customers.delete_error"));
       }
     }

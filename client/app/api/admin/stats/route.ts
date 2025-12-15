@@ -40,7 +40,6 @@ export async function GET() {
     return NextResponse.json(stats);
 
   } catch (error) {
-    console.error('Error fetching admin stats:', error);
     // Use a 503 Service Unavailable status code if there's a DB issue
     return NextResponse.json({ message: 'An error occurred while fetching stats' }, { status: 503 });
   }

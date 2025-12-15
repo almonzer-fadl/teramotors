@@ -42,17 +42,6 @@ export async function GET(request: Request) {
       .select('name description items')
       .lean();
 
-    console.log('Found templates:', templates.length);
-    console.log('Template details:', JSON.stringify(templates.map(t => ({
-      name: t.name,
-      itemCount: t.items?.length || 0,
-      items: t.items?.map((i: any) => ({
-        name: i.name,
-        category: i.category,
-        uniqueCode: i.uniqueCode,
-        hasCode: !!i.uniqueCode
-      }))
-    })), null, 2));
 
     const templateItemsWithCodes = templates.flatMap(template =>
       (template.items || [])
@@ -66,7 +55,6 @@ export async function GET(request: Request) {
         }))
     );
 
-    console.log('Template items with codes:', templateItemsWithCodes.length);
 
     if (format === 'json') {
       return NextResponse.json({
@@ -413,7 +401,6 @@ export async function GET(request: Request) {
       headers: { 'Content-Type': 'text/html; charset=utf-8' }
     });
   } catch (error) {
-    console.error('Error fetching unique codes:', error);
     return new NextResponse(`
       <html>
         <body>

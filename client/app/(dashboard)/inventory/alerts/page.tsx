@@ -29,7 +29,6 @@ export default function InventoryAlertsPage() {
         setParts(await response.json())
       }
     } catch (error) {
-      console.error('Failed to fetch low stock parts:', error)
     } finally {
       setLoading(false)
     }

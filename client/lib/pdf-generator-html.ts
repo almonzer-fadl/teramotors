@@ -88,7 +88,6 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
     try {
       qrCodeDataUrl = await QRCode.toDataURL(qrCodeData, { width: 100, margin: 1 });
     } catch (error) {
-      console.error('Error generating QR code:', error);
     }
   }
 

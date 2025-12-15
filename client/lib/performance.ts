@@ -22,10 +22,8 @@ export class DatabaseOptimizer {
       await Customer.collection.createIndex({ isActive: 1 });
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('Customer indexes created successfully');
       }
     } catch (error) {
-      console.error('Error creating customer indexes:', error);
     }
   }
 
@@ -42,10 +40,8 @@ export class DatabaseOptimizer {
       await Vehicle.collection.createIndex({ isActive: 1 });
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('Vehicle indexes created successfully');
       }
     } catch (error) {
-      console.error('Error creating vehicle indexes:', error);
     }
   }
 
@@ -65,10 +61,8 @@ export class DatabaseOptimizer {
       });
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('Appointment indexes created successfully');
       }
     } catch (error) {
-      console.error('Error creating appointment indexes:', error);
     }
   }
 
@@ -89,10 +83,8 @@ export class DatabaseOptimizer {
       });
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('JobCard indexes created successfully');
       }
     } catch (error) {
-      console.error('Error creating job card indexes:', error);
     }
   }
 
@@ -112,10 +104,8 @@ export class DatabaseOptimizer {
       });
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('Invoice indexes created successfully');
       }
     } catch (error) {
-      console.error('Error creating invoice indexes:', error);
     }
   }
 
@@ -131,10 +121,8 @@ export class DatabaseOptimizer {
       await Estimate.collection.createIndex({ validUntil: 1 });
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('Estimate indexes created successfully');
       }
     } catch (error) {
-      console.error('Error creating estimate indexes:', error);
     }
   }
 
@@ -155,16 +143,13 @@ export class DatabaseOptimizer {
       });
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('Part indexes created successfully');
       }
     } catch (error) {
-      console.error('Error creating part indexes:', error);
     }
   }
 
   static async createAllIndexes() {
     if (process.env.NODE_ENV === 'development') {
-      console.log('Creating database indexes for performance optimization...');
     }
     
     await Promise.all([
@@ -178,7 +163,6 @@ export class DatabaseOptimizer {
     ]);
     
     if (process.env.NODE_ENV === 'development') {
-      console.log('All database indexes created successfully');
     }
   }
 }
@@ -434,7 +418,6 @@ export class PerformanceMonitor {
       }
       
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[PERFORMANCE] ${label}: ${duration.toFixed(2)}ms`);
       }
     };
   }

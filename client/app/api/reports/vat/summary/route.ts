@@ -44,7 +44,6 @@ export const GET = withTenantAuth(
       });
 
     } catch (error) {
-      console.error('Error fetching VAT summary:', error);
       return NextResponse.json({ error: 'Failed to fetch report summary' }, { status: 500 });
     }
   },

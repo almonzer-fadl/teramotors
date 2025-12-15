@@ -64,23 +64,10 @@ export async function POST(req: NextRequest) {
     customer.portalAccess.otpCreatedAt = new Date();
     await customer.save();
 
-    // Log OTP to console if email is not configured (for testing)
-    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'dummy-key') {
-      console.log('\n═══════════════════════════════════════════════════════');
-      console.log('🔐 CUSTOMER PORTAL OTP (Email not configured)');
-      console.log('═══════════════════════════════════════════════════════');
-      console.log(`Customer: ${customer.firstName} ${customer.lastName}`);
-      console.log(`Email: ${customer.email}`);
-      console.log(`OTP Code: ${otp}`);
-      console.log(`Valid for: 10 minutes`);
-      console.log('═══════════════════════════════════════════════════════\n');
-    }
-
     // Send OTP via email
     try {
       await CustomerPortalAuth.sendOTP(customer, tenant, otp);
     } catch (emailError) {
-      console.error('Failed to send OTP email (continuing anyway):', emailError);
       // Continue anyway - OTP is saved to database and logged to console
     }
 
@@ -90,7 +77,6 @@ export async function POST(req: NextRequest) {
       customerId: customer._id.toString()
     });
   } catch (error: any) {
-    console.error('Request OTP error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to send OTP' },
       { status: 500 }

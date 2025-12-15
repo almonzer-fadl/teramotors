@@ -64,7 +64,6 @@ export default function ServiceForm({
         setTemplates(await response.json());
       }
     } catch (error) {
-      console.error("Failed to fetch service templates:", error);
     }
   };
 
@@ -87,7 +86,6 @@ export default function ServiceForm({
         setFormData(service);
       }
     } catch (error) {
-      console.error("Failed to fetch service:", error);
     }
   };
 
@@ -115,7 +113,6 @@ export default function ServiceForm({
         alert(error.message || t('forms.failed_to_save_service'));
       }
     } catch (error) {
-      console.error("Failed to save service:", error);
       alert(t('forms.failed_to_save_service'));
     } finally {
       setLoading(false);

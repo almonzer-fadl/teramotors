@@ -47,7 +47,6 @@ export async function GET(request: Request) {
     });
 
   } catch (error) {
-    console.error('Error fetching tenants:', error);
     return NextResponse.json({ message: 'An error occurred while fetching tenants' }, { status: 500 });
   }
 }

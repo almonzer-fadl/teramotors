@@ -17,7 +17,6 @@ export async function GET(request: Request) {
 
     return new Response(JSON.stringify(lowStockParts));
   } catch (error) {
-    console.error('Error fetching low stock parts:', error);
     return new Response(JSON.stringify({ error: 'Failed to fetch low stock parts' }), { status: 500 });
   }
 }

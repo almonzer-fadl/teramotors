@@ -54,11 +54,9 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
         });
         setItems(template.items || []);
       } else {
-        console.error("Failed to fetch template");
         router.push("/inspections/templates");
       }
     } catch (error) {
-      console.error("Error fetching template:", error);
       router.push("/inspections/templates");
     } finally {
       setLoading(false);
@@ -117,10 +115,8 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
       if (response.ok) {
         router.push("/inspections/templates");
       } else {
-        console.error("Failed to update template");
       }
     } catch (error) {
-      console.error("Error updating template:", error);
     } finally {
       setSaving(false);
     }

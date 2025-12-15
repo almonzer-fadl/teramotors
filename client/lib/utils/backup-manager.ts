@@ -68,14 +68,12 @@ export async function createFullBackup(userId: mongoose.Types.ObjectId): Promise
         return backupDoc;
 
     } catch (error) {
-        console.error("Backup failed:", error)
         backupDoc.status = 'failed';
         await backupDoc.save();
         // remove the failed backup file
         try {
             await fs.unlink(backupPath);
         } catch (unlinkError) {
-            console.error("Failed to delete incomplete backup file:", unlinkError);
         }
         throw error;
     }

@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error updating low stock status:', error);
     return NextResponse.json({ error: 'Failed to update low stock status.' }, { status: 500 });
   }
 }

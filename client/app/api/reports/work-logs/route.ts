@@ -108,7 +108,6 @@ export async function GET(request: Request) {
 
     return Response.json({ logs, pagination: { totalCount, currentPage: page, totalPages, limit } })
   } catch (e) {
-    console.error('Error fetching work logs:', e)
     return Response.json({ error: 'Failed to fetch logs' }, { status: 500 })
   }
 }
