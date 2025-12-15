@@ -48,6 +48,13 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
   }, [customerId]);
 
   useEffect(() => {
+    // When custom make is selected, automatically enable custom model input
+    if (customMake) {
+      setCustomModel(true);
+      setAvailableModels([]);
+      return;
+    }
+
     // Only update available models when using predefined makes (not custom)
     if (form.make && !customMake) {
       const models = getModelsForMake(form.make);
@@ -116,10 +123,11 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
   const handleMakeChange = (value: string) => {
     if (value === 'custom') {
       setCustomMake(true);
-      setForm({ ...form, make: '' });
+      setForm({ ...form, make: '', model: '' });
     } else {
       setCustomMake(false);
-      setForm({ ...form, make: value });
+      setCustomModel(false); // Reset custom model when switching to predefined make
+      setForm({ ...form, make: value, model: '' });
     }
   };
 
