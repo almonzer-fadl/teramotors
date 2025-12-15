@@ -14,7 +14,7 @@ const StatCard = ({ title, value, color }: { title: string; value: string; color
     </div>
 );
 
-const CustomerRow = ({ customer, t }: { customer: any; t: any }) => {
+const CustomerRow = ({ customer, t, i18n }: { customer: any; t: any; i18n: any }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -124,7 +124,7 @@ export const ArAgingReport = ({ data }: { data: any }) => {
                         </thead>
                         <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
                             {customers.map((customer: any) => (
-                                <CustomerRow key={customer.customerName} customer={customer} t={t} />
+                                <CustomerRow key={customer.customerName} customer={customer} t={t} i18n={i18n} />
                             ))}
                         </tbody>
                     </table>
