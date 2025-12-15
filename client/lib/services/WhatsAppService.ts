@@ -10,7 +10,6 @@ async function sendMessage(tenantId: string, customerId: string, to: string, bod
 
     if (!instanceId || !token) {
         const errorMsg = 'WhatsApp integration not configured for this tenant.';
-        console.error(errorMsg);
         await new WhatsAppMessage({
             tenantId,
             customerId,
@@ -41,7 +40,6 @@ async function sendMessage(tenantId: string, customerId: string, to: string, bod
         const data = await response.json();
 
         if (data.sent === 'true' || response.ok) {
-            console.log('WhatsApp message sent successfully:', data);
             await new WhatsAppMessage({
                 tenantId,
                 customerId,
@@ -51,7 +49,6 @@ async function sendMessage(tenantId: string, customerId: string, to: string, bod
             }).save();
             return { success: true, message: data.message, ...data };
         } else {
-            console.error('Failed to send WhatsApp message:', data.error);
              await new WhatsAppMessage({
                 tenantId,
                 customerId,
@@ -63,7 +60,6 @@ async function sendMessage(tenantId: string, customerId: string, to: string, bod
             return { success: false, error: data.error };
         }
     } catch (error) {
-        console.error('Error sending WhatsApp message:', error);
         await new WhatsAppMessage({
             tenantId,
             customerId,

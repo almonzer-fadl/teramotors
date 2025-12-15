@@ -16,7 +16,6 @@ export async function GET() {
 
     return Response.json(templates)
   } catch (error) {
-    console.error('Error fetching inspection templates:', error)
     // Return empty array when database is unavailable
     return Response.json([])
   }
@@ -49,7 +48,6 @@ export async function POST(request: Request) {
       template
     }, { status: 201 })
   } catch (error) {
-    console.error('Error creating inspection template:', error)
     return Response.json({ error: 'Failed to create inspection template' }, { status: 500 })
   }
 }

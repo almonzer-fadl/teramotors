@@ -135,7 +135,6 @@ export default function InlineInvoiceCreator({ isOpen, onClose, jobCardId, onCre
         }));
       }
     } catch (e) {
-      console.error('Failed to fetch initial data:', e);
     }
   };
 

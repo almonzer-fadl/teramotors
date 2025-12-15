@@ -17,7 +17,6 @@ class CacheService {
     try {
       // Only initialize Redis if URL is provided
       if (!process.env.REDIS_URL) {
-        console.log('Redis URL not provided, caching disabled');
         this.isConnected = false;
         return;
       }
@@ -32,21 +31,18 @@ class CacheService {
       this.client.on('error', (err: any) => {
         // Only log errors in development
         if (process.env.NODE_ENV === 'development') {
-          console.error('Redis Client Error:', err);
         }
         this.isConnected = false;
       });
 
       this.client.on('connect', () => {
         if (process.env.NODE_ENV === 'development') {
-          console.log('Redis Client Connected');
         }
         this.isConnected = true;
       });
 
       this.client.on('disconnect', () => {
         if (process.env.NODE_ENV === 'development') {
-          console.log('Redis Client Disconnected');
         }
         this.isConnected = false;
       });
@@ -55,7 +51,6 @@ class CacheService {
     } catch (error) {
       // Only log errors in development
       if (process.env.NODE_ENV === 'development') {
-        console.error('Failed to initialize Redis client:', error);
       }
       this.isConnected = false;
     }
@@ -71,7 +66,6 @@ class CacheService {
       return value ? JSON.parse(value) : null;
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Cache get error:', error);
       }
       return null;
     }
@@ -99,7 +93,6 @@ class CacheService {
       return true;
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Cache set error:', error);
       }
       return false;
     }
@@ -115,7 +108,6 @@ class CacheService {
       return true;
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Cache delete error:', error);
       }
       return false;
     }
@@ -135,7 +127,6 @@ class CacheService {
       return true;
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Cache invalidation error:', error);
       }
       return false;
     }
@@ -154,7 +145,6 @@ class CacheService {
       return true;
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Cache pattern invalidation error:', error);
       }
       return false;
     }
@@ -170,7 +160,6 @@ class CacheService {
       return true;
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Cache flush error:', error);
       }
       return false;
     }
@@ -186,7 +175,6 @@ class CacheService {
       return true;
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Cache health check error:', error);
       }
       return false;
     }

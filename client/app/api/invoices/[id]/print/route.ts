@@ -54,7 +54,6 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error generating Invoice HTML:', error);
     return new Response(JSON.stringify({ error: 'Failed to generate HTML' }), { status: 500 });
   }
 }

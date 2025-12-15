@@ -322,7 +322,6 @@ export async function POST(request: NextRequest) {
       })
     }
   } catch (error) {
-    console.error('Error exporting report:', error)
     return new Response(JSON.stringify({ error: 'Failed to export report' }), { status: 500 })
   }
 }

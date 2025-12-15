@@ -31,7 +31,6 @@ export const POST = withTenantAuth(
         return NextResponse.json({ message: `Password for ${user.email} has been reset to "TempPass123!". The user will be required to change it on next login.` });
 
     } catch (error) {
-      console.error('Error resetting password:', error);
       return NextResponse.json({ error: 'Failed to reset password' }, { status: 500 });
     }
   },

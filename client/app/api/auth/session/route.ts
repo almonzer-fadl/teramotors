@@ -11,7 +11,6 @@ export async function GET() {
       return NextResponse.json(null, { status: 401 })
     }
   } catch (error) {
-    console.error("Session API error:", error)
     return NextResponse.json(null, { status: 401 })
   }
 }

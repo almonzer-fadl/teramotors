@@ -173,7 +173,6 @@ export const POST = withTenantAuth(
         );
       }
     } catch (whatsappError) {
-      console.error('Error sending job started WhatsApp message:', whatsappError);
     }
 
     const populatedJobCard = await JobCard.findById(jobCard._id)

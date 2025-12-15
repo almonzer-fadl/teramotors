@@ -140,7 +140,6 @@ function InvoicesPageContent() {
         });
       }
     } catch (error) {
-      console.error("Failed to fetch invoices:", error);
       setInvoices([]);
       setPagination({
         currentPage: 1,
@@ -175,7 +174,6 @@ function InvoicesPageContent() {
       alert(t('invoices.delete_success', { defaultValue: 'Invoice deleted successfully.' }));
       await fetchInvoices(searchTerm, statusFilter, currentPage, itemsPerPage);
     } catch (error) {
-      console.error('Failed to delete invoice:', error);
       alert(t('invoices.delete_failed', { defaultValue: 'Failed to delete invoice.' }));
     }
   };
@@ -199,10 +197,8 @@ function InvoicesPageContent() {
 
         setShowPrintModal(true);
       } else {
-        console.error('Failed to fetch invoice details');
       }
     } catch (error) {
-      console.error('Error fetching invoice details:', error);
     }
   };
 

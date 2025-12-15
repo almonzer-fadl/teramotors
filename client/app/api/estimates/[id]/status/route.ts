@@ -23,7 +23,6 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     return new Response(JSON.stringify({ success: true, estimate: updatedEstimate }));
   } catch (error) {
-    console.error('Error updating estimate status:', error);
     return new Response(JSON.stringify({ error: 'Failed to update estimate status' }), { status: 500 });
   }
 }

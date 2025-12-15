@@ -23,7 +23,6 @@ export async function POST(request: NextRequest, context: { params: Promise<{ id
 
     return new Response(JSON.stringify({ success: true, jobCard: updatedJobCard }));
   } catch (error) {
-    console.error('Error updating job card photos:', error);
     return new Response(JSON.stringify({ error: 'Failed to update job card photos' }), { status: 500 });
   }
 }

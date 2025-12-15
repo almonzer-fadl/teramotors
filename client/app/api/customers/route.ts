@@ -115,7 +115,6 @@ export const POST = withTenantAuth(
       const whatsappListeners = WhatsAppEventListeners.getInstance();
       await whatsappListeners.onCustomerCreated(customer._id.toString());
     } catch (whatsappError) {
-      console.error('Error sending welcome WhatsApp message:', whatsappError);
       // Don't fail the customer creation if WhatsApp fails
     }
 

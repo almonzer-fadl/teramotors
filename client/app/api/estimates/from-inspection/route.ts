@@ -47,13 +47,11 @@ export async function POST(request: NextRequest) {
     if (selectedItems && Array.isArray(selectedItems) && selectedItems.length > 0) {
       const selectedItemIds = new Set(selectedItems.map((item: any) => item.itemId));
       itemsToProcess = inspection.items.filter((item: any) => selectedItemIds.has(item.itemId));
-      console.log(`[Estimate API] Using ${itemsToProcess.length} selected items from ${inspection.items.length} total items`);
     } else {
       // Auto-select items that need repair
       itemsToProcess = inspection.items.filter((item: any) =>
         item.condition === 'fair' || item.condition === 'poor' || item.condition === 'critical'
       );
-      console.log(`[Estimate API] Auto-selected ${itemsToProcess.length} items needing repair from ${inspection.items.length} total items`);
     }
 
     if (itemsToProcess.length === 0) {
@@ -170,7 +168,6 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error('Error creating estimate from inspection:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return NextResponse.json({ error: 'Failed to create estimate from inspection', details: errorMessage }, { status: 500 });
   }

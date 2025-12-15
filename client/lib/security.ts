@@ -339,12 +339,10 @@ export class SecurityAuditLogger {
       userAgent: details.userAgent || 'unknown'
     };
 
-    console.log(`[SECURITY ${severity.toUpperCase()}]`, logEntry);
 
     // In production, this would be sent to a security monitoring service
     if (severity === 'critical' || severity === 'high') {
       // Send alert to security team
-      console.error('SECURITY ALERT:', logEntry);
     }
   }
 

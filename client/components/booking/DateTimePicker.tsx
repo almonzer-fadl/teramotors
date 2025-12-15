@@ -145,21 +145,17 @@ export function DateTimePicker({
     try {
       const dateStr = date.toISOString().split('T')[0];
       const url = `/api/public/tenants/${tenantSlug}/available-slots?date=${dateStr}`;
-      console.log('Fetching slots from:', url);
 
       const response = await fetch(url);
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('API Error:', errorData);
         throw new Error(errorData.error || 'Failed to fetch available slots');
       }
 
       const data = await response.json();
-      console.log('Received slots data:', data);
       setAvailableSlots(data.slots || []);
     } catch (err: any) {
-      console.error('Error fetching slots:', err);
       setError(err.message || 'Failed to load available time slots');
       setAvailableSlots([]);
     } finally {

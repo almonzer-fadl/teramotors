@@ -19,7 +19,6 @@ export async function GET(request: NextRequest) {
     
     return new Response(JSON.stringify(categories));
   } catch (error) {
-    console.error('Error fetching service categories:', error);
     return new Response(JSON.stringify({ error: 'Failed to fetch service categories' }), { status: 500 });
   }
 }

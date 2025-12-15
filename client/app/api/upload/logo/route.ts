@@ -60,7 +60,6 @@ const handler = withTenantAuth(
 
       return NextResponse.json({ url: uploadResult.url });
     } catch (error: any) {
-      console.error('Logo upload error:', error);
       return NextResponse.json(
         { error: error?.message || 'Failed to upload logo.' },
         { status: 500 }

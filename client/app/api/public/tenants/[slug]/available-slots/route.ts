@@ -68,7 +68,6 @@ export async function GET(
       availableSlots: slots.filter(s => s.available).length,
     });
   } catch (error) {
-    console.error('Error fetching available slots:', error);
     return NextResponse.json(
       { error: 'Failed to fetch available slots' },
       { status: 500 }

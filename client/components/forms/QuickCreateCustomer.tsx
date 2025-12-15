@@ -58,7 +58,6 @@ export default function QuickCreateCustomer({ isOpen, onClose, onCreated }: Quic
         setError(errorData.error || errorData.message || t('forms.failed_to_create_customer'));
       }
     } catch (err) {
-      console.error('Failed to create customer:', err);
       setError(t('forms.failed_to_create_customer'));
     } finally {
       setLoading(false);

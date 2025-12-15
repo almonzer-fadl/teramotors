@@ -99,7 +99,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: `${customers.length} customers imported successfully` });
   } catch (error: any) {
-    console.error('Error importing customers:', error);
     return NextResponse.json({ 
       success: false, 
       error: { message: error.message || 'Error importing customers' } 

@@ -14,7 +14,6 @@ export async function GET() {
     await connectToDatabase()
 
     // Ensure all models are registered
-    console.log('Available models:', Object.keys(mongoose.models));
 
     const recent = await JobCard.find({
       status: { $in: ['pending', 'in-progress'] },
@@ -46,7 +45,6 @@ export async function GET() {
 
     return NextResponse.json(shaped, { status: 200 })
   } catch (error) {
-    console.error('Error fetching recent job cards:', error)
     return NextResponse.json({ message: 'Error fetching recent job cards' }, { status: 500 })
   }
 }

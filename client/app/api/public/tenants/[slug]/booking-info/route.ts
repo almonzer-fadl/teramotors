@@ -61,7 +61,6 @@ export async function GET(
       services,
     });
   } catch (error) {
-    console.error('Error fetching booking info:', error);
     return NextResponse.json(
       { error: 'Failed to fetch booking information' },
       { status: 500 }

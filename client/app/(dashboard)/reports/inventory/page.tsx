@@ -26,7 +26,6 @@ export default function InventoryReportPage() {
           setReport(data.data);
         }
       } catch (error) {
-        console.error('Failed to fetch inventory report:', error);
       } finally {
         setLoading(false);
       }

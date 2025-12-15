@@ -126,7 +126,6 @@ export class NotificationService {
       try {
         await this.sendEmailNotification(type, userId, data);
       } catch (error) {
-        console.error('Failed to send email notification:', error);
       }
     }
 

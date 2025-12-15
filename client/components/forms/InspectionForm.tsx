@@ -127,7 +127,6 @@ export default function InspectionForm({
         setTemplates(templatesArray);
       }
     } catch (error) {
-      console.error("Failed to fetch initial data:", error);
       setJobCards([]);
       setUsers([]);
       setTemplates([]);
@@ -157,7 +156,6 @@ export default function InspectionForm({
         });
       }
     } catch (error) {
-      console.error("Failed to fetch inspection:", error);
     }
   };
 
@@ -187,7 +185,6 @@ export default function InspectionForm({
         alert(error.message || t('forms.failed_to_save_inspection'));
       }
     } catch (error) {
-      console.error("Failed to save inspection:", error);
       alert(t('forms.failed_to_save_inspection'));
     } finally {
       setLoading(false);
@@ -235,7 +232,6 @@ export default function InspectionForm({
         }
       }
     } catch (error) {
-      console.error("Failed to load template items:", error);
     }
   };
 

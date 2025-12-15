@@ -10,7 +10,6 @@ export const GET = withTenantAuth(
       const distribution = await calculateSubscriptionDistribution();
       return NextResponse.json({ distribution });
     } catch (error) {
-      console.error('Error fetching subscription analytics:', error);
       return NextResponse.json({ error: 'Failed to fetch subscription analytics' }, { status: 500 });
     }
   },

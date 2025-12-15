@@ -21,7 +21,6 @@ export async function getTenantById(
     await connectToDatabase();
     return await Tenant.findById(tenantId);
   } catch (error) {
-    console.error('Error getting tenant:', error);
     return null;
   }
 }
@@ -36,7 +35,6 @@ export async function getTenantBySlug(slug: string): Promise<ITenant | null> {
     await connectToDatabase();
     return await Tenant.findOne({ slug });
   } catch (error) {
-    console.error('Error getting tenant by slug:', error);
     return null;
   }
 }
@@ -65,7 +63,6 @@ export async function validateTenantActive(
 
     return true;
   } catch (error) {
-    console.error('Error validating tenant:', error);
     return false;
   }
 }
@@ -118,7 +115,6 @@ export async function userBelongsToTenant(
     if (!user?.tenantId) return false;
     return user.tenantId.toString() === tenantId.toString();
   } catch (error) {
-    console.error('Error checking user tenant:', error);
     return false;
   }
 }

@@ -54,7 +54,6 @@ export async function GET(request: NextRequest) {
       itemsWithCodes: itemsWithCodes
     });
   } catch (error) {
-    console.error('Error checking template:', error);
     return NextResponse.json({
       error: 'Failed to check template',
       details: error instanceof Error ? error.message : 'Unknown error'

@@ -74,7 +74,6 @@ export const GET = withTenantAuth(
       return NextResponse.json(report);
 
     } catch (error) {
-      console.error('Error fetching Technician Performance summary:', error);
       return NextResponse.json({ error: 'Failed to fetch report summary' }, { status: 500 });
     }
   },

@@ -1,0 +1,3194 @@
+{
+  "timestamp": "2025-12-15T17:17:22.278Z",
+  "stats": {
+    "filesProcessed": 471,
+    "filesModified": 232,
+    "logsRemoved": 104,
+    "errorsRemoved": 417,
+    "warnsRemoved": 9,
+    "infosRemoved": 0,
+    "debugsRemoved": 0
+  },
+  "removedLogs": [
+    {
+      "file": "lib/tenant-utils.ts",
+      "line": 24,
+      "type": "error",
+      "content": "console.error('Error getting tenant:', error);"
+    },
+    {
+      "file": "lib/tenant-utils.ts",
+      "line": 39,
+      "type": "error",
+      "content": "console.error('Error getting tenant by slug:', error);"
+    },
+    {
+      "file": "lib/tenant-utils.ts",
+      "line": 68,
+      "type": "error",
+      "content": "console.error('Error validating tenant:', error);"
+    },
+    {
+      "file": "lib/tenant-utils.ts",
+      "line": 121,
+      "type": "error",
+      "content": "console.error('Error checking user tenant:', error);"
+    },
+    {
+      "file": "lib/simple-auth.ts",
+      "line": 32,
+      "type": "log",
+      "content": "console.log('[AUTH] Looking up user:', email)"
+    },
+    {
+      "file": "lib/simple-auth.ts",
+      "line": 36,
+      "type": "log",
+      "content": "console.log('[AUTH] Exact match result:', user ? 'Found' : 'Not found')"
+    },
+    {
+      "file": "lib/simple-auth.ts",
+      "line": 41,
+      "type": "log",
+      "content": "console.log('[AUTH] Case-insensitive result:', user ? 'Found' : 'Not found')"
+    },
+    {
+      "file": "lib/simple-auth.ts",
+      "line": 56,
+      "type": "log",
+      "content": "console.log('[AUTH] User found:', { email: user.email, role: user.role, hasPassword: !!user.password..."
+    },
+    {
+      "file": "lib/simple-auth.ts",
+      "line": 59,
+      "type": "log",
+      "content": "console.log('[AUTH] Password valid:', isValidPassword)"
+    },
+    {
+      "file": "lib/simple-auth.ts",
+      "line": 113,
+      "type": "error",
+      "content": "console.error(\"Sign in error:\", error)"
+    },
+    {
+      "file": "lib/simple-auth-client.ts",
+      "line": 39,
+      "type": "error",
+      "content": "console.error(\"Sign out error:\", error)"
+    },
+    {
+      "file": "lib/security.ts",
+      "line": 342,
+      "type": "log",
+      "content": "console.log(`[SECURITY ${severity.toUpperCase()}]`, logEntry);"
+    },
+    {
+      "file": "lib/security.ts",
+      "line": 347,
+      "type": "error",
+      "content": "console.error('SECURITY ALERT:', logEntry);"
+    },
+    {
+      "file": "lib/search.ts",
+      "line": 272,
+      "type": "error",
+      "content": "console.error('Search error:', error);"
+    },
+    {
+      "file": "lib/search.ts",
+      "line": 335,
+      "type": "error",
+      "content": "console.error('Search suggestions error:', error);"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 25,
+      "type": "log",
+      "content": "console.log('Customer indexes created successfully');"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 28,
+      "type": "error",
+      "content": "console.error('Error creating customer indexes:', error);"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 45,
+      "type": "log",
+      "content": "console.log('Vehicle indexes created successfully');"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 48,
+      "type": "error",
+      "content": "console.error('Error creating vehicle indexes:', error);"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 68,
+      "type": "log",
+      "content": "console.log('Appointment indexes created successfully');"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 71,
+      "type": "error",
+      "content": "console.error('Error creating appointment indexes:', error);"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 92,
+      "type": "log",
+      "content": "console.log('JobCard indexes created successfully');"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 95,
+      "type": "error",
+      "content": "console.error('Error creating job card indexes:', error);"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 115,
+      "type": "log",
+      "content": "console.log('Invoice indexes created successfully');"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 118,
+      "type": "error",
+      "content": "console.error('Error creating invoice indexes:', error);"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 134,
+      "type": "log",
+      "content": "console.log('Estimate indexes created successfully');"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 137,
+      "type": "error",
+      "content": "console.error('Error creating estimate indexes:', error);"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 158,
+      "type": "log",
+      "content": "console.log('Part indexes created successfully');"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 161,
+      "type": "error",
+      "content": "console.error('Error creating part indexes:', error);"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 167,
+      "type": "log",
+      "content": "console.log('Creating database indexes for performance optimization...');"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 181,
+      "type": "log",
+      "content": "console.log('All database indexes created successfully');"
+    },
+    {
+      "file": "lib/performance.ts",
+      "line": 437,
+      "type": "log",
+      "content": "console.log(`[PERFORMANCE] ${label}: ${duration.toFixed(2)}ms`);"
+    },
+    {
+      "file": "lib/pdf-generator-html.ts",
+      "line": 91,
+      "type": "error",
+      "content": "console.error('Error generating QR code:', error);"
+    },
+    {
+      "file": "lib/notifications.ts",
+      "line": 129,
+      "type": "error",
+      "content": "console.error('Failed to send email notification:', error);"
+    },
+    {
+      "file": "lib/email.ts",
+      "line": 23,
+      "type": "warn",
+      "content": "console.warn('Resend API key not configured. Email sending disabled.');"
+    },
+    {
+      "file": "lib/email.ts",
+      "line": 36,
+      "type": "error",
+      "content": "console.error('Email sending error:', error);"
+    },
+    {
+      "file": "lib/email.ts",
+      "line": 42,
+      "type": "error",
+      "content": "console.error('Email service error:', error);"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 33,
+      "type": "log",
+      "content": "console.log(\"DB connection verified\");"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 37,
+      "type": "log",
+      "content": "console.log(\"DB connection lost, reconnecting...\");"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 62,
+      "type": "log",
+      "content": "console.log(\"MongoDB connected successfully\");"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 70,
+      "type": "error",
+      "content": "console.error('MongoDB connection error:', err);"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 76,
+      "type": "log",
+      "content": "console.log('MongoDB disconnected');"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 81,
+      "type": "log",
+      "content": "console.log('MongoDB reconnected');"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 87,
+      "type": "log",
+      "content": "console.log('MongoDB connection closed');"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 96,
+      "type": "error",
+      "content": "console.error(\"MongoDB connection error:\", error);"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 100,
+      "type": "log",
+      "content": "console.log(`Retrying connection in ${retryDelay}ms... (Attempt ${connectionAttempts}/${maxRetries})..."
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 160,
+      "type": "error",
+      "content": "console.error('Database operation failed:', dbError);"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 163,
+      "type": "log",
+      "content": "console.log('Using fallback data');"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 200,
+      "type": "error",
+      "content": "console.error('Database health check failed:', error);"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 209,
+      "type": "log",
+      "content": "console.log('Database connection closed gracefully');"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 211,
+      "type": "error",
+      "content": "console.error('Error during database shutdown:', error);"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 230,
+      "type": "error",
+      "content": "console.error('Connection error:', error);"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 237,
+      "type": "log",
+      "content": "console.log(`Attempting to reconnect... (${connectionAttempts + 1}/${maxRetries})`);"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 241,
+      "type": "error",
+      "content": "console.error('Reconnection failed:', retryError);"
+    },
+    {
+      "file": "lib/db.ts",
+      "line": 256,
+      "type": "log",
+      "content": "console.log(\"Connection status reset\");"
+    },
+    {
+      "file": "lib/cloudinary.ts",
+      "line": 56,
+      "type": "error",
+      "content": "console.error('Cloudinary upload error:', error);"
+    },
+    {
+      "file": "lib/cloudinary.ts",
+      "line": 71,
+      "type": "error",
+      "content": "console.error('Multiple file upload error:', error);"
+    },
+    {
+      "file": "lib/cloudinary.ts",
+      "line": 84,
+      "type": "error",
+      "content": "console.error('Cloudinary delete error:', error);"
+    },
+    {
+      "file": "lib/cloudinary.ts",
+      "line": 120,
+      "type": "error",
+      "content": "console.error('Cloudinary URL generation error:', error);"
+    },
+    {
+      "file": "lib/cloudinary.ts",
+      "line": 137,
+      "type": "error",
+      "content": "console.error('Thumbnail generation error:', error);"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 20,
+      "type": "log",
+      "content": "console.log('Redis URL not provided, caching disabled');"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 35,
+      "type": "error",
+      "content": "console.error('Redis Client Error:', err);"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 42,
+      "type": "log",
+      "content": "console.log('Redis Client Connected');"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 49,
+      "type": "log",
+      "content": "console.log('Redis Client Disconnected');"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 58,
+      "type": "error",
+      "content": "console.error('Failed to initialize Redis client:', error);"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 74,
+      "type": "error",
+      "content": "console.error('Cache get error:', error);"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 102,
+      "type": "error",
+      "content": "console.error('Cache set error:', error);"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 118,
+      "type": "error",
+      "content": "console.error('Cache delete error:', error);"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 138,
+      "type": "error",
+      "content": "console.error('Cache invalidation error:', error);"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 157,
+      "type": "error",
+      "content": "console.error('Cache pattern invalidation error:', error);"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 173,
+      "type": "error",
+      "content": "console.error('Cache flush error:', error);"
+    },
+    {
+      "file": "lib/cache.ts",
+      "line": 189,
+      "type": "error",
+      "content": "console.error('Cache health check error:', error);"
+    },
+    {
+      "file": "lib/api-client.ts",
+      "line": 111,
+      "type": "error",
+      "content": "console.error(`API Error [${method}] ${endpoint}:`, error)"
+    },
+    {
+      "file": "config/company-config.ts",
+      "line": 42,
+      "type": "error",
+      "content": "console.error('VAT Number validation failed:', trimmedVatNumber, 'Length:', trimmedVatNumber.length,..."
+    },
+    {
+      "file": "config/company-config.ts",
+      "line": 62,
+      "type": "warn",
+      "content": "console.warn(\"⚠️  Company configuration issues:\", configErrors);"
+    },
+    {
+      "file": "zatca/zatca-qr-generator.ts",
+      "line": 25,
+      "type": "warn",
+      "content": "console.warn(\n        'Invalid company VAT number detected in ZATCAQRGenerator constructor:',\n      ..."
+    },
+    {
+      "file": "zatca/zatca-qr-generator.ts",
+      "line": 226,
+      "type": "error",
+      "content": "console.error('Failed to generate QR code image:', error);"
+    },
+    {
+      "file": "app/(dashboard)/layout.tsx",
+      "line": 43,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch onboarding status\", error);"
+    },
+    {
+      "file": "components/ui/LogoutButton.tsx",
+      "line": 20,
+      "type": "error",
+      "content": "console.error('Failed to sign out', error);"
+    },
+    {
+      "file": "components/ui/Combobox.tsx",
+      "line": 51,
+      "type": "log",
+      "content": "console.log('Combobox display:', { value, selectedOption, allOptions: options });"
+    },
+    {
+      "file": "components/ui/Combobox.tsx",
+      "line": 67,
+      "type": "log",
+      "content": "console.log('Combobox selection:', { currentValue, optionValue: option.value, currentFormValue: valu..."
+    },
+    {
+      "file": "components/ui/Combobox.tsx",
+      "line": 70,
+      "type": "log",
+      "content": "console.log('Selected value:', selectedValue);"
+    },
+    {
+      "file": "components/settings/ZatcaSettings.tsx",
+      "line": 45,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch ZATCA settings\", error);"
+    },
+    {
+      "file": "components/settings/ZatcaSettings.tsx",
+      "line": 83,
+      "type": "error",
+      "content": "console.error(\"Error saving ZATCA settings\", error);"
+    },
+    {
+      "file": "components/settings/UserManagementSettings.tsx",
+      "line": 67,
+      "type": "log",
+      "content": "console.log('Fetched users:', data); // Debug log"
+    },
+    {
+      "file": "components/settings/UserManagementSettings.tsx",
+      "line": 71,
+      "type": "error",
+      "content": "console.error(\"Failed to load users:\", errorData);"
+    },
+    {
+      "file": "components/settings/UserManagementSettings.tsx",
+      "line": 75,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch users:\", error);"
+    },
+    {
+      "file": "components/settings/UserManagementSettings.tsx",
+      "line": 99,
+      "type": "error",
+      "content": "console.error(\"Error resetting password:\", error);"
+    },
+    {
+      "file": "components/settings/UserManagementSettings.tsx",
+      "line": 126,
+      "type": "error",
+      "content": "console.error(\"Error adding user:\", error);"
+    },
+    {
+      "file": "components/settings/UserManagementSettings.tsx",
+      "line": 151,
+      "type": "error",
+      "content": "console.error(\"Error updating role:\", error);"
+    },
+    {
+      "file": "components/settings/UserManagementSettings.tsx",
+      "line": 175,
+      "type": "error",
+      "content": "console.error(\"Error updating status:\", error);"
+    },
+    {
+      "file": "components/settings/UserManagementSettings.tsx",
+      "line": 195,
+      "type": "error",
+      "content": "console.error(\"Error deleting user:\", error);"
+    },
+    {
+      "file": "components/settings/LocalizationSettings.tsx",
+      "line": 38,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch localization settings\", error);"
+    },
+    {
+      "file": "components/settings/LocalizationSettings.tsx",
+      "line": 66,
+      "type": "error",
+      "content": "console.error(\"Error saving localization settings\", error);"
+    },
+    {
+      "file": "components/settings/InvoicingSettings.tsx",
+      "line": 41,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch invoicing settings\", error);"
+    },
+    {
+      "file": "components/settings/InvoicingSettings.tsx",
+      "line": 69,
+      "type": "error",
+      "content": "console.error(\"Error saving invoicing settings\", error);"
+    },
+    {
+      "file": "components/settings/IntegrationsSettings.tsx",
+      "line": 48,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch integrations settings\", error);"
+    },
+    {
+      "file": "components/settings/IntegrationsSettings.tsx",
+      "line": 81,
+      "type": "error",
+      "content": "console.error(\"Error saving integrations settings\", error);"
+    },
+    {
+      "file": "components/settings/InspectionSettings.tsx",
+      "line": 50,
+      "type": "error",
+      "content": "console.error('Failed to fetch inspection settings:', error);"
+    },
+    {
+      "file": "components/settings/InspectionSettings.tsx",
+      "line": 72,
+      "type": "error",
+      "content": "console.error('Error saving inspection settings:', error);"
+    },
+    {
+      "file": "components/settings/CompanyProfileSettings.tsx",
+      "line": 68,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch company profile\", error);"
+    },
+    {
+      "file": "components/settings/CompanyProfileSettings.tsx",
+      "line": 139,
+      "type": "error",
+      "content": "console.error(\"Error uploading logo\", error);"
+    },
+    {
+      "file": "components/settings/CompanyProfileSettings.tsx",
+      "line": 162,
+      "type": "error",
+      "content": "console.error(\"Error saving company profile\", error);"
+    },
+    {
+      "file": "components/settings/AppearanceSettings.tsx",
+      "line": 44,
+      "type": "error",
+      "content": "console.error(\"Error saving theme:\", error);"
+    },
+    {
+      "file": "components/modals/WahaConfigModal.tsx",
+      "line": 37,
+      "type": "error",
+      "content": "console.error('Error fetching session status:', err);"
+    },
+    {
+      "file": "components/modals/WahaConfigModal.tsx",
+      "line": 49,
+      "type": "error",
+      "content": "console.error('Error fetching QR code:', err);"
+    },
+    {
+      "file": "components/forms/VehicleForm.tsx",
+      "line": 81,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch customers:\", error);"
+    },
+    {
+      "file": "components/forms/VehicleForm.tsx",
+      "line": 117,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch vehicle:\", error);"
+    },
+    {
+      "file": "components/forms/VehicleForm.tsx",
+      "line": 181,
+      "type": "error",
+      "content": "console.error(\"Failed to save vehicle:\", error);"
+    },
+    {
+      "file": "components/forms/VehicleForm.tsx",
+      "line": 577,
+      "type": "error",
+      "content": "console.error('Upload failed:', error);"
+    },
+    {
+      "file": "components/forms/ServiceForm.tsx",
+      "line": 67,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch service templates:\", error);"
+    },
+    {
+      "file": "components/forms/ServiceForm.tsx",
+      "line": 90,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch service:\", error);"
+    },
+    {
+      "file": "components/forms/ServiceForm.tsx",
+      "line": 118,
+      "type": "error",
+      "content": "console.error(\"Failed to save service:\", error);"
+    },
+    {
+      "file": "components/forms/QuickCreateVehicle.tsx",
+      "line": 101,
+      "type": "error",
+      "content": "console.error('Failed to create vehicle:', err);"
+    },
+    {
+      "file": "components/forms/QuickCreateService.tsx",
+      "line": 78,
+      "type": "error",
+      "content": "console.error('Failed to create service:', err);"
+    },
+    {
+      "file": "components/forms/QuickCreatePart.tsx",
+      "line": 80,
+      "type": "error",
+      "content": "console.error('Failed to create part:', err);"
+    },
+    {
+      "file": "components/forms/QuickCreateCustomer.tsx",
+      "line": 61,
+      "type": "error",
+      "content": "console.error('Failed to create customer:', err);"
+    },
+    {
+      "file": "components/forms/PaymentForm.tsx",
+      "line": 73,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch payment:\", error);"
+    },
+    {
+      "file": "components/forms/PaymentForm.tsx",
+      "line": 116,
+      "type": "error",
+      "content": "console.error(\"Failed to save payment:\", error);"
+    },
+    {
+      "file": "components/forms/PartForm.tsx",
+      "line": 74,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch part:\", error);"
+    },
+    {
+      "file": "components/forms/PartForm.tsx",
+      "line": 114,
+      "type": "error",
+      "content": "console.error(\"Failed to save part:\", error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 192,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch job card:\", error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 220,
+      "type": "error",
+      "content": "console.error('Failed to fetch linked invoice:', error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 273,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch customers:\", customersRes.status, customersRes.statusText);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 305,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch initial data:\", error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 328,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch appointment details:\", error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 350,
+      "type": "error",
+      "content": "console.error(\"Failed to create job card from estimate:\", error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 380,
+      "type": "error",
+      "content": "console.error(\"Failed to save job card:\", error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 444,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch estimate details:\", error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 498,
+      "type": "error",
+      "content": "console.error(\"Failed to save job card and create invoice:\", error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 584,
+      "type": "error",
+      "content": "console.error(\"Failed to save job card and create estimate:\", error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 614,
+      "type": "error",
+      "content": "console.error('Failed to prepare invoice for printing:', error);"
+    },
+    {
+      "file": "components/forms/JobCardForm.tsx",
+      "line": 678,
+      "type": "error",
+      "content": "console.error('Failed to create linked estimate:', error);"
+    },
+    {
+      "file": "components/forms/InvoiceForm.tsx",
+      "line": 98,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch job cards\", error);"
+    },
+    {
+      "file": "components/forms/InvoiceForm.tsx",
+      "line": 138,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch invoice:\", error);"
+    },
+    {
+      "file": "components/forms/InvoiceForm.tsx",
+      "line": 185,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch job card details:\", error);"
+    },
+    {
+      "file": "components/forms/InvoiceForm.tsx",
+      "line": 238,
+      "type": "error",
+      "content": "console.error(\"Failed to save invoice:\", error);"
+    },
+    {
+      "file": "components/forms/InspectionForm.tsx",
+      "line": 130,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch initial data:\", error);"
+    },
+    {
+      "file": "components/forms/InspectionForm.tsx",
+      "line": 160,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch inspection:\", error);"
+    },
+    {
+      "file": "components/forms/InspectionForm.tsx",
+      "line": 190,
+      "type": "error",
+      "content": "console.error(\"Failed to save inspection:\", error);"
+    },
+    {
+      "file": "components/forms/InspectionForm.tsx",
+      "line": 238,
+      "type": "error",
+      "content": "console.error(\"Failed to load template items:\", error);"
+    },
+    {
+      "file": "components/forms/InlineInvoiceCreator.tsx",
+      "line": 138,
+      "type": "error",
+      "content": "console.error('Failed to fetch initial data:', e);"
+    },
+    {
+      "file": "components/forms/InlineEstimateCreator.tsx",
+      "line": 149,
+      "type": "error",
+      "content": "console.error('Failed to fetch initial data:', e);"
+    },
+    {
+      "file": "components/forms/EstimateForm.tsx",
+      "line": 169,
+      "type": "error",
+      "content": "console.error('Error fetching initial data:', error);"
+    },
+    {
+      "file": "components/forms/EstimateForm.tsx",
+      "line": 216,
+      "type": "error",
+      "content": "console.error('Error fetching estimate:', error);"
+    },
+    {
+      "file": "components/forms/EstimateForm.tsx",
+      "line": 270,
+      "type": "error",
+      "content": "console.error('Error fetching inspection:', error);"
+    },
+    {
+      "file": "components/forms/EstimateForm.tsx",
+      "line": 385,
+      "type": "error",
+      "content": "console.error('Error saving estimate:', error);"
+    },
+    {
+      "file": "components/forms/EstimateForm.tsx",
+      "line": 401,
+      "type": "error",
+      "content": "console.error('Error generating PDF:', error);"
+    },
+    {
+      "file": "components/forms/CustomerForm.tsx",
+      "line": 90,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch customer:\", error);"
+    },
+    {
+      "file": "components/forms/CustomerForm.tsx",
+      "line": 128,
+      "type": "error",
+      "content": "console.error(\"Failed to save customer:\", error);"
+    },
+    {
+      "file": "components/forms/AppointmentForm.tsx",
+      "line": 100,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch appointment:\", error);"
+    },
+    {
+      "file": "components/forms/AppointmentForm.tsx",
+      "line": 147,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch initial data:\", error);"
+    },
+    {
+      "file": "components/forms/AppointmentForm.tsx",
+      "line": 167,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch available slots:\", error);"
+    },
+    {
+      "file": "components/forms/AppointmentForm.tsx",
+      "line": 197,
+      "type": "error",
+      "content": "console.error(\"Failed to save appointment:\", error);"
+    },
+    {
+      "file": "components/dashboard/TopBarLogo.tsx",
+      "line": 35,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch tenant branding\", error);"
+    },
+    {
+      "file": "components/dashboard/Search.tsx",
+      "line": 117,
+      "type": "error",
+      "content": "console.error('Search error:', error);"
+    },
+    {
+      "file": "components/dashboard/Search.tsx",
+      "line": 141,
+      "type": "log",
+      "content": "console.log('Export functionality', type, format);"
+    },
+    {
+      "file": "components/dashboard/Search.tsx",
+      "line": 143,
+      "type": "error",
+      "content": "console.error('Export error:', error);"
+    },
+    {
+      "file": "components/dashboard/JobCardGrid.tsx",
+      "line": 150,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch recent job cards:\", error);"
+    },
+    {
+      "file": "components/dashboard/ErrorDisplay.tsx",
+      "line": 14,
+      "type": "error",
+      "content": "console.error(error);"
+    },
+    {
+      "file": "components/admin/TenantManagementTable.tsx",
+      "line": 49,
+      "type": "error",
+      "content": "console.error('Error fetching tenants:', err);"
+    },
+    {
+      "file": "components/admin/TenantDetailsForm.tsx",
+      "line": 63,
+      "type": "error",
+      "content": "console.error('Error updating tenant:', err);"
+    },
+    {
+      "file": "components/admin/SystemStatusBoard.tsx",
+      "line": 48,
+      "type": "error",
+      "content": "console.error('Error fetching system health:', error);"
+    },
+    {
+      "file": "components/booking/DateTimePicker.tsx",
+      "line": 148,
+      "type": "log",
+      "content": "console.log('Fetching slots from:', url);"
+    },
+    {
+      "file": "components/booking/DateTimePicker.tsx",
+      "line": 154,
+      "type": "error",
+      "content": "console.error('API Error:', errorData);"
+    },
+    {
+      "file": "components/booking/DateTimePicker.tsx",
+      "line": 159,
+      "type": "log",
+      "content": "console.log('Received slots data:', data);"
+    },
+    {
+      "file": "components/booking/DateTimePicker.tsx",
+      "line": 162,
+      "type": "error",
+      "content": "console.error('Error fetching slots:', err);"
+    },
+    {
+      "file": "lib/utils/restore-manager.ts",
+      "line": 9,
+      "type": "log",
+      "content": "console.log(`Starting restore from: ${filepath}`);"
+    },
+    {
+      "file": "lib/utils/restore-manager.ts",
+      "line": 14,
+      "type": "warn",
+      "content": "console.warn('mongorestore stderr:', stderr);"
+    },
+    {
+      "file": "lib/utils/restore-manager.ts",
+      "line": 17,
+      "type": "log",
+      "content": "console.log('mongorestore stdout:', stdout);"
+    },
+    {
+      "file": "lib/utils/restore-manager.ts",
+      "line": 18,
+      "type": "log",
+      "content": "console.log(`Restore completed successfully from: ${filepath}`);"
+    },
+    {
+      "file": "lib/utils/restore-manager.ts",
+      "line": 21,
+      "type": "error",
+      "content": "console.error(`Failed to restore backup from: ${filepath}`, error);"
+    },
+    {
+      "file": "lib/utils/backup-manager.ts",
+      "line": 71,
+      "type": "error",
+      "content": "console.error(\"Backup failed:\", error)"
+    },
+    {
+      "file": "lib/utils/backup-manager.ts",
+      "line": 78,
+      "type": "error",
+      "content": "console.error(\"Failed to delete incomplete backup file:\", unlinkError);"
+    },
+    {
+      "file": "lib/services/socket.ts",
+      "line": 28,
+      "type": "log",
+      "content": "console.log('[Socket] NEXT_PUBLIC_SOCKET_URL not set; skipping socket connection');"
+    },
+    {
+      "file": "lib/services/socket.ts",
+      "line": 36,
+      "type": "warn",
+      "content": "console.warn('[Socket] Max reconnection attempts reached; skipping connection');"
+    },
+    {
+      "file": "lib/services/socket.ts",
+      "line": 71,
+      "type": "log",
+      "content": "console.log('[Socket] Connected to server');"
+    },
+    {
+      "file": "lib/services/socket.ts",
+      "line": 80,
+      "type": "log",
+      "content": "console.log('[Socket] Disconnected:', reason);"
+    },
+    {
+      "file": "lib/services/socket.ts",
+      "line": 87,
+      "type": "warn",
+      "content": "console.warn('[Socket] Connection timeout - server may not be running');"
+    },
+    {
+      "file": "lib/services/socket.ts",
+      "line": 89,
+      "type": "error",
+      "content": "console.error('[Socket] Connection error:', error?.message || error);"
+    },
+    {
+      "file": "lib/services/socket.ts",
+      "line": 97,
+      "type": "log",
+      "content": "console.log('[Socket] Reconnected after', attemptNumber, 'attempts');"
+    },
+    {
+      "file": "lib/services/socket.ts",
+      "line": 104,
+      "type": "warn",
+      "content": "console.warn('[Socket] Reconnection timeout - server may not be running');"
+    },
+    {
+      "file": "lib/services/socket.ts",
+      "line": 106,
+      "type": "error",
+      "content": "console.error('[Socket] Reconnection error:', error?.message || error);"
+    },
+    {
+      "file": "lib/services/socket.ts",
+      "line": 114,
+      "type": "warn",
+      "content": "console.warn('[Socket] Failed to reconnect after', this.maxReconnectAttempts, 'attempts - server may..."
+    },
+    {
+      "file": "lib/services/loggingService.ts",
+      "line": 30,
+      "type": "error",
+      "content": "console.error('Failed to write to activity log:', error);"
+    },
+    {
+      "file": "lib/services/WhatsAppService.ts",
+      "line": 13,
+      "type": "error",
+      "content": "console.error(errorMsg);"
+    },
+    {
+      "file": "lib/services/WhatsAppService.ts",
+      "line": 44,
+      "type": "log",
+      "content": "console.log('WhatsApp message sent successfully:', data);"
+    },
+    {
+      "file": "lib/services/WhatsAppService.ts",
+      "line": 54,
+      "type": "error",
+      "content": "console.error('Failed to send WhatsApp message:', data.error);"
+    },
+    {
+      "file": "lib/services/WhatsAppService.ts",
+      "line": 66,
+      "type": "error",
+      "content": "console.error('Error sending WhatsApp message:', error);"
+    },
+    {
+      "file": "lib/services/WhatsAppEventListeners.ts",
+      "line": 21,
+      "type": "log",
+      "content": "console.log(`[WhatsApp Event] Cannot send message: Customer ${customerId} has WhatsApp disabled, or ..."
+    },
+    {
+      "file": "lib/services/WhatsAppEventListeners.ts",
+      "line": 32,
+      "type": "log",
+      "content": "console.log(`[WhatsApp Event] Message sent to customer ${customerId}`);"
+    },
+    {
+      "file": "lib/services/WhatsAppEventListeners.ts",
+      "line": 34,
+      "type": "error",
+      "content": "console.error(`[WhatsApp Event] Error sending message to customer ${customerId}:`, error);"
+    },
+    {
+      "file": "lib/services/WahaService.ts",
+      "line": 67,
+      "type": "log",
+      "content": "console.log('Waha message sent:', response.data);"
+    },
+    {
+      "file": "lib/services/WahaService.ts",
+      "line": 70,
+      "type": "error",
+      "content": "console.error('Error sending message via Waha:', error);"
+    },
+    {
+      "file": "lib/services/BookingNotificationService.ts",
+      "line": 38,
+      "type": "error",
+      "content": "console.error('Failed to send customer confirmation email:', error);"
+    },
+    {
+      "file": "lib/services/BookingNotificationService.ts",
+      "line": 74,
+      "type": "error",
+      "content": "console.error('Failed to send admin notification email:', error);"
+    },
+    {
+      "file": "lib/models/Invoice.ts",
+      "line": 152,
+      "type": "error",
+      "content": "console.error(\"Error in getNextInvoiceNumber, falling back to INV-0001:\", error);"
+    },
+    {
+      "file": "lib/stores/referenceDataStore.ts",
+      "line": 165,
+      "type": "error",
+      "content": "console.error('Error fetching customers:', error);"
+    },
+    {
+      "file": "lib/stores/referenceDataStore.ts",
+      "line": 182,
+      "type": "error",
+      "content": "console.error('Error fetching vehicles:', error);"
+    },
+    {
+      "file": "lib/stores/referenceDataStore.ts",
+      "line": 199,
+      "type": "error",
+      "content": "console.error('Error fetching services:', error);"
+    },
+    {
+      "file": "lib/stores/referenceDataStore.ts",
+      "line": 216,
+      "type": "error",
+      "content": "console.error('Error fetching parts:', error);"
+    },
+    {
+      "file": "lib/stores/referenceDataStore.ts",
+      "line": 233,
+      "type": "error",
+      "content": "console.error('Error fetching invoices:', error);"
+    },
+    {
+      "file": "lib/middleware/performance.ts",
+      "line": 80,
+      "type": "log",
+      "content": "console.log(`Performance [${name}]: ${end - start}ms`);"
+    },
+    {
+      "file": "lib/middleware/performance.ts",
+      "line": 85,
+      "type": "log",
+      "content": "console.log(`Performance [${name}]: ${end - start}ms`);"
+    },
+    {
+      "file": "lib/contexts/TenantContext.tsx",
+      "line": 115,
+      "type": "error",
+      "content": "console.error('Error fetching tenant:', err)"
+    },
+    {
+      "file": "lib/contexts/TenantContext.tsx",
+      "line": 144,
+      "type": "error",
+      "content": "console.error('Error updating branding:', err)"
+    },
+    {
+      "file": "app/portal/[slug]/page.tsx",
+      "line": 164,
+      "type": "error",
+      "content": "console.error('Logout error:', err);"
+    },
+    {
+      "file": "app/(dashboard)/whatsapp/page.tsx",
+      "line": 67,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch data\", error);"
+    },
+    {
+      "file": "app/(dashboard)/whatsapp/page.tsx",
+      "line": 95,
+      "type": "error",
+      "content": "console.error('Failed to test integration', error);"
+    },
+    {
+      "file": "app/(dashboard)/whatsapp/page.tsx",
+      "line": 134,
+      "type": "error",
+      "content": "console.error(\"Error sending message\", error);"
+    },
+    {
+      "file": "app/(dashboard)/vehicles/page.tsx",
+      "line": 116,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch vehicles:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/vehicles/page.tsx",
+      "line": 186,
+      "type": "error",
+      "content": "console.error(\"Failed to delete vehicle:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/services/page.tsx",
+      "line": 81,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch categories:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/services/page.tsx",
+      "line": 99,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch services:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/services/page.tsx",
+      "line": 146,
+      "type": "error",
+      "content": "console.error(\"Failed to delete service:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/services/page.tsx",
+      "line": 181,
+      "type": "log",
+      "content": "console.log('Starting import for file:', file.name);"
+    },
+    {
+      "file": "app/(dashboard)/services/page.tsx",
+      "line": 186,
+      "type": "log",
+      "content": "console.log('Sending request to /api/services/import');"
+    },
+    {
+      "file": "app/(dashboard)/services/page.tsx",
+      "line": 192,
+      "type": "log",
+      "content": "console.log('Response status:', response.status);"
+    },
+    {
+      "file": "app/(dashboard)/services/page.tsx",
+      "line": 193,
+      "type": "log",
+      "content": "console.log('Response ok:', response.ok);"
+    },
+    {
+      "file": "app/(dashboard)/services/page.tsx",
+      "line": 197,
+      "type": "error",
+      "content": "console.error('Response error:', errorText);"
+    },
+    {
+      "file": "app/(dashboard)/services/page.tsx",
+      "line": 202,
+      "type": "log",
+      "content": "console.log('Import result:', result);"
+    },
+    {
+      "file": "app/(dashboard)/services/page.tsx",
+      "line": 212,
+      "type": "error",
+      "content": "console.error('Import error:', error);"
+    },
+    {
+      "file": "app/(dashboard)/users/page.tsx",
+      "line": 43,
+      "type": "error",
+      "content": "console.error('Failed to fetch users');"
+    },
+    {
+      "file": "app/(dashboard)/users/page.tsx",
+      "line": 46,
+      "type": "error",
+      "content": "console.error('Error fetching users:', error);"
+    },
+    {
+      "file": "app/(dashboard)/users/page.tsx",
+      "line": 81,
+      "type": "error",
+      "content": "console.error('Error updating user:', error);"
+    },
+    {
+      "file": "app/(dashboard)/payments/page.tsx",
+      "line": 64,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch payments:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/payments/page.tsx",
+      "line": 84,
+      "type": "error",
+      "content": "console.error(\"Failed to delete payment:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/payments/page.tsx",
+      "line": 101,
+      "type": "error",
+      "content": "console.error(\"Failed to update payment status:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/onboarding/page.tsx",
+      "line": 80,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch onboarding status\", error);"
+    },
+    {
+      "file": "app/(dashboard)/onboarding/page.tsx",
+      "line": 96,
+      "type": "error",
+      "content": "console.error(\"Failed to update onboarding status\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/page.tsx",
+      "line": 113,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch job cards:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/page.tsx",
+      "line": 167,
+      "type": "error",
+      "content": "console.error(\"Failed to update job card status:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/page.tsx",
+      "line": 189,
+      "type": "error",
+      "content": "console.error(\"Failed to delete job card:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/invoices/page.tsx",
+      "line": 143,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch invoices:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/invoices/page.tsx",
+      "line": 178,
+      "type": "error",
+      "content": "console.error('Failed to delete invoice:', error);"
+    },
+    {
+      "file": "app/(dashboard)/invoices/page.tsx",
+      "line": 202,
+      "type": "error",
+      "content": "console.error('Failed to fetch invoice details');"
+    },
+    {
+      "file": "app/(dashboard)/invoices/page.tsx",
+      "line": 205,
+      "type": "error",
+      "content": "console.error('Error fetching invoice details:', error);"
+    },
+    {
+      "file": "app/(dashboard)/invoices/invoice-service.ts",
+      "line": 233,
+      "type": "error",
+      "content": "console.error('Failed to update payment status:', error);"
+    },
+    {
+      "file": "app/(dashboard)/invoices/invoice-service.ts",
+      "line": 378,
+      "type": "warn",
+      "content": "console.warn('Could not save invoice counter');"
+    },
+    {
+      "file": "app/(dashboard)/invoices/invoice-service.ts",
+      "line": 402,
+      "type": "log",
+      "content": "console.log(`💾 Saved invoice: ${invoice.invoiceData.invoiceNumber}`);"
+    },
+    {
+      "file": "app/(dashboard)/invoices/invoice-service.ts",
+      "line": 405,
+      "type": "error",
+      "content": "console.error('Failed to save invoice:', error);"
+    },
+    {
+      "file": "app/(dashboard)/reports/page.tsx",
+      "line": 107,
+      "type": "error",
+      "content": "console.error(`Failed to fetch summary for ${titleKey}:`, error);"
+    },
+    {
+      "file": "app/(dashboard)/inventory/page.tsx",
+      "line": 78,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch parts:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inventory/page.tsx",
+      "line": 152,
+      "type": "error",
+      "content": "console.error('Import error:', error);"
+    },
+    {
+      "file": "app/(dashboard)/inventory/page.tsx",
+      "line": 167,
+      "type": "error",
+      "content": "console.error(\"Failed to delete part:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspection-templates/page.tsx",
+      "line": 43,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch templates:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspection-templates/page.tsx",
+      "line": 60,
+      "type": "error",
+      "content": "console.error(\"Failed to delete template:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/estimates/page.tsx",
+      "line": 81,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch estimates:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/page.tsx",
+      "line": 108,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch data:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/page.tsx",
+      "line": 123,
+      "type": "error",
+      "content": "console.error(\"Failed to generate PDF:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/dashboard/page.tsx",
+      "line": 224,
+      "type": "error",
+      "content": "console.error(\"Failed to parse welcome tasks\", err);"
+    },
+    {
+      "file": "app/(dashboard)/dashboard/page.tsx",
+      "line": 391,
+      "type": "error",
+      "content": "console.error(t('alerts.unauthorized_dashboard'));"
+    },
+    {
+      "file": "app/(dashboard)/dashboard/page.tsx",
+      "line": 393,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch dashboard stats:\", response.status);"
+    },
+    {
+      "file": "app/(dashboard)/dashboard/page.tsx",
+      "line": 396,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch dashboard stats:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/dashboard/page.tsx",
+      "line": 413,
+      "type": "log",
+      "content": "console.log(`[${ev}] was triggered, fetching stats`);"
+    },
+    {
+      "file": "app/(dashboard)/appointments/page.tsx",
+      "line": 156,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch appointments:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/customers/page.tsx",
+      "line": 119,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch customers:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/customers/page.tsx",
+      "line": 175,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch customer suggestions:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/customers/page.tsx",
+      "line": 230,
+      "type": "error",
+      "content": "console.error(\"Failed to delete customer:\", error);"
+    },
+    {
+      "file": "app/api/users/route.ts",
+      "line": 18,
+      "type": "error",
+      "content": "console.error('Error fetching users:', error);"
+    },
+    {
+      "file": "app/api/users/route.ts",
+      "line": 77,
+      "type": "error",
+      "content": "console.error('Error adding new user:', error);"
+    },
+    {
+      "file": "app/api/test-connection/route.ts",
+      "line": 5,
+      "type": "log",
+      "content": "console.log('Testing MongoDB connection...')"
+    },
+    {
+      "file": "app/api/test-connection/route.ts",
+      "line": 6,
+      "type": "log",
+      "content": "console.log('MONGODB_URI exists:', !!process.env.MONGODB_URI)"
+    },
+    {
+      "file": "app/api/test-connection/route.ts",
+      "line": 17,
+      "type": "error",
+      "content": "console.error('MongoDB connection failed:', error)"
+    },
+    {
+      "file": "app/api/upload/route.ts",
+      "line": 94,
+      "type": "error",
+      "content": "console.error('Error uploading file:', error);"
+    },
+    {
+      "file": "app/api/search/route.ts",
+      "line": 46,
+      "type": "error",
+      "content": "console.error('Search API error:', error);"
+    },
+    {
+      "file": "app/api/profile/route.ts",
+      "line": 52,
+      "type": "error",
+      "content": "console.error('Error updating profile:', error);"
+    },
+    {
+      "file": "app/api/parts/route.ts",
+      "line": 71,
+      "type": "error",
+      "content": "console.error('Error fetching parts:', error);"
+    },
+    {
+      "file": "app/api/parts/route.ts",
+      "line": 114,
+      "type": "error",
+      "content": "console.error('Error creating part:', error);"
+    },
+    {
+      "file": "app/api/reports/route.ts",
+      "line": 341,
+      "type": "error",
+      "content": "console.error('Error fetching report data:', error)"
+    },
+    {
+      "file": "app/api/invoices/route.ts",
+      "line": 64,
+      "type": "error",
+      "content": "console.error('Error fetching invoices:', error);"
+    },
+    {
+      "file": "app/api/invoices/route.ts",
+      "line": 111,
+      "type": "log",
+      "content": "console.log('Invoice creation request body:', { discount, jobCardId, manualCustomerId, manualVehicle..."
+    },
+    {
+      "file": "app/api/invoices/route.ts",
+      "line": 455,
+      "type": "log",
+      "content": "console.log('Invoice document to be saved:', { discount, totalAmount, customerId, vehicleId });"
+    },
+    {
+      "file": "app/api/invoices/route.ts",
+      "line": 504,
+      "type": "error",
+      "content": "console.error('Error sending job completed WhatsApp message:', whatsappError);"
+    },
+    {
+      "file": "app/api/invoices/route.ts",
+      "line": 528,
+      "type": "log",
+      "content": "console.log(`[Invoice Created] Attempting to send WhatsApp message for customer ${customerIdString},..."
+    },
+    {
+      "file": "app/api/invoices/route.ts",
+      "line": 535,
+      "type": "log",
+      "content": "console.log(`[Invoice Created] WhatsApp message sent successfully`);"
+    },
+    {
+      "file": "app/api/invoices/route.ts",
+      "line": 539,
+      "type": "error",
+      "content": "console.error('[Invoice Created] Error sending invoice ready WhatsApp message:', whatsappError);..."
+    },
+    {
+      "file": "app/api/invoices/route.ts",
+      "line": 567,
+      "type": "error",
+      "content": "console.error('Error creating invoice:', error);"
+    },
+    {
+      "file": "app/api/mechanics/route.ts",
+      "line": 26,
+      "type": "error",
+      "content": "console.error('Error fetching mechanics:', error);"
+    },
+    {
+      "file": "app/api/job-cards/route.ts",
+      "line": 176,
+      "type": "error",
+      "content": "console.error('Error sending job started WhatsApp message:', whatsappError);"
+    },
+    {
+      "file": "app/api/inspection-templates/route.ts",
+      "line": 19,
+      "type": "error",
+      "content": "console.error('Error fetching inspection templates:', error)"
+    },
+    {
+      "file": "app/api/inspection-templates/route.ts",
+      "line": 52,
+      "type": "error",
+      "content": "console.error('Error creating inspection template:', error)"
+    },
+    {
+      "file": "app/api/estimates/route.ts",
+      "line": 73,
+      "type": "error",
+      "content": "console.error('Error fetching estimates:', error)"
+    },
+    {
+      "file": "app/api/estimates/route.ts",
+      "line": 243,
+      "type": "error",
+      "content": "console.error('Error creating estimate:', error)"
+    },
+    {
+      "file": "app/api/create-admin/route.ts",
+      "line": 63,
+      "type": "error",
+      "content": "console.error('Error creating admin user:', error)"
+    },
+    {
+      "file": "app/api/customers/route.ts",
+      "line": 118,
+      "type": "error",
+      "content": "console.error('Error sending welcome WhatsApp message:', whatsappError);"
+    },
+    {
+      "file": "app/(auth)/register/page.tsx",
+      "line": 217,
+      "type": "error",
+      "content": "console.error(\"Failed to update onboarding status\", onboardingError);"
+    },
+    {
+      "file": "components/settings/admin/PlatformDefaultsSettings.tsx",
+      "line": 32,
+      "type": "error",
+      "content": "console.error('Failed to fetch global defaults:', error);"
+    },
+    {
+      "file": "components/settings/admin/PlatformDefaultsSettings.tsx",
+      "line": 52,
+      "type": "error",
+      "content": "console.error('Error saving global defaults:', error);"
+    },
+    {
+      "file": "app/(dashboard)/settings/subscription/page.tsx",
+      "line": 119,
+      "type": "error",
+      "content": "console.error('Error fetching subscription:', error);"
+    },
+    {
+      "file": "app/(dashboard)/settings/organization/page.tsx",
+      "line": 101,
+      "type": "error",
+      "content": "console.error('Error fetching organization:', error);"
+    },
+    {
+      "file": "app/(dashboard)/services/[id]/page.tsx",
+      "line": 58,
+      "type": "error",
+      "content": "console.error('Failed to fetch service data:', error);"
+    },
+    {
+      "file": "app/(dashboard)/payments/[id]/page.tsx",
+      "line": 46,
+      "type": "error",
+      "content": "console.error('Failed to fetch payment:', error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 175,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch job card:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 191,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch parts:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 206,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch services:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 219,
+      "type": "error",
+      "content": "console.error('Failed to fetch linked invoice:', error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 233,
+      "type": "error",
+      "content": "console.error('Failed to fetch linked estimate:', error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 269,
+      "type": "error",
+      "content": "console.error(`Failed to ${action} job:`, error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 286,
+      "type": "error",
+      "content": "console.error(\"Failed to upload photo:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 338,
+      "type": "error",
+      "content": "console.error(\"Failed to save parts:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 356,
+      "type": "error",
+      "content": "console.error(\"Failed to save notes:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 409,
+      "type": "error",
+      "content": "console.error(\"Failed to save services:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 435,
+      "type": "error",
+      "content": "console.error(\"Failed to delete job card:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/job-cards/[id]/page.tsx",
+      "line": 927,
+      "type": "error",
+      "content": "console.error('Error uploading file:', error);"
+    },
+    {
+      "file": "app/(dashboard)/invoices/[id]/page.tsx",
+      "line": 47,
+      "type": "error",
+      "content": "console.error('Failed to fetch invoice:', error);"
+    },
+    {
+      "file": "app/(dashboard)/reports/inventory/page.tsx",
+      "line": 29,
+      "type": "error",
+      "content": "console.error('Failed to fetch inventory report:', error);"
+    },
+    {
+      "file": "app/(dashboard)/reports/[reportName]/page.tsx",
+      "line": 85,
+      "type": "error",
+      "content": "console.error(`Failed to fetch ${reportName} report:`, error);"
+    },
+    {
+      "file": "app/(dashboard)/inventory/alerts/page.tsx",
+      "line": 32,
+      "type": "error",
+      "content": "console.error('Failed to fetch low stock parts:', error)"
+    },
+    {
+      "file": "app/(dashboard)/inventory/[id]/page.tsx",
+      "line": 60,
+      "type": "error",
+      "content": "console.error('Failed to fetch part data:', error);"
+    },
+    {
+      "file": "app/(dashboard)/inspection-templates/new/page.tsx",
+      "line": 54,
+      "type": "error",
+      "content": "console.error(\"Failed to save template:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/estimates/[id]/page.tsx",
+      "line": 92,
+      "type": "error",
+      "content": "console.error(t('estimates.failed_to_fetch'));"
+    },
+    {
+      "file": "app/(dashboard)/estimates/[id]/page.tsx",
+      "line": 96,
+      "type": "error",
+      "content": "console.error(t('estimates.error_fetching'), error);"
+    },
+    {
+      "file": "app/(dashboard)/estimates/[id]/page.tsx",
+      "line": 111,
+      "type": "error",
+      "content": "console.error(t('estimates.error_generating_pdf'), error);"
+    },
+    {
+      "file": "app/(dashboard)/estimates/[id]/page.tsx",
+      "line": 131,
+      "type": "error",
+      "content": "console.error(t('estimates.failed_to_delete'));"
+    },
+    {
+      "file": "app/(dashboard)/estimates/[id]/page.tsx",
+      "line": 134,
+      "type": "error",
+      "content": "console.error(t('estimates.error_deleting'), error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/templates/page.tsx",
+      "line": 40,
+      "type": "error",
+      "content": "console.error(\"Error fetching templates:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/templates/page.tsx",
+      "line": 57,
+      "type": "error",
+      "content": "console.error(\"Failed to delete template\");"
+    },
+    {
+      "file": "app/(dashboard)/inspections/templates/page.tsx",
+      "line": 60,
+      "type": "error",
+      "content": "console.error(\"Error deleting template:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 105,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch inspection\");"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 109,
+      "type": "error",
+      "content": "console.error(\"Error fetching inspection:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 128,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch inspection details\");"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 132,
+      "type": "error",
+      "content": "console.error(\"Failed to generate PDF:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 151,
+      "type": "error",
+      "content": "console.error(\"Failed to delete inspection\");"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 155,
+      "type": "error",
+      "content": "console.error(\"Error deleting inspection:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 182,
+      "type": "log",
+      "content": "console.log('[AUTOMATION] Starting automation workflow...');"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 189,
+      "type": "log",
+      "content": "console.log(`[AUTOMATION] Found ${itemsNeedingRepair.length} items needing repair:`,\n              i..."
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 198,
+      "type": "log",
+      "content": "console.log('[AUTOMATION STEP 1] Creating estimate from inspection...');"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 210,
+      "type": "error",
+      "content": "console.error('[AUTOMATION STEP 1 FAILED] Failed to create estimate:', errorData);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 215,
+      "type": "log",
+      "content": "console.log('[AUTOMATION STEP 1 SUCCESS] Estimate created:', estimateData.estimate._id);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 216,
+      "type": "log",
+      "content": "console.log('Estimate services:', estimateData.estimate.services.length,\n              'Estimate par..."
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 221,
+      "type": "log",
+      "content": "console.log('[AUTOMATION STEP 2] Creating invoice from inspection job card as-is...');"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 233,
+      "type": "error",
+      "content": "console.error('[AUTOMATION STEP 2 FAILED] Failed to create invoice:', errorData);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 238,
+      "type": "log",
+      "content": "console.log('[AUTOMATION STEP 2 SUCCESS] Invoice created for inspection job card:', invoiceData.invo..."
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 239,
+      "type": "log",
+      "content": "console.log('Invoice total (inspection fee only):', invoiceData.invoice.totalAmount);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 242,
+      "type": "log",
+      "content": "console.log('[AUTOMATION STEP 3] Sending WhatsApp notification...');"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 259,
+      "type": "log",
+      "content": "console.log('[AUTOMATION STEP 3 SUCCESS] WhatsApp notification sent');"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 261,
+      "type": "error",
+      "content": "console.error('[AUTOMATION STEP 3 WARNING] WhatsApp notification failed:', whatsappError);..."
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 265,
+      "type": "log",
+      "content": "console.log('[AUTOMATION] All steps completed successfully!');"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 268,
+      "type": "error",
+      "content": "console.error('[AUTOMATION FAILED]', autoError);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 273,
+      "type": "error",
+      "content": "console.error(\"Failed to update status\");"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 277,
+      "type": "error",
+      "content": "console.error(\"Error updating status:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 356,
+      "type": "error",
+      "content": "console.error('Error loading reports:', error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 383,
+      "type": "error",
+      "content": "console.error('Failed to close job card');"
+    },
+    {
+      "file": "app/(dashboard)/inspections/[id]/page.tsx",
+      "line": 387,
+      "type": "error",
+      "content": "console.error('Error closing job card:', error);"
+    },
+    {
+      "file": "app/(dashboard)/appointments/calendar/page.tsx",
+      "line": 41,
+      "type": "error",
+      "content": "console.error('Failed to fetch appointments:', error);"
+    },
+    {
+      "file": "app/(dashboard)/appointments/[id]/page.tsx",
+      "line": 51,
+      "type": "error",
+      "content": "console.error('Failed to fetch appointment', error);"
+    },
+    {
+      "file": "app/(dashboard)/appointments/[id]/page.tsx",
+      "line": 74,
+      "type": "error",
+      "content": "console.error('Failed to cancel appointment', error);"
+    },
+    {
+      "file": "app/(dashboard)/customers/[id]/page.tsx",
+      "line": 66,
+      "type": "error",
+      "content": "console.error('Failed to fetch customer', error);"
+    },
+    {
+      "file": "app/(dashboard)/admin/tenants/page.tsx",
+      "line": 166,
+      "type": "error",
+      "content": "console.error('Error fetching tenants:', error);"
+    },
+    {
+      "file": "app/(dashboard)/admin/analytics/page.tsx",
+      "line": 94,
+      "type": "error",
+      "content": "console.error('Error fetching analytics data:', err);"
+    },
+    {
+      "file": "app/api/whatsapp/webhook/route.ts",
+      "line": 19,
+      "type": "log",
+      "content": "console.log(`Message not found for Twilio ID: ${MessageSid}`);"
+    },
+    {
+      "file": "app/api/whatsapp/webhook/route.ts",
+      "line": 34,
+      "type": "log",
+      "content": "console.log(`Updated message ${MessageSid} status to ${MessageStatus}`);"
+    },
+    {
+      "file": "app/api/whatsapp/webhook/route.ts",
+      "line": 39,
+      "type": "error",
+      "content": "console.error('Error processing WhatsApp webhook:', error);"
+    },
+    {
+      "file": "app/api/whatsapp/test/route.ts",
+      "line": 49,
+      "type": "error",
+      "content": "console.error('Error testing WhatsApp integration:', error);"
+    },
+    {
+      "file": "app/api/whatsapp/send/route.ts",
+      "line": 43,
+      "type": "error",
+      "content": "console.error('Error sending manual WhatsApp message:', error);"
+    },
+    {
+      "file": "app/api/whatsapp/messages/route.ts",
+      "line": 65,
+      "type": "error",
+      "content": "console.error('Error fetching WhatsApp messages:', error);"
+    },
+    {
+      "file": "app/api/whatsapp/history/route.ts",
+      "line": 24,
+      "type": "error",
+      "content": "console.error('Error fetching WhatsApp history:', error);"
+    },
+    {
+      "file": "app/api/whatsapp/inspection-completed/route.ts",
+      "line": 56,
+      "type": "error",
+      "content": "console.error('Error sending WhatsApp notification for inspection completion:', error);"
+    },
+    {
+      "file": "app/api/waha/qr/route.ts",
+      "line": 24,
+      "type": "error",
+      "content": "console.error('Error getting QR code:', error);"
+    },
+    {
+      "file": "app/api/waha/session/route.ts",
+      "line": 27,
+      "type": "log",
+      "content": "console.log('Session does not exist, creating it...');"
+    },
+    {
+      "file": "app/api/waha/session/route.ts",
+      "line": 34,
+      "type": "error",
+      "content": "console.error('Error getting Waha session:', error);"
+    },
+    {
+      "file": "app/api/waha/session/route.ts",
+      "line": 64,
+      "type": "error",
+      "content": "console.error('Error managing Waha session:', error);"
+    },
+    {
+      "file": "app/api/users/[id]/route.ts",
+      "line": 21,
+      "type": "error",
+      "content": "console.error('Error fetching user:', error);"
+    },
+    {
+      "file": "app/api/users/[id]/route.ts",
+      "line": 47,
+      "type": "error",
+      "content": "console.error('Error deleting user:', error);"
+    },
+    {
+      "file": "app/api/vehicles/import/route.ts",
+      "line": 56,
+      "type": "error",
+      "content": "console.error('Error importing vehicles:', error);"
+    },
+    {
+      "file": "app/api/vehicles/export/route.ts",
+      "line": 51,
+      "type": "error",
+      "content": "console.error('Error exporting vehicles:', error);"
+    },
+    {
+      "file": "app/api/upload/logo/route.ts",
+      "line": 63,
+      "type": "error",
+      "content": "console.error('Logo upload error:', error);"
+    },
+    {
+      "file": "app/api/settings/zatca/route.ts",
+      "line": 17,
+      "type": "error",
+      "content": "console.error('Error fetching ZATCA settings:', error);"
+    },
+    {
+      "file": "app/api/settings/zatca/route.ts",
+      "line": 49,
+      "type": "error",
+      "content": "console.error('Error updating ZATCA settings:', error);"
+    },
+    {
+      "file": "app/api/settings/localization/route.ts",
+      "line": 17,
+      "type": "error",
+      "content": "console.error('Error fetching localization settings:', error);"
+    },
+    {
+      "file": "app/api/settings/localization/route.ts",
+      "line": 51,
+      "type": "error",
+      "content": "console.error('Error updating localization settings:', error);"
+    },
+    {
+      "file": "app/api/settings/invoicing/route.ts",
+      "line": 17,
+      "type": "error",
+      "content": "console.error('Error fetching invoicing settings:', error);"
+    },
+    {
+      "file": "app/api/settings/invoicing/route.ts",
+      "line": 51,
+      "type": "error",
+      "content": "console.error('Error updating invoicing settings:', error);"
+    },
+    {
+      "file": "app/api/settings/integrations/route.ts",
+      "line": 17,
+      "type": "error",
+      "content": "console.error('Error fetching integrations settings:', error);"
+    },
+    {
+      "file": "app/api/settings/integrations/route.ts",
+      "line": 56,
+      "type": "error",
+      "content": "console.error('Error updating integrations settings:', error);"
+    },
+    {
+      "file": "app/api/settings/inspection/route.ts",
+      "line": 43,
+      "type": "error",
+      "content": "console.error('Error fetching inspection settings:', error);"
+    },
+    {
+      "file": "app/api/settings/inspection/route.ts",
+      "line": 103,
+      "type": "error",
+      "content": "console.error('Error saving inspection settings:', error);"
+    },
+    {
+      "file": "app/api/settings/company-profile/route.ts",
+      "line": 26,
+      "type": "error",
+      "content": "console.error('Error fetching company profile:', error);"
+    },
+    {
+      "file": "app/api/settings/company-profile/route.ts",
+      "line": 75,
+      "type": "error",
+      "content": "console.error('Error updating company profile:', error);"
+    },
+    {
+      "file": "app/api/settings/booking/route.ts",
+      "line": 42,
+      "type": "error",
+      "content": "console.error('Error updating booking settings:', error);"
+    },
+    {
+      "file": "app/api/settings/appearance/route.ts",
+      "line": 17,
+      "type": "error",
+      "content": "console.error('Error fetching appearance settings:', error);"
+    },
+    {
+      "file": "app/api/settings/appearance/route.ts",
+      "line": 49,
+      "type": "error",
+      "content": "console.error('Error updating appearance settings:', error);"
+    },
+    {
+      "file": "app/api/test/unique-codes/route.ts",
+      "line": 45,
+      "type": "log",
+      "content": "console.log('Found templates:', templates.length);"
+    },
+    {
+      "file": "app/api/test/unique-codes/route.ts",
+      "line": 46,
+      "type": "log",
+      "content": "console.log('Template details:', JSON.stringify(templates.map(t => ({\n      name: t.name,\n      item..."
+    },
+    {
+      "file": "app/api/test/unique-codes/route.ts",
+      "line": 69,
+      "type": "log",
+      "content": "console.log('Template items with codes:', templateItemsWithCodes.length);"
+    },
+    {
+      "file": "app/api/test/unique-codes/route.ts",
+      "line": 416,
+      "type": "error",
+      "content": "console.error('Error fetching unique codes:', error);"
+    },
+    {
+      "file": "app/api/test/check-template/route.ts",
+      "line": 57,
+      "type": "error",
+      "content": "console.error('Error checking template:', error);"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 9,
+      "type": "log",
+      "content": "console.log('Services import API called');"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 14,
+      "type": "log",
+      "content": "//   console.log('Rate limit exceeded');"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 21,
+      "type": "log",
+      "content": "console.log('No session found');"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 28,
+      "type": "log",
+      "content": "console.log('File received:', file?.name, file?.size);"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 46,
+      "type": "log",
+      "content": "console.log('Database connected successfully');"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 55,
+      "type": "log",
+      "content": "console.log('Excel rows parsed:', rows.length);"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 115,
+      "type": "log",
+      "content": "console.log('Detected columns -> name:', nameCol, 'price:', priceCol, 'data rows:', dataRows.length)..."
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 145,
+      "type": "log",
+      "content": "console.log('Services prepared:', services.length);"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 155,
+      "type": "log",
+      "content": "console.log(`Imported batch ${Math.floor(i/batchSize) + 1}: ${batch.length} services`);"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 158,
+      "type": "log",
+      "content": "console.log('Import completed:', importedCount, 'services');"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 165,
+      "type": "error",
+      "content": "console.error('Database error:', dbError);"
+    },
+    {
+      "file": "app/api/services/import/route.ts",
+      "line": 172,
+      "type": "error",
+      "content": "console.error('Error importing services:', error);"
+    },
+    {
+      "file": "app/api/services/categories/route.ts",
+      "line": 22,
+      "type": "error",
+      "content": "console.error('Error fetching service categories:', error);"
+    },
+    {
+      "file": "app/api/search/suggestions/route.ts",
+      "line": 24,
+      "type": "error",
+      "content": "console.error('Search suggestions API error:', error);"
+    },
+    {
+      "file": "app/api/portal/vehicles/route.ts",
+      "line": 44,
+      "type": "error",
+      "content": "console.error('Error fetching vehicles:', error);"
+    },
+    {
+      "file": "app/api/portal/vehicles/route.ts",
+      "line": 83,
+      "type": "error",
+      "content": "console.error('Error creating vehicle:', error);"
+    },
+    {
+      "file": "app/api/portal/session/route.ts",
+      "line": 33,
+      "type": "error",
+      "content": "console.error('Error fetching portal session:', error);"
+    },
+    {
+      "file": "app/api/portal/profile/route.ts",
+      "line": 45,
+      "type": "error",
+      "content": "console.error('Error fetching profile:', error);"
+    },
+    {
+      "file": "app/api/portal/profile/route.ts",
+      "line": 79,
+      "type": "error",
+      "content": "console.error('Error updating profile:', error);"
+    },
+    {
+      "file": "app/api/portal/dashboard/route.ts",
+      "line": 144,
+      "type": "error",
+      "content": "console.error('Dashboard error:', error);"
+    },
+    {
+      "file": "app/api/portal/appointments/route.ts",
+      "line": 38,
+      "type": "error",
+      "content": "console.error('Error fetching appointments:', error);"
+    },
+    {
+      "file": "app/api/parts/low-stock/route.ts",
+      "line": 20,
+      "type": "error",
+      "content": "console.error('Error fetching low stock parts:', error);"
+    },
+    {
+      "file": "app/api/parts/import/route.ts",
+      "line": 103,
+      "type": "error",
+      "content": "console.error('Error importing parts:', error);"
+    },
+    {
+      "file": "app/api/parts/compatible/route.ts",
+      "line": 38,
+      "type": "error",
+      "content": "console.error('Error fetching compatible parts:', error);"
+    },
+    {
+      "file": "app/api/parts/[id]/route.ts",
+      "line": 27,
+      "type": "error",
+      "content": "console.error('Error fetching part:', error);"
+    },
+    {
+      "file": "app/api/parts/[id]/route.ts",
+      "line": 64,
+      "type": "error",
+      "content": "console.error('Error updating part:', error);"
+    },
+    {
+      "file": "app/api/parts/[id]/route.ts",
+      "line": 94,
+      "type": "error",
+      "content": "console.error('Error deleting part:', error);"
+    },
+    {
+      "file": "app/api/reports/work-logs/route.ts",
+      "line": 111,
+      "type": "error",
+      "content": "console.error('Error fetching work logs:', e)"
+    },
+    {
+      "file": "app/api/reports/vat/route.ts",
+      "line": 52,
+      "type": "error",
+      "content": "console.error('Error fetching VAT report:', error);"
+    },
+    {
+      "file": "app/api/reports/technician-performance/route.ts",
+      "line": 83,
+      "type": "error",
+      "content": "console.error('Error fetching Technician Performance report:', error);"
+    },
+    {
+      "file": "app/api/reports/sales/route.ts",
+      "line": 161,
+      "type": "error",
+      "content": "console.error('Error fetching Sales report:', error);"
+    },
+    {
+      "file": "app/api/reports/profit-and-loss/route.ts",
+      "line": 84,
+      "type": "error",
+      "content": "console.error('Error fetching P&L report:', error);"
+    },
+    {
+      "file": "app/api/reports/payments-received/route.ts",
+      "line": 53,
+      "type": "error",
+      "content": "console.error('Error fetching Payments Received report:', error);"
+    },
+    {
+      "file": "app/api/reports/inventory-valuation/route.ts",
+      "line": 38,
+      "type": "error",
+      "content": "console.error('Error fetching Inventory Valuation report:', error);"
+    },
+    {
+      "file": "app/api/reports/inventory/route.ts",
+      "line": 51,
+      "type": "error",
+      "content": "console.error('Error generating inventory report:', error);"
+    },
+    {
+      "file": "app/api/reports/export/route.ts",
+      "line": 325,
+      "type": "error",
+      "content": "console.error('Error exporting report:', error)"
+    },
+    {
+      "file": "app/api/reports/accounts-receivable/route.ts",
+      "line": 104,
+      "type": "error",
+      "content": "console.error('Error fetching A/R Aging report:', error);"
+    },
+    {
+      "file": "app/api/onboarding/status/route.ts",
+      "line": 40,
+      "type": "error",
+      "content": "console.error('Error updating onboarding status:', error);"
+    },
+    {
+      "file": "app/api/invoices/[id]/route.ts",
+      "line": 80,
+      "type": "error",
+      "content": "console.error('Error fetching invoice:', error);"
+    },
+    {
+      "file": "app/api/invoices/[id]/route.ts",
+      "line": 115,
+      "type": "error",
+      "content": "console.error('Error deleting invoice:', error);"
+    },
+    {
+      "file": "app/api/job-cards/recent/route.ts",
+      "line": 17,
+      "type": "log",
+      "content": "console.log('Available models:', Object.keys(mongoose.models));"
+    },
+    {
+      "file": "app/api/job-cards/recent/route.ts",
+      "line": 49,
+      "type": "error",
+      "content": "console.error('Error fetching recent job cards:', error)"
+    },
+    {
+      "file": "app/api/job-cards/from-estimate/route.ts",
+      "line": 115,
+      "type": "error",
+      "content": "console.error('Error creating job card from estimate:', error);"
+    },
+    {
+      "file": "app/api/job-cards/[id]/route.ts",
+      "line": 98,
+      "type": "error",
+      "content": "console.error(\n          'Error sending job completed WhatsApp message:',\n          whatsappError\n  ..."
+    },
+    {
+      "file": "app/api/inspections/[id]/route.ts",
+      "line": 42,
+      "type": "error",
+      "content": "console.error('Error fetching inspection:', error);"
+    },
+    {
+      "file": "app/api/inspections/[id]/route.ts",
+      "line": 99,
+      "type": "error",
+      "content": "console.error('Error updating inspection:', error);"
+    },
+    {
+      "file": "app/api/inspections/[id]/route.ts",
+      "line": 130,
+      "type": "error",
+      "content": "console.error('Error deleting inspection:', error);"
+    },
+    {
+      "file": "app/api/maintenance/update-low-stock/route.ts",
+      "line": 44,
+      "type": "error",
+      "content": "console.error('Error updating low stock status:', error);"
+    },
+    {
+      "file": "app/api/maintenance/migrate-tenant-ids/route.ts",
+      "line": 134,
+      "type": "error",
+      "content": "console.error('Error migrating tenant IDs:', error);"
+    },
+    {
+      "file": "app/api/inspection-templates/[id]/route.ts",
+      "line": 27,
+      "type": "error",
+      "content": "console.error('Error fetching template:', error);"
+    },
+    {
+      "file": "app/api/inspection-templates/[id]/route.ts",
+      "line": 67,
+      "type": "error",
+      "content": "console.error('Error updating template:', error);"
+    },
+    {
+      "file": "app/api/inspection-templates/[id]/route.ts",
+      "line": 93,
+      "type": "error",
+      "content": "console.error('Error deleting template:', error);"
+    },
+    {
+      "file": "app/api/estimates/from-inspection/route.ts",
+      "line": 50,
+      "type": "log",
+      "content": "console.log(`[Estimate API] Using ${itemsToProcess.length} selected items from ${inspection.items.le..."
+    },
+    {
+      "file": "app/api/estimates/from-inspection/route.ts",
+      "line": 56,
+      "type": "log",
+      "content": "console.log(`[Estimate API] Auto-selected ${itemsToProcess.length} items needing repair from ${inspe..."
+    },
+    {
+      "file": "app/api/estimates/from-inspection/route.ts",
+      "line": 173,
+      "type": "error",
+      "content": "console.error('Error creating estimate from inspection:', error);"
+    },
+    {
+      "file": "app/api/estimates/[id]/route.ts",
+      "line": 37,
+      "type": "error",
+      "content": "console.error('Error fetching estimate:', error);"
+    },
+    {
+      "file": "app/api/estimates/[id]/route.ts",
+      "line": 75,
+      "type": "error",
+      "content": "console.error('Error updating estimate:', error);"
+    },
+    {
+      "file": "app/api/estimates/[id]/route.ts",
+      "line": 107,
+      "type": "error",
+      "content": "console.error('Error deleting estimate:', error);"
+    },
+    {
+      "file": "app/api/customers/import/route.ts",
+      "line": 102,
+      "type": "error",
+      "content": "console.error('Error importing customers:', error);"
+    },
+    {
+      "file": "app/api/appointments/reminders/route.ts",
+      "line": 35,
+      "type": "error",
+      "content": "console.error('Error sending reminders:', error);"
+    },
+    {
+      "file": "app/api/appointments/available-slots/route.ts",
+      "line": 77,
+      "type": "error",
+      "content": "console.error('Error fetching available slots:', error);"
+    },
+    {
+      "file": "app/api/admin/users/route.ts",
+      "line": 47,
+      "type": "error",
+      "content": "console.error('Error fetching users:', error);"
+    },
+    {
+      "file": "app/api/admin/usage/route.ts",
+      "line": 40,
+      "type": "error",
+      "content": "console.error('Error fetching usage data:', error);"
+    },
+    {
+      "file": "app/api/admin/stats/route.ts",
+      "line": 43,
+      "type": "error",
+      "content": "console.error('Error fetching admin stats:', error);"
+    },
+    {
+      "file": "app/api/admin/logs/route.ts",
+      "line": 55,
+      "type": "error",
+      "content": "console.error('Error fetching logs:', error);"
+    },
+    {
+      "file": "app/api/admin/tenants/route.ts",
+      "line": 50,
+      "type": "error",
+      "content": "console.error('Error fetching tenants:', error);"
+    },
+    {
+      "file": "app/api/admin/backup/route.ts",
+      "line": 16,
+      "type": "error",
+      "content": "console.error('Error fetching backups:', error);"
+    },
+    {
+      "file": "app/api/admin/backup/route.ts",
+      "line": 45,
+      "type": "error",
+      "content": "console.error('Error creating backup:', error);"
+    },
+    {
+      "file": "app/api/auth/verify-email/route.ts",
+      "line": 24,
+      "type": "error",
+      "content": "console.error('Error verifying email:', error)"
+    },
+    {
+      "file": "app/api/auth/session/route.ts",
+      "line": 14,
+      "type": "error",
+      "content": "console.error(\"Session API error:\", error)"
+    },
+    {
+      "file": "app/api/auth/reset-password/route.ts",
+      "line": 40,
+      "type": "error",
+      "content": "console.error('Error resetting password:', error)"
+    },
+    {
+      "file": "app/api/auth/signin/route.ts",
+      "line": 8,
+      "type": "log",
+      "content": "console.log('[SIGNIN] Attempt for email:', email)"
+    },
+    {
+      "file": "app/api/auth/signin/route.ts",
+      "line": 11,
+      "type": "log",
+      "content": "console.log('[SIGNIN] Missing email or password')"
+    },
+    {
+      "file": "app/api/auth/signin/route.ts",
+      "line": 20,
+      "type": "log",
+      "content": "console.log('[SIGNIN] Result:', { success: result.success, role: result.user?.role, error: result.er..."
+    },
+    {
+      "file": "app/api/auth/signin/route.ts",
+      "line": 28,
+      "type": "error",
+      "content": "console.error(\"Sign in API error:\", error)"
+    },
+    {
+      "file": "app/api/auth/register-tenant/route.ts",
+      "line": 156,
+      "type": "error",
+      "content": "console.error(\"Register tenant API error:\", error)"
+    },
+    {
+      "file": "app/api/auth/signout/route.ts",
+      "line": 9,
+      "type": "error",
+      "content": "console.error(\"Sign out API error:\", error)"
+    },
+    {
+      "file": "app/api/auth/forgot-password/route.ts",
+      "line": 33,
+      "type": "error",
+      "content": "console.error('Error issuing reset token:', error)"
+    },
+    {
+      "file": "app/api/auth/request-verify/route.ts",
+      "line": 37,
+      "type": "error",
+      "content": "console.error('Error issuing verification token:', error)"
+    },
+    {
+      "file": "app/(dashboard)/inspections/templates/new/page.tsx",
+      "line": 92,
+      "type": "error",
+      "content": "console.error(\"Failed to create template:\", errorData);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/templates/new/page.tsx",
+      "line": 96,
+      "type": "error",
+      "content": "console.error(\"Error creating template:\", error);"
+    },
+    {
+      "file": "app/api/whatsapp/messages/[customerId]/route.ts",
+      "line": 37,
+      "type": "error",
+      "content": "console.error('Error getting customer messages:', error);"
+    },
+    {
+      "file": "app/api/users/[id]/status/route.ts",
+      "line": 36,
+      "type": "error",
+      "content": "console.error('Error updating user status:', error);"
+    },
+    {
+      "file": "app/api/users/[id]/role/route.ts",
+      "line": 36,
+      "type": "error",
+      "content": "console.error('Error updating user role:', error);"
+    },
+    {
+      "file": "app/api/users/[id]/reset-password/route.ts",
+      "line": 34,
+      "type": "error",
+      "content": "console.error('Error resetting password:', error);"
+    },
+    {
+      "file": "app/api/portal/vehicles/[id]/route.ts",
+      "line": 57,
+      "type": "error",
+      "content": "console.error('Error updating vehicle:', error);"
+    },
+    {
+      "file": "app/api/portal/vehicles/[id]/route.ts",
+      "line": 82,
+      "type": "error",
+      "content": "console.error('Error deleting vehicle:', error);"
+    },
+    {
+      "file": "app/api/portal/auth/verify-otp/route.ts",
+      "line": 51,
+      "type": "error",
+      "content": "console.error('Verify OTP error:', error);"
+    },
+    {
+      "file": "app/api/portal/auth/request-otp/route.ts",
+      "line": 69,
+      "type": "log",
+      "content": "console.log('\\n═══════════════════════════════════════════════════════');"
+    },
+    {
+      "file": "app/api/portal/auth/request-otp/route.ts",
+      "line": 70,
+      "type": "log",
+      "content": "console.log('🔐 CUSTOMER PORTAL OTP (Email not configured)');"
+    },
+    {
+      "file": "app/api/portal/auth/request-otp/route.ts",
+      "line": 71,
+      "type": "log",
+      "content": "console.log('═══════════════════════════════════════════════════════');"
+    },
+    {
+      "file": "app/api/portal/auth/request-otp/route.ts",
+      "line": 72,
+      "type": "log",
+      "content": "console.log(`Customer: ${customer.firstName} ${customer.lastName}`);"
+    },
+    {
+      "file": "app/api/portal/auth/request-otp/route.ts",
+      "line": 73,
+      "type": "log",
+      "content": "console.log(`Email: ${customer.email}`);"
+    },
+    {
+      "file": "app/api/portal/auth/request-otp/route.ts",
+      "line": 74,
+      "type": "log",
+      "content": "console.log(`OTP Code: ${otp}`);"
+    },
+    {
+      "file": "app/api/portal/auth/request-otp/route.ts",
+      "line": 75,
+      "type": "log",
+      "content": "console.log(`Valid for: 10 minutes`);"
+    },
+    {
+      "file": "app/api/portal/auth/request-otp/route.ts",
+      "line": 76,
+      "type": "log",
+      "content": "console.log('═══════════════════════════════════════════════════════\\n');"
+    },
+    {
+      "file": "app/api/portal/auth/request-otp/route.ts",
+      "line": 83,
+      "type": "error",
+      "content": "console.error('Failed to send OTP email (continuing anyway):', emailError);"
+    },
+    {
+      "file": "app/api/portal/auth/request-otp/route.ts",
+      "line": 93,
+      "type": "error",
+      "content": "console.error('Request OTP error:', error);"
+    },
+    {
+      "file": "app/api/portal/auth/logout/route.ts",
+      "line": 26,
+      "type": "error",
+      "content": "console.error('Logout error:', error);"
+    },
+    {
+      "file": "app/api/parts/[id]/usage/route.ts",
+      "line": 16,
+      "type": "error",
+      "content": "console.error('Error fetching part usage:', error);"
+    },
+    {
+      "file": "app/api/reports/vat/summary/route.ts",
+      "line": 47,
+      "type": "error",
+      "content": "console.error('Error fetching VAT summary:', error);"
+    },
+    {
+      "file": "app/api/reports/technician-performance/summary/route.ts",
+      "line": 77,
+      "type": "error",
+      "content": "console.error('Error fetching Technician Performance summary:', error);"
+    },
+    {
+      "file": "app/api/reports/sales/summary/route.ts",
+      "line": 75,
+      "type": "error",
+      "content": "console.error('Error fetching Sales summary report:', error);"
+    },
+    {
+      "file": "app/api/reports/profit-and-loss/summary/route.ts",
+      "line": 71,
+      "type": "error",
+      "content": "console.error('Error fetching P&L summary report:', error);"
+    },
+    {
+      "file": "app/api/reports/payments-received/summary/route.ts",
+      "line": 46,
+      "type": "error",
+      "content": "console.error('Error fetching Payments Received summary:', error);"
+    },
+    {
+      "file": "app/api/reports/inventory-valuation/summary/route.ts",
+      "line": 24,
+      "type": "error",
+      "content": "console.error('Error fetching Inventory Valuation summary:', error);"
+    },
+    {
+      "file": "app/api/reports/accounts-receivable/summary/route.ts",
+      "line": 53,
+      "type": "error",
+      "content": "console.error('Error fetching A/R Aging summary:', error);"
+    },
+    {
+      "file": "app/api/invoices/[id]/view/route.ts",
+      "line": 44,
+      "type": "error",
+      "content": "console.error('Error fetching invoice for view:', error);"
+    },
+    {
+      "file": "app/api/invoices/[id]/print/route.ts",
+      "line": 57,
+      "type": "error",
+      "content": "console.error('Error generating Invoice HTML:', error);"
+    },
+    {
+      "file": "app/api/invoices/[id]/pdf-arabic/route.ts",
+      "line": 28,
+      "type": "error",
+      "content": "console.error('Server error:', errorText);"
+    },
+    {
+      "file": "app/api/invoices/[id]/pdf-arabic/route.ts",
+      "line": 45,
+      "type": "error",
+      "content": "console.error('Error generating Arabic PDF:', error);"
+    },
+    {
+      "file": "app/api/invoices/[id]/pdf/route.tsx",
+      "line": 28,
+      "type": "error",
+      "content": "console.error('Server error:', errorText);"
+    },
+    {
+      "file": "app/api/invoices/[id]/pdf/route.tsx",
+      "line": 45,
+      "type": "error",
+      "content": "console.error('Error generating Invoice PDF:', error);"
+    },
+    {
+      "file": "app/api/job-cards/[id]/time/route.ts",
+      "line": 32,
+      "type": "error",
+      "content": "console.error('Error updating job card time:', error);"
+    },
+    {
+      "file": "app/api/job-cards/[id]/photos/route.ts",
+      "line": 26,
+      "type": "error",
+      "content": "console.error('Error updating job card photos:', error);"
+    },
+    {
+      "file": "app/api/job-cards/[id]/status/route.ts",
+      "line": 46,
+      "type": "error",
+      "content": "console.error('Error sending job completed WhatsApp message:', whatsappError);"
+    },
+    {
+      "file": "app/api/job-cards/[id]/status/route.ts",
+      "line": 53,
+      "type": "error",
+      "content": "console.error('Error updating job card status:', error);"
+    },
+    {
+      "file": "app/api/inspections/[id]/pdf/route.ts",
+      "line": 63,
+      "type": "error",
+      "content": "console.error('Error generating PDF:', error);"
+    },
+    {
+      "file": "app/api/inspections/[id]/match-parts/route.ts",
+      "line": 56,
+      "type": "error",
+      "content": "console.error('Error matching parts for inspection:', error);"
+    },
+    {
+      "file": "app/api/estimates/[id]/status/route.ts",
+      "line": 26,
+      "type": "error",
+      "content": "console.error('Error updating estimate status:', error);"
+    },
+    {
+      "file": "app/api/estimates/[id]/pdf/route.ts",
+      "line": 47,
+      "type": "error",
+      "content": "console.error('Error generating PDF:', error);"
+    },
+    {
+      "file": "app/api/admin/tenants/[id]/route.ts",
+      "line": 35,
+      "type": "error",
+      "content": "console.error('Error updating tenant status:', error);"
+    },
+    {
+      "file": "app/api/admin/analytics/tenants/route.ts",
+      "line": 45,
+      "type": "error",
+      "content": "console.error('Error fetching tenant analytics:', error);"
+    },
+    {
+      "file": "app/api/admin/analytics/subscriptions/route.ts",
+      "line": 13,
+      "type": "error",
+      "content": "console.error('Error fetching subscription analytics:', error);"
+    },
+    {
+      "file": "app/api/admin/analytics/revenue/route.ts",
+      "line": 45,
+      "type": "error",
+      "content": "console.error('Error fetching revenue analytics:', error);"
+    },
+    {
+      "file": "app/api/admin/analytics/mrr/route.ts",
+      "line": 41,
+      "type": "error",
+      "content": "console.error('Error fetching MRR analytics:', error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/templates/[id]/edit/page.tsx",
+      "line": 57,
+      "type": "error",
+      "content": "console.error(\"Failed to fetch template\");"
+    },
+    {
+      "file": "app/(dashboard)/inspections/templates/[id]/edit/page.tsx",
+      "line": 61,
+      "type": "error",
+      "content": "console.error(\"Error fetching template:\", error);"
+    },
+    {
+      "file": "app/(dashboard)/inspections/templates/[id]/edit/page.tsx",
+      "line": 120,
+      "type": "error",
+      "content": "console.error(\"Failed to update template\");"
+    },
+    {
+      "file": "app/(dashboard)/inspections/templates/[id]/edit/page.tsx",
+      "line": 123,
+      "type": "error",
+      "content": "console.error(\"Error updating template:\", error);"
+    },
+    {
+      "file": "app/api/public/tenants/[slug]/booking-info/route.ts",
+      "line": 64,
+      "type": "error",
+      "content": "console.error('Error fetching booking info:', error);"
+    },
+    {
+      "file": "app/api/public/tenants/[slug]/book/route.ts",
+      "line": 195,
+      "type": "error",
+      "content": "console.error('Error sending notifications:', error);"
+    },
+    {
+      "file": "app/api/public/tenants/[slug]/book/route.ts",
+      "line": 216,
+      "type": "error",
+      "content": "console.error('Error creating booking:', error);"
+    },
+    {
+      "file": "app/api/public/tenants/[slug]/available-slots/route.ts",
+      "line": 71,
+      "type": "error",
+      "content": "console.error('Error fetching available slots:', error);"
+    },
+    {
+      "file": "app/api/job-cards/[id]/work/stop/route.ts",
+      "line": 36,
+      "type": "error",
+      "content": "console.error('Error stopping work log:', e)"
+    },
+    {
+      "file": "app/api/job-cards/[id]/work/start/route.ts",
+      "line": 39,
+      "type": "error",
+      "content": "console.error('Error starting work log:', e)"
+    },
+    {
+      "file": "app/api/job-cards/[id]/work/active/route.ts",
+      "line": 29,
+      "type": "error",
+      "content": "console.error('Error fetching active logs:', e)"
+    },
+    {
+      "file": "app/api/admin/tenants/[id]/edit/route.ts",
+      "line": 43,
+      "type": "error",
+      "content": "console.error('Error updating tenant details:', error);"
+    },
+    {
+      "file": "app/api/admin/tenants/[id]/details/route.ts",
+      "line": 30,
+      "type": "error",
+      "content": "console.error('Error fetching tenant details:', error);"
+    },
+    {
+      "file": "app/api/admin/backup/[id]/restore/route.ts",
+      "line": 33,
+      "type": "error",
+      "content": "console.error('Error initiating backup restore:', error);"
+    },
+    {
+      "file": "app/api/admin/backup/[id]/download/route.ts",
+      "line": 36,
+      "type": "error",
+      "content": "console.error('Backup file not found on disk:', error);"
+    },
+    {
+      "file": "app/api/admin/backup/[id]/download/route.ts",
+      "line": 39,
+      "type": "error",
+      "content": "console.error('Error downloading backup:', error);"
+    }
+  ]
+}

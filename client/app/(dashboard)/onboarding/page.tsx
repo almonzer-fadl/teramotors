@@ -77,7 +77,6 @@ export default function OnboardingPage() {
                     }
                 }
             } catch (error) {
-                console.error("Failed to fetch onboarding status", error);
             } finally {
                 setLoading(false);
             }
@@ -93,7 +92,6 @@ export default function OnboardingPage() {
                 body: JSON.stringify(update),
             });
         } catch (error) {
-            console.error("Failed to update onboarding status", error);
         }
     };
 

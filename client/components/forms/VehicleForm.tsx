@@ -78,7 +78,6 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
         setCustomers(cachedCustomers);
       }
     } catch (error) {
-      console.error("Failed to fetch customers:", error);
       setCustomers([]);
     }
   };
@@ -114,7 +113,6 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
         }
       }
     } catch (error) {
-      console.error("Failed to fetch vehicle:", error);
       alert(t("forms.failed_to_load_vehicle"));
     }
   };
@@ -178,7 +176,6 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
         alert(error.message || t("forms.failed_to_save_vehicle"));
       }
     } catch (error) {
-      console.error("Failed to save vehicle:", error);
       alert(t("forms.failed_to_save_vehicle"));
     } finally {
       setLoading(false);
@@ -574,7 +571,6 @@ export default function VehicleForm({ vehicleId }: { vehicleId?: string }) {
                         handlePhotoUpload(secure_url);
                       }
                     } catch (error) {
-                      console.error('Upload failed:', error);
                       alert(t("forms.upload_failed"));
                     }
                   }

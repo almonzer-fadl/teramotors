@@ -35,7 +35,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: parts });
   } catch (error) {
-    console.error('Error fetching compatible parts:', error);
     return NextResponse.json({ success: false, error: { message: 'Error fetching compatible parts' } }, { status: 500 });
   }
 }

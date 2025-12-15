@@ -24,14 +24,12 @@ export async function GET(request: NextRequest) {
     } catch (error: any) {
       // If session doesn't exist (404 or 422), create it
       if (error.response?.status === 404 || error.response?.status === 422) {
-        console.log('Session does not exist, creating it...');
         const newSession = await sessionService.createSession(wahaSessionName);
         return NextResponse.json(newSession);
       }
       throw error;
     }
   } catch (error: any) {
-    console.error('Error getting Waha session:', error);
     return NextResponse.json({
       error: 'Failed to get session',
       details: error.message
@@ -61,7 +59,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(sessionInfo);
     }
   } catch (error: any) {
-    console.error('Error managing Waha session:', error);
     return NextResponse.json({
       error: 'Failed to manage session',
       details: error.message

@@ -108,7 +108,6 @@ class ApiClient {
         success: true,
       }
     } catch (error) {
-      console.error(`API Error [${method}] ${endpoint}:`, error)
       return {
         data: null as TResponse,
         success: false,

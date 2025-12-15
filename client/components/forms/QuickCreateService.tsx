@@ -75,7 +75,6 @@ export default function QuickCreateService({ isOpen, onClose, onCreated }: Quick
         setError(errorData.message || t('forms.failed_to_create_service'));
       }
     } catch (err) {
-      console.error('Failed to create service:', err);
       setError(t('forms.failed_to_create_service'));
     } finally {
       setLoading(false);

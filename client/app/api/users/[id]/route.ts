@@ -18,7 +18,6 @@ export const GET = withTenantAuth(
       }
       return NextResponse.json(user);
     } catch (error) {
-      console.error('Error fetching user:', error);
       return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 });
     }
   },
@@ -44,7 +43,6 @@ export const DELETE = withTenantAuth(
       return NextResponse.json({ message: 'User deleted successfully.' });
 
     } catch (error) {
-      console.error('Error deleting user:', error);
       return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
     }
   },

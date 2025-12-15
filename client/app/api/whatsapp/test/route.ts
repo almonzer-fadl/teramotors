@@ -46,7 +46,6 @@ export const GET = withTenantAuth(
         message: providerMessage
       });
     } catch (error) {
-      console.error('Error testing WhatsApp integration:', error);
       return NextResponse.json(
         {
           configured: false,

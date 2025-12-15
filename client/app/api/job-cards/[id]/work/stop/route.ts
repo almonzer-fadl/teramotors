@@ -33,7 +33,6 @@ export async function POST(
 
     return Response.json({ success: true, workLog: active })
   } catch (e) {
-    console.error('Error stopping work log:', e)
     return Response.json({ error: 'Failed to stop work' }, { status: 500 })
   }
 }

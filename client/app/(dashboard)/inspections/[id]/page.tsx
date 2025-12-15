@@ -102,11 +102,9 @@ export default function InspectionDetailsPage() {
         const data = await response.json();
         setInspection(data);
       } else {
-        console.error("Failed to fetch inspection");
         router.push("/inspections");
       }
     } catch (error) {
-      console.error("Error fetching inspection:", error);
       router.push("/inspections");
     } finally {
       setLoading(false);
@@ -125,11 +123,9 @@ export default function InspectionDetailsPage() {
         setSelectedJobCard(data.jobCardId);
         setShowPrintModal(true);
       } else {
-        console.error("Failed to fetch inspection details");
         alert(t("inspections.failed_to_generate_pdf"));
       }
     } catch (error) {
-      console.error("Failed to generate PDF:", error);
       alert(t("inspections.failed_to_generate_pdf"));
     } finally {
       setGeneratingPDF(false);
@@ -148,11 +144,9 @@ export default function InspectionDetailsPage() {
       if (response.ok) {
         router.push("/inspections");
       } else {
-        console.error("Failed to delete inspection");
         alert(t("inspections.failed_to_delete"));
       }
     } catch (error) {
-      console.error("Error deleting inspection:", error);
       alert(t("inspections.failed_to_delete"));
     } finally {
       setDeleting(false);
@@ -179,15 +173,12 @@ export default function InspectionDetailsPage() {
 
         // Trigger automation when status changes to "completed"
         if (newStatus === "completed") {
-          console.log('[AUTOMATION] Starting automation workflow...');
           try {
             // Get inspection items that need repair (fair, poor, or critical condition)
             const itemsNeedingRepair = inspection.items.filter((item: any) =>
               item.condition === 'fair' || item.condition === 'poor' || item.condition === 'critical'
             );
 
-            console.log(`[AUTOMATION] Found ${itemsNeedingRepair.length} items needing repair:`,
-              itemsNeedingRepair.map((i: any) => i.itemId));
 
             if (itemsNeedingRepair.length === 0) {
               alert('Inspection completed, but no items need repair. Estimate and invoice not generated.');
@@ -195,7 +186,6 @@ export default function InspectionDetailsPage() {
             }
 
             // 1. Auto-generate estimate from inspection with selected items
-            console.log('[AUTOMATION STEP 1] Creating estimate from inspection...');
             const estimateResponse = await fetch('/api/estimates/from-inspection', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -207,18 +197,13 @@ export default function InspectionDetailsPage() {
 
             if (!estimateResponse.ok) {
               const errorData = await estimateResponse.json();
-              console.error('[AUTOMATION STEP 1 FAILED] Failed to create estimate:', errorData);
               throw new Error(`Failed to create estimate: ${JSON.stringify(errorData)}`);
             }
 
             const estimateData = await estimateResponse.json();
-            console.log('[AUTOMATION STEP 1 SUCCESS] Estimate created:', estimateData.estimate._id);
-            console.log('Estimate services:', estimateData.estimate.services.length,
-              'Estimate parts:', estimateData.estimate.parts.length);
 
             // 2. Auto-generate invoice from inspection job card AS IS (just inspection fee)
             // The estimate is saved for later use when creating a repair job card
-            console.log('[AUTOMATION STEP 2] Creating invoice from inspection job card as-is...');
             const invoiceResponse = await fetch('/api/invoices', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -230,16 +215,12 @@ export default function InspectionDetailsPage() {
 
             if (!invoiceResponse.ok) {
               const errorData = await invoiceResponse.json();
-              console.error('[AUTOMATION STEP 2 FAILED] Failed to create invoice:', errorData);
               throw new Error(`Failed to create invoice: ${JSON.stringify(errorData)}`);
             }
 
             const invoiceData = await invoiceResponse.json();
-            console.log('[AUTOMATION STEP 2 SUCCESS] Invoice created for inspection job card:', invoiceData.invoice._id);
-            console.log('Invoice total (inspection fee only):', invoiceData.invoice.totalAmount);
 
             // 3. Send WhatsApp notification
-            console.log('[AUTOMATION STEP 3] Sending WhatsApp notification...');
             try {
               await fetch('/api/whatsapp/inspection-completed', {
                 method: 'POST',
@@ -256,25 +237,19 @@ export default function InspectionDetailsPage() {
                   serviceCount: estimateData.estimate.services.length
                 }),
               });
-              console.log('[AUTOMATION STEP 3 SUCCESS] WhatsApp notification sent');
             } catch (whatsappError) {
-              console.error('[AUTOMATION STEP 3 WARNING] WhatsApp notification failed:', whatsappError);
               // Don't fail the whole automation if WhatsApp fails
             }
 
-            console.log('[AUTOMATION] All steps completed successfully!');
             alert('Inspection completed! Estimate and invoice generated successfully. WhatsApp notification sent to customer. Click "Print Reports" to review and print.');
           } catch (autoError) {
-            console.error('[AUTOMATION FAILED]', autoError);
             alert(`Inspection marked as completed, but automation failed: ${autoError instanceof Error ? autoError.message : 'Unknown error'}. Please check the console for details.`);
           }
         }
       } else {
-        console.error("Failed to update status");
         alert("Failed to update status");
       }
     } catch (error) {
-      console.error("Error updating status:", error);
       alert("Failed to update status");
     } finally {
       setUpdatingStatus(false);
@@ -353,7 +328,6 @@ export default function InspectionDetailsPage() {
       setSelectedJobCard(inspection.jobCardId);
       setShowAllPrintModals(true);
     } catch (error) {
-      console.error('Error loading reports:', error);
       alert('Failed to load reports. Please try again.');
     } finally {
       setLoadingReports(false);
@@ -380,11 +354,9 @@ export default function InspectionDetailsPage() {
           // Redirect to job cards page or inspections list
           router.push('/inspections');
         } else {
-          console.error('Failed to close job card');
           alert('Reports printed, but failed to close job card. Please close it manually.');
         }
       } catch (error) {
-        console.error('Error closing job card:', error);
         alert('Reports printed, but failed to close job card. Please close it manually.');
       }
     }

@@ -45,7 +45,6 @@ export default function IntegrationsSettings() {
                     }));
                 }
             } catch (error) {
-                console.error("Failed to fetch integrations settings", error);
             } finally {
                 setLoading(false);
             }
@@ -78,7 +77,6 @@ export default function IntegrationsSettings() {
             }
             toast.success(t('settings.integrations.settings_saved', 'Integrations settings saved!'));
         } catch (error) {
-            console.error("Error saving integrations settings", error);
             toast.error(`Failed to save: ${(error as Error).message}`);
         } finally {
             setSaving(false);

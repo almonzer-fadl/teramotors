@@ -40,7 +40,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 
     return NextResponse.json({ message: 'Tenant updated successfully', tenant });
   } catch (error) {
-    console.error('Error updating tenant details:', error);
     return NextResponse.json({ message: 'An error occurred while updating tenant details' }, { status: 500 });
   }
 }

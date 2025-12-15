@@ -35,7 +35,6 @@ export const GET = withTenantAuth(
       });
 
     } catch (error) {
-      console.error('Error fetching Inventory Valuation report:', error);
       return NextResponse.json({ error: 'Failed to fetch report data' }, { status: 500 });
     }
   },

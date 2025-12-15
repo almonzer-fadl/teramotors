@@ -23,7 +23,6 @@ export const GET = withTenantAuth(
       });
 
     } catch (error) {
-      console.error('Error fetching company profile:', error);
       return NextResponse.json({ error: 'Failed to fetch company profile' }, { status: 500 });
     }
   },
@@ -72,7 +71,6 @@ export const PUT = withTenantAuth(
         return NextResponse.json(updatedTenant);
 
     } catch (error) {
-      console.error('Error updating company profile:', error);
       if((error as any).name === 'ValidationError') {
            return NextResponse.json({ error: (error as any).message }, { status: 400 });
       }

@@ -89,11 +89,9 @@ export default function EstimateDetailPage() {
         const data = await response.json();
         setEstimate(data);
       } else {
-        console.error(t('estimates.failed_to_fetch'));
         router.push('/estimates');
       }
     } catch (error) {
-      console.error(t('estimates.error_fetching'), error);
       router.push('/estimates');
     } finally {
       setLoading(false);
@@ -108,7 +106,6 @@ export default function EstimateDetailPage() {
       // Show print modal with estimate data
       setShowPrintModal(true);
     } catch (error) {
-      console.error(t('estimates.error_generating_pdf'), error);
     } finally {
       setGeneratingPDF(false);
     }
@@ -128,10 +125,8 @@ export default function EstimateDetailPage() {
       if (response.ok) {
         router.push('/estimates');
       } else {
-        console.error(t('estimates.failed_to_delete'));
       }
     } catch (error) {
-      console.error(t('estimates.error_deleting'), error);
     } finally {
       setDeleting(false);
     }

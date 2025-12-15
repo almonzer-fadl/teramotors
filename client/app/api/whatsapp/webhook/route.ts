@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
     const message = await WhatsAppMessage.findOne({ twilioMessageId: MessageSid });
 
     if (!message) {
-      console.log(`Message not found for Twilio ID: ${MessageSid}`);
       return NextResponse.json({ error: 'Message not found' }, { status: 404 });
     }
 
@@ -31,12 +30,10 @@ export async function POST(request: NextRequest) {
 
     await WhatsAppMessage.findByIdAndUpdate(message._id, updateData);
 
-    console.log(`Updated message ${MessageSid} status to ${MessageStatus}`);
 
     return NextResponse.json({ success: true });
 
   } catch (error) {
-    console.error('Error processing WhatsApp webhook:', error);
     return NextResponse.json({
       error: 'Internal server error',
       details: error instanceof Error ? error.message : 'Unknown error'

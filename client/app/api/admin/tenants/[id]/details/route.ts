@@ -27,7 +27,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
     return NextResponse.json({ tenant, users });
 
   } catch (error) {
-    console.error('Error fetching tenant details:', error);
     return NextResponse.json({ message: 'An error occurred while fetching tenant details' }, { status: 500 });
   }
 }

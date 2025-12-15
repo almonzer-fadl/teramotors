@@ -40,7 +40,6 @@ export const POST = withTenantAuth(
       }
 
     } catch (error) {
-      console.error('Error sending manual WhatsApp message:', error);
       return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
     }
   },

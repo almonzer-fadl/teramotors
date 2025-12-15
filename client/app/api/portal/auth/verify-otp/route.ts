@@ -48,7 +48,6 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error: any) {
-    console.error('Verify OTP error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to verify OTP' },
       { status: 500 }

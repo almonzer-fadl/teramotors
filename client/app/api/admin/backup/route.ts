@@ -13,7 +13,6 @@ export const GET = withTenantAuth(
       const backups = await Backup.find({}).sort({ createdAt: -1 }).lean();
       return NextResponse.json({ backups, total: backups.length });
     } catch (error) {
-      console.error('Error fetching backups:', error);
       return NextResponse.json({ error: 'Failed to fetch backups' }, { status: 500 });
     }
   },
@@ -42,7 +41,6 @@ export const POST = withTenantAuth(
       return NextResponse.json({ error: 'Invalid backup type specified.' }, { status: 400 });
 
     } catch (error) {
-      console.error('Error creating backup:', error);
       return NextResponse.json({ error: 'Failed to create backup' }, { status: 500 });
     }
   },

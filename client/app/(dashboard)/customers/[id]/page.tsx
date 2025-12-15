@@ -63,7 +63,6 @@ export default function CustomerDetailPage() {
           const data = await res.json();
           setCustomer(data);
         } catch (error) {
-          console.error('Failed to fetch customer', error);
         } finally {
           setLoading(false);
         }

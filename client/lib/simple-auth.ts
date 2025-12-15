@@ -29,16 +29,13 @@ export type Session = AuthSession
 export async function signIn(email: string, password: string): Promise<{ success: boolean; user?: AuthUser; error?: string }> {
   try {
     await connectToDatabase()
-    console.log('[AUTH] Looking up user:', email)
 
     // Try exact match first
     let user = await User.findOne({ email })
-    console.log('[AUTH] Exact match result:', user ? 'Found' : 'Not found')
 
     // If not found, try case-insensitive
     if (!user) {
       user = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } })
-      console.log('[AUTH] Case-insensitive result:', user ? 'Found' : 'Not found')
     }
 
     if (!user) {
@@ -53,10 +50,8 @@ export async function signIn(email: string, password: string): Promise<{ success
       return { success: false, error: "Invalid email or password" }
     }
 
-    console.log('[AUTH] User found:', { email: user.email, role: user.role, hasPassword: !!user.password })
 
     const isValidPassword = await bcrypt.compare(password, user.password)
-    console.log('[AUTH] Password valid:', isValidPassword)
 
     if (!isValidPassword) {
       // Log failed login attempt (invalid password)
@@ -110,7 +105,6 @@ export async function signIn(email: string, password: string): Promise<{ success
 
     return { success: true, user: authUser }
   } catch (error) {
-    console.error("Sign in error:", error)
     // Log generic sign-in error
     await logActivity({
       level: 'error',

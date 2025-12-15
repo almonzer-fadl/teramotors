@@ -189,7 +189,6 @@ export default function JobCardForm({
         });
       }
     } catch (error) {
-      console.error("Failed to fetch job card:", error);
     }
   };
 
@@ -217,7 +216,6 @@ export default function JobCardForm({
           setLinkedInvoiceId(null);
         }
       } catch (error) {
-        console.error('Failed to fetch linked invoice:', error);
         setLinkedInvoiceId(null);
       }
     };
@@ -270,7 +268,6 @@ export default function JobCardForm({
         const items = Array.isArray(json.customers) ? json.customers : (Array.isArray(json) ? json : []);
         setCustomers(items);
       } else {
-        console.error("Failed to fetch customers:", customersRes.status, customersRes.statusText);
       }
       
       if (vehiclesRes.ok) {
@@ -302,7 +299,6 @@ export default function JobCardForm({
         })));
       }
     } catch (error) {
-      console.error("Failed to fetch initial data:", error);
       setAppointments([]);
       setCustomers([]);
       setVehicles([]);
@@ -325,7 +321,6 @@ export default function JobCardForm({
         }));
       }
     } catch (error) {
-      console.error("Failed to fetch appointment details:", error);
     }
   };
 
@@ -347,7 +342,6 @@ export default function JobCardForm({
             alert(error.message || 'Failed to create job card from estimate.');
         }
     } catch (error) {
-        console.error("Failed to create job card from estimate:", error);
         alert('An error occurred while creating the job card from the estimate.');
     } finally {
         setLoading(false);
@@ -377,7 +371,6 @@ export default function JobCardForm({
       socketService.emitJobCreated();
       return data?.jobCard || data;
     } catch (error) {
-      console.error("Failed to save job card:", error);
       alert(t("forms.failed_to_save_job_card"));
       return null;
     }
@@ -441,7 +434,6 @@ export default function JobCardForm({
             }));
         }
     } catch (error) {
-        console.error("Failed to fetch estimate details:", error);
     }
   };
 
@@ -495,7 +487,6 @@ export default function JobCardForm({
         router.push("/job-cards");
       }
     } catch (error) {
-      console.error("Failed to save job card and create invoice:", error);
       alert(t("forms.failed_to_save_job_card"));
     } finally {
       setLoading(false);
@@ -581,7 +572,6 @@ export default function JobCardForm({
         router.push("/job-cards");
       }
     } catch (error) {
-      console.error("Failed to save job card and create estimate:", error);
       alert(t("forms.failed_to_save_job_card"));
     } finally {
       setLoading(false);
@@ -611,7 +601,6 @@ export default function JobCardForm({
       });
       setIsPrintModalOpen(true);
     } catch (error) {
-      console.error('Failed to prepare invoice for printing:', error);
       alert(t('invoices.print_error'));
     } finally {
       setPrintingInvoice(false);
@@ -675,7 +664,6 @@ export default function JobCardForm({
         router.push("/estimates");
       }
     } catch (error) {
-      console.error('Failed to create linked estimate:', error);
       alert(t('estimates.failed_to_create_estimate'));
     } finally {
       setUpdatingEstimate(false);

@@ -153,7 +153,6 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
 
   } catch (error: any) {
-    console.error("Register tenant API error:", error)
 
     // Handle mongoose validation errors
     if (error.name === 'ValidationError') {

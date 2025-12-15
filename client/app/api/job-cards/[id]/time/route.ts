@@ -29,7 +29,6 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
 
     return new Response(JSON.stringify({ success: true, jobCard: updatedJobCard }));
   } catch (error) {
-    console.error('Error updating job card time:', error);
     return new Response(JSON.stringify({ error: 'Failed to update job card time' }), { status: 500 });
   }
 }

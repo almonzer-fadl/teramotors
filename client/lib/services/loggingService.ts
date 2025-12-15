@@ -27,7 +27,6 @@ export async function logActivity(logData: LogData): Promise<void> {
   } catch (error) {
     // Log the error to the console, but don't re-throw it.
     // We don't want a logging failure to crash a primary user operation.
-    console.error('Failed to write to activity log:', error);
   }
 }
 

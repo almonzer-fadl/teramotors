@@ -38,7 +38,6 @@ export default function InvoicingSettings() {
                     setFormData(prev => ({ ...prev, ...data }));
                 }
             } catch (error) {
-                console.error("Failed to fetch invoicing settings", error);
             } finally {
                 setLoading(false);
             }
@@ -66,7 +65,6 @@ export default function InvoicingSettings() {
             }
             toast.success(t('settings.invoicing.settings_saved', 'Invoicing settings saved!'));
         } catch (error) {
-            console.error("Error saving invoicing settings", error);
             toast.error(`Failed to save: ${(error as Error).message}`);
         } finally {
             setSaving(false);

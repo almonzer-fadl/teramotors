@@ -71,7 +71,6 @@ export default function PartForm({ partId }: { partId?: string }) {
             });
           }
         } catch (error) {
-          console.error("Failed to fetch part:", error);
         }
       }
       fetchPart();
@@ -111,7 +110,6 @@ export default function PartForm({ partId }: { partId?: string }) {
         alert(error.message || t('forms.failed_to_save_part'));
       }
     } catch (error) {
-      console.error("Failed to save part:", error);
       alert(t('forms.failed_to_save_part'));
     }
   };

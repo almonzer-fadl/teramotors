@@ -338,7 +338,6 @@ export async function GET(request: NextRequest) {
 
     return new Response(JSON.stringify(reportData))
   } catch (error) {
-    console.error('Error fetching report data:', error)
     return new Response(JSON.stringify({ error: 'Failed to fetch report data' }), { status: 500 })
   }
 }

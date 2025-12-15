@@ -61,7 +61,6 @@ export default function PaymentsPage() {
         setPayments(paymentsArray);
       }
     } catch (error) {
-      console.error("Failed to fetch payments:", error);
     } finally {
       setLoading(false);
     }
@@ -81,7 +80,6 @@ export default function PaymentsPage() {
           throw new Error('Failed to delete payment');
         }
       } catch (error) {
-        console.error("Failed to delete payment:", error);
         alert(t('payments.delete_failed', 'Failed to delete payment.'));
       }
     }
@@ -98,7 +96,6 @@ export default function PaymentsPage() {
         fetchPayments(); // Refetch after status update
       }
     } catch (error) {
-      console.error("Failed to update payment status:", error);
     }
   };
 

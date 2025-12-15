@@ -14,7 +14,6 @@ export const GET = withTenantAuth(
       }
       return NextResponse.json(tenant.settings || {});
     } catch (error) {
-      console.error('Error fetching localization settings:', error);
       return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
     }
   },
@@ -48,7 +47,6 @@ export const PUT = withTenantAuth(
         return NextResponse.json(updatedTenant.settings);
 
     } catch (error) {
-      console.error('Error updating localization settings:', error);
       return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
     }
   },

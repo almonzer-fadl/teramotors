@@ -21,7 +21,6 @@ export async function GET(request: NextRequest) {
     const qrData = await sessionService.getQRCode(wahaSessionName);
     return NextResponse.json({ qr: qrData });
   } catch (error: any) {
-    console.error('Error getting QR code:', error);
     return NextResponse.json({
       error: 'Failed to get QR code',
       details: error.message

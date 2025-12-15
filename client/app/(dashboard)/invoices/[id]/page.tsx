@@ -44,7 +44,6 @@ export default function InvoiceDetailPage() {
         }
         setData(await res.json());
       } catch (error) {
-        console.error('Failed to fetch invoice:', error);
       } finally {
         setLoading(false);
       }

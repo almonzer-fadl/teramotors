@@ -149,7 +149,6 @@ InvoiceSchema.statics.getNextInvoiceNumber = async function(
     const nextNumber = (safeLastNumber + 1).toString().padStart(4, '0');
     return `${prefix}-${nextNumber}`;
   } catch (error) {
-    console.error("Error in getNextInvoiceNumber, falling back to INV-0001:", error);
     return 'INV-0001';
   }
 };

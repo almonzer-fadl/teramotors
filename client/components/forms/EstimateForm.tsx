@@ -166,7 +166,6 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
         setInspections([]);
       }
     } catch (error) {
-      console.error('Error fetching initial data:', error);
       setCustomers([]);
       setVehicles([]);
       setServices([]);
@@ -213,7 +212,6 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
         });
       }
     } catch (error) {
-      console.error('Error fetching estimate:', error);
     }
   };
 
@@ -267,7 +265,6 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
         }));
       }
     } catch (error) {
-      console.error('Error fetching inspection:', error);
     }
   };
 
@@ -382,7 +379,6 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
         }
       }
     } catch (error) {
-      console.error('Error saving estimate:', error);
     } finally {
       setLoading(false);
     }
@@ -398,7 +394,6 @@ export default function EstimateForm({ estimateId }: { estimateId?: string }) {
       const currentLanguage = localStorage.getItem('i18nextLng') || 'en';
       window.open(`/api/estimates/${estimateId || 'new'}/pdf?lang=${currentLanguage}`, '_blank');
     } catch (error) {
-      console.error('Error generating PDF:', error);
     }
   };
 

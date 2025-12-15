@@ -147,7 +147,6 @@ export default function JobCardGrid() {
           setJobCards(data);
         }
       } catch (error) {
-        console.error("Failed to fetch recent job cards:", error);
       } finally {
         setLoading(false);
       }

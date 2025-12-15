@@ -70,7 +70,6 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
-    console.error('Error fetching estimates:', error)
     // Return empty array when database is unavailable
     return Response.json({
       estimates: [],
@@ -240,7 +239,6 @@ export async function POST(request: Request) {
       estimate: populatedEstimate
     }, { status: 201 })
   } catch (error) {
-    console.error('Error creating estimate:', error)
     return Response.json({ 
       error: 'Failed to create estimate',
       details: error instanceof Error ? error.message : 'Unknown error',

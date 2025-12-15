@@ -61,7 +61,6 @@ export async function GET(request: NextRequest) {
       }
     }));
   } catch (error) {
-    console.error('Error fetching invoices:', error);
     return new Response(JSON.stringify({ error: 'Failed to fetch invoices' }), { status: 500 });
   }
 }
@@ -108,7 +107,6 @@ export async function POST(request: Request) {
 
     // Debug logging
 
-    console.log('Invoice creation request body:', { discount, jobCardId, manualCustomerId, manualVehicleId });
 
 
 
@@ -452,7 +450,6 @@ export async function POST(request: Request) {
 
     // Debug logging
 
-    console.log('Invoice document to be saved:', { discount, totalAmount, customerId, vehicleId });
 
     if (jobCardId) {
 
@@ -501,7 +498,6 @@ export async function POST(request: Request) {
         );
       } catch (whatsappError) {
 
-        console.error('Error sending job completed WhatsApp message:', whatsappError);
 
       }
 
@@ -525,18 +521,15 @@ export async function POST(request: Request) {
 
       const customerIdString = typeof customerId === 'object' && customerId._id ? customerId._id.toString() : customerId.toString();
 
-      console.log(`[Invoice Created] Attempting to send WhatsApp message for customer ${customerIdString}, invoice ${invoice._id}`);
 
       const whatsappListeners = WhatsAppEventListeners.getInstance();
 
       const invoiceIdString = String(invoice._id);
       await whatsappListeners.onInvoiceCreated(customerIdString, invoiceIdString);
 
-      console.log(`[Invoice Created] WhatsApp message sent successfully`);
 
     } catch (whatsappError) {
 
-      console.error('[Invoice Created] Error sending invoice ready WhatsApp message:', whatsappError);
 
       // Don't fail the invoice creation if WhatsApp fails
 
@@ -564,7 +557,6 @@ export async function POST(request: Request) {
 
   } catch (error) {
 
-    console.error('Error creating invoice:', error);
 
     return new Response(JSON.stringify({ error: 'Failed to create invoice' }), { status: 500 });
 

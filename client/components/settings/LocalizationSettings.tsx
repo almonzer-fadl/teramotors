@@ -35,7 +35,6 @@ export default function LocalizationSettings() {
                     setFormData(prev => ({ ...prev, ...data }));
                 }
             } catch (error) {
-                console.error("Failed to fetch localization settings", error);
             } finally {
                 setLoading(false);
             }
@@ -63,7 +62,6 @@ export default function LocalizationSettings() {
             }
             toast.success(t('settings.localization.settings_saved', 'Localization settings saved!'));
         } catch (error) {
-            console.error("Error saving localization settings", error);
             toast.error(`Failed to save: ${(error as Error).message}`);
         } finally {
             setSaving(false);

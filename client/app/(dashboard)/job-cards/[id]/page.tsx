@@ -172,7 +172,6 @@ export default function JobCardDetailsPage() {
         setJobCard(await response.json());
       }
     } catch (error) {
-      console.error("Failed to fetch job card:", error);
     } finally {
       setLoading(false);
     }
@@ -188,7 +187,6 @@ export default function JobCardDetailsPage() {
         setParts(partsArray);
       }
     } catch (error) {
-      console.error("Failed to fetch parts:", error);
       setParts([]); // Set empty array on error
     }
   };
@@ -203,7 +201,6 @@ export default function JobCardDetailsPage() {
         setServices(servicesArray);
       }
     } catch (error) {
-      console.error("Failed to fetch services:", error);
       setServices([]); // Set empty array on error
     }
   };
@@ -216,7 +213,6 @@ export default function JobCardDetailsPage() {
         setLinkedInvoiceId(data.invoice?._id || null);
       }
     } catch (error) {
-      console.error('Failed to fetch linked invoice:', error);
     }
   };
 
@@ -230,7 +226,6 @@ export default function JobCardDetailsPage() {
         setLinkedEstimateId(linkedEstimate?._id || null);
       }
     } catch (error) {
-      console.error('Failed to fetch linked estimate:', error);
     }
   };
 
@@ -266,7 +261,6 @@ export default function JobCardDetailsPage() {
         setJobCard(updatedJobCard.jobCard);
       }
     } catch (error) {
-      console.error(`Failed to ${action} job:`, error);
     }
   };
 
@@ -283,7 +277,6 @@ export default function JobCardDetailsPage() {
           setJobCard({ ...jobCard, photos: updatedPhotos });
         }
       } catch (error) {
-        console.error("Failed to upload photo:", error);
       }
     }
   };
@@ -335,7 +328,6 @@ export default function JobCardDetailsPage() {
           throw new Error(t("job_cards.failed_to_save_parts"));
         }
       } catch (error) {
-        console.error("Failed to save parts:", error);
       }
     }
   };
@@ -353,7 +345,6 @@ export default function JobCardDetailsPage() {
           throw new Error(t("job_cards.failed_to_save_notes"));
         }
       } catch (error) {
-        console.error("Failed to save notes:", error);
       }
     }
   };
@@ -406,7 +397,6 @@ export default function JobCardDetailsPage() {
           throw new Error(t("job_cards.failed_to_save_services"));
         }
       } catch (error) {
-        console.error("Failed to save services:", error);
       }
     }
   };
@@ -432,7 +422,6 @@ export default function JobCardDetailsPage() {
         alert(error.error || t("job_cards.failed_to_delete"));
       }
     } catch (error) {
-      console.error("Failed to delete job card:", error);
       alert(t("job_cards.failed_to_delete"));
     } finally {
       setDeleting(false);
@@ -924,7 +913,6 @@ export default function JobCardDetailsPage() {
                     await handlePhotoUpload(uploadData.url);
                   }
                 } catch (error) {
-                  console.error('Error uploading file:', error);
                 }
               }
             }} />

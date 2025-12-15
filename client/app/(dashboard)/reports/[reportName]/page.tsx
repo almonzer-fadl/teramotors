@@ -82,7 +82,6 @@ export default function DetailedReportPage() {
                 }
 
             } catch (error) {
-                console.error(`Failed to fetch ${reportName} report:`, error);
                 setData(null); 
             } finally {
                 setLoading(false);

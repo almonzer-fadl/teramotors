@@ -24,7 +24,6 @@ export async function GET(
 
     return new Response(JSON.stringify(part));
   } catch (error) {
-    console.error('Error fetching part:', error);
     return new Response(JSON.stringify({ error: 'Failed to fetch part' }), { status: 500 });
   }
 }
@@ -61,7 +60,6 @@ export async function PUT(
 
     return new Response(JSON.stringify({ success: true, part }));
   } catch (error) {
-    console.error('Error updating part:', error);
     return new Response(JSON.stringify({ error: 'Failed to update part' }), { status: 500 });
   }
 }
@@ -91,7 +89,6 @@ export async function DELETE(
 
     return new Response(JSON.stringify({ success: true }));
   } catch (error) {
-    console.error('Error deleting part:', error);
     return new Response(JSON.stringify({ error: 'Failed to delete part' }), { status: 500 });
   }
 }

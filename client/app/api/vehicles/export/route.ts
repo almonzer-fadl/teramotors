@@ -48,7 +48,6 @@ export async function GET(req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Error exporting vehicles:', error);
     return NextResponse.json({ success: false, error: { message: 'Error exporting vehicles' } }, { status: 500 });
   }
 }

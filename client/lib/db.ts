@@ -30,11 +30,9 @@ export const connectToDatabase = async (): Promise<void> => {
       // Ping the database to check if connection is still alive
       if (mongoose.connection.db) {
         await mongoose.connection.db.admin().ping();
-        console.log("DB connection verified");
         return;
       }
     } catch (error) {
-      console.log("DB connection lost, reconnecting...");
       isConnected = false;
     }
   }
@@ -59,7 +57,6 @@ export const connectToDatabase = async (): Promise<void> => {
     
     isConnected = true;
     connectionAttempts = 0;
-    console.log("MongoDB connected successfully");
     
     // Handle connection events (only add once)
     if (!listenersAdded) {
@@ -67,24 +64,20 @@ export const connectToDatabase = async (): Promise<void> => {
       mongoose.connection.removeAllListeners();
       
       mongoose.connection.on('error', (err) => {
-        console.error('MongoDB connection error:', err);
         isConnected = false;
         handleConnectionError(err);
       });
       
       mongoose.connection.on('disconnected', () => {
-        console.log('MongoDB disconnected');
         isConnected = false;
       });
       
       mongoose.connection.on('reconnected', () => {
-        console.log('MongoDB reconnected');
         isConnected = true;
         connectionAttempts = 0;
       });
       
       mongoose.connection.on('close', () => {
-        console.log('MongoDB connection closed');
         isConnected = false;
       });
       
@@ -93,11 +86,9 @@ export const connectToDatabase = async (): Promise<void> => {
     
   } catch (error) {
     connectionAttempts++;
-    console.error("MongoDB connection error:", error);
     isConnected = false;
     
     if (connectionAttempts < maxRetries) {
-      console.log(`Retrying connection in ${retryDelay}ms... (Attempt ${connectionAttempts}/${maxRetries})`);
       await new Promise(resolve => setTimeout(resolve, retryDelay));
       return connectToDatabase();
     } else {
@@ -157,10 +148,8 @@ export const withDatabaseErrorHandling = async <T>(
     return await operation();
   } catch (error) {
     const dbError = handleDatabaseError(error);
-    console.error('Database operation failed:', dbError);
     
     if (fallback && dbError.retryable) {
-      console.log('Using fallback data');
       return fallback();
     }
     
@@ -197,7 +186,6 @@ export const isDatabaseHealthy = async (): Promise<boolean> => {
     }
     return false;
   } catch (error) {
-    console.error('Database health check failed:', error);
     return false;
   }
 };
@@ -206,9 +194,7 @@ export const gracefulShutdown = async (): Promise<void> => {
   try {
     await mongoose.connection.close();
     isConnected = false;
-    console.log('Database connection closed gracefully');
   } catch (error) {
-    console.error('Error during database shutdown:', error);
   }
 };
 
@@ -227,18 +213,15 @@ const getFallbackData = () => {
 };
 
 const handleConnectionError = (error: any) => {
-  console.error('Connection error:', error);
   
   // Implement exponential backoff for reconnection
   const delay = Math.min(1000 * Math.pow(2, connectionAttempts), 30000);
   
   setTimeout(async () => {
     if (connectionAttempts < maxRetries) {
-      console.log(`Attempting to reconnect... (${connectionAttempts + 1}/${maxRetries})`);
       try {
         await connectToDatabase();
       } catch (retryError) {
-        console.error('Reconnection failed:', retryError);
       }
     }
   }, delay);
@@ -253,7 +236,6 @@ export const resetConnection = () => {
   if (mongoose.connection) {
     mongoose.connection.removeAllListeners();
   }
-  console.log("Connection status reset");
 };
 
 // Helper function to check if we need to reconnect

@@ -192,7 +192,6 @@ export async function POST(
         service
       ),
     ]).catch(error => {
-      console.error('Error sending notifications:', error);
     });
 
     return NextResponse.json({
@@ -213,7 +212,6 @@ export async function POST(
       },
     }, { status: 201 });
   } catch (error) {
-    console.error('Error creating booking:', error);
     return NextResponse.json(
       { error: 'Failed to create booking. Please try again.' },
       { status: 500 }

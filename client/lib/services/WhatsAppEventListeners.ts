@@ -18,7 +18,6 @@ export class WhatsAppEventListeners {
     try {
       const customer = (await Customer.findById(customerId).lean()) as any;
       if (!customer || !customer.whatsappEnabled || !customer.phoneNumber || !customer.tenantId) {
-        console.log(`[WhatsApp Event] Cannot send message: Customer ${customerId} has WhatsApp disabled, or phone/tenant is missing.`);
         return;
       }
 
@@ -29,9 +28,7 @@ export class WhatsAppEventListeners {
         messageBody
       );
 
-      console.log(`[WhatsApp Event] Message sent to customer ${customerId}`);
     } catch (error) {
-      console.error(`[WhatsApp Event] Error sending message to customer ${customerId}:`, error);
       // We don't re-throw here to prevent a failed WhatsApp message from crashing a core business logic flow.
     }
   }

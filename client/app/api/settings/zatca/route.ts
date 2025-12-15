@@ -14,7 +14,6 @@ export const GET = withTenantAuth(
       }
       return NextResponse.json(tenant.zatcaConfig || {});
     } catch (error) {
-      console.error('Error fetching ZATCA settings:', error);
       return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
     }
   },
@@ -46,7 +45,6 @@ export const PUT = withTenantAuth(
         return NextResponse.json(updatedTenant.zatcaConfig);
 
     } catch (error) {
-      console.error('Error updating ZATCA settings:', error);
       return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
     }
   },

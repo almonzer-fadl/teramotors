@@ -43,7 +43,6 @@ export default function PaymentDetailPage() {
         const { payment } = await res.json();
         setPayment(payment);
       } catch (error) {
-        console.error('Failed to fetch payment:', error);
       } finally {
         setLoading(false);
       }

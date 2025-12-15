@@ -15,7 +15,6 @@ export const GET = withTenantAuth(
       const users = await User.find({ tenantId }).select('-password').lean();
       return NextResponse.json(users);
     } catch (error) {
-      console.error('Error fetching users:', error);
       return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
   },
@@ -74,7 +73,6 @@ export const POST = withTenantAuth(
       return NextResponse.json(userResponse, { status: 201 });
 
     } catch (error) {
-      console.error('Error adding new user:', error);
       return NextResponse.json({ error: 'Failed to add new user' }, { status: 500 });
     }
   },

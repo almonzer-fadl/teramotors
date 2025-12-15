@@ -23,7 +23,6 @@ export async function GET() {
 
     return new Response(JSON.stringify(mechanics));
   } catch (error) {
-    console.error('Error fetching mechanics:', error);
     return new Response(JSON.stringify({ error: 'Failed to fetch mechanics' }), { status: 500 });
   }
 }

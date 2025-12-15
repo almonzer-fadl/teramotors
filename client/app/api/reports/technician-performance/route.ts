@@ -80,7 +80,6 @@ export const GET = withTenantAuth(
       return NextResponse.json(report);
 
     } catch (error) {
-      console.error('Error fetching Technician Performance report:', error);
       return NextResponse.json({ error: 'Failed to fetch report data' }, { status: 500 });
     }
   },

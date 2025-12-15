@@ -230,7 +230,6 @@ import {
         return true;
   
       } catch (error) {
-        console.error('Failed to update payment status:', error);
         return false;
       }
     }
@@ -375,7 +374,6 @@ import {
         localStorage?.setItem('zatca_invoice_counter', this.invoiceCounter.toString());
       } catch {
         // Handle environments without localStorage
-        console.warn('Could not save invoice counter');
       }
     }
   
@@ -399,10 +397,8 @@ import {
         });
         
         localStorage?.setItem(invoicesKey, JSON.stringify(existing));
-        console.log(`💾 Saved invoice: ${invoice.invoiceData.invoiceNumber}`);
         
       } catch (error) {
-        console.error('Failed to save invoice:', error);
         throw error;
       }
     }

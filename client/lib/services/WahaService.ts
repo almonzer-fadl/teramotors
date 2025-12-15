@@ -64,10 +64,8 @@ export class WahaService {
       };
 
       const response = await this.client.post('/api/sendText', payload);
-      console.log('Waha message sent:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Error sending message via Waha:', error);
       throw error;
     }
   }

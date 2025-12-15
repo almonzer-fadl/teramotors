@@ -34,7 +34,6 @@ export async function GET(
 
     return new Response(JSON.stringify(estimate));
   } catch (error) {
-    console.error('Error fetching estimate:', error);
     return new Response(JSON.stringify({ error: 'Failed to fetch estimate' }), { status: 500 });
   }
 }
@@ -72,7 +71,6 @@ export async function PUT(
 
     return new Response(JSON.stringify({ success: true, estimate }));
   } catch (error) {
-    console.error('Error updating estimate:', error);
     return new Response(JSON.stringify({ error: 'Failed to update estimate' }), { status: 500 });
   }
 }
@@ -104,7 +102,6 @@ export async function DELETE(
 
     return new Response(JSON.stringify({ success: true }));
   } catch (error) {
-    console.error('Error deleting estimate:', error);
     return new Response(JSON.stringify({ error: 'Failed to delete estimate' }), { status: 500 });
   }
 }

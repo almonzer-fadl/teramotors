@@ -50,7 +50,6 @@ export const GET = withTenantAuth(
       return NextResponse.json(summary);
 
     } catch (error) {
-      console.error('Error fetching A/R Aging summary:', error);
       return NextResponse.json({ error: 'Failed to fetch report summary' }, { status: 500 });
     }
   },

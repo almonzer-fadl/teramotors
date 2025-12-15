@@ -40,7 +40,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                   }
               }
           } catch (error) {
-              console.error("Failed to fetch onboarding status", error);
           }
       };
       fetchOnboardingStatus();

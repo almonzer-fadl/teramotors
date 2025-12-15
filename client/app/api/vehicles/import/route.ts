@@ -53,7 +53,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: `${vehicles.length} vehicles imported successfully` });
   } catch (error) {
-    console.error('Error importing vehicles:', error);
     return NextResponse.json({ success: false, error: { message: 'Error importing vehicles' } }, { status: 500 });
   }
 }

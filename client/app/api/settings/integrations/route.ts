@@ -14,7 +14,6 @@ export const GET = withTenantAuth(
       }
       return NextResponse.json(tenant.integrations || {});
     } catch (error) {
-      console.error('Error fetching integrations settings:', error);
       return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
     }
   },
@@ -53,7 +52,6 @@ export const PUT = withTenantAuth(
         return NextResponse.json(updatedTenant.integrations);
 
     } catch (error) {
-      console.error('Error updating integrations settings:', error);
       return NextResponse.json({ error: 'Failed to update settings' }, { status: 500 });
     }
   },

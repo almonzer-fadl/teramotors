@@ -39,7 +39,6 @@ export interface CompanyConfig {
     const vatRegex = /^\d{15}$/;
     const trimmedVatNumber = String(config.vatNumber).trim();
     if (!vatRegex.test(trimmedVatNumber)) {
-      console.error('VAT Number validation failed:', trimmedVatNumber, 'Length:', trimmedVatNumber.length, 'Original:', config.vatNumber);
       errors.push("Invalid Unified National Number format. Must be 15 digits");
     }
 
@@ -59,5 +58,4 @@ export interface CompanyConfig {
   // Auto-validate on import
   const configErrors = validateCompanyConfig(COMPANY_CONFIG);
   if (configErrors.length > 0) {
-    console.warn("⚠️  Company configuration issues:", configErrors);
   }

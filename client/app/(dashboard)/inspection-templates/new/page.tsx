@@ -51,7 +51,6 @@ export default function NewTemplatePage() {
         alert(error.message || t("templates.failed_to_save_template"));
       }
     } catch (error) {
-      console.error("Failed to save template:", error);
       alert(t("templates.failed_to_save_template"));
     } finally {
       setLoading(false);

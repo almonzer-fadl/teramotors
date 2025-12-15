@@ -161,7 +161,6 @@ export default function CustomerPortalDashboard() {
       await fetch('/api/portal/auth/logout', { method: 'POST' });
       router.push(`/portal/${tenantSlug}/login`);
     } catch (err) {
-      console.error('Logout error:', err);
     }
   };
 

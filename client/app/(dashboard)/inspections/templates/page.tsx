@@ -37,7 +37,6 @@ export default function TemplatesPage() {
         setTemplates(data);
       }
     } catch (error) {
-      console.error("Error fetching templates:", error);
     } finally {
       setLoading(false);
     }
@@ -54,10 +53,8 @@ export default function TemplatesPage() {
       if (response.ok) {
         setTemplates(prev => prev.filter(template => template._id !== id));
       } else {
-        console.error("Failed to delete template");
       }
     } catch (error) {
-      console.error("Error deleting template:", error);
     }
   };
 

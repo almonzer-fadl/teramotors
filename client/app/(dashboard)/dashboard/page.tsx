@@ -221,7 +221,6 @@ export default function DashboardPage() {
       try {
         setTaskCompletion(JSON.parse(storedTasks));
       } catch (err) {
-        console.error("Failed to parse welcome tasks", err);
       }
     }
   }, [isLoading]);
@@ -388,12 +387,9 @@ export default function DashboardPage() {
             }
           });
         } else if (response.status === 401) {
-          console.error(t('alerts.unauthorized_dashboard'));
         } else {
-          console.error("Failed to fetch dashboard stats:", response.status);
         }
       } catch (error) {
-        console.error("Failed to fetch dashboard stats:", error);
       } finally {
         setLoading(false);
       }
@@ -410,7 +406,6 @@ export default function DashboardPage() {
     const updateHandlers = eventNames.map(ev => {
       const handler = () => {
         fetchStats();
-        console.log(`[${ev}] was triggered, fetching stats`);
       };
       return { event: ev, handler };
     });

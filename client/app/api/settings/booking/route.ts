@@ -39,7 +39,6 @@ export const PUT = withTenantAuth(
         bookingSettings: tenant.bookingSettings,
       });
     } catch (error) {
-      console.error('Error updating booking settings:', error);
       return NextResponse.json(
         { error: 'Failed to update booking settings' },
         { status: 500 }

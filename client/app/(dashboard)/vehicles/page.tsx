@@ -113,7 +113,6 @@ export default function VehiclesPage() {
         });
       }
     } catch (error) {
-      console.error("Failed to fetch vehicles:", error);
       setVehicles([]);
       setPagination({
         currentPage: 1,
@@ -183,7 +182,6 @@ export default function VehiclesPage() {
           toast.error(errorData.error || t("vehicles.delete_error")); // Assuming delete_error translation exists
         }
       } catch (error) {
-        console.error("Failed to delete vehicle:", error);
         toast.error(t("vehicles.delete_error"));
       }
     }
@@ -206,60 +204,89 @@ export default function VehiclesPage() {
       animate="animate"
       className="max-w-6xl mx-auto py-12 px-4"
     >
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-          {t('vehicles.title')}
-        </h1>
-        <Link 
+      <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+            {t('vehicles.title', 'Vehicles')}
+          </h1>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            {t('vehicles.subtitle', 'Manage your vehicle inventory')}
+          </p>
+        </div>
+        <Link
           href="/vehicles/new"
-          className="flex items-center justify-center px-5 py-3 bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white rounded-lg shadow-lg"
+          className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white rounded-2xl shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/30 transition-all duration-200 font-semibold"
         >
-          <Plus className="me-2" />
-          {t('vehicles.add_vehicle')}
+          <Plus className="me-2 h-5 w-5" />
+          {t('vehicles.add_vehicle', 'Add Vehicle')}
         </Link>
-      </div>
+      </motion.div>
 
-      <div className="mb-8">
-        <input
-          type="text"
-          placeholder={t('vehicles.search_placeholder')}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-3.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200"
-        />
-      </div>
+      <motion.div variants={itemVariants} className="mb-8">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder={t('vehicles.search_placeholder', 'Search vehicles by make, model, license plate...')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-12 pr-4 py-3.5 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-2 border-gray-200 dark:border-gray-700 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#F97402] focus:ring-4 focus:ring-[#F97402]/20 transition-all duration-200 shadow-lg shadow-gray-200/50 dark:shadow-gray-800/30"
+          />
+          <Car className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+        </div>
+      </motion.div>
 
-      <ResponsiveVehiclesTable
-        vehicles={sortedVehicles}
-        onDelete={handleDelete}
-        onSort={handleSort}
-        sortKey={sortKey}
-        sortDirection={sortDirection}
-      />
-
-        {pagination.totalPages > 1 && (
-          <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl px-6 py-4 border-t border-gray-200/50 dark:border-gray-700/50 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-gray-800/30 mt-8">
-            <Pagination
-              currentPage={pagination.currentPage}
-              totalPages={pagination.totalPages}
-              totalItems={pagination.totalCount}
-              itemsPerPage={pagination.limit}
-              onPageChange={handlePageChange}
-              onItemsPerPageChange={handleItemsPerPageChange}
-              itemsPerPageOptions={[10, 30, 50]}
-              showItemsPerPage={true}
-            />
-          </div>
-        )}
-
-      {vehicles.length === 0 && (
+      {vehicles.length === 0 ? (
         <motion.div variants={itemVariants}>
-            <div className="p-12 text-center bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50">
-                <Car className="h-16 w-16 mx-auto text-gray-400" />
-                <h3 className="mt-4 text-xl font-medium text-gray-900 dark:text-white">{t('vehicles.no_vehicles_found')}</h3>
-                <p className="mt-1 text-gray-500 dark:text-gray-400">{t('vehicles.get_started')}</p>
+          <div className="p-12 text-center bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800">
+            <div className="flex justify-center mb-6">
+              <div className="h-20 w-20 rounded-full bg-gradient-to-br from-[#F97402]/10 to-[#F13F33]/10 flex items-center justify-center">
+                <Car className="h-10 w-10 text-[#F97402]" />
+              </div>
             </div>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              {t('vehicles.no_vehicles_found', 'No vehicles found')}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              {t('vehicles.get_started', 'Get started by adding your first vehicle')}
+            </p>
+            <Link
+              href="/vehicles/new"
+              className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white rounded-2xl shadow-lg shadow-[#F97402]/25 hover:shadow-xl hover:shadow-[#F97402]/30 transition-all duration-200 font-semibold"
+            >
+              <Plus className="me-2 h-5 w-5" />
+              {t('vehicles.add_vehicle', 'Add Vehicle')}
+            </Link>
+          </div>
         </motion.div>
+      ) : (
+        <>
+          <motion.div variants={itemVariants}>
+            <ResponsiveVehiclesTable
+              vehicles={sortedVehicles}
+              onDelete={handleDelete}
+              onSort={handleSort}
+              sortKey={sortKey}
+              sortDirection={sortDirection}
+            />
+          </motion.div>
+
+          {pagination.totalPages > 1 && (
+            <motion.div variants={itemVariants} className="mt-8">
+              <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl px-6 py-4 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800">
+                <Pagination
+                  currentPage={pagination.currentPage}
+                  totalPages={pagination.totalPages}
+                  totalItems={pagination.totalCount}
+                  itemsPerPage={pagination.limit}
+                  onPageChange={handlePageChange}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                  itemsPerPageOptions={[10, 30, 50]}
+                  showItemsPerPage={true}
+                />
+              </div>
+            </motion.div>
+          )}
+        </>
       )}
     </motion.div>
   );

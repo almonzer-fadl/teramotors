@@ -104,7 +104,6 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
             setSummaryData(data);
           }
         } catch (error) {
-          console.error(`Failed to fetch summary for ${titleKey}:`, error);
         } finally {
           setLoadingSummary(false);
         }

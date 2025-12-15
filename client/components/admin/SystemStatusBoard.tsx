@@ -45,7 +45,6 @@ export default function SystemStatusBoard() {
       setHealth(data);
       setLastUpdated(new Date());
     } catch (error) {
-      console.error('Error fetching system health:', error);
       toast.error('An unexpected error occurred while fetching system health.');
       setHealth(null);
     } finally {

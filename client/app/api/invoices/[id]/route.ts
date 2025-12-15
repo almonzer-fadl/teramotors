@@ -77,7 +77,6 @@ export async function GET(
 
   } catch (error) {
 
-    console.error('Error fetching invoice:', error);
 
     return new Response(JSON.stringify({ error: 'Failed to fetch invoice' }), { status: 500 });
 
@@ -112,7 +111,6 @@ export async function DELETE(
 
     return new Response(JSON.stringify({ message: 'Invoice deleted successfully' }), { status: 200 });
   } catch (error) {
-    console.error('Error deleting invoice:', error);
     return new Response(JSON.stringify({ error: 'Failed to delete invoice' }), { status: 500 });
   }
 }

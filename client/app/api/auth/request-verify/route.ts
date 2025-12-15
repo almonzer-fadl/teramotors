@@ -34,7 +34,6 @@ export async function POST() {
 
     return Response.json({ success: true })
   } catch (error) {
-    console.error('Error issuing verification token:', error)
     return Response.json({ error: 'Failed to issue verification token' }, { status: 500 })
   }
 }

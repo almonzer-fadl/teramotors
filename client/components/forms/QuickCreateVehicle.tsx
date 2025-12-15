@@ -98,7 +98,6 @@ export default function QuickCreateVehicle({ isOpen, onClose, customerId, onCrea
         setError(errorData.error || errorData.message || t('forms.failed_to_create_vehicle'));
       }
     } catch (err) {
-      console.error('Failed to create vehicle:', err);
       setError(t('forms.failed_to_create_vehicle'));
     } finally {
       setLoading(false);

@@ -74,7 +74,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: availableSlots });
   } catch (error) {
-    console.error('Error fetching available slots:', error);
     return NextResponse.json({ success: false, error: { message: 'Error fetching available slots' } }, { status: 500 });
   }
 }

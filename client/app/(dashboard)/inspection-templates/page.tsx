@@ -40,7 +40,6 @@ export default function InspectionTemplatesPage() {
         setTemplates(data);
       }
     } catch (error) {
-      console.error("Failed to fetch templates:", error);
     } finally {
       setLoading(false);
     }
@@ -57,7 +56,6 @@ export default function InspectionTemplatesPage() {
         setTemplates(templates.filter(t => t._id !== id));
       }
     } catch (error) {
-      console.error("Failed to delete template:", error);
     }
   };
 

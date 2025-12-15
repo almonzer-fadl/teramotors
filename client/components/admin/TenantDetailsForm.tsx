@@ -60,7 +60,6 @@ export default function TenantDetailsForm({ tenant, onUpdate }: TenantDetailsFor
       onUpdate(result.tenant); // Notify parent component of update
     } catch (err: any) {
       toast.error(`Error updating tenant: ${err.message}`);
-      console.error('Error updating tenant:', err);
     } finally {
       setLoading(false);
     }
