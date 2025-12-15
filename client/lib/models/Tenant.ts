@@ -69,9 +69,9 @@ export interface ITenant extends Document {
       fromEmail?: string;
     };
     whatsapp?: {
-      sessionId: string;
-      apiUrl: string;
-      apiKey?: string;
+      instanceId: string;
+      token: string;
+      apiUrl?: string;
     };
     twilio?: {
       accountSid: string;
@@ -216,9 +216,9 @@ const TenantSchema = new Schema<ITenant>(
         fromEmail: String,
       },
       whatsapp: {
-        sessionId: String,
+        instanceId: String,
+        token: String,
         apiUrl: String,
-        apiKey: String,
       },
       twilio: {
         accountSid: String,
