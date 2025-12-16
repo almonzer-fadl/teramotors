@@ -12,7 +12,7 @@ export const GET = withTenantAuth(
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search') || '';
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const limit = parseInt(searchParams.get('limit') || '1000'); // High default for dropdowns
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
