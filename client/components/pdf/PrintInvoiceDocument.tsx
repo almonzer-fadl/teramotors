@@ -304,14 +304,18 @@ const PrintInvoiceDocument = ({
               <span>{t.servicesTotal}:</span>
               <span>{formatCurrency(servicesTotal)}</span>
             </div>
-            <div className="total-row">
-              <span>{t.partsTotal}:</span>
-              <span>{formatCurrency(partsTotal)}</span>
-            </div>
-            <div className="total-row">
-              <span>{t.tax}:</span>
-              <span>{formatCurrency(tax)}</span>
-            </div>
+            {parts.length > 0 && (
+              <>
+                <div className="total-row">
+                  <span>{t.partsTotal}:</span>
+                  <span>{formatCurrency(partsTotal)}</span>
+                </div>
+                <div className="total-row">
+                  <span>{t.tax}:</span>
+                  <span>{formatCurrency(tax)}</span>
+                </div>
+              </>
+            )}
             {discount > 0 && (
               <div className="total-row">
                 <span>{t.discount} ({discount}%):</span>
