@@ -145,7 +145,7 @@ app.get('/api/invoices/:id/view', async (req, res) => {
 
     // Generate HTML using the PDF generator's HTML method
     const pdfGenerator = getPDFGenerator();
-    const html = pdfGenerator.generateInvoiceHTML(invoice, jobCard, { language });
+    const html = await pdfGenerator.generateInvoiceHTML(invoice, jobCard, { language });
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(html);

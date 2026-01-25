@@ -11,11 +11,11 @@ const styles = StyleSheet.create({
     direction: 'rtl',
     fontFamily: 'Helvetica'
   },
-  header: { fontSize: 24, marginBottom: 20, textAlign: 'center', color: '#111827', fontWeight: 'bold' },
+  header: { fontSize: 24, marginBottom: 20, marginTop: 100, textAlign: 'center', color: '#111827', fontWeight: 'bold' },
   metaRow: { fontSize: 12, marginBottom: 4, color: '#374151' },
-  sectionTitle: { fontSize: 14, marginTop: 16, marginBottom: 8, color: '#111827', fontWeight: 'bold' },
+  sectionTitle: { fontSize: 14, marginTop: 16, marginBottom: 8, color: '#111827', fontWeight: 'bold', orphans: 0, widows: 0 },
   text: { fontSize: 12, marginBottom: 4, color: '#374151' },
-  table: { width: '100%', borderStyle: 'solid', borderWidth: 1, borderColor: '#e5e7eb', marginTop: 8 },
+  table: { width: '100%', borderStyle: 'solid', borderWidth: 1, borderColor: '#e5e7eb', marginTop: 8, orphans: 0, widows: 0 },
   tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
   tableColHeader: { 
     width: '25%', 
@@ -140,7 +140,7 @@ const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps)
                 <Text style={styles.tableColHeader}>الإجمالي</Text>
               </View>
               {services.map((s: any, idx: number) => (
-                <View style={styles.tableRow} key={idx}>
+                <View style={styles.tableRow} key={idx} wrap={false}>
                   <Text style={styles.tableCol}>{s.serviceId?.name || ''}</Text>
                   <Text style={styles.tableCol}>{s.quantity}</Text>
                   <Text style={styles.tableCol}>{formatCurrency(s.laborHours * s.laborRate)}</Text>
@@ -162,7 +162,7 @@ const InvoiceDocument = ({ invoice, jobCard, qrCodeData }: InvoiceDocumentProps)
                 <Text style={styles.tableColHeader}>الإجمالي</Text>
               </View>
               {parts.map((p: any, idx: number) => (
-                <View style={styles.tableRow} key={idx}>
+                <View style={styles.tableRow} key={idx} wrap={false}>
                   <Text style={styles.tableCol}>{p.partId?.name || ''}</Text>
                   <Text style={styles.tableCol}>{p.quantity}</Text>
                   <Text style={styles.tableCol}>{formatCurrency(p.cost)}</Text>
