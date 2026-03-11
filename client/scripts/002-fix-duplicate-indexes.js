@@ -14,6 +14,7 @@
  *   MONGODB_URI - MongoDB connection string
  */
 
+require('dotenv').config({ path: '.env.local' });
 const mongoose = require('mongoose');
 
 async function runMigration() {
