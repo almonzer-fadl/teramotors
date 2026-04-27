@@ -3,6 +3,8 @@ import { withTenantAuth } from '@/lib/middleware/withTenantAuth';
 import { connectToDatabase } from '@/lib/db';
 import Tenant from '@/lib/models/Tenant';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = withTenantAuth(
   async (_req: NextRequest, { tenantId }) => {
     await connectToDatabase();
