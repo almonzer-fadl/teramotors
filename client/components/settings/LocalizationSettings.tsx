@@ -19,10 +19,10 @@ export default function LocalizationSettings() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [formData, setFormData] = useState({
-        timezone: 'Asia/Riyadh',
-        currency: 'SAR',
-        locale: 'ar-SA',
-        dateFormat: 'DD/MM/YYYY',
+        timezone: 'UTC',
+        currency: 'USD',
+        locale: 'en-US',
+        dateFormat: 'MM/DD/YYYY',
     });
 
     useEffect(() => {
@@ -81,15 +81,19 @@ export default function LocalizationSettings() {
                         <div>
                             <FormLabel>{t('settings.localization.timezone', 'Timezone')}</FormLabel>
                             <FormSelect name="timezone" value={formData.timezone} onChange={handleInputChange}>
-                                <option value="Asia/Riyadh">Asia/Riyadh (GMT+3)</option>
+                                <option value="UTC">UTC</option>
+                                <option value="America/New_York">America/New_York</option>
+                                <option value="Europe/London">Europe/London</option>
+                                <option value="Asia/Dubai">Asia/Dubai</option>
                             </FormSelect>
                         </div>
                         <div>
                             <FormLabel>{t('settings.localization.currency', 'Currency')}</FormLabel>
                             <FormSelect name="currency" value={formData.currency} onChange={handleInputChange}>
-                                <option value="SAR">{t('settings.localization.sar', 'SAR - Saudi Riyal')}</option>
                                 <option value="USD">{t('settings.localization.usd', 'USD - US Dollar')}</option>
                                 <option value="EUR">{t('settings.localization.eur', 'EUR - Euro')}</option>
+                                <option value="GBP">GBP - British Pound</option>
+                                <option value="AED">AED - UAE Dirham</option>
                             </FormSelect>
                         </div>
                     </div>
@@ -97,8 +101,9 @@ export default function LocalizationSettings() {
                         <div>
                             <FormLabel>{t('settings.localization.default_language', 'Default Language')}</FormLabel>
                              <FormSelect name="locale" value={formData.locale} onChange={handleInputChange}>
-                                <option value="ar-SA">{t('settings.localization.arabic_saudi', 'Arabic (Saudi Arabia)')}</option>
                                 <option value="en-US">{t('settings.localization.english_us', 'English (US)')}</option>
+                                <option value="en-GB">English (UK)</option>
+                                <option value="ar">Arabic</option>
                             </FormSelect>
                         </div>
                         <div>

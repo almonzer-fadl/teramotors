@@ -4,20 +4,28 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Building, Users, FileText, Globe, Key, Share2, Palette, Clipboard, UserCircle, Calendar, CreditCard } from 'lucide-react';
+import { Building, Users, FileText, Globe, Share2, Palette, Clipboard, UserCircle, Calendar, CreditCard, type LucideIcon } from 'lucide-react';
 import { fadeInUp, staggerContainer } from '@/lib/dashboard-animations';
 import CompanyProfileSettings from '@/components/settings/CompanyProfileSettings';
 import UserManagementSettings from '@/components/settings/UserManagementSettings';
 import InvoicingSettings from '@/components/settings/InvoicingSettings';
 import LocalizationSettings from '@/components/settings/LocalizationSettings';
-import ZatcaSettings from '@/components/settings/ZatcaSettings';
 import IntegrationsSettings from '@/components/settings/IntegrationsSettings';
 import AppearanceSettings from '@/components/settings/AppearanceSettings';
 import InspectionSettings from '@/components/settings/InspectionSettings';
 import AccountSettings from '@/components/settings/AccountSettings';
 import BookingSettings from '@/components/settings/BookingSettings';
 
-const tabs = [
+type SettingsTab = {
+    id: string;
+    nameKey: string;
+    name: string;
+    icon: LucideIcon;
+    component?: React.ReactNode;
+    href?: string;
+};
+
+const tabs: SettingsTab[] = [
     { id: 'account', nameKey: 'settings.tabs.account', name: 'Account', icon: UserCircle, component: <AccountSettings /> },
     { id: 'billing', nameKey: 'settings.tabs.billing', name: 'Billing', icon: CreditCard, href: '/settings/subscription' },
     { id: 'company_profile', nameKey: 'settings.tabs.company_profile', name: 'Company Profile', icon: Building, component: <CompanyProfileSettings /> },
@@ -26,7 +34,6 @@ const tabs = [
     { id: 'invoicing', nameKey: 'settings.tabs.invoicing', name: 'Invoicing & Estimates', icon: FileText, component: <InvoicingSettings /> },
     { id: 'inspections', nameKey: 'settings.tabs.inspections', name: 'Inspections', icon: Clipboard, component: <InspectionSettings /> },
     { id: 'localization', nameKey: 'settings.tabs.localization', name: 'Localization', icon: Globe, component: <LocalizationSettings /> },
-    { id: 'zatca', nameKey: 'settings.tabs.zatca', name: 'ZATCA', icon: Key, component: <ZatcaSettings /> },
     { id: 'integrations', nameKey: 'settings.tabs.integrations', name: 'Integrations', icon: Share2, component: <IntegrationsSettings /> },
     { id: 'appearance', nameKey: 'settings.tabs.appearance', name: 'Appearance', icon: Palette, component: <AppearanceSettings /> },
 ];
@@ -66,7 +73,7 @@ export default function SettingsPage() {
                                             : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                                     }`;
 
-                                    if ('href' in tab) {
+                                    if (tab.href) {
                                         return (
                                             <Link key={tab.id} href={tab.href} className={className}>
                                                 <tab.icon className={`w-5 h-5 ${isRTL ? 'ms-3' : 'me-3'}`} />

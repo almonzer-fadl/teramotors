@@ -55,8 +55,8 @@
     "reset_access_description": "Confirm the email you registered with and we’ll send a secure link so you can sign back in within seconds.",
     "forgot_highlight_secure_title": "Secure verification",
     "forgot_highlight_secure_desc": "Every request is validated and protected with bank-grade encryption.",
-    "forgot_highlight_support_title": "Arabic support",
-    "forgot_highlight_support_desc": "A Riyadh-based team is ready 7 days a week to help you finish the reset.",
+    "forgot_highlight_support_title": "Human support",
+    "forgot_highlight_support_desc": "Our team is ready 7 days a week to help you finish the reset.",
     "forgot_highlight_fast_title": "Fast delivery",
     "forgot_highlight_fast_desc": "Reset instructions are dispatched instantly and stay valid for 30 minutes.",
     "support_stat_label": "WhatsApp & phone support",
@@ -413,8 +413,8 @@
     "invoice_number": "Invoice Number",
     "invoice_date": "Invoice Date",
     "job_card": "Job Card",
-    "zatca_qr_preview": "ZATCA QR Code Preview",
-    "zatca_compliant": "ZATCA Compliant",
+    "zatca_qr_preview": "Invoice QR Code Preview",
+    "zatca_compliant": "Tax Ready",
     "qr_code_generated_automatically": "QR code will be generated automatically when invoice is created",
     "qr_code_contains": "Contains: Seller info, VAT number, timestamp, amounts",
     "services_total": "Services Total",
@@ -693,8 +693,8 @@
     "services_total": "Services Total",
     "parts_total": "Parts Total",
     "invoice_totals": "Invoice Totals",
-    "zatca_qr_preview": "ZATCA QR Code Preview",
-    "zatca_compliant": "ZATCA Compliant",
+    "zatca_qr_preview": "Invoice QR Code Preview",
+    "zatca_compliant": "Tax Ready",
     "qr_code_generated_automatically": "QR code will be generated automatically when invoice is created",
     "qr_code_contains": "Contains: Seller info, VAT number, timestamp, amounts",
     "total_revenue": "Total Revenue",
@@ -1342,7 +1342,7 @@
       "description": "With over 15 years of experience, we provide expert automotive repair and maintenance services. From routine oil changes to complex engine repairs, we keep your vehicle running smoothly and safely.",
       "book_appointment": "Book Appointment",
       "call_now": "Call Now",
-      "phone": "+966590090612",
+      "phone": "+1 555 123 4567",
       "satisfaction_value": "100%",
       "support_value": "24/7"
     },
@@ -1354,7 +1354,7 @@
         "feature1": "Basic vehicle inspection",
         "feature2": "Oil change service",
         "feature3": "Tire rotation",
-        "price": "109 SAR/month"
+        "price": "$49/month"
       },
       "standard": {
         "title": "Standard Plan",
@@ -1362,7 +1362,7 @@
         "feature2": "Brake system check",
         "feature3": "Battery testing",
         "feature4": "Priority scheduling",
-        "price": "221 SAR/month"
+        "price": "$129/month"
       },
       "premium": {
         "title": "Premium Plan",
@@ -1371,7 +1371,7 @@
         "feature3": "Transmission service",
         "feature4": "24/7 roadside assistance",
         "feature5": "Free towing up to 50 miles",
-        "price": "371 SAR/month"
+        "price": "Custom"
       },
       "enterprise": {
         "title": "Enterprise Plan",
@@ -1449,7 +1449,7 @@
       "title": "Get In Touch",
       "subtitle": "Ready to schedule your next service?",
       "address": "صناعية, الرمال, الرياض 13252, المملكة العربية السعودية",
-      "phone": "+966590090612",
+      "phone": "+1 555 123 4567",
       "email": "info@teramotors.com",
       "hours": "Mon-Fri: 7AM-6PM, Sat: 8AM-4PM, Sun: Closed",
       "book_online": "Book Online",
@@ -1586,7 +1586,7 @@
     "invoice_pdf": "Invoice PDF",
     "reschedule": "Reschedule",
     "teramotors_logo": "TeraMotors Logo",
-    "zatca_qr": "ZATCA QR",
+    "zatca_qr": "Invoice QR",
     "description_of_inspection_item": "Description of this inspection item",
     "condition_good": "Good",
     "condition_fair": "Fair",
