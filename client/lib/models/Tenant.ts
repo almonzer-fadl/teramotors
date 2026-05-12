@@ -27,6 +27,9 @@ export interface ITenant extends Document {
     endDate?: Date;
     maxUsers: number;
     maxVehicles: number;
+    polarCustomerId?: string;
+    polarSubscriptionId?: string;
+    polarProductId?: string;
   };
   settings: {
     timezone: string;
@@ -130,7 +133,7 @@ const TenantSchema = new Schema<ITenant>(
         city: String,
         district: String,
         postalCode: String,
-        country: { type: String, default: 'SA' },
+        country: { type: String, default: 'US' },
       },
       phone: String,
       email: String,
@@ -146,12 +149,15 @@ const TenantSchema = new Schema<ITenant>(
       endDate: Date,
       maxUsers: { type: Number, default: 5 },
       maxVehicles: { type: Number, default: 100 },
+      polarCustomerId: String,
+      polarSubscriptionId: String,
+      polarProductId: String,
     },
     settings: {
-      timezone: { type: String, default: 'Asia/Riyadh' },
-      currency: { type: String, default: 'SAR' },
-      locale: { type: String, default: 'ar-SA' },
-      dateFormat: { type: String, default: 'DD/MM/YYYY' },
+      timezone: { type: String, default: 'UTC' },
+      currency: { type: String, default: 'USD' },
+      locale: { type: String, default: 'en-US' },
+      dateFormat: { type: String, default: 'MM/DD/YYYY' },
       theme: { type: String, default: 'default' },
       onboardingState: {
         step: { type: Number, default: 1 },

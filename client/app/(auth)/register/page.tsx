@@ -3,7 +3,7 @@
 import { useState, Suspense, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Building2,
@@ -23,6 +23,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { signIn } from "@/lib/simple-auth-client";
+import { SUBSCRIPTION_TIERS } from "@/lib/subscription/tiers";
 
 // Animation variants
 const containerVariants: Variants = {
@@ -91,6 +92,12 @@ interface FormData {
 function RegisterForm() {
   const { t } = useTranslation('common');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedPlan = searchParams.get("plan");
+  const checkoutPlan =
+    requestedPlan === "basic" || requestedPlan === "pro" || requestedPlan === "enterprise"
+      ? requestedPlan
+      : null;
   const steps = useMemo(() => [
     { id: 1, title: t('register.steps.business.title'), description: t('register.steps.business.description') },
     { id: 2, title: t('register.steps.account.title'), description: t('register.steps.account.description') },
@@ -101,6 +108,11 @@ function RegisterForm() {
     { value: t('register.features.fee_value'), label: t('register.features.fee_label') },
     { value: t('register.features.support_value'), label: t('register.features.support_label') },
   ], [t]);
+  const planCards = useMemo(() => [
+    { id: "free", name: "Free", price: "Free" },
+    { id: "basic", name: "Basic", price: `$${SUBSCRIPTION_TIERS.basic.pricing.monthly}/mo` },
+    { id: "pro", name: "Pro", price: `$${SUBSCRIPTION_TIERS.pro.pricing.monthly}/mo` },
+  ], []);
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -215,7 +227,7 @@ function RegisterForm() {
             });
           } catch (onboardingError) {
           }
-          router.push("/dashboard?welcome=1");
+          router.push(checkoutPlan ? `/api/polar/checkout?plan=${checkoutPlan}` : "/dashboard?welcome=1");
         } else {
           // If login fails, redirect to login page with a success message
           router.push("/login?registered=true");
@@ -282,6 +294,11 @@ function RegisterForm() {
             <p className="text-gray-600 dark:text-gray-300">
               {t('register.subheading')}
             </p>
+            {checkoutPlan && (
+              <p className="mt-3 inline-flex rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#F97402] dark:bg-orange-900/30">
+                {checkoutPlan} plan selected
+              </p>
+            )}
           </div>
 
           {/* Progress Steps */}
@@ -635,6 +652,28 @@ function RegisterForm() {
             >
               <div className="text-2xl font-bold text-white">{feature.value}</div>
               <div className="text-xs">{feature.label}</div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="mt-6 grid grid-cols-3 gap-3"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {planCards.map((plan) => (
+            <motion.div
+              key={plan.id}
+              variants={itemVariants}
+              className={`rounded-2xl border px-3 py-4 text-center backdrop-blur ${
+                checkoutPlan === plan.id
+                  ? "border-[#F97402] bg-white/20 text-white"
+                  : "border-white/15 bg-white/10 text-white/80"
+              }`}
+            >
+              <div className="text-xs font-semibold uppercase tracking-wide">{plan.name}</div>
+              <div className="mt-1 text-sm font-bold">{plan.price}</div>
             </motion.div>
           ))}
         </motion.div>

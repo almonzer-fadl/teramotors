@@ -3,29 +3,25 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   CreditCard,
   Check,
   Star,
   Zap,
-  ArrowRight,
   ArrowLeft,
   Crown,
   Building2,
   Calendar,
   AlertTriangle,
-  Download,
   RefreshCw,
-  ChevronRight,
   Loader2,
   CheckCircle2,
   Users,
   FileText,
   Car,
-  Package,
 } from "lucide-react";
-import { useSession } from "@/lib/hooks/useSession";
-import { SUBSCRIPTION_TIERS, getTierConfig, type SubscriptionTier } from "@/lib/subscription/tiers";
+import { SUBSCRIPTION_TIERS, compareTiers, getTierConfig, type SubscriptionTier } from "@/lib/subscription/tiers";
 
 // Animation variants
 const containerVariants: Variants = {
@@ -89,7 +85,7 @@ const tierIcons: Record<SubscriptionTier, typeof Star> = {
 };
 
 export default function SubscriptionPage() {
-  const { user } = useSession();
+  const { t } = useTranslation("common");
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
@@ -126,6 +122,7 @@ export default function SubscriptionPage() {
 
   const currentTier = subscription?.tier || 'free';
   const currentConfig = getTierConfig(currentTier);
+  const getText = (value: string) => t(value, value);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -145,6 +142,23 @@ export default function SubscriptionPage() {
   const handleUpgrade = (tier: SubscriptionTier) => {
     setSelectedTier(tier);
     setShowUpgradeModal(true);
+  };
+
+  const confirmUpgrade = () => {
+    if (!selectedTier || selectedTier === 'free') return;
+
+    if (selectedTier === 'enterprise') {
+      window.location.href = 'mailto:build@vantlaunch.com?subject=TeraMotors%20Enterprise%20Plan';
+      return;
+    }
+
+    window.location.href = `/api/polar/checkout?plan=${selectedTier}`;
+  };
+
+  const formatUsd = (amount: number) => {
+    if (amount === -1) return 'Custom';
+    if (amount === 0) return 'Free';
+    return `$${amount.toLocaleString()}`;
   };
 
   if (loading) {
@@ -215,7 +229,7 @@ export default function SubscriptionPage() {
                   <div className="ms-4">
                     <div className="flex items-center gap-3">
                       <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                        {currentConfig.name} Plan
+                        {getText(currentConfig.name)} Plan
                       </h2>
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${statusBadge.color}`}>
                         <StatusIcon className="w-3.5 h-3.5 me-1.5" />
@@ -223,7 +237,7 @@ export default function SubscriptionPage() {
                       </span>
                     </div>
                     <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                      {currentConfig.description}
+                      {getText(currentConfig.description)}
                     </p>
                   </div>
                 </div>
@@ -251,7 +265,7 @@ export default function SubscriptionPage() {
                     Monthly Price
                   </div>
                   <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {currentConfig.pricing.monthly === 0 ? 'Free' : `SAR ${currentConfig.pricing.monthly}`}
+                    {formatUsd(currentConfig.pricing.monthly)}
                     {currentConfig.pricing.monthly > 0 && <span className="text-sm font-normal text-gray-500">/mo</span>}
                   </div>
                 </div>
@@ -404,6 +418,7 @@ export default function SubscriptionPage() {
               {(Object.entries(SUBSCRIPTION_TIERS) as [SubscriptionTier, typeof SUBSCRIPTION_TIERS.free][]).map(
                 ([tier, config], index) => {
                   const isCurrentPlan = tier === currentTier;
+                  const isLowerTier = compareTiers(tier, currentTier) < 0;
                   const TierIcon = tierIcons[tier];
                   const price = billingCycle === 'annual' ? config.pricing.annual : config.pricing.monthly;
 
@@ -435,7 +450,7 @@ export default function SubscriptionPage() {
                           </div>
                           <div className="ms-3">
                             <h4 className="font-bold text-gray-900 dark:text-white">
-                              {config.name}
+                              {getText(config.name)}
                             </h4>
                             {isCurrentPlan && (
                               <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
@@ -459,7 +474,7 @@ export default function SubscriptionPage() {
                             ) : (
                               <>
                                 <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                                  SAR {billingCycle === 'annual' ? Math.round(price / 12) : price}
+                                  ${billingCycle === 'annual' ? Math.round(price / 12) : price}
                                 </span>
                                 <span className="text-gray-500 dark:text-gray-400 ms-1">/mo</span>
                               </>
@@ -467,7 +482,7 @@ export default function SubscriptionPage() {
                           </div>
                           {billingCycle === 'annual' && price > 0 && (
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              Billed SAR {price}/year
+                              Billed ${price}/year
                             </p>
                           )}
                         </div>
@@ -477,18 +492,18 @@ export default function SubscriptionPage() {
                           {config.features.slice(0, 5).map((feature, i) => (
                             <li key={i} className="flex items-start text-sm">
                               <Check className="w-4 h-4 text-emerald-500 me-2 mt-0.5 flex-shrink-0" />
-                              <span className="text-gray-600 dark:text-gray-300">{feature.name}</span>
+                              <span className="text-gray-600 dark:text-gray-300">{getText(feature.name)}</span>
                             </li>
                           ))}
                         </ul>
 
                         {/* CTA */}
-                        {isCurrentPlan ? (
+                        {isCurrentPlan || isLowerTier ? (
                           <button
                             disabled
                             className="w-full py-3 px-4 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-semibold rounded-xl"
                           >
-                            Current Plan
+                            {isCurrentPlan ? 'Current Plan' : 'Included'}
                           </button>
                         ) : (
                           <motion.button
@@ -522,53 +537,16 @@ export default function SubscriptionPage() {
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   Billing History
                 </h3>
-                <motion.button
-                  className="text-sm text-[#F97402] hover:text-[#F13F33] font-semibold flex items-center"
-                  whileHover={{ x: 3 }}
-                >
-                  View All
-                  <ChevronRight className="w-4 h-4 ms-1" />
-                </motion.button>
               </div>
 
-              <div className="space-y-3">
-                {[
-                  { date: 'Dec 1, 2024', amount: 199, status: 'Paid', invoice: '#INV-2024-012' },
-                  { date: 'Nov 1, 2024', amount: 199, status: 'Paid', invoice: '#INV-2024-011' },
-                  { date: 'Oct 1, 2024', amount: 199, status: 'Paid', invoice: '#INV-2024-010' },
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
-                    whileHover={{ x: 3 }}
-                  >
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                      </div>
-                      <div className="ms-4">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">
-                          {item.invoice}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {item.date}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                        SAR {item.amount}
-                      </span>
-                      <motion.button
-                        className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Download className="w-4 h-4" />
-                      </motion.button>
-                    </div>
-                  </motion.div>
-                ))}
+              <div className="rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/40 p-6 text-center">
+                <CreditCard className="mx-auto h-8 w-8 text-gray-400" />
+                <p className="mt-3 text-sm font-semibold text-gray-900 dark:text-white">
+                  No invoices yet
+                </p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  Receipts and invoices will be available from Polar after your first paid checkout.
+                </p>
               </div>
             </div>
           </motion.div>
@@ -600,12 +578,12 @@ export default function SubscriptionPage() {
                   })()}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  Upgrade to {getTierConfig(selectedTier).name}
+                  Upgrade to {getText(getTierConfig(selectedTier).name)}
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400 mb-6">
                   {selectedTier === 'enterprise'
                     ? 'Contact our sales team to discuss enterprise pricing and custom features.'
-                    : `You'll be charged SAR ${getTierConfig(selectedTier).pricing.monthly}/month starting today.`
+                    : `You'll be redirected to Polar Checkout for ${formatUsd(getTierConfig(selectedTier).pricing.monthly)}/month.`
                   }
                 </p>
 
@@ -620,6 +598,7 @@ export default function SubscriptionPage() {
                     className="flex-1 py-3 px-4 bg-gradient-to-r from-[#F97402] to-[#F13F33] text-white font-semibold rounded-xl shadow-lg shadow-[#F97402]/25"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
+                    onClick={confirmUpgrade}
                   >
                     {selectedTier === 'enterprise' ? 'Contact Sales' : 'Confirm Upgrade'}
                   </motion.button>

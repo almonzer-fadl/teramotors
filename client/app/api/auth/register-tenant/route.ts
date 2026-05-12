@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
           phone: tenant.phone || '',
           website: tenant.website || '',
           address: {
-            country: 'SA', // Default country
+            country: 'US',
           }
         },
         subscription: {
@@ -113,10 +113,10 @@ export async function POST(request: NextRequest) {
           maxVehicles: 100,
         },
         settings: {
-          timezone: 'Asia/Riyadh',
-          currency: 'SAR',
-          locale: 'ar-SA', // Correct field name (not 'language')
-          dateFormat: 'DD/MM/YYYY',
+          timezone: 'UTC',
+          currency: 'USD',
+          locale: 'en-US',
+          dateFormat: 'MM/DD/YYYY',
         },
         branding: {
           primaryColor: '#3b82f6',

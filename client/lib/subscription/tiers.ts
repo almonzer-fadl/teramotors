@@ -7,7 +7,7 @@ export type SubscriptionTier = 'free' | 'basic' | 'pro' | 'enterprise'
 
 export interface PricingInfo {
   monthly: number
-  annual: number // Price per month when billed annually
+  annual: number // Total annual price
   currency: string
 }
 
@@ -29,6 +29,7 @@ export interface TierConfig {
   limits: TierLimits
   badge?: string
   color: string // Tailwind gradient classes for tier styling
+  polarProductEnv?: string
 }
 
 export interface TierLimits {
@@ -49,7 +50,7 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     pricing: {
       monthly: 0,
       annual: 0,
-      currency: 'SAR',
+      currency: 'USD',
     },
     limits: {
       maxCustomers: 50,
@@ -79,10 +80,11 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     description: 'marketing.pricing.basic.description',
     color: 'from-blue-500 to-blue-600',
     pricing: {
-      monthly: 199,
-      annual: 166, // ~17% discount
-      currency: 'SAR',
+      monthly: 49,
+      annual: 490,
+      currency: 'USD',
     },
+    polarProductEnv: 'POLAR_PRODUCT_BASIC_ID',
     limits: {
       maxCustomers: 500,
       maxVehicles: 1000,
@@ -111,10 +113,11 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     description: 'marketing.pricing.pro.description',
     color: 'from-[#F97402] to-[#F13F33]',
     pricing: {
-      monthly: 499,
-      annual: 416, // ~17% discount
-      currency: 'SAR',
+      monthly: 129,
+      annual: 1290,
+      currency: 'USD',
     },
+    polarProductEnv: 'POLAR_PRODUCT_PRO_ID',
     popular: true,
     badge: 'marketing.pricing.most_popular_badge',
     limits: {
@@ -147,8 +150,9 @@ export const SUBSCRIPTION_TIERS: Record<SubscriptionTier, TierConfig> = {
     pricing: {
       monthly: -1, // Contact sales
       annual: -1,
-      currency: 'SAR',
+      currency: 'USD',
     },
+    polarProductEnv: 'POLAR_PRODUCT_ENTERPRISE_ID',
     badge: 'marketing.pricing.custom_pricing_badge',
     limits: {
       maxCustomers: -1, // Unlimited
@@ -182,10 +186,14 @@ export function getTierByPrice(monthlyPrice: number): SubscriptionTier | null {
   return tier?.id || null
 }
 
-export function formatPrice(price: number, currency: string = 'SAR'): string {
+export function formatPrice(price: number, currency: string = 'USD'): string {
   if (price === -1) return 'Contact Us'
   if (price === 0) return 'Free'
-  return `${currency} ${price.toLocaleString()}`
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  }).format(price)
 }
 
 export function getMonthlyPrice(tier: SubscriptionTier, annual: boolean = false): number {
