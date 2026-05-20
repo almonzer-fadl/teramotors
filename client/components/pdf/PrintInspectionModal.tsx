@@ -30,16 +30,26 @@ const PrintInspectionModal = ({
 
   const handlePrint = () => {
     setIsPrinting(true);
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
-    if (printWindow) {
-      const printContent = document.querySelector('.inspection-print-content')?.innerHTML;
+    
+    // Create a hidden iframe for printing
+    let iframe = document.getElementById('print-iframe') as HTMLIFrameElement;
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id = 'print-iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+    }
 
-      printWindow.document.write(`
+    const printContent = document.querySelector('.inspection-print-content')?.innerHTML;
+    const iframeDoc = iframe.contentWindow?.document;
+
+    if (iframeDoc) {
+      iframeDoc.open();
+      iframeDoc.write(`
         <!DOCTYPE html>
         <html dir="rtl" lang="ar">
           <head>
             <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <title>Inspection Report</title>
             <style>
               html, body {
@@ -65,22 +75,26 @@ const PrintInspectionModal = ({
 
               ${PRINT_INSPECTION_STYLES}
             </style>
+            <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
           </head>
           <body>
             <div class="print-wrapper">
               ${printContent || ''}
             </div>
+            <script>
+              window.onload = () => {
+                window.focus();
+                window.print();
+              };
+            </script>
           </body>
         </html>
       `);
-
-      printWindow.document.close();
-      printWindow.onload = () => {
-        printWindow.focus();
-        printWindow.print();
-        printWindow.close();
+      iframeDoc.close();
+      
+      setTimeout(() => {
         setIsPrinting(false);
-      };
+      }, 1000);
     } else {
       setIsPrinting(false);
     }

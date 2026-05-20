@@ -88,8 +88,17 @@ const PrintAllReportsModal = ({
       return;
     }
 
-    const printWindow = window.open('', '_blank', 'width=800,height=600');
-    if (printWindow) {
+    // Create a hidden iframe for printing
+    let iframe = document.getElementById('print-iframe') as HTMLIFrameElement;
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id = 'print-iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+    }
+
+    const iframeDoc = iframe.contentWindow?.document;
+    if (iframeDoc) {
       let title = 'Print';
       let containerClass = 'print-container';
       let cssContent = '';
@@ -108,32 +117,36 @@ const PrintAllReportsModal = ({
         cssContent = getInvoicePrintCSS();
       }
 
-      printWindow.document.write(`
+      iframeDoc.open();
+      iframeDoc.write(`
         <!DOCTYPE html>
         <html dir="rtl" lang="ar">
         <head>
           <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>${title}</title>
           <style>
             ${cssContent}
           </style>
+          <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
         </head>
         <body>
           <div class="${containerClass}">
             ${printContent}
           </div>
+          <script>
+            window.onload = () => {
+              window.focus();
+              window.print();
+            };
+          </script>
         </body>
         </html>
       `);
-
-      printWindow.document.close();
-      printWindow.onload = () => {
-        printWindow.focus();
-        printWindow.print();
-        printWindow.close();
+      iframeDoc.close();
+      
+      setTimeout(() => {
         setIsPrinting(null);
-      };
+      }, 1000);
     } else {
       setIsPrinting(null);
     }

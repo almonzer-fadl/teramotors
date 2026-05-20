@@ -61,9 +61,9 @@ export default function SearchableComboBox({
     setMounted(true);
   }, []);
 
-  // Update dropdown position when opened
-  useEffect(() => {
-    if (isOpen && containerRef.current) {
+  // Update dropdown position
+  const updateDropdownPosition = () => {
+    if (containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       setDropdownPosition({
         top: rect.bottom + window.scrollY,
@@ -71,29 +71,36 @@ export default function SearchableComboBox({
         width: rect.width,
       });
     }
+  };
+
+  // Update dropdown position when opened or window changes
+  useEffect(() => {
+    if (isOpen) {
+      updateDropdownPosition();
+    }
   }, [isOpen]);
 
-  // Close dropdown on scroll/resize for better UX
+  // Handle scroll and resize without closing
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleScrollOrResize = () => {
-      setIsOpen(false);
-      setSearchQuery('');
+    const handleUpdate = () => {
+      // Use requestAnimationFrame for smooth position updates
+      requestAnimationFrame(updateDropdownPosition);
     };
 
-    // Close dropdown when user scrolls or resizes
-    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
-    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    window.addEventListener('scroll', handleUpdate, { passive: true });
+    window.addEventListener('resize', handleUpdate, { passive: true });
+    
     return () => {
-      window.removeEventListener('scroll', handleScrollOrResize);
-      window.removeEventListener('resize', handleScrollOrResize);
+      window.removeEventListener('scroll', handleUpdate);
+      window.removeEventListener('resize', handleUpdate);
     };
   }, [isOpen]);
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside (including touch)
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       const target = event.target as Node;
       const isInsideContainer = containerRef.current?.contains(target);
       const isInsideDropdown = dropdownRef.current?.contains(target);
@@ -106,7 +113,11 @@ export default function SearchableComboBox({
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside, { passive: true });
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('touchstart', handleClickOutside);
+      };
     }
   }, [isOpen]);
 

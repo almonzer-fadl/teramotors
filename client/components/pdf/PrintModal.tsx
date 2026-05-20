@@ -38,64 +38,28 @@ const PrintModal = ({
     return `data:image/png;base64,${qr}`;
   }, [invoice?.zatca?.qrCodeImage, invoice?.zatca?.qrCode]);
 
-  useEffect(() => {
-    if (isOpen) {
-      // Add print styles to head when modal opens
-      const printStyles = document.createElement('style');
-      printStyles.id = 'print-modal-styles';
-      printStyles.textContent = `
-        @media print {
-          body * {
-            visibility: hidden;
-          }
-          .print-content, .print-content * {
-            visibility: visible;
-          }
-          .print-content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: auto;
-          }
-          .print-actions {
-            display: none !important;
-          }
-          .print-invoice-container {
-            visibility: visible !important;
-            position: static !important;
-            width: 100% !important;
-            height: auto !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-        }
-      `;
-      document.head.appendChild(printStyles);
-
-      return () => {
-        const existingStyles = document.getElementById('print-modal-styles');
-        if (existingStyles) {
-          existingStyles.remove();
-        }
-      };
-    }
-  }, [isOpen]);
-
   const handlePrint = () => {
     setIsPrinting(true);
     
-    // Create a new window for printing to avoid modal conflicts
-    const printWindow = window.open('', '_blank', 'width=900,height=1200');
-    if (printWindow) {
-      const printContent = document.querySelector('.print-content')?.innerHTML;
-      
-      printWindow.document.write(`
+    // Create a hidden iframe for printing
+    let iframe = document.getElementById('print-iframe') as HTMLIFrameElement;
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id = 'print-iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+    }
+
+    const printContent = document.querySelector('.print-content')?.innerHTML;
+    const iframeDoc = iframe.contentWindow?.document;
+
+    if (iframeDoc) {
+      iframeDoc.open();
+      iframeDoc.write(`
         <!DOCTYPE html>
         <html dir="${isRTL ? 'rtl' : 'ltr'}" lang="${language}">
           <head>
             <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <title>Invoice Print</title>
             <style>
               @page { size: A4; margin: 10mm; }
@@ -106,23 +70,30 @@ const PrintModal = ({
                 background: #fff;
                 font-family: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
               }
+              /* Add any additional styles needed for the print document here */
+              img { max-width: 100%; }
             </style>
+            <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
           </head>
           <body>
             ${printContent || ''}
+            <script>
+              // Wait for all images and resources to load before printing
+              window.onload = () => {
+                window.focus();
+                window.print();
+                // We don't remove the iframe immediately to allow the print dialog to finish
+              };
+            </script>
           </body>
         </html>
       `);
+      iframeDoc.close();
       
-      printWindow.document.close();
-      
-      // Wait for content to load then print
-      printWindow.onload = () => {
-        printWindow.focus();
-        printWindow.print();
-        printWindow.close();
+      // Reset isPrinting state after a delay (approximate time for print dialog to appear)
+      setTimeout(() => {
         setIsPrinting(false);
-      };
+      }, 1000);
     } else {
       setIsPrinting(false);
     }
