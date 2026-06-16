@@ -30,17 +30,6 @@ import { VideoModal } from "@/components/VideoModal";
 const fadeInUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
 const staggerVars = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 
-function useIsMobile() {
-  const [mobile, setMobile] = useState(false);
-  useEffect(() => {
-    const check = () => setMobile(window.innerWidth < 768 || "ontouchstart" in window);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-  return mobile;
-}
-
 function BeforeState() {
   return (
     <div className="relative h-full w-full">
@@ -129,7 +118,7 @@ const tiers = [
 export default function Home() {
   const [demoOpen, setDemoOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const isMobile = useIsMobile();
+
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
@@ -237,12 +226,12 @@ export default function Home() {
         <div className="absolute bottom-[-18rem] left-1/2 hidden h-[34rem] w-[72rem] -translate-x-1/2 rounded-full bg-[#5f6f52]/6 blur-[120px] sm:block" />
 
         <motion.div
-          initial={isMobile ? undefined : "hidden"}
-          animate={isMobile ? undefined : "visible"}
-          variants={isMobile ? undefined : staggerVars}
+          initial="hidden"
+          animate="visible"
+          variants={staggerVars}
           className="relative z-10 mx-auto grid max-w-7xl gap-10 sm:gap-14 lg:grid-cols-2 lg:items-center"
         >
-          <motion.div variants={isMobile ? undefined : fadeInUp}>
+          <motion.div variants={fadeInUp}>
             <p className="inline-flex rounded-full border border-[#cfd8c7] bg-white/70 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#5f6f52] sm:px-3 sm:py-1.5 sm:text-xs sm:tracking-[0.2em]">
               Workshop management operating system
             </p>
@@ -280,7 +269,7 @@ export default function Home() {
             </div>
           </motion.div>
 
-          <motion.div variants={isMobile ? undefined : fadeInUp} className="relative">
+          <motion.div variants={fadeInUp} className="relative">
             <BeforeAfterSlider
               before={<BeforeState />}
               after={<AfterState />}
@@ -305,8 +294,8 @@ export default function Home() {
       <section id="system" className="border-y border-white/70 bg-[#fbfaf5]/55 px-4 py-12 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-7xl">
           <motion.div
-            initial={isMobile ? undefined : { opacity: 0, y: 20 }}
-            whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5 }}
             className="max-w-3xl"
@@ -323,16 +312,16 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial={isMobile ? undefined : "hidden"}
-            whileInView={isMobile ? undefined : "visible"}
+            initial={"hidden"}
+            whileInView={"visible"}
             viewport={{ once: true, margin: "-60px" }}
-            variants={isMobile ? undefined : staggerVars}
+            variants={staggerVars}
             className="mt-8 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4"
           >
             {modules.map((mod) => (
               <motion.div
                 key={mod.title}
-                variants={isMobile ? undefined : fadeInUp}
+                variants={fadeInUp}
                 className="rounded-[22px] border border-white/70 bg-white/82 p-4 shadow-[0_18px_50px_rgba(52,64,45,0.08)] ring-1 ring-[#dfe5d8]/70 backdrop-blur sm:rounded-[28px] sm:p-5"
               >
                 <div className="grid size-10 place-items-center rounded-xl bg-[#f1eadc] text-[#5f6f52] sm:size-12 sm:rounded-2xl">
@@ -350,8 +339,8 @@ export default function Home() {
       <section id="demo" className="px-4 py-12 sm:px-6 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
           <motion.div
-            initial={isMobile ? undefined : { opacity: 0, y: 20 }}
-            whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5 }}
           >
@@ -383,8 +372,8 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial={isMobile ? undefined : { opacity: 0, y: 20 }}
-            whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5, delay: 0.15 }}
             className="rounded-[24px] border border-white/70 bg-white/82 p-4 shadow-[0_22px_70px_rgba(52,64,45,0.1)] ring-1 ring-[#dfe5d8]/70 backdrop-blur sm:rounded-[32px] sm:p-7"
@@ -407,8 +396,8 @@ export default function Home() {
       <section id="pricing" className="border-t border-white/70 bg-[#f7f3ea]/72 px-4 py-12 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-7xl">
           <motion.div
-            initial={isMobile ? undefined : { opacity: 0, y: 20 }}
-            whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.5 }}
             className="mx-auto max-w-3xl text-center"
@@ -427,8 +416,8 @@ export default function Home() {
             {tiers.map((tier, i) => (
               <motion.div
                 key={tier.name}
-                initial={isMobile ? undefined : { opacity: 0, y: 20 }}
-                whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className={`relative flex flex-col rounded-[24px] border bg-white/82 p-5 shadow-[0_20px_60px_rgba(52,64,45,0.08)] backdrop-blur sm:rounded-[30px] sm:p-6 ${
@@ -472,8 +461,8 @@ export default function Home() {
       {/* Bottom CTA */}
       <section className="px-4 py-12 sm:px-6 sm:py-20">
         <motion.div
-          initial={isMobile ? undefined : { opacity: 0, y: 20 }}
-          whileInView={isMobile ? undefined : { opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.5 }}
           className="mx-auto max-w-5xl rounded-[24px] bg-[#151612] px-5 py-10 text-center text-white shadow-[0_26px_80px_rgba(21,22,18,0.22)] sm:rounded-[34px] sm:px-10 sm:py-16"
