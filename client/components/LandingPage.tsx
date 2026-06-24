@@ -1,3 +1,4 @@
+"use client";
 
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
@@ -806,6 +807,24 @@ export default function LandingPage() {
                 </div>
               </div>
             </motion.a>
+          </motion.div>
+
+          <motion.div
+            className="mt-10 max-w-4xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <iframe
+              src="https://maps.google.com/maps?width=600&height=400&hl=en&q=Tera%20Motors%2C%20Riyadh&t=&z=15&ie=UTF8&iwloc=B&output=embed"
+              width="100%"
+              height="350"
+              className="border-0 rounded-2xl shadow-lg"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
           </motion.div>
         </div>
       </section>

@@ -26,6 +26,7 @@ const nextConfig = {
               "img-src 'self' data: blob: https://res.cloudinary.com https://www.googletagmanager.com https://www.google-analytics.com",
               "font-src 'self' data: https://fonts.gstatic.com",
               "connect-src 'self' https://api.resend.com https://res.cloudinary.com https://www.googletagmanager.com https://www.google-analytics.com wss://* https://*",
+              "frame-src 'self' https://maps.google.com https://www.google.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'"
