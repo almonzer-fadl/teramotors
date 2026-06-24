@@ -817,7 +817,7 @@ export default function LandingPage() {
             viewport={{ once: true, margin: "-100px" }}
           >
             <iframe
-              src="https://maps.google.com/maps?width=600&height=400&hl=en&q=Tera%20Motors%2C%20Riyadh&t=&z=15&ie=UTF8&iwloc=B&output=embed"
+              src="https://maps.google.com/maps?q=24.8409092,46.8205118&z=17&output=embed"
               width="100%"
               height="350"
               className="border-0 rounded-2xl shadow-lg"
