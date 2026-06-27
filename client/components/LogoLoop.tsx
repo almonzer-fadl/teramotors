@@ -245,7 +245,7 @@ export const LogoLoop = React.memo<LogoLoopProps>(
     const rootClasses = useMemo(
       () =>
         cx(
-          'relative overflow-x-hidden group',
+          'relative overflow-hidden group',
           '[--logoloop-gap:32px]',
           '[--logoloop-logoHeight:28px]',
           '[--logoloop-fadeColorAuto:#ffffff]',

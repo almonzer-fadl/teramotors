@@ -89,7 +89,7 @@ export default function OrganizationPage() {
         setFormData({
           name: "Quick Fix Auto Repairs",
           email: "info@quickfix.example",
-          phone: "+966599006314",
+          phone: "+966553022102",
           website: "https://quickfix.example",
           address: "123 Main Street",
           city: "Austin",
@@ -363,7 +363,7 @@ export default function OrganizationPage() {
                       value={formData.phone}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-500"
-                      placeholder="+966599006314"
+                      placeholder="+966553022102"
                     />
                   </div>
 

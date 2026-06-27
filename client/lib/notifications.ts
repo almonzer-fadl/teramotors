@@ -345,7 +345,7 @@ export class NotificationService {
           </div>
           <div class="footer">
             <p>TeraMotors Auto Repair Shop</p>
-            <p>Contact: +966 XX XXX XXXX | Email: info@teramotors.com</p>
+            <p>Contact: +966553022102 | Email: info@teramotors.com</p>
           </div>
         </div>
       </body>
@@ -363,7 +363,7 @@ export class NotificationService {
       
       ---
       TeraMotors Auto Repair Shop
-      Contact: +966 XX XXX XXXX | Email: info@teramotors.com
+      Contact: +966553022102 | Email: info@teramotors.com
     `;
   }
 }

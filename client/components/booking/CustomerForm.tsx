@@ -223,7 +223,7 @@ export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }
             <InputField name="firstName" label={isArabic ? 'الاسم الأول' : 'First Name'} icon={User} required register={register} errors={errors} watchedValue={watchedFields.firstName} />
             <InputField name="lastName" label={isArabic ? 'اسم العائلة' : 'Last Name'} icon={User} required register={register} errors={errors} watchedValue={watchedFields.lastName} />
             <InputField name="email" label={isArabic ? 'البريد الإلكتروني' : 'Email'} icon={Mail} type="email" required register={register} errors={errors} watchedValue={watchedFields.email} />
-            <InputField name="phone" label={isArabic ? 'رقم الهاتف' : 'Phone Number'} icon={Phone} type="tel" placeholder="+966xxxxxxxxx" required register={register} errors={errors} watchedValue={watchedFields.phone} />
+            <InputField name="phone" label={isArabic ? 'رقم الهاتف' : 'Phone Number'} icon={Phone} type="tel" placeholder="+966553022102" required register={register} errors={errors} watchedValue={watchedFields.phone} />
           </motion.div>
         </motion.div>
 

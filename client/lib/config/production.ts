@@ -37,7 +37,7 @@ export const productionConfig = {
       logoUrl: `${process.env.NEXT_PUBLIC_URL}/logo.png`,
       companyName: 'TeraMotors',
       companyAddress: '123 Auto Repair St, Riyadh, Saudi Arabia',
-      companyPhone: '+966 XX XXX XXXX',
+      companyPhone: '+966553022102',
       companyEmail: 'info@teramotors.com'
     }
   },
