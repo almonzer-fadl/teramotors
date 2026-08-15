@@ -19,7 +19,7 @@ const PrintEstimateDocument = ({
   // Calculate totals with discount and tax only on parts
   const services = estimate?.services || [];
   const parts = estimate?.parts || [];
-  const servicesTotal = services.reduce((sum: number, s: any) => sum + (s.laborHours * s.laborRate), 0);
+  const servicesTotal = services.reduce((sum: number, s: any) => sum + ((s.quantity || 1) * s.laborHours * s.laborRate), 0);
   const partsTotal = parts.reduce((sum: number, p: any) => sum + (p.quantity * p.unitCost), 0);
   const subtotal = servicesTotal + partsTotal;
   const tax = partsTotal * 0.15; // Tax only on parts
@@ -186,7 +186,7 @@ const PrintEstimateDocument = ({
               {services.map((s: any, index: number) => (
                 <tr key={index}>
                   <td>{s.serviceId?.name || s.name || 'N/A'}</td><td>{s.quantity || 1}</td><td>{s.laborHours || 0}</td>
-                  <td>{formatCurrency(s.laborRate || 0)}</td><td>{formatCurrency((s.laborHours || 0) * (s.laborRate || 0))}</td>
+                  <td>{formatCurrency(s.laborRate || 0)}</td><td>{formatCurrency((s.quantity || 1) * (s.laborHours || 0) * (s.laborRate || 0))}</td>
                 </tr>
               ))}
             </tbody>
