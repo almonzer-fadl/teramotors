@@ -1107,7 +1107,7 @@ export default function JobCardForm({
               {formData.services.map((service, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-5 gap-4 items-center mb-4"
+                  className="grid grid-cols-6 gap-4 items-center mb-4"
                 >
                   <div className="col-span-2 space-y-2">
                     <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.service')}</label>
@@ -1163,10 +1163,16 @@ export default function JobCardForm({
                       </div>
                     </div>
                   )}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.total')}</label>
+                    <div className="w-full px-4 py-3.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold text-center">
+                      {formatCurrency((service.quantity || 0) * (service.laborHours || 0) * (service.laborRate || 0))}
+                    </div>
+                  </div>
                   <button
                     type="button"
                     onClick={(e) => removeService(index, e)}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-red-700 mt-6"
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>
@@ -1199,7 +1205,7 @@ export default function JobCardForm({
                 {formData.partsUsed.map((part, index) => (
                     <div
                     key={index}
-                    className="grid grid-cols-4 gap-4 items-center mb-4"
+                    className="grid grid-cols-5 gap-4 items-center mb-4"
                     >
                     <div className="col-span-2 space-y-2">
                         <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('job_cards.select_part')}</label>
@@ -1245,10 +1251,16 @@ export default function JobCardForm({
                         </div>
                         </div>
                     )}
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{t('forms.total')}</label>
+                        <div className="w-full px-4 py-3.5 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold text-center">
+                          {formatCurrency((part.quantity || 0) * (part.cost || 0))}
+                        </div>
+                    </div>
                     <button
                         type="button"
                         onClick={(e) => removePart(index, e)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-red-500 hover:text-red-700 mt-6"
                     >
                         <Trash2 className="h-5 w-5" />
                     </button>
