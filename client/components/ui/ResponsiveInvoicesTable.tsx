@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useSession } from '@/lib/simple-auth-client';
+import { useState, useMemo } from 'react';
 import {
   Trash2,
   Eye,
@@ -17,6 +18,7 @@ import {
   Calendar,
   AlertTriangle,
   Printer,
+  Search,
 } from 'lucide-react';
 import { tableRowHover } from '@/lib/dashboard-animations';
 
@@ -121,6 +123,30 @@ export default function ResponsiveInvoicesTable({
   const { t } = useTranslation('common');
   const { user } = useSession();
   const isAdmin = user?.role === 'admin';
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter invoices based on search query
+  const filteredInvoices = useMemo(() => {
+    if (!searchQuery.trim()) return invoices;
+
+    const query = searchQuery.toLowerCase();
+    return invoices.filter((invoice) => {
+      // Search by customer name
+      const customerName = `${invoice.customerId.firstName} ${invoice.customerId.lastName}`.toLowerCase();
+
+      // Search by license plate
+      const licensePlate = invoice.vehicleId?.licensePlate?.toLowerCase() || '';
+
+      // Search by invoice number
+      const invoiceNumber = `INV-${invoice._id.slice(-6)}`.toLowerCase();
+
+      return (
+        customerName.includes(query) ||
+        licensePlate.includes(query) ||
+        invoiceNumber.includes(query)
+      );
+    });
+  }, [invoices, searchQuery]);
 
   const renderStatusLabel = (status: Invoice['status']) => {
     if (status === 'paid') return t('invoices.paid');
@@ -143,6 +169,22 @@ export default function ResponsiveInvoicesTable({
 
   return (
     <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm rounded-lg overflow-hidden">
+      {/* Search Bar */}
+      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="block w-full ps-10 pe-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[#F97402] focus:border-transparent transition-colors"
+            placeholder={t('invoices.search_placeholder', { defaultValue: 'Search by customer name, plate number, or invoice number...' })}
+          />
+        </div>
+      </div>
+
       {/* Desktop Table */}
       <div className="hidden lg:block overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
@@ -172,7 +214,19 @@ export default function ResponsiveInvoicesTable({
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-            {invoices.map((invoice) => (
+            {filteredInvoices.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-6 py-12 text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <Search className="h-12 w-12 text-gray-400 mb-3" />
+                    <p className="text-gray-500 dark:text-gray-400">
+                      {t('invoices.no_results', { defaultValue: 'No invoices found matching your search' })}
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              filteredInvoices.map((invoice) => (
               <motion.tr
                 key={invoice._id}
                 className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
@@ -296,14 +350,24 @@ export default function ResponsiveInvoicesTable({
                   </div>
                 </td>
               </motion.tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Mobile/Tablet Cards */}
-      <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
-        {invoices.map((invoice) => (
+      <div className="lg:hidden p-4">
+        {filteredInvoices.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Search className="h-12 w-12 text-gray-400 mb-3" />
+            <p className="text-gray-500 dark:text-gray-400">
+              {t('invoices.no_results', { defaultValue: 'No invoices found matching your search' })}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {filteredInvoices.map((invoice) => (
           <motion.div
             key={invoice._id}
             className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
@@ -432,7 +496,9 @@ export default function ResponsiveInvoicesTable({
               </button>
             </div>
           </motion.div>
-        ))}
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -6,7 +6,6 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Plus,
-  Search,
   CreditCard,
   DollarSign,
   Clock,
@@ -70,7 +69,6 @@ function InvoicesPageContent() {
   const searchParams = useSearchParams();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -89,8 +87,8 @@ function InvoicesPageContent() {
   const [qrCodeData, setQrCodeData] = useState<string>("");
 
   useEffect(() => {
-    fetchInvoices(searchTerm, statusFilter, currentPage, itemsPerPage);
-  }, [searchTerm, statusFilter, currentPage, itemsPerPage]);
+    fetchInvoices(statusFilter, currentPage, itemsPerPage);
+  }, [statusFilter, currentPage, itemsPerPage]);
 
   useEffect(() => {
     const printInvoiceId = searchParams.get('print');
@@ -102,11 +100,10 @@ function InvoicesPageContent() {
     }
   }, [searchParams, invoices]);
 
-  const fetchInvoices = async (search: string, status: string, page: number, limit: number) => {
+  const fetchInvoices = async (status: string, page: number, limit: number) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
-        search,
         status,
         page: page.toString(),
         limit: limit.toString()
@@ -172,7 +169,7 @@ function InvoicesPageContent() {
       }
 
       alert(t('invoices.delete_success', { defaultValue: 'Invoice deleted successfully.' }));
-      await fetchInvoices(searchTerm, statusFilter, currentPage, itemsPerPage);
+      await fetchInvoices(statusFilter, currentPage, itemsPerPage);
     } catch (error) {
       alert(t('invoices.delete_failed', { defaultValue: 'Failed to delete invoice.' }));
     }
@@ -241,28 +238,16 @@ function InvoicesPageContent() {
         <motion.div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border border-gray-100 dark:border-gray-800 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30" variants={fadeInUp}>
           <div className="px-4 py-5 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder={t('invoices.search_placeholder')}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-500 focus:ring-[#F97402] focus:border-[#F97402]"
-                  />
-                </div>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2 focus:ring-[#F97402] focus:border-[#F97402]"
-                >
-                  <option value="all">{t('invoices.all_status')}</option>
-                  <option value="pending">{t('invoices.pending')}</option>
-                  <option value="paid">{t('invoices.paid')}</option>
-                  <option value="cancelled">{t('appointments.cancelled')}</option>
-                </select>
-              </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-4 py-2 focus:ring-[#F97402] focus:border-[#F97402]"
+              >
+                <option value="all">{t('invoices.all_status')}</option>
+                <option value="pending">{t('invoices.pending')}</option>
+                <option value="paid">{t('invoices.paid')}</option>
+                <option value="cancelled">{t('appointments.cancelled')}</option>
+              </select>
               <div className="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-end">
                 {t(filteredInvoices.length === 1 ? 'invoices.invoice_count' : 'invoices.invoice_count_plural', { count: filteredInvoices.length })}
               </div>
