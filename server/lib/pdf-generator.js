@@ -57,7 +57,7 @@ class PDFGenerator {
         document.head.appendChild(style);
       });
 
-      const html = this.generateInvoiceHTML(invoice, jobCard, options);
+      const html = await this.generateInvoiceHTML(invoice, jobCard, options);
 
       await page.setContent(html, {
         waitUntil: 'networkidle0',
@@ -84,7 +84,7 @@ class PDFGenerator {
     }
   }
 
-  generateInvoiceHTML(invoice, jobCard, options) {
+  async generateInvoiceHTML(invoice, jobCard, options) {
     const isRTL = options.language === 'ar';
     const t = this.getTranslations(options.language);
 
@@ -97,17 +97,19 @@ class PDFGenerator {
     const tax = subtotal * 0.15;
     const grandTotal = subtotal + tax;
 
-    // Generate QR code synchronously if available
+    // Generate QR code if available
     let qrCodeDataUrl = '';
     if (invoice.zatca?.qrCode) {
-      QRCode.toDataURL(invoice.zatca.qrCode, {
-        width: 200,
-        margin: 1,
-        color: { dark: '#000000', light: '#FFFFFF' },
-        errorCorrectionLevel: 'M'
-      }, (err, url) => {
-        if (!err) qrCodeDataUrl = url;
-      });
+      try {
+        qrCodeDataUrl = await QRCode.toDataURL(invoice.zatca.qrCode, {
+          width: 200,
+          margin: 1,
+          color: { dark: '#000000', light: '#FFFFFF' },
+          errorCorrectionLevel: 'M'
+        });
+      } catch (err) {
+        console.error('Failed to generate QR code:', err);
+      }
     }
 
     return `

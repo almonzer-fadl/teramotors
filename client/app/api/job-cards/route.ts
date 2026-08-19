@@ -16,7 +16,7 @@ export const GET = withTenantAuth(
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status');
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const limit = parseInt(searchParams.get('limit') || '100');
 
     // Build query with tenant filter
     const query: Record<string, unknown> = { tenantId };
