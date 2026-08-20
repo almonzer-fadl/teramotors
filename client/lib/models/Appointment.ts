@@ -69,7 +69,7 @@ AppointmentSchema.index({ tenantId: 1, status: 1 });
 AppointmentSchema.index({ tenantId: 1, priority: 1 });
 AppointmentSchema.index({ tenantId: 1, createdAt: -1 });
 AppointmentSchema.index({ tenantId: 1, status: 1, appointmentDate: 1 });
-AppointmentSchema.index({ confirmationNumber: 1 }, { unique: true });
+// Note: confirmationNumber already has unique: true in field definition, no need for duplicate index
 AppointmentSchema.index({ tenantId: 1, source: 1 });
 
 // Helper method to find appointments by tenant

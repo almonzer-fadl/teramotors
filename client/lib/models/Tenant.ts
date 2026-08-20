@@ -251,7 +251,7 @@ const TenantSchema = new Schema<ITenant>(
   }
 );
 
-TenantSchema.index({ slug: 1 }, { unique: true });
+// Note: slug already has unique: true in field definition, no need for duplicate index
 TenantSchema.index({ status: 1 });
 TenantSchema.index({ 'subscription.plan': 1 });
 TenantSchema.index({ 'stats.currentUsers': 1 });
