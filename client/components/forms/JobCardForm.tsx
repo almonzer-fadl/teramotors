@@ -870,8 +870,8 @@ export default function JobCardForm({
       })
       .map(v => ({
         value: v._id,
-        label: `${v.make} ${v.model} (${v.year})`,
-        searchText: `${v.make} ${v.model} ${v.year}`,
+        label: `${v.make} ${v.model} (${v.year})${v.licensePlate ? ` - ${v.licensePlate}` : ''}`,
+        searchText: `${v.make} ${v.model} ${v.year} ${v.licensePlate || ''}`,
       }));
   
     const partOptions: SearchableComboBoxOption[] = parts.map(p => ({
