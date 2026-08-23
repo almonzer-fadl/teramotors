@@ -29,6 +29,7 @@ interface VehicleMinimal {
   make: string;
   model: string;
   year: number;
+  licensePlate?: string;
   customerId: string | { _id: string };
 }
 interface ServiceMinimal {
