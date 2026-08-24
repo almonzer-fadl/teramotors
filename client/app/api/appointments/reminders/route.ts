@@ -5,6 +5,8 @@ import Appointment from '@/lib/models/Appointment';
 import { connectToDatabase } from '@/lib/db';
 import { sendEmail } from '@/lib/email';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     await connectToDatabase();

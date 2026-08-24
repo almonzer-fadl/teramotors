@@ -4,6 +4,8 @@ import { connectToDatabase } from '@/lib/db';
 import Customer from '@/lib/models/Customer';
 import { WhatsAppService } from '@/lib/services/WhatsAppService';
 
+export const dynamic = 'force-dynamic';
+
 // POST /api/whatsapp/send - Send a manual message
 export const POST = withTenantAuth(
   async (req: NextRequest, { tenantId }) => {
