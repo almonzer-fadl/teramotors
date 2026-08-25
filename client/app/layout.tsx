@@ -12,9 +12,18 @@ export default function RootLayout({
   return (
     <html lang="en" className="font-english">
       <head>
-        <title>TeraMotor - Auto Repair Management</title>
-        <link rel="icon" href="/icon.png" type="image/png" />
-        <meta name="description" content="Professional auto repair management system for TeraMotor" />
+        <title>تيرا موتور</title>
+        <link rel="icon" href="/tenant-logos/teramotors-logo-transparent.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/tenant-logos/teramotors-logo-transparent.png" />
+        <meta name="description" content="مركز تيرا موتور لصيانة السيارات" />
+        <meta property="og:title" content="تيرا موتور" />
+        <meta property="og:description" content="مركز تيرا موتور لصيانة السيارات" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="/tenant-logos/teramotors-logo-transparent.png" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="تيرا موتور" />
+        <meta name="twitter:description" content="مركز تيرا موتور لصيانة السيارات" />
+        <meta name="twitter:image" content="/tenant-logos/teramotors-logo-transparent.png" />
         {/* Google Ads Conversion Tracking */}
         <Script id="google-ads-conversion" strategy="afterInteractive">
           {`
