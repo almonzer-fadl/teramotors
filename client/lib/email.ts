@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 'dummy-key');
 
@@ -16,26 +17,64 @@ interface EmailTemplate {
   data: Record<string, any>;
 }
 
+let smtpTransporter: nodemailer.Transporter | null = null;
+
+function getSMTPTransporter(): nodemailer.Transporter | null {
+  const host = process.env.EMAIL_SERVER_HOST;
+  const port = parseInt(process.env.EMAIL_SERVER_PORT || '587', 10);
+  const user = process.env.EMAIL_SERVER_USER;
+  const pass = process.env.EMAIL_SERVER_PASSWORD;
+
+  if (!host || !user || !pass) return null;
+
+  if (!smtpTransporter) {
+    smtpTransporter = nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465, // true for SSL (e.g. Gmail), false for STARTTLS on 587
+      auth: { user, pass },
+    });
+  }
+
+  return smtpTransporter;
+}
+
 export async function sendEmail({ to, subject, text, html }: EmailOptions) {
   try {
-    // Check if API key is properly configured
-    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 'dummy-key') {
-      return { id: 'mock-email-id', message: 'Email sending disabled - no API key configured' };
+    const from = process.env.EMAIL_FROM || 'TeraMotor <noreply@teramotors.com>';
+
+    // 1) Use configured SMTP (e.g. Google) when available
+    const transporter = getSMTPTransporter();
+    if (transporter) {
+      const info = await transporter.sendMail({
+        from,
+        to,
+        subject,
+        text,
+        html,
+      });
+      return { id: info.messageId, message: 'Email sent via SMTP' };
     }
 
-    const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'TeraMotors <noreply@teramotors.com>',
-      to: [to],
-      subject,
-      html,
-      text,
-    });
+    // 2) Fallback to Resend if SMTP is not configured
+    if (process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== 'dummy-key') {
+      const { data, error } = await resend.emails.send({
+        from,
+        to: [to],
+        subject,
+        html,
+        text,
+      });
 
-    if (error) {
-      throw new Error(`Failed to send email: ${error.message}`);
+      if (error) {
+        throw new Error(`Failed to send email: ${error.message}`);
+      }
+
+      return data;
     }
 
-    return data;
+    // 3) No provider configured - mock success (no email is sent)
+    return { id: 'mock-email-id', message: 'Email sending disabled - no SMTP or Resend configured' };
   } catch (error) {
     throw error;
   }
@@ -56,7 +95,7 @@ export function generateEmailTemplate(template: string, data: Record<string, any
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>TeraMotors</title>
+      <title>TeraMotor</title>
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -70,14 +109,14 @@ export function generateEmailTemplate(template: string, data: Record<string, any
     <body>
       <div class="container">
         <div class="header">
-          <h1>🚗 TeraMotors</h1>
+          <h1>🚗 TeraMotor</h1>
           <p>Professional Auto Repair Services</p>
         </div>
         <div class="content">
           ${getTemplateContent(template, data)}
         </div>
         <div class="footer">
-          <p>TeraMotors Auto Repair Shop</p>
+          <p>TeraMotor Auto Repair Shop</p>
           <p>Contact: +966553022102 | Email: info@teramotors.com</p>
         </div>
       </div>
@@ -135,7 +174,7 @@ function getTemplateContent(template: string, data: Record<string, any>): string
     case 'password-reset':
       return `
         <h2>Password Reset Request</h2>
-        <p>You requested a password reset for your TeraMotors account.</p>
+        <p>You requested a password reset for your TeraMotor account.</p>
         <p>Click the button below to reset your password:</p>
         <a href="${data.resetUrl}" class="button">Reset Password</a>
         <p>This link will expire in 1 hour.</p>
@@ -144,9 +183,9 @@ function getTemplateContent(template: string, data: Record<string, any>): string
     
     case 'welcome':
       return `
-        <h2>Welcome to TeraMotors!</h2>
+        <h2>Welcome to TeraMotor!</h2>
         <p>Dear ${data.customerName},</p>
-        <p>Welcome to TeraMotors! We're excited to serve you.</p>
+        <p>Welcome to TeraMotor! We're excited to serve you.</p>
         <p>Your account has been created successfully.</p>
         <p>You can now:</p>
         <ul>
@@ -158,7 +197,7 @@ function getTemplateContent(template: string, data: Record<string, any>): string
       `;
     
     default:
-      return `<p>${data.message || 'Thank you for choosing TeraMotors!'}</p>`;
+      return `<p>${data.message || 'Thank you for choosing TeraMotor!'}</p>`;
   }
 }
 
@@ -166,7 +205,7 @@ function generateTextTemplate(template: string, data: Record<string, any>): stri
   switch (template) {
     case 'appointment-reminder':
       return `
-        Appointment Reminder - TeraMotors
+        Appointment Reminder - TeraMotor
         
         Dear ${data.customerName},
         
@@ -182,7 +221,7 @@ function generateTextTemplate(template: string, data: Record<string, any>): stri
     
     case 'invoice-notification':
       return `
-        Invoice Ready - TeraMotors
+        Invoice Ready - TeraMotor
         
         Dear ${data.customerName},
         
@@ -196,7 +235,7 @@ function generateTextTemplate(template: string, data: Record<string, any>): stri
       `;
     
     default:
-      return `Thank you for choosing TeraMotors!`;
+      return `Thank you for choosing TeraMotor!`;
   }
 }
 
@@ -251,7 +290,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string) 
   
   return sendEmailTemplate({
     to: email,
-    subject: 'Password Reset - TeraMotors',
+    subject: 'Password Reset - TeraMotor',
     template: 'password-reset',
     data: { resetUrl }
   });
@@ -260,7 +299,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string) 
 export async function sendWelcomeEmail(customer: any) {
   return sendEmailTemplate({
     to: customer.email,
-    subject: 'Welcome to TeraMotors!',
+    subject: 'Welcome to TeraMotor!',
     template: 'welcome',
     data: {
       customerName: customer.firstName
