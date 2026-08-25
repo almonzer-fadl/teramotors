@@ -104,25 +104,38 @@ export function generateEmailTemplate(template: string, data: Record<string, any
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #1f2937; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background: #f9fafb; }
-        .footer { background: #374151; color: white; padding: 15px; text-align: center; font-size: 12px; }
-        .button { background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; }
-        .highlight { background: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; margin: 15px 0; }
+        .header { background: linear-gradient(135deg, #063479 0%, #2563EB 100%); color: white; padding: 24px 20px; border-radius: 12px 12px 0 0; }
+        .header-inner { display: table; width: 100%; }
+        .logo-badge { display: table-cell; vertical-align: middle; width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.45); text-align: center; font-size: 26px; font-weight: 800; color: #ffffff; }
+        .header-text { display: table-cell; vertical-align: middle; padding-left: 16px; }
+        .header-text h1 { margin: 0; font-size: 22px; }
+        .header-text p { margin: 4px 0 0 0; font-size: 13px; opacity: 0.85; }
+        .content { padding: 24px 20px; background: #f9fafb; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px; }
+        .content h2 { margin: 0 0 12px 0; font-size: 18px; color: #063479; }
+        .content p { margin: 0 0 12px 0; color: #374151; }
+        .footer { padding: 16px 20px; text-align: center; font-size: 12px; color: #6b7280; }
+        .footer a { color: #2563EB; text-decoration: none; font-weight: 600; }
+        .button { background: linear-gradient(135deg, #2563EB 0%, #063479 100%); color: white !important; padding: 13px 28px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 700; }
+        .highlight { background: #eff6ff; padding: 14px 16px; border-left: 4px solid #2563EB; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 14px; color: #1e3a8a; }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <h1>🚗 TeraMotor</h1>
-          <p>Professional Auto Repair Services</p>
+          <div class="header-inner">
+            <div class="logo-badge">T</div>
+            <div class="header-text">
+              <h1>TeraMotor</h1>
+              <p>Professional Auto Repair Services</p>
+            </div>
+          </div>
         </div>
         <div class="content">
           ${getTemplateContent(template, data)}
         </div>
         <div class="footer">
           <p>TeraMotor Auto Repair Shop</p>
-          <p>Contact: +966553022102 | Email: info@teramotors.com</p>
+          <p><a href="https://wa.me/905075928117">WhatsApp Support</a> &nbsp;|&nbsp; <a href="mailto:info@teramotors.com">info@teramotors.com</a></p>
         </div>
       </div>
     </body>
@@ -180,10 +193,12 @@ function getTemplateContent(template: string, data: Record<string, any>): string
       return `
         <h2>Password Reset Request</h2>
         <p>You requested a password reset for your TeraMotor account.</p>
-        <p>Click the button below to reset your password:</p>
-        <a href="${data.resetUrl}" class="button">Reset Password</a>
-        <p>This link will expire in 1 hour.</p>
-        <p>If you didn't request this, please ignore this email.</p>
+        <p>Click the button below to choose a new password:</p>
+        <a href="${data.resetUrl}" class="button">Reset My Password &rarr;</a>
+        <div class="highlight">
+          <strong>Link expires in 30 minutes.</strong><br>
+          If you didn't request this, you can safely ignore this email — your password won't change.
+        </div>
       `;
     
     case 'welcome':
@@ -239,6 +254,19 @@ function generateTextTemplate(template: string, data: Record<string, any>): stri
         Payment can be made at our workshop.
       `;
     
+    case 'password-reset':
+      return `
+        Password Reset Request - TeraMotor
+
+        You requested a password reset for your TeraMotor account.
+
+        Click the link below to choose a new password:
+        ${data.resetUrl}
+
+        This link will expire in 30 minutes.
+        If you didn't request this, you can safely ignore this email.
+      `;
+
     default:
       return `Thank you for choosing TeraMotor!`;
   }
