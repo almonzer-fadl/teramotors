@@ -3,20 +3,25 @@
 
 import { useEffect, useState } from 'react';
 import { PRINT_INVOICE_STYLES } from './printInvoiceStyles';
+import { CompanyInfo, DEFAULT_COMPANY_INFO, formatAddress, resolveLogoUrl } from '@/lib/company-info';
 
 interface PrintInvoiceDocumentProps {
   invoice: any;
   jobCard?: any;
   qrCodeData?: string;
   language?: string;
+  company?: CompanyInfo | null;
 }
 
 const PrintInvoiceDocument = ({
   invoice,
   jobCard,
   qrCodeData,
-  language = 'ar'
+  language = 'ar',
+  company
 }: PrintInvoiceDocumentProps) => {
+  const companyInfo: CompanyInfo = { ...DEFAULT_COMPANY_INFO, ...(company || {}) };
+  const companyLogo = resolveLogoUrl(companyInfo.logoUrl);
   const isRTL = language !== 'en';
   const services = jobCard?.services || invoice?.services || [];
   const parts = jobCard?.partsUsed || invoice?.parts || [];
@@ -171,18 +176,18 @@ const PrintInvoiceDocument = ({
 
       <div className="header">
         <div className="logo-container">
-          <img src="/icon.png" alt="TeraMotors Logo" className="logo-image" />
+          <img src={companyLogo} alt="Company Logo" className="logo-image" />
           <div>
-            <div className="company-name">Tera<span className="highlight">Visions</span></div>
+            <div className="company-name">{companyInfo.name}</div>
             <div className="company-subtitle">Auto Repair Solutions</div>
           </div>
         </div>
         <div className="company-details">
-          <div><strong>{t.companyLabel}:</strong> تيرا فيجنز</div>
-          <div><strong>{t.crNumber}:</strong> 7051569718</div>
-          <div><strong>{t.vatNumber}:</strong> 314211338900003</div>
-          <div>الرياض، صناعية الرمال، المملكة العربية السعودية</div>
-          <div>+966553022102 · info@teramotors.com</div>
+          <div><strong>{t.companyLabel}:</strong> {companyInfo.nameAr || companyInfo.name}</div>
+          {companyInfo.crNumber && <div><strong>{t.crNumber}:</strong> {companyInfo.crNumber}</div>}
+          {companyInfo.vatNumber && <div><strong>{t.vatNumber}:</strong> {companyInfo.vatNumber}</div>}
+          {formatAddress(companyInfo.address) && <div>{formatAddress(companyInfo.address)}</div>}
+          <div>{[companyInfo.phone, companyInfo.email].filter(Boolean).join(' · ')}</div>
         </div>
       </div>
 

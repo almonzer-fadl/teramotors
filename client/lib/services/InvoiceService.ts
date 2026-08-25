@@ -18,6 +18,20 @@ export class InvoiceService {
   }
 
   /**
+   * Update the company identity used for ZATCA QR generation (per-tenant)
+   */
+  updateCompanyInfo(companyName?: string, companyVATNumber?: string): void {
+    try {
+      this.qrGenerator.updateCompanyInfo(
+        companyName || COMPANY_CONFIG.name,
+        companyVATNumber || COMPANY_CONFIG.vatNumber
+      );
+    } catch (error) {
+      // Keep previous values if the update fails
+    }
+  }
+
+  /**
    * Create invoice from job card data (main integration point)
    */
   async createInvoiceFromJobCard(invoiceNumber: string, jobCardData: {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Estimate from '@/lib/models/Estimate';
+import Tenant from '@/lib/models/Tenant';
 import { getServerSession } from "@/lib/auth-server";
 
 export async function GET(
@@ -32,7 +33,21 @@ export async function GET(
       return new Response(JSON.stringify({ error: 'Estimate not found' }), { status: 404 });
     }
 
-    return new Response(JSON.stringify(estimate));
+    let company: any = null;
+    if (estimate.tenantId) {
+      const tenant = await Tenant.findById(estimate.tenantId)
+        .select('companyInfo branding')
+        .lean();
+      if (tenant) {
+        company = {
+          ...(tenant.companyInfo || {}),
+          logoUrl: tenant.branding?.logoUrl || undefined,
+        };
+      }
+    }
+
+    const estimateObj = estimate.toObject();
+    return new Response(JSON.stringify({ ...estimateObj, company }));
   } catch (error) {
     return new Response(JSON.stringify({ error: 'Failed to fetch estimate' }), { status: 500 });
   }

@@ -28,7 +28,7 @@ export default function InvoiceDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = (params as any)?.id as string;
-  const [data, setData] = useState<{ invoice: any; jobCard: any } | null>(null);
+  const [data, setData] = useState<{ invoice: any; jobCard: any; company?: any } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -64,6 +64,7 @@ export default function InvoiceDetailPage() {
   }, [data?.invoice?.zatca]);
 
   const { invoice, jobCard } = data || {};
+  const company = data?.company || null;
 
   const InfoCard = ({ icon: Icon, label, value, iconBg = 'bg-gray-500' }: { icon: React.ElementType, label: string, value: React.ReactNode, iconBg?: string }) => (
     <div className="bg-gray-50/50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-200/50 dark:border-gray-700/50">
@@ -153,6 +154,39 @@ export default function InvoiceDetailPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {company && (
+          <motion.div
+            className="mb-6 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden"
+            variants={scaleIn}
+          >
+            <div className="px-6 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex items-center gap-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={company.logoUrl || '/icon.png'}
+                  alt="Company Logo"
+                  className="h-14 w-14 rounded-xl object-contain bg-gray-50 dark:bg-gray-800 p-1 border border-gray-200 dark:border-gray-700"
+                />
+                <div>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {company.nameAr || company.name || 'TeraMotors Workshop'}
+                  </p>
+                  {company.name && company.nameAr && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{company.name}</p>
+                  )}
+                </div>
+              </div>
+              <div className="sm:ms-auto flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600 dark:text-gray-300">
+                {company.crNumber && (
+                  <span><strong className="text-gray-500 dark:text-gray-400">{t('settings.crNumber', { defaultValue: 'C.R.' })}:</strong> {company.crNumber}</span>
+                )}
+                {company.vatNumber && (
+                  <span><strong className="text-gray-500 dark:text-gray-400">{t('settings.vatNumber', { defaultValue: 'VAT' })}:</strong> {company.vatNumber}</span>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Details Column */}
           <div className="lg:col-span-2 space-y-6">

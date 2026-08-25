@@ -6,6 +6,7 @@ import PrintInspectionDocument from './PrintInspectionDocument';
 import PrintEstimateDocument from './PrintEstimateDocument';
 import PrintInvoiceDocument from './PrintInvoiceDocument';
 import { getInvoicePrintCSS, getEstimatePrintCSS, getInspectionPrintCSS } from './printStyles';
+import { CompanyInfo } from '@/lib/company-info';
 
 interface PrintAllReportsModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface PrintAllReportsModalProps {
   invoice: any;
   jobCard?: any;
   language?: string;
+  company?: CompanyInfo | null;
 }
 
 type DocumentType = 'inspection' | 'estimate' | 'invoice';
@@ -26,7 +28,8 @@ const PrintAllReportsModal = ({
   estimate,
   invoice,
   jobCard,
-  language = 'ar'
+  language = 'ar',
+  company
 }: PrintAllReportsModalProps) => {
   const [isPrinting, setIsPrinting] = useState<string | null>(null);
   const [activeDocument, setActiveDocument] = useState<DocumentType>('inspection');
@@ -53,13 +56,13 @@ const PrintAllReportsModal = ({
       type: 'estimate' as DocumentType,
       title: 'التقدير',
       color: 'from-green-600 to-green-500',
-      component: <PrintEstimateDocument estimate={estimate} language={language} />
+      component: <PrintEstimateDocument estimate={estimate} language={language} company={company} />
     },
     {
       type: 'invoice' as DocumentType,
       title: 'الفاتورة',
       color: 'from-red-600 to-red-500',
-      component: <PrintInvoiceDocument invoice={invoice} jobCard={jobCard} qrCodeData={qrCodeData} language={language} />
+      component: <PrintInvoiceDocument invoice={invoice} jobCard={jobCard} qrCodeData={qrCodeData} language={language} company={company} />
     }
   ];
 

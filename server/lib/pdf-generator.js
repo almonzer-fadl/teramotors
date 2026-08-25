@@ -88,6 +88,14 @@ class PDFGenerator {
     const isRTL = options.language === 'ar';
     const t = this.getTranslations(options.language);
 
+    // Tenant/company identity (passed by server route)
+    const company = options.company || {};
+    const companyName = company.name || (isRTL ? t.company : t.companyEn);
+    const companyNameAr = company.nameAr || company.name || t.company;
+    const crNumber = company.crNumber || '';
+    const vatNumber = company.vatNumber || '';
+    const logoUrl = company.logoUrl || '';
+
     // Calculate totals
     const services = jobCard?.services || [];
     const parts = jobCard?.partsUsed || [];
@@ -154,6 +162,32 @@ class PDFGenerator {
             color: #F13F33;
             margin: 0;
             ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
+        }
+
+        .company-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+
+        .company-meta .logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .company-meta .meta-lines {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .company-meta .meta-lines div {
+            margin: 2px 0;
         }
 
         .invoice-title {
@@ -324,7 +358,14 @@ class PDFGenerator {
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="company-name">${t.company}</h1>
+            ${logoUrl ? `<div class="company-meta"><img class="logo" src="${logoUrl}" alt="Logo"></div>` : ''}
+            <h1 class="company-name">${this.escapeHtml(isRTL ? companyNameAr : companyName)}</h1>
+            <div class="company-meta meta-lines">
+                <div>
+                    ${crNumber ? `<div><strong>${t.crNumber}:</strong> ${this.escapeHtml(crNumber)}</div>` : ''}
+                    ${vatNumber ? `<div><strong>${t.vatNumber}:</strong> ${this.escapeHtml(vatNumber)}</div>` : ''}
+                </div>
+            </div>
             <h2 class="invoice-title">${t.title} #${String(invoice._id || '').slice(-6)}</h2>
 
             ${qrCodeDataUrl ? `
@@ -443,6 +484,9 @@ class PDFGenerator {
       ar: {
         title: "فاتورة",
         company: "تيرا موتورز لصيانة السيارات",
+        companyEn: "TeraMotors Auto Repair",
+        crNumber: "رقم السجل التجاري",
+        vatNumber: "الرقم الضريبي",
         invoiceNumber: "رقم الفاتورة #",
         date: "التاريخ",
         dueDate: "تاريخ الاستحقاق",
@@ -474,6 +518,9 @@ class PDFGenerator {
       en: {
         title: "Invoice",
         company: "TeraMotors Auto Repair",
+        companyEn: "TeraMotors Auto Repair",
+        crNumber: "C.R. Number",
+        vatNumber: "VAT Number",
         invoiceNumber: "Invoice #",
         date: "Date",
         dueDate: "Due Date",
@@ -511,6 +558,15 @@ class PDFGenerator {
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${day}/${month}/${year}`;
+  }
+
+  escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   formatCurrency(amount, isRTL) {

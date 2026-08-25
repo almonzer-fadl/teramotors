@@ -92,7 +92,7 @@ export default function JobCardForm({
   const [isPartModalOpen, setPartModalOpen] = useState(false);
   const [isServiceModalOpen, setServiceModalOpen] = useState(false);
   const [linkedInvoiceId, setLinkedInvoiceId] = useState<string | null>(null);
-  const [printModalData, setPrintModalData] = useState<{ invoice: any; jobCard?: any } | null>(null);
+  const [printModalData, setPrintModalData] = useState<{ invoice: any; jobCard?: any; company?: any } | null>(null);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [printingInvoice, setPrintingInvoice] = useState(false);
   const [updatingEstimate, setUpdatingEstimate] = useState(false);
@@ -599,6 +599,7 @@ export default function JobCardForm({
       setPrintModalData({
         invoice: invoiceData.invoice,
         jobCard: invoiceData.jobCard || savedJobCard,
+        company: invoiceData.company || null,
       });
       setIsPrintModalOpen(true);
     } catch (error) {
@@ -1539,6 +1540,7 @@ export default function JobCardForm({
           invoice={printModalData.invoice}
           jobCard={printModalData.jobCard}
           language={i18n.language}
+          company={printModalData.company}
         />
       )}
 

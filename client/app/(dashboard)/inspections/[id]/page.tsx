@@ -731,6 +731,7 @@ export default function InspectionDetailsPage() {
           invoice={invoiceData.invoice}
           jobCard={selectedJobCard || invoiceData.jobCard}
           language={'ar'}
+          company={estimateData.company || invoiceData.company || null}
         />
       )}
     </div>

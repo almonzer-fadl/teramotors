@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { Invoice, JobCard } from '@/lib/models';
+import Tenant from '@/lib/models/Tenant';
 
 // This route is public so customers can view invoices from WhatsApp links
 export async function GET(
@@ -31,8 +32,21 @@ export async function GET(
         .populate('partsUsed.partId');
     }
 
+    let company: any = null;
+    if (invoice.tenantId) {
+      const tenant = await Tenant.findById(invoice.tenantId)
+        .select('companyInfo branding')
+        .lean();
+      if (tenant) {
+        company = {
+          ...(tenant.companyInfo || {}),
+          logoUrl: tenant.branding?.logoUrl || undefined,
+        };
+      }
+    }
+
     // Return the invoice data for viewing
-    return NextResponse.json({ invoice, jobCard }, {
+    return NextResponse.json({ invoice, jobCard, company }, {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache, no-store, must-revalidate',

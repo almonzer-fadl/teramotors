@@ -11,7 +11,7 @@ export default function InvoicePdfPage() {
   const { t } = useTranslation('common');
   const params = useParams();
   const id = (params as any)?.id as string;
-  const [data, setData] = useState<{ invoice: any; jobCard: any } | null>(null);
+  const [data, setData] = useState<{ invoice: any; jobCard: any; company?: any } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -104,6 +104,7 @@ export default function InvoicePdfPage() {
             jobCard={data.jobCard}
             qrCodeData={qrSrc ?? undefined}
             language="ar"
+            company={data.company}
           />
         </div>
       </div>

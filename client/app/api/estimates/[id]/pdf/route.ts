@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Estimate from '@/lib/models/Estimate';
+import Tenant from '@/lib/models/Tenant';
 import { getServerSession } from "@/lib/auth-server";
 
 export async function GET(
@@ -34,8 +35,21 @@ export async function GET(
     const language = url.searchParams.get('lang') || 'en';
     const isRTL = language === 'ar';
 
+    let company: any = null;
+    if (estimate.tenantId) {
+      const tenant = await Tenant.findById(estimate.tenantId)
+        .select('companyInfo branding')
+        .lean();
+      if (tenant) {
+        company = {
+          ...(tenant.companyInfo || {}),
+          logoUrl: tenant.branding?.logoUrl || undefined,
+        };
+      }
+    }
+
     // Generate HTML content for PDF
-    const htmlContent = generateEstimateHTML(estimate, language, isRTL);
+    const htmlContent = generateEstimateHTML(estimate, language, isRTL, company);
 
     return new NextResponse(htmlContent, {
       headers: {
@@ -51,9 +65,15 @@ export async function GET(
   }
 }
 
-function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boolean = false): string {
+function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boolean = false, company: any = null): string {
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString();
   const formatCurrency = (amount: number) => `ر.س ${amount.toFixed(2)}`;
+
+  const companyName = company?.name || 'TeraMotors Workshop';
+  const companyNameAr = company?.nameAr || company?.name || companyName;
+  const crNumber = company?.crNumber || '';
+  const vatNumber = company?.vatNumber || '';
+  const logoUrl = company?.logoUrl || '';
 
   // Translation object
   const translations = {
@@ -189,6 +209,20 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
             margin: 5px 0 0 0;
             font-size: 1.1em;
         }
+        .header .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 4px;
+            background: #fff;
+        }
+        .header .meta {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 8px;
+        }
         .section {
             margin-bottom: 30px;
             page-break-inside: avoid;
@@ -294,8 +328,13 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
     <button class="print-button no-print" onclick="window.print()">${t.printButton}</button>
 
     <div class="header">
+        ${logoUrl ? `<img class="logo" src="${logoUrl}" alt="Logo" />` : ''}
         <h1>${t.title}</h1>
-        <p>${t.company}</p>
+        <p>${isRTL ? companyNameAr : companyName}</p>
+        <div class="meta">
+            ${crNumber ? `<div><strong>${isRTL ? 'رقم السجل التجاري' : 'C.R. Number'}:</strong> ${crNumber}</div>` : ''}
+            ${vatNumber ? `<div><strong>${isRTL ? 'الرقم الضريبي' : 'VAT Number'}:</strong> ${vatNumber}</div>` : ''}
+        </div>
     </div>
 
     <div class="section">
