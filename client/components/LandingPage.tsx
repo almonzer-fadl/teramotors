@@ -6,29 +6,32 @@ import Image from "next/image";
 import {
   Wrench,
   Car,
-  Calendar,
   Phone,
   MapPin,
-  Clock,
   CheckCircle,
-  ArrowRight,
   Star,
-  Shield,
   Award,
-  Users,
   Mail,
   Globe,
   Menu,
   X,
-  User
+  User,
+  Cog,
+  Disc,
+  Gauge,
+  Zap,
+  Snowflake,
+  Droplets,
+  ShieldCheck,
+  MessageCircle
 } from "lucide-react";
-import { motion, useInView, useScroll, useTransform, type Variants } from "framer-motion";
+import { motion, useInView, type Variants } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { LogoLoop } from "@/components/LogoLoop";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
-
-
+const WHATSAPP_URL = "https://wa.me/601167709123";
+const WHATSAPP_PHONE = "+60 11-6770 9123";
 
 // Animation Variants
 const fadeInUp: Variants = {
@@ -73,19 +76,6 @@ const scaleInAnimation: Variants = {
   animate: { opacity: 1, scale: 1, transition: { duration: 0.6 } }
 };
 
-const pulseAnimation: Variants = {
-  animate: {
-    boxShadow: [
-      "0 0 0 0 rgba(249, 116, 2, 0.4)",
-      "0 0 0 10px rgba(249, 116, 2, 0)"
-    ],
-    transition: {
-      duration: 2,
-      repeat: Infinity
-    }
-  }
-};
-
 // Counter Component for Stats
 function Counter({ end }: { end: number }) {
   const [count, setCount] = useState(0);
@@ -125,7 +115,7 @@ function TestimonialImage({ src, alt, className }: { src: string, alt: string, c
       initial={{ opacity: 0, scale: 0.8 }}
       animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
       transition={{ duration: 0.6 }}
-      className={`group relative overflow-hidden rounded-2xl shadow-lg dark:shadow-gray-900/50 hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-300 hover:-translate-y-1 hover:scale-105 ${className}`}
+      className={`group relative overflow-hidden rounded-3xl shadow-lg dark:shadow-gray-900/50 hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-300 hover:-translate-y-1 hover:scale-105 ${className}`}
     >
       <Image
         src={src}
@@ -149,7 +139,7 @@ function LanguageSwitch() {
   return (
     <button
       onClick={toggleLanguage}
-      className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors"
+      className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors"
     >
       <Globe className="w-4 h-4" />
       <span className="font-medium">{i18n.language === 'en' ? 'العربية' : 'English'}</span>
@@ -160,51 +150,6 @@ function LanguageSwitch() {
 export default function LandingPage() {
   const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const subscriptions = [
-    {
-      title: t("landing.subscriptions.basic.title"),
-      features: [
-        t("landing.subscriptions.basic.feature1"),
-        t("landing.subscriptions.basic.feature2"),
-        t("landing.subscriptions.basic.feature3"),
-      ],
-      price: t("landing.subscriptions.basic.price"),
-    },
-    {
-      title: t("landing.subscriptions.standard.title"),
-      features: [
-        t("landing.subscriptions.standard.feature1"),
-        t("landing.subscriptions.standard.feature2"),
-        t("landing.subscriptions.standard.feature3"),
-        t("landing.subscriptions.standard.feature4"),
-      ],
-      price: t("landing.subscriptions.standard.price"),
-    },
-    {
-      title: t("landing.subscriptions.premium.title"),
-      features: [
-        t("landing.subscriptions.premium.feature1"),
-        t("landing.subscriptions.premium.feature2"),
-        t("landing.subscriptions.premium.feature3"),
-        t("landing.subscriptions.premium.feature4"),
-        t("landing.subscriptions.premium.feature5"),
-      ],
-      price: t("landing.subscriptions.premium.price"),
-    },
-    {
-      title: t("landing.subscriptions.enterprise.title"),
-      features: [
-        t("landing.subscriptions.enterprise.feature1"),
-        t("landing.subscriptions.enterprise.feature2"),
-        t("landing.subscriptions.enterprise.feature3"),
-        t("landing.subscriptions.enterprise.feature4"),
-        t("landing.subscriptions.enterprise.feature5"),
-        t("landing.subscriptions.enterprise.feature6"),
-      ],
-      price: t("landing.subscriptions.enterprise.price"),
-    },
-  ];
 
   const companyLogos = [
     { src: "/logos/City-ambulance.svg", alt: "City Ambulance", width: 120, height: 40 },
@@ -246,28 +191,43 @@ export default function LandingPage() {
     t("landing.about.values.convenience")
   ];
 
+  const services = [
+    { key: 'engine_repair', icon: Cog },
+    { key: 'brake_service', icon: Disc },
+    { key: 'transmission', icon: Gauge },
+    { key: 'electrical', icon: Zap },
+    { key: 'ac_heating', icon: Snowflake },
+    { key: 'suspension', icon: Car },
+    { key: 'oil_change', icon: Droplets },
+    { key: 'inspection', icon: ShieldCheck }
+  ];
+
+  const navLinks = [
+    { href: '#services', label: t("landing.services.title") },
+    { href: '#about', label: t("landing.about.title") },
+    { href: '#contact', label: t("landing.contact.title") }
+  ];
+
   return (
-    <div className="min-h-screen overflow-x-hidden bg-gray-50 dark:bg-gray-950 transition-colors">
+    <div className="min-h-screen overflow-x-hidden bg-white dark:bg-gray-950 transition-colors">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-sm dark:shadow-gray-800/50 sticky top-0 z-50 transition-colors">
+      <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-sm dark:shadow-gray-800/50 sticky top-0 z-50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex justify-between items-center py-3">
             <div className="flex items-center">
                 <Image
-                  src="/icon.png"
-                  alt="TeraMotors Logo"
+                  src="/tenant-logos/teramotors-logo-transparent.png"
+                  alt="TeraMotor Logo"
                   width={56}
                   height={56}
-                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl me-2 sm:me-3 object-contain"
+                  className="w-12 h-12 sm:w-14 sm:h-14 me-2 sm:me-3 object-contain"
                 />
                 <div className="flex flex-col">
-                  <span className="flex items-center gap-2">
-                    <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#063479] dark:text-white drop-shadow-sm font-logo" style={{ letterSpacing: '0.04em' }}>
-                      Tera
-                      <span className="text-[#F97402]">Motors</span>
-                    </span>
+                  <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#063479] dark:text-white drop-shadow-sm font-logo" style={{ letterSpacing: '0.04em' }}>
+                    Tera
+                    <span className="text-[#2563EB] dark:text-[#60A5FA]">Motor</span>
                   </span>
-                  <span className="text-xs font-semibold uppercase tracking-widest text-[#063479] dark:text-gray-300 bg-blue-100 dark:bg-gray-800 rounded px-2 py-0.5 mt-1 self-start shadow-sm" style={{ letterSpacing: '0.15em' }}>
+                  <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-[#063479] dark:text-gray-300 bg-blue-50 dark:bg-gray-800 rounded px-2 py-0.5 mt-1 self-start shadow-sm" style={{ letterSpacing: '0.15em' }}>
                     {t('landing.header.auto_repair')}
                   </span>
                 </div>
@@ -275,17 +235,19 @@ export default function LandingPage() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
-              <a href="#subscriptions" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.subscriptions.title")}</a>
-              <a href="#about" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.about.title")}</a>
-              <a href="#contact" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.contact.title")}</a>
-              <Link href="/portal/teramotors-default/login" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors flex items-center gap-1">
+              {navLinks.map((link) => (
+                <a key={link.href} href={link.href} className="text-gray-700 dark:text-gray-300 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors font-medium">
+                  {link.label}
+                </a>
+              ))}
+              <Link href="/portal/teramotors-default/login" className="text-gray-700 dark:text-gray-300 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors flex items-center gap-1 font-medium">
                 {t('landing.header.customer_portal')}
               </Link>
               <LanguageSwitch />
               <ThemeToggle />
-              <a href="tel:+966553022102" className="text-[#F97402] font-semibold flex items-center">
-                <Phone className="w-4 h-4 me-1" />
-                +966553022102
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-gradient-to-r from-[#2563EB] to-[#063479] text-white px-4 py-2 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300">
+                <MessageCircle className="w-4 h-4" />
+                {WHATSAPP_PHONE}
               </a>
             </div>
 
@@ -294,7 +256,7 @@ export default function LandingPage() {
               <ThemeToggle />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors"
+                className="p-2 text-gray-700 dark:text-gray-300 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors"
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -310,56 +272,45 @@ export default function LandingPage() {
           className="md:hidden overflow-hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"
         >
           <div className="px-4 py-4 space-y-3">
-            <a
-              href="#subscriptions"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors font-medium"
-            >
-              {t("landing.subscriptions.title")}
-            </a>
-            <a
-              href="#about"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors font-medium"
-            >
-              {t("landing.about.title")}
-            </a>
-            <a
-              href="#contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block py-2 text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors font-medium"
-            >
-              {t("landing.contact.title")}
-            </a>
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 text-gray-700 dark:text-gray-300 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors font-medium"
+              >
+                {link.label}
+              </a>
+            ))}
             <Link
               href="/portal/teramotors-default/login"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 py-2 text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors font-medium"
+              className="flex items-center gap-2 py-2 text-gray-700 dark:text-gray-300 hover:text-[#2563EB] dark:hover:text-[#60A5FA] transition-colors font-medium"
             >
-              
               {t('landing.header.customer_portal')}
             </Link>
             <div className="py-2">
               <LanguageSwitch />
             </div>
             <a
-              href="tel:+966553022102"
-              className="flex items-center py-3 px-4 bg-[#F97402] text-white rounded-lg font-semibold hover:bg-[#d6352a] transition-colors"
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-[#2563EB] to-[#063479] text-white rounded-xl font-semibold transition-colors"
             >
-              <Phone className="w-5 h-5 me-2" />
-              +966553022102
+              <MessageCircle className="w-5 h-5" />
+              {WHATSAPP_PHONE}
             </a>
           </div>
         </motion.div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#063479] via-[#052a5f] to-slate-900 dark:from-slate-950 dark:via-gray-900 dark:to-black text-white py-12 sm:py-16 md:py-24">
-        {/* TODO: Add hero background image of workshop */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#041E42] via-[#063479] to-[#0A4DD8] dark:from-slate-950 dark:via-gray-900 dark:to-black text-white py-16 sm:py-20 md:py-28">
         {/* Background Elements */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#F97402]/20 to-transparent rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-500/20 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-sky-400/20 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-400/15 to-transparent rounded-full blur-3xl"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
@@ -372,21 +323,21 @@ export default function LandingPage() {
               >
                 <motion.div
                   variants={fadeInUp}
-                  className="inline-flex items-center px-3 py-2 sm:px-4 rounded-full bg-[#F97402]/20 border border-[#F97402]/30 text-[#F97402] text-xs sm:text-sm font-medium"
+                  className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 border border-white/20 text-white text-xs sm:text-sm font-medium backdrop-blur-sm"
                 >
                   <Wrench className="w-3 h-3 sm:w-4 sm:h-4 me-2" />
                   {t('landing_missing.professional_auto_repair')}
                 </motion.div>
                 <motion.h1
                   variants={fadeInUp}
-                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight bg-gradient-to-r from-white via-sky-100 to-sky-300 bg-clip-text text-transparent"
                 >
                   {t("landing.hero.title")}
                 </motion.h1>
-                <motion.p variants={fadeInUp} className="text-base sm:text-lg md:text-xl text-blue-100 leading-relaxed max-w-lg">
+                <motion.p variants={fadeInUp} className="text-base sm:text-lg md:text-xl text-sky-100 leading-relaxed max-w-lg">
                   {t("landing.hero.subtitle")}
                 </motion.p>
-                <motion.p variants={fadeInUp} className="text-sm sm:text-base md:text-lg text-blue-200/80 leading-relaxed max-w-xl">
+                <motion.p variants={fadeInUp} className="text-sm sm:text-base md:text-lg text-sky-200/80 leading-relaxed max-w-xl">
                   {t("landing.hero.description")}
                 </motion.p>
               </motion.div>
@@ -398,12 +349,14 @@ export default function LandingPage() {
                 transition={{ delay: 0.6, duration: 0.6 }}
               >
                 <motion.a
-                  href="tel:+966553022102"
-                  className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#F97402] to-[#d6352a] text-white font-semibold rounded-2xl hover:shadow-2xl hover:shadow-[#F97402]/25 transition-all duration-300 hover:-translate-y-1"
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative inline-flex items-center justify-center px-8 py-4 bg-white text-[#063479] font-bold rounded-2xl hover:shadow-2xl hover:shadow-sky-400/25 transition-all duration-300 hover:-translate-y-1"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Phone className="w-5 h-5 me-2 group-hover:scale-110 transition-transform" />
+                  <MessageCircle className="w-5 h-5 me-2 group-hover:scale-110 transition-transform" />
                   {t("landing.hero.call_now")}
                 </motion.a>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -424,18 +377,18 @@ export default function LandingPage() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, duration: 0.7 }}
             >
-              <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-white/20 shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl sm:rounded-3xl"></div>
+              <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-4 sm:p-6 md:p-8 border border-white/20 shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-3xl"></div>
                 <div className="relative text-center">
                   <motion.div
-                    className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#F97402] to-[#d6352a] rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg"
+                    className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-sky-400 to-[#063479] rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg shadow-sky-500/30"
                     variants={floatingAnimation}
                     animate="animate"
                   >
                     <Car className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
                   </motion.div>
                   <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-4">{t('landing_missing.professional_service')}</h3>
-                  <p className="text-blue-100 mb-6 sm:mb-8 text-sm sm:text-base md:text-lg">{t('landing_missing.trusted_by_thousands')}</p>
+                  <p className="text-sky-100 mb-6 sm:mb-8 text-sm sm:text-base md:text-lg">{t('landing_missing.trusted_by_thousands')}</p>
 
                   <motion.div
                     className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6"
@@ -445,35 +398,35 @@ export default function LandingPage() {
                   >
                     <motion.div
                       variants={scaleInAnimation}
-                      className="bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6"
+                      className="bg-white/20 backdrop-blur-sm rounded-2xl p-3 sm:p-4 md:p-6"
                     >
                       <div className="text-2xl sm:text-2xl md:text-3xl font-bold text-white">
                         <Counter end={15} />
                       </div>
-                      <div className="text-xs sm:text-sm text-blue-200">{t('landing_missing.years_experience')}</div>
+                      <div className="text-xs sm:text-sm text-sky-200">{t('landing_missing.years_experience')}</div>
                     </motion.div>
                     <motion.div
                       variants={scaleInAnimation}
-                      className="bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6"
+                      className="bg-white/20 backdrop-blur-sm rounded-2xl p-3 sm:p-4 md:p-6"
                     >
                       <div className="text-2xl sm:text-2xl md:text-3xl font-bold text-white">{t('landing.hero.satisfaction_value')}</div>
-                      <div className="text-xs sm:text-sm text-blue-200">{t('landing_missing.satisfaction')}</div>
+                      <div className="text-xs sm:text-sm text-sky-200">{t('landing_missing.satisfaction')}</div>
                     </motion.div>
                     <motion.div
                       variants={scaleInAnimation}
-                      className="bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6"
+                      className="bg-white/20 backdrop-blur-sm rounded-2xl p-3 sm:p-4 md:p-6"
                     >
                       <div className="text-2xl sm:text-2xl md:text-3xl font-bold text-white">{t('landing.hero.support_value')}</div>
-                      <div className="text-xs sm:text-sm text-blue-200">{t('landing_missing.support_24_7')}</div>
+                      <div className="text-xs sm:text-sm text-sky-200">{t('landing_missing.support_24_7')}</div>
                     </motion.div>
                     <motion.div
                       variants={scaleInAnimation}
-                      className="bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6"
+                      className="bg-white/20 backdrop-blur-sm rounded-2xl p-3 sm:p-4 md:p-6"
                     >
                       <div className="text-2xl sm:text-2xl md:text-3xl font-bold text-white">
                         <Counter end={15000} />
                       </div>
-                      <div className="text-xs sm:text-sm text-blue-200">{t('landing_missing.happy_customers')}</div>
+                      <div className="text-xs sm:text-sm text-sky-200">{t('landing_missing.happy_customers')}</div>
                     </motion.div>
                   </motion.div>
                 </div>
@@ -483,85 +436,67 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Subscriptions Section */}
-      <section id="subscriptions" className="relative py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 transition-colors">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%220%200%2040%2040%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22%23f3f4f6%22%20fill-opacity%3D%220.3%22%3E%3Cpath%20d%3D%22M20%2020c0-5.5-4.5-10-10-10s-10%204.5-10%2010%204.5%2010%2010%2010%2010-4.5%2010-10zm10%200c0-5.5-4.5-10-10-10s-10%204.5-10%2010%204.5%2010%2010%2010%2010-4.5%2010-10z%22/%3E%3C/g%3E%3C/svg%3E')] opacity-20 dark:opacity-5"></div>
-
+      {/* Services Section */}
+      <section id="services" className="relative py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-sky-50/60 dark:from-gray-900 dark:to-gray-950 transition-colors">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            className="text-center mb-20"
+            className="text-center mb-14 sm:mb-20"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true, margin: "-100px" }}
           >
             <motion.div
-              className="inline-flex items-center px-4 py-2 rounded-full bg-[#F97402]/10 border border-[#F97402]/20 text-[#F97402] text-sm font-medium mb-6"
+              className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-[#2563EB] dark:text-sky-300 text-sm font-medium mb-6"
               variants={floatingAnimation}
               animate="animate"
             >
               <Award className="w-4 h-4 me-2" />
-              {t('landing_missing.our_subscriptions')}
+              {t('landing_missing.our_services')}
             </motion.div>
-            <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              {t("landing.subscriptions.title")}
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6 bg-gradient-to-r from-[#063479] to-[#2563EB] bg-clip-text text-transparent">
+              {t("landing.services.title")}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              {t("landing.subscriptions.subtitle")}
+            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              {t("landing.services.subtitle")}
             </p>
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
             variants={staggerContainer}
             initial="initial"
             whileInView="animate"
             viewport={{ once: true, margin: "-100px" }}
           >
-            {subscriptions.map((subscription, index) => (
-              <motion.div
-                key={index}
-                className="group relative"
-                variants={staggerItem}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#F97402]/5 to-[#063479]/5 dark:from-[#F97402]/10 dark:to-[#063479]/10 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+            {services.map(({ key, icon: Icon }) => {
+              const serviceTitle = t(`landing.services.${key}.title`);
+              const serviceDescription = t(`landing.services.${key}.description`);
+              return (
                 <motion.div
-                  className="relative bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg dark:shadow-gray-900/50 hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-500 border border-gray-100 dark:border-gray-700 h-full flex flex-col"
-                  whileHover={{ scale: 1.02, y: -8 }}
-                  transition={{ duration: 0.3 }}
+                  key={key}
+                  variants={staggerItem}
+                  className="group relative"
                 >
-                  {index === 2 && (
-                    <motion.div
-                      className="absolute inset-0 rounded-3xl"
-                      variants={pulseAnimation}
-                      animate="animate"
-                      style={{ pointerEvents: 'none' }}
-                    />
-                  )}
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-[#F97402] transition-colors">
-                    {subscription.title}
-                  </h3>
-                  <ul className="text-gray-600 dark:text-gray-300 leading-relaxed mb-6 flex-grow">
-                    {subscription.features.map((feature, featureIndex) => (
-                      <motion.li
-                        key={featureIndex}
-                        className="flex items-center mb-2"
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ delay: featureIndex * 0.05 }}
-                        viewport={{ once: true }}
-                      >
-                        <CheckCircle className="w-5 h-5 text-[#F97402] me-2 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white mt-auto">
-                    {subscription.price}
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-[#063479]/10 dark:from-blue-500/20 dark:to-[#063479]/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                  <motion.div
+                    className="relative bg-white dark:bg-gray-800 rounded-3xl p-6 sm:p-8 shadow-lg dark:shadow-gray-900/50 hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-500 border border-gray-100 dark:border-gray-700 h-full flex flex-col"
+                    whileHover={{ scale: 1.02, y: -8 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="w-14 h-14 bg-gradient-to-br from-[#2563EB] to-[#063479] rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform duration-300">
+                      <Icon className="w-7 h-7 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-[#2563EB] dark:group-hover:text-sky-300 transition-colors">
+                      {serviceTitle}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
+                      {serviceDescription}
+                    </p>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            ))}
+              );
+            })}
           </motion.div>
         </div>
       </section>
@@ -588,7 +523,7 @@ export default function LandingPage() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 bg-gray-50 dark:bg-gray-900 transition-colors">
+      <section id="about" className="py-20 bg-white dark:bg-gray-900 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
@@ -597,10 +532,10 @@ export default function LandingPage() {
               viewport={{ once: true, margin: "-100px" }}
               variants={slideInLeft}
             >
-              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 bg-gradient-to-r from-[#063479] to-[#2563EB] bg-clip-text text-transparent">
                 {t("landing.about.title")}
               </h2>
-              <h3 className="text-2xl font-semibold text-[#F97402] mb-6">
+              <h3 className="text-2xl font-semibold text-[#2563EB] dark:text-sky-300 mb-6">
                 {t("landing.about.subtitle")}
               </h3>
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-8 leading-relaxed">
@@ -611,13 +546,12 @@ export default function LandingPage() {
               </p>
             </motion.div>
             <motion.div
-              className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg dark:shadow-gray-900/50"
+              className="bg-gradient-to-br from-sky-50 to-blue-50/50 dark:from-gray-800 dark:to-gray-800/50 rounded-3xl p-8 shadow-lg dark:shadow-gray-900/50 border border-blue-100 dark:border-gray-700"
               initial="initial"
               whileInView="animate"
               viewport={{ once: true, margin: "-100px" }}
               variants={slideInRight}
             >
-              {/* TODO: Add workshop team photo */}
               <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
                 {t('landing_missing.why_choose_us')}
               </h3>
@@ -634,7 +568,9 @@ export default function LandingPage() {
                     className="flex items-start gap-3"
                     variants={staggerItem}
                   >
-                    <CheckCircle className="w-6 h-6 text-[#F97402] flex-shrink-0 mt-0.5" />
+                    <div className="w-6 h-6 bg-gradient-to-br from-[#2563EB] to-[#063479] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    </div>
                     <span className="text-gray-700 dark:text-gray-300">{value}</span>
                   </motion.div>
                 ))}
@@ -645,11 +581,10 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 relative overflow-hidden transition-colors">
+      <section className="py-20 bg-gradient-to-br from-sky-50/50 to-white dark:from-gray-800 dark:to-gray-900 relative overflow-hidden transition-colors">
         {/* Background Elements */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23f3f4f6%22%20fill-opacity%3D%220.3%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40 dark:opacity-5"></div>
-        <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-[#F97402]/5 to-transparent dark:from-[#F97402]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-[#063479]/5 to-transparent dark:from-[#063479]/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-blue-400/10 to-transparent dark:from-blue-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-[#063479]/10 to-transparent dark:from-[#063479]/20 rounded-full blur-3xl"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -660,14 +595,14 @@ export default function LandingPage() {
             viewport={{ once: true, margin: "-100px" }}
           >
             <motion.div
-              className="inline-flex items-center px-4 py-2 rounded-full bg-[#F97402]/10 border border-[#F97402]/20 text-[#F97402] text-sm font-medium mb-6"
+              className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-[#2563EB] dark:text-sky-300 text-sm font-medium mb-6"
               variants={floatingAnimation}
               animate="animate"
             >
               <Star className="w-4 h-4 me-2" />
               {t('landing_missing.trusted_by_thousands')}
             </motion.div>
-            <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6 bg-gradient-to-r from-[#063479] to-[#2563EB] bg-clip-text text-transparent">
               {t("landing.testimonials.title")}
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
@@ -722,11 +657,11 @@ export default function LandingPage() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="relative py-12 sm:py-16 md:py-20 bg-gradient-to-br from-[#063479] via-[#052a5f] to-slate-900 dark:from-gray-900 dark:via-gray-950 dark:to-gray-950 text-white overflow-hidden transition-colors">
+      <section id="contact" className="relative py-12 sm:py-16 md:py-20 bg-gradient-to-br from-[#041E42] via-[#063479] to-[#0A4DD8] dark:from-gray-900 dark:via-gray-950 dark:to-gray-950 text-white overflow-hidden transition-colors">
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.h2
-            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white via-blue-100 to-blue-200 bg-clip-text text-transparent"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-white via-sky-100 to-sky-300 bg-clip-text text-transparent"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -735,7 +670,7 @@ export default function LandingPage() {
             {t("landing.contact.title")}
           </motion.h2>
           <motion.p
-            className="text-lg text-blue-100 dark:text-blue-300 mb-8"
+            className="text-lg text-sky-100 dark:text-sky-300 mb-8"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.6 }}
@@ -752,20 +687,22 @@ export default function LandingPage() {
             whileInView="animate"
             viewport={{ once: true, margin: "-100px" }}
           >
-            {/* Phone Card */}
+            {/* WhatsApp Card */}
             <motion.a
-              href="tel:+966553022102"
-              className="group bg-white/5 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-white/10 dark:border-gray-700 hover:bg-white/10 dark:hover:bg-gray-700/50 hover:border-white/20 dark:hover:border-gray-600 transition-all duration-300"
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group bg-white/5 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10 dark:border-gray-700 hover:bg-white/10 dark:hover:bg-gray-700/50 hover:border-white/20 dark:hover:border-gray-600 transition-all duration-300"
               variants={staggerItem}
               whileHover={{ scale: 1.05, y: -4 }}
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#F97402] to-[#d6352a] rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <Phone className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-[#063479] rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <MessageCircle className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-white text-sm">{t('landing_missing.call_us')}</h4>
-                  <p className="text-blue-200 dark:text-blue-300 text-xs">{t("landing.contact.phone")}</p>
+                  <p className="text-sky-200 dark:text-sky-300 text-xs">{t("landing.contact.phone")}</p>
                 </div>
               </div>
             </motion.a>
@@ -773,17 +710,17 @@ export default function LandingPage() {
             {/* Email Card */}
             <motion.a
               href="mailto:info@teramotors.com"
-              className="group bg-white/5 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-white/10 dark:border-gray-700 hover:bg-white/10 dark:hover:bg-gray-700/50 hover:border-white/20 dark:hover:border-gray-600 transition-all duration-300"
+              className="group bg-white/5 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10 dark:border-gray-700 hover:bg-white/10 dark:hover:bg-gray-700/50 hover:border-white/20 dark:hover:border-gray-600 transition-all duration-300"
               variants={staggerItem}
               whileHover={{ scale: 1.05, y: -4 }}
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#F97402] to-[#d6352a] rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-[#063479] rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                   <Mail className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-white text-sm">{t("landing.contact.book_online")}</h4>
-                  <p className="text-blue-200 dark:text-blue-300 text-xs">{t('landing.contact.email_address')}</p>
+                  <p className="text-sky-200 dark:text-sky-300 text-xs">{t('landing.contact.email_address')}</p>
                 </div>
               </div>
             </motion.a>
@@ -793,17 +730,17 @@ export default function LandingPage() {
               href="https://www.google.com/maps/place/%D8%AA%D9%8A%D8%B1%D8%A7+%D9%84%D8%B5%D9%8A%D8%A7%D9%86%D8%A9+%D8%A7%D9%84%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA%E2%80%AD/@24.8410326,46.8204813,15z/data=!4m19!1m10!3m9!1s0x3e2e55b9d4a57a9f:0xc0bc4c555c8e6e02!2z2KrZitix2Kcg2YTYtdmK2KfZhtipINin2YTYs9mK2KfYsdin2Ko!8m2!3d24.8409092!4d46.8205118!10e5!14m1!1BCgIgAQ!16s%2Fg%2F11x6ymw6b2!3m7!1s0x3e2e55b9d4a57a9f:0xc0bc4c555c8e6e02!8m2!3d24.8409092!4d46.8205118!9m1!1b1!16s%2Fg%2F11x6ymw6b2?entry=ttu&g_ep=EgoyMDI1MTAxNC4wIKXMDSoASAFQAw%3D%3D"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-white/5 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-white/10 dark:border-gray-700 hover:bg-white/10 dark:hover:bg-gray-700/50 hover:border-white/20 dark:hover:border-gray-600 transition-all duration-300"
+              className="group bg-white/5 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10 dark:border-gray-700 hover:bg-white/10 dark:hover:bg-gray-700/50 hover:border-white/20 dark:hover:border-gray-600 transition-all duration-300"
               variants={staggerItem}
               whileHover={{ scale: 1.05, y: -4 }}
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#F97402] to-[#d6352a] rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-[#063479] rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                   <MapPin className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-white text-sm">{t('landing_missing.visit_our_shop')}</h4>
-                  <p className="text-blue-200 dark:text-blue-300 text-xs">{t("landing.contact.address")}</p>
+                  <p className="text-sky-200 dark:text-sky-300 text-xs">{t("landing.contact.address")}</p>
                 </div>
               </div>
             </motion.a>
@@ -820,7 +757,7 @@ export default function LandingPage() {
               src="https://maps.google.com/maps?q=24.8409092,46.8205118&z=17&output=embed"
               width="100%"
               height="350"
-              className="border-0 rounded-2xl shadow-lg"
+              className="border-0 rounded-3xl shadow-lg"
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -830,68 +767,64 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12 transition-colors">
+      <footer className="bg-gray-950 dark:bg-black text-white py-12 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
             <div className="flex items-center mb-3">
                 <Image
-                  src="/icon.png"
-                  alt="TeraMotors Logo"
+                  src="/tenant-logos/teramotors-logo-transparent.png"
+                  alt="TeraMotor Logo"
                   width={40}
                   height={40}
-                  className="w-10 h-10 rounded-lg me-3 object-contain"
+                  className="w-12 h-12 me-3 object-contain"
                 />
                 <div className="flex flex-col">
-                  <span className="flex items-center gap-2">
-                    <span className="text-xl font-extrabold tracking-tight text-white drop-shadow-sm font-logo" style={{ letterSpacing: '0.04em' }}>
-                      Tera
-                      <span className="text-[#F97402]">Motors</span>
-                    </span>
+                  <span className="text-xl font-extrabold tracking-tight text-white drop-shadow-sm font-logo" style={{ letterSpacing: '0.04em' }}>
+                    Tera
+                    <span className="text-[#60A5FA]">Motor</span>
                   </span>
-                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-300 dark:text-gray-400 bg-gray-700 dark:bg-gray-800 rounded px-2 py-0.5 mt-1 self-start shadow-sm" style={{ letterSpacing: '0.15em' }}>
-                    Auto Repair
+                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 bg-gray-800 rounded px-2 py-0.5 mt-1 self-start shadow-sm" style={{ letterSpacing: '0.15em' }}>
+                    {t('landing.header.auto_repair')}
                   </span>
                 </div>
             </div>
-              <p className="text-gray-400 dark:text-gray-500 leading-relaxed mb-6 max-w-md">
+              <p className="text-gray-400 leading-relaxed mb-6 max-w-md">
                 {t("landing.about.description")}
               </p>
               <div className="flex gap-4">
-                <a href="tel:+966553022102" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors">
-                  <Phone className="w-5 h-5" />
+                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#60A5FA] transition-colors" aria-label="WhatsApp">
+                  <MessageCircle className="w-5 h-5" />
                 </a>
-                <a href="mailto:info@teramotors.com" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors">
+                <a href="mailto:info@teramotors.com" className="text-gray-400 hover:text-[#60A5FA] transition-colors" aria-label="Email">
                   <Mail className="w-5 h-5" />
                 </a>
+                <a href="https://maps.google.com/maps?q=24.8409092,46.8205118&z=17&output=embed" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#60A5FA] transition-colors" aria-label="Location">
+                  <MapPin className="w-5 h-5" />
+                </a>
               </div>
             </div>
             <div>
-              <h4 className="text-base font-semibold mb-3 text-white dark:text-gray-100">{t('landing_missing.subscriptions')}</h4>
+              <h4 className="text-base font-semibold mb-3 text-white">{t("landing.services.title")}</h4>
               <div className="space-y-1">
-                <a href="#subscriptions" className="block text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">{t('landing_missing.basic_plan')}</a>
-                <a href="#subscriptions" className="block text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">{t('landing_missing.premium_plan')}</a>
-                <a href="#subscriptions" className="block text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">{t('landing_missing.enterprise_plan')}</a>
-                <a href="#subscriptions" className="block text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors text-sm">{t('landing_missing.custom_plan')}</a>
+                <a href="#services" className="block text-gray-400 hover:text-[#60A5FA] transition-colors text-sm">{t("landing.services.title")}</a>
+                <a href="#about" className="block text-gray-400 hover:text-[#60A5FA] transition-colors text-sm">{t("landing.about.title")}</a>
+                <a href="#contact" className="block text-gray-400 hover:text-[#60A5FA] transition-colors text-sm">{t("landing.contact.title")}</a>
+                <Link href="/portal/teramotors-default/login" className="block text-gray-400 hover:text-[#60A5FA] transition-colors text-sm">
+                  {t('landing.header.customer_portal')}
+                </Link>
               </div>
             </div>
             <div>
-              <h4 className="text-base font-semibold mb-3 text-white dark:text-gray-100">{t('landing_missing.contact_info')}</h4>
-              <div className="space-y-1 text-gray-400 dark:text-gray-500 text-sm">
+              <h4 className="text-base font-semibold mb-3 text-white">{t('landing_missing.contact_info')}</h4>
+              <div className="space-y-1 text-gray-400 text-sm">
                 <p>{t("landing.contact.address")}</p>
                 <p>{t("landing.contact.phone")}</p>
                 <p>{t("landing.contact.email")}</p>
-                <div className="pt-2 space-y-1">
-                  <Link
-                    href="/portal/teramotors-default/login"
-                    className="flex items-center gap-1 text-blue-400 hover:text-white dark:hover:text-gray-300 transition-colors font-medium text-sm"
-                  >
-                    <User className="w-4 h-4" />
-                    {t('landing.header.customer_portal')}
-                  </Link>
+                <div className="pt-2">
                   <Link
                     href="/login"
-                    className="block text-[#F97402] hover:text-white dark:hover:text-gray-300 transition-colors font-medium text-sm"
+                    className="block text-[#60A5FA] hover:text-white transition-colors font-medium text-sm"
                   >
                     {t('landing.footer.staff_login')}
                   </Link>
@@ -899,7 +832,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 dark:border-gray-700 mt-6 pt-4 text-center text-gray-400 dark:text-gray-500 text-sm">
+          <div className="border-t border-gray-800 mt-6 pt-4 text-center text-gray-400 text-sm">
             <p>&copy; {new Date().getFullYear()} {t('landing.footer.company_name')}. {t('landing_missing.all_rights_reserved')}</p>
           </div>
         </div>
