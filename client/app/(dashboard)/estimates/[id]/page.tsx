@@ -256,7 +256,7 @@ export default function EstimateDetailPage() {
                 />
                 <div>
                   <p className="text-lg font-bold text-gray-900 dark:text-white">
-                    {company.nameAr || company.name || 'TeraMotors Workshop'}
+                    {company.nameAr || company.name || 'TeraMotor Workshop'}
                   </p>
                   {company.name && company.nameAr && (
                     <p className="text-sm text-gray-500 dark:text-gray-400">{company.name}</p>

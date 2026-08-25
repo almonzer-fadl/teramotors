@@ -12,9 +12,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="font-english">
       <head>
-        <title>TeraMotors - Auto Repair Management</title>
+        <title>TeraMotor - Auto Repair Management</title>
         <link rel="icon" href="/icon.png" type="image/png" />
-        <meta name="description" content="Professional auto repair management system for TeraMotors" />
+        <meta name="description" content="Professional auto repair management system for TeraMotor" />
         {/* Google Ads Conversion Tracking */}
         <Script id="google-ads-conversion" strategy="afterInteractive">
           {`

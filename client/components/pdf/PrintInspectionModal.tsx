@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import PrintInspectionDocument from './PrintInspectionDocument';
 import { PRINT_INSPECTION_STYLES } from './printInspectionStyles';
+import { CompanyInfo } from '@/lib/company-info';
 
 interface PrintInspectionModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface PrintInspectionModalProps {
   inspection: any;
   jobCard?: any;
   language?: string;
+  company?: CompanyInfo | null;
 }
 
 const PrintInspectionModal = ({
@@ -18,7 +20,8 @@ const PrintInspectionModal = ({
   onClose,
   inspection,
   jobCard,
-  language = 'ar'
+  language = 'ar',
+  company
 }: PrintInspectionModalProps) => {
   const { t } = useTranslation('common');
   const [isPrinting, setIsPrinting] = useState(false);
@@ -128,6 +131,7 @@ const PrintInspectionModal = ({
                     inspection={inspection}
                     jobCard={jobCard}
                     language={language}
+                    company={company}
                   />
                 </div>
               </div>
@@ -144,7 +148,7 @@ const PrintInspectionModal = ({
             <button
               onClick={handlePrint}
               disabled={isPrinting}
-              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-[#F97402] to-[#f96206] border border-transparent rounded-md shadow hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#F97402] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] border border-transparent rounded-md shadow hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2563EB] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPrinting ? printingLabel : printLabel}
             </button>

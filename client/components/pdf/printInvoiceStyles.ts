@@ -1,9 +1,9 @@
 export const PRINT_INVOICE_STYLES = `
   :root {
-    --invoice-orange: #F97402;
+    --invoice-accent: #2563EB;
     --invoice-navy: #063479;
-    --invoice-muted: #FFF8F1;
-    --invoice-border: #FAD8B0;
+    --invoice-muted: #EFF6FF;
+    --invoice-border: #BFDBFE;
     --invoice-note: rgba(6, 52, 121, 0.06);
     --invoice-bg: #ffffff;
   }
@@ -61,7 +61,7 @@ export const PRINT_INVOICE_STYLES = `
   }
 
   .company-name .highlight {
-    color: var(--invoice-orange);
+    color: var(--invoice-accent);
   }
 
   .company-subtitle {
@@ -93,7 +93,7 @@ export const PRINT_INVOICE_STYLES = `
   .document-title h1 {
     font-size: 26px;
     font-weight: 800;
-    color: var(--invoice-orange);
+    color: var(--invoice-accent);
     margin: 0;
   }
 
@@ -256,7 +256,7 @@ export const PRINT_INVOICE_STYLES = `
     border-top: 1px dashed rgba(0,0,0,0.12);
     font-size: 14px;
     font-weight: 700;
-    color: var(--invoice-orange);
+    color: var(--invoice-accent);
   }
 
   .notes {

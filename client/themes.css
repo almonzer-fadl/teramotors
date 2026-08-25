@@ -3,15 +3,15 @@
 */
 
 @layer base {
-  /* Default Theme (Orange) - This is the fallback */
+  /* Default Theme (Blue) - This is the fallback */
   :root, [data-theme="default"] {
-    --primary: oklch(0.7 0.2 45); /* Orange */
-    --accent: oklch(0.6 0.2 25); /* Red-orange */
+    --primary: oklch(0.6 0.15 250); /* Blue */
+    --accent: oklch(0.7 0.15 210); /* Lighter Blue */
     --ring: var(--primary);
   }
   [data-theme="default"].dark {
-    --primary: oklch(0.7 0.2 45); /* Orange */
-    --accent: oklch(0.7 0.2 45); /* Brighter orange for dark mode */
+    --primary: oklch(0.7 0.15 250); /* Blue */
+    --accent: oklch(0.7 0.15 210); /* Lighter Blue */
     --ring: var(--primary);
   }
 

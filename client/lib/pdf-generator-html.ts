@@ -22,7 +22,7 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
   const translations = {
     en: {
       title: "Invoice",
-      company: "TeraMotors Auto Repair",
+      company: "TeraMotor Auto Repair",
       invoiceNumber: "Invoice #",
       date: "Date",
       customerInfo: "Customer Information",
@@ -46,12 +46,12 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
       grandTotal: "Grand Total",
       notes: "Notes",
       generatedOn: "Generated on",
-      systemName: "TeraMotors Auto Repair Management System",
+      systemName: "TeraMotor Auto Repair Management System",
       status: "Status"
     },
     ar: {
       title: "فاتورة",
-      company: "تيرا موتورز لصيانة السيارات",
+      company: "تيرا موتور لصيانة السيارات",
       invoiceNumber: "رقم الفاتورة #",
       date: "التاريخ",
       customerInfo: "معلومات العميل",
@@ -75,7 +75,7 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
       grandTotal: "المجموع الإجمالي",
       notes: "ملاحظات",
       generatedOn: "تم الإنشاء في",
-      systemName: "نظام إدارة صيانة السيارات تيرا موتورز",
+      systemName: "نظام إدارة صيانة السيارات تيرا موتور",
       status: "الحالة"
     }
   };

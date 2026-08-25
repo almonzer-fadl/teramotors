@@ -1,11 +1,11 @@
 export const PRINT_INSPECTION_STYLES = `
   :root {
-    --inspection-brand: #F97402;
+    --inspection-brand: #2563EB;
     --inspection-navy: #063479;
-    --inspection-muted: #fdf8f4;
+    --inspection-muted: #eff6ff;
     --inspection-border: #e4e4e7;
     --inspection-card: #ffffff;
-    --inspection-note: rgba(249, 116, 2, 0.08);
+    --inspection-note: rgba(37, 99, 235, 0.08);
   }
 
   .print-inspection-container {
