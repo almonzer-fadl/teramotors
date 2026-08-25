@@ -51,7 +51,7 @@ export async function generateInvoiceHTML(data: InvoiceData): Promise<string> {
     },
     ar: {
       title: "فاتورة",
-      company: "تيرا موتور لصيانة السيارات",
+      company: "مركز تيرا موتور لصيانة السيارات",
       invoiceNumber: "رقم الفاتورة #",
       date: "التاريخ",
       customerInfo: "معلومات العميل",
