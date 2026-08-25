@@ -23,15 +23,14 @@ import {
   Snowflake,
   Droplets,
   ShieldCheck,
-  MessageCircle
 } from "lucide-react";
 import { motion, useInView, type Variants } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { LogoLoop } from "@/components/LogoLoop";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
-const WHATSAPP_URL = "https://wa.me/601167709123";
-const WHATSAPP_PHONE = "+60 11-6770 9123";
+const PHONE_TEL = "tel:+966553022102";
+const PHONE_DISPLAY = "+966553022102";
 
 // Animation Variants
 const fadeInUp: Variants = {
@@ -245,9 +244,9 @@ export default function LandingPage() {
               </Link>
               <LanguageSwitch />
               <ThemeToggle />
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-gradient-to-r from-[#2563EB] to-[#063479] text-white px-4 py-2 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300">
-                <MessageCircle className="w-4 h-4" />
-                {WHATSAPP_PHONE}
+              <a href={PHONE_TEL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-gradient-to-r from-[#2563EB] to-[#063479] text-white px-4 py-2 rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300">
+                <Phone className="w-4 h-4" />
+                {PHONE_DISPLAY}
               </a>
             </div>
 
@@ -293,13 +292,13 @@ export default function LandingPage() {
               <LanguageSwitch />
             </div>
             <a
-              href={WHATSAPP_URL}
+              href={PHONE_TEL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-[#2563EB] to-[#063479] text-white rounded-xl font-semibold transition-colors"
             >
-              <MessageCircle className="w-5 h-5" />
-              {WHATSAPP_PHONE}
+              <Phone className="w-5 h-5" />
+              {PHONE_DISPLAY}
             </a>
           </div>
         </motion.div>
@@ -349,14 +348,14 @@ export default function LandingPage() {
                 transition={{ delay: 0.6, duration: 0.6 }}
               >
                 <motion.a
-                  href={WHATSAPP_URL}
+                  href={PHONE_TEL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group relative inline-flex items-center justify-center px-8 py-4 bg-white text-[#063479] font-bold rounded-2xl hover:shadow-2xl hover:shadow-sky-400/25 transition-all duration-300 hover:-translate-y-1"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <MessageCircle className="w-5 h-5 me-2 group-hover:scale-110 transition-transform" />
+                  <Phone className="w-5 h-5 me-2 group-hover:scale-110 transition-transform" />
                   {t("landing.hero.call_now")}
                 </motion.a>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -689,7 +688,7 @@ export default function LandingPage() {
           >
             {/* WhatsApp Card */}
             <motion.a
-              href={WHATSAPP_URL}
+              href={PHONE_TEL}
               target="_blank"
               rel="noopener noreferrer"
               className="group bg-white/5 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 border border-white/10 dark:border-gray-700 hover:bg-white/10 dark:hover:bg-gray-700/50 hover:border-white/20 dark:hover:border-gray-600 transition-all duration-300"
@@ -698,7 +697,7 @@ export default function LandingPage() {
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-[#063479] rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <MessageCircle className="w-5 h-5 text-white" />
+                  <Phone className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-white text-sm">{t('landing_missing.call_us')}</h4>
@@ -793,8 +792,8 @@ export default function LandingPage() {
                 {t("landing.about.description")}
               </p>
               <div className="flex gap-4">
-                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#60A5FA] transition-colors" aria-label="WhatsApp">
-                  <MessageCircle className="w-5 h-5" />
+                <a href={PHONE_TEL} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#60A5FA] transition-colors" aria-label="WhatsApp">
+                  <Phone className="w-5 h-5" />
                 </a>
                 <a href="mailto:info@teramotors.com" className="text-gray-400 hover:text-[#60A5FA] transition-colors" aria-label="Email">
                   <Mail className="w-5 h-5" />

@@ -1,4 +1,4 @@
-// Design Tokens for TeraMotors SaaS
+// Design Tokens for TeraMotor SaaS
 // Apple-inspired design system with modern aesthetics
 
 export const colors = {

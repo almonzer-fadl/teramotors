@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 // Placeholder for different onboarding steps
 const OnboardingStepWelcome = ({ onNext, onSkip }: { onNext: () => void; onSkip: () => void; }) => (
     <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome to TeraMotors!</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome to TeraMotor!</h1>
         <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">Let's get your workshop set up in a few quick steps.</p>
         <div className="mt-8 flex justify-center gap-4">
             <button onClick={onSkip} className="px-6 py-3 rounded-xl font-semibold text-gray-700 dark:text-gray-300 bg-white/80 dark:bg-gray-800/80 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">

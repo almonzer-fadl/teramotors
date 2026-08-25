@@ -161,7 +161,7 @@ function LoginForm() {
             >
               <Image
                 src="/icon.png"
-                alt="TeraMotors Logo"
+                alt="TeraMotor Logo"
                 width={64}
                 height={64}
                 className="w-14 h-14 object-contain rounded-xl"

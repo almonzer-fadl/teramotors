@@ -71,7 +71,7 @@ function generateInspectionHTML(inspection: any, jobCard: any, language: string 
   const translations = {
     en: {
       title: "Vehicle Inspection Report",
-      company: "TeraMotors Auto Repair",
+      company: "TeraMotor Auto Repair",
       printButton: "🖨️ Print PDF",
       vehicleInfo: "Vehicle Information",
       makeModel: "Make & Model",
@@ -87,7 +87,7 @@ function generateInspectionHTML(inspection: any, jobCard: any, language: string 
       recommendations: "Recommendations",
       nextInspectionDue: "Next Inspection Due",
       generatedOn: "Generated on",
-      systemName: "TeraMotors Auto Repair Management System",
+      systemName: "TeraMotor Auto Repair Management System",
       noItems: "No items found",
       customer: "Customer",
       mechanic: "Mechanic",

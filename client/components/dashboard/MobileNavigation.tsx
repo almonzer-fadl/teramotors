@@ -97,7 +97,7 @@ export default function MobileNavigation({ className = "" }: MobileNavigationPro
           <div className="fixed inset-y-0 left-0 w-80 bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="text-lg font-semibold text-gray-900">TeraMotors</h2>
+              <h2 className="text-lg font-semibold text-gray-900">TeraMotor</h2>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-2 text-gray-500 hover:text-gray-700"

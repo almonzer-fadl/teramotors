@@ -77,7 +77,7 @@ export default function ForgotPasswordPage() {
             <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center">
               <Image
                 src="/icon.png"
-                alt="TeraMotors Logo"
+                alt="TeraMotor Logo"
                 width={56}
                 height={56}
                 className="w-12 h-12 object-contain rounded-xl"
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
             </div>
             <div>
               <p className="text-sm uppercase tracking-widest text-white/70">{t('landing_missing.workshop_portal')}</p>
-              <p className="text-xl font-semibold">TeraMotors</p>
+              <p className="text-xl font-semibold">TeraMotor</p>
             </div>
           </div>
           <div>
@@ -141,7 +141,7 @@ export default function ForgotPasswordPage() {
             <div className="w-16 h-16 bg-gradient-to-br from-[#F97402] to-[#F13F33] rounded-2xl flex items-center justify-center shadow-lg shadow-[#F97402]/30">
               <Image
                 src="/icon.png"
-                alt="TeraMotors Logo"
+                alt="TeraMotor Logo"
                 width={56}
                 height={56}
                 className="w-12 h-12 object-contain rounded-xl"

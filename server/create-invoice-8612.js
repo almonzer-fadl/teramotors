@@ -78,7 +78,7 @@ async function createInvoice() {
     dueDate.setDate(dueDate.getDate() + 30);
 
     // Generate TLV for QR Code (simplified)
-    const sellerName = Buffer.from('TeraMotors', 'utf-8');
+    const sellerName = Buffer.from('TeraMotor', 'utf-8');
     const vatNumber = Buffer.from('300000000000003', 'utf-8');
     const timestamp = Buffer.from(new Date().toISOString(), 'utf-8');
     const totalBuffer = Buffer.from(totalAmount.toFixed(2), 'utf-8');

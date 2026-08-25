@@ -184,7 +184,7 @@ export default function LandingPage() {
                 priority
               />
               <span className="ms-2 sm:ms-3 text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                TeraMotors
+                TeraMotor
               </span>
             </Link>
 
@@ -754,7 +754,7 @@ export default function LandingPage() {
                   height={48}
                   className="w-12 h-12 rounded-2xl object-contain"
                 />
-                <span className="ms-3 text-xl font-bold text-white">TeraMotors</span>
+                <span className="ms-3 text-xl font-bold text-white">TeraMotor</span>
               </div>
               <p className="text-sm dark:text-gray-300">
                 {t('marketing.footer.description')}
@@ -794,7 +794,7 @@ export default function LandingPage() {
 
           <div className="border-t border-gray-800 dark:border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between">
             <p className="text-sm">
-              © {new Date().getFullYear()} TeraMotors. {t('marketing.footer.copyright')}
+              © {new Date().getFullYear()} TeraMotor. {t('marketing.footer.copyright')}
             </p>
             <p className="text-sm mt-4 md:mt-0">
               {t('marketing.footer.made_in')}
