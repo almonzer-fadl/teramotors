@@ -135,7 +135,7 @@ export function generateEmailTemplate(template: string, data: Record<string, any
         </div>
         <div class="footer">
           <p>TeraMotor Auto Repair Shop</p>
-          <p><a href="https://wa.me/905075928117">WhatsApp Support</a> &nbsp;|&nbsp; <a href="mailto:info@teramotors.com">info@teramotors.com</a></p>
+          <p><a href="https://wa.me/601167709123">WhatsApp Support</a> &nbsp;|&nbsp; <a href="mailto:info@teramotors.com">info@teramotors.com</a></p>
         </div>
       </div>
     </body>
