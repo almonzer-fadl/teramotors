@@ -158,6 +158,10 @@ export default function LandingPage() {
   const features = getFeatures(t);
   const stats = getStats(t);
   const testimonials = getTestimonials(t);
+  const getPlanHref = (tier: SubscriptionTier) => {
+    if (tier === "basic" || tier === "pro") return `/register?plan=${tier}`;
+    return "/register";
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
@@ -200,7 +204,7 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center gap-4">
               <LanguageSwitcher />
               <ThemeToggle />
-              <Link href="#hero">
+              <Link href="/login">
                 <motion.button
                   className="text-gray-700 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-white transition-colors"
                   whileHover={{ scale: 1.02 }}
@@ -612,7 +616,7 @@ export default function LandingPage() {
                           ) : (
                             <div className="flex items-baseline">
                               <span className="text-3xl font-bold text-gray-900 dark:text-white">
-                                SAR {billingCycle === 'annual' ? Math.round(price / 12) : price}
+                                ${billingCycle === 'annual' ? Math.round(price / 12) : price}
                               </span>
                               <span className="text-gray-500 dark:text-gray-400 ms-1">/mo</span>
                             </div>
@@ -628,7 +632,7 @@ export default function LandingPage() {
                           ))}
                         </ul>
 
-                        <Link href="/register" className="block mt-8">
+                        <Link href={getPlanHref(tier)} className="block mt-8">
                           <motion.button
                             className={`w-full py-3 px-4 font-semibold rounded-xl transition-all ${
                               config.popular

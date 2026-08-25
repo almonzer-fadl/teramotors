@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Building, Users, FileText, Globe, Key, Share2, Palette, Clipboard, UserCircle, Calendar } from 'lucide-react';
+import { Building, Users, FileText, Globe, Key, Share2, Palette, Clipboard, UserCircle, Calendar, CreditCard } from 'lucide-react';
 import { fadeInUp, staggerContainer } from '@/lib/dashboard-animations';
 import CompanyProfileSettings from '@/components/settings/CompanyProfileSettings';
 import UserManagementSettings from '@/components/settings/UserManagementSettings';
@@ -18,6 +19,7 @@ import BookingSettings from '@/components/settings/BookingSettings';
 
 const tabs = [
     { id: 'account', nameKey: 'settings.tabs.account', name: 'Account', icon: UserCircle, component: <AccountSettings /> },
+    { id: 'billing', nameKey: 'settings.tabs.billing', name: 'Billing', icon: CreditCard, href: '/settings/subscription' },
     { id: 'company_profile', nameKey: 'settings.tabs.company_profile', name: 'Company Profile', icon: Building, component: <CompanyProfileSettings /> },
     { id: 'user_management', nameKey: 'settings.tabs.user_management', name: 'User Management', icon: Users, component: <UserManagementSettings /> },
     { id: 'online_booking', nameKey: 'settings.tabs.online_booking', name: 'Online Booking', icon: Calendar, component: <BookingSettings /> },
@@ -57,20 +59,33 @@ export default function SettingsPage() {
                     <motion.div className="lg:col-span-1" variants={fadeInUp}>
                         <div className="sticky top-24">
                              <div className="space-y-2">
-                                {tabs.map((tab) => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`w-full flex items-center p-4 rounded-xl ${isRTL ? 'text-right' : 'text-left'} transition-all duration-200 ${
-                                            activeTab === tab.id
-                                                ? 'bg-gradient-to-r from-[#F97402]/10 to-[#F13F33]/10 text-[#F97402] font-semibold border border-[#F97402]/20'
-                                                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                                        }`}
-                                    >
-                                        <tab.icon className={`w-5 h-5 ${isRTL ? 'ms-3' : 'me-3'}`} />
-                                        <span>{t(tab.nameKey, tab.name)}</span>
-                                    </button>
-                                ))}
+                                {tabs.map((tab) => {
+                                    const className = `w-full flex items-center p-4 rounded-xl ${isRTL ? 'text-right' : 'text-left'} transition-all duration-200 ${
+                                        activeTab === tab.id
+                                            ? 'bg-gradient-to-r from-[#F97402]/10 to-[#F13F33]/10 text-[#F97402] font-semibold border border-[#F97402]/20'
+                                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                    }`;
+
+                                    if ('href' in tab) {
+                                        return (
+                                            <Link key={tab.id} href={tab.href} className={className}>
+                                                <tab.icon className={`w-5 h-5 ${isRTL ? 'ms-3' : 'me-3'}`} />
+                                                <span>{t(tab.nameKey, tab.name)}</span>
+                                            </Link>
+                                        );
+                                    }
+
+                                    return (
+                                        <button
+                                            key={tab.id}
+                                            onClick={() => setActiveTab(tab.id)}
+                                            className={className}
+                                        >
+                                            <tab.icon className={`w-5 h-5 ${isRTL ? 'ms-3' : 'me-3'}`} />
+                                            <span>{t(tab.nameKey, tab.name)}</span>
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     </motion.div>

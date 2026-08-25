@@ -93,7 +93,7 @@
   "register": {
     "back_to_login": "Back to login",
     "heading": "Create your workshop",
-    "subheading": "Start your free trial today",
+    "subheading": "Create an account, start your 14-day trial, and choose a USD plan when ready.",
     "steps": {
       "business": {
         "title": "Business info",
@@ -122,7 +122,7 @@
     "placeholders": {
       "workshop_name": "e.g., Quick Fix Auto Repairs",
       "business_email": "contact@yourworkshop.com",
-      "business_phone": "+966 50 123 4567",
+      "business_phone": "+1 555 123 4567",
       "website": "https://yourworkshop.com",
       "first_name": "John",
       "last_name": "Doe",
@@ -1676,10 +1676,10 @@
       "start_trial": "Start Free Trial"
     },
     "hero": {
-      "zatca_badge": "Now with ZATCA E-Invoicing Compliance",
+      "zatca_badge": "Now with invoicing, job cards, and reporting",
       "title": "Run Your Workshop",
       "title_highlight": "Like a Pro",
-      "subtitle": "The all-in-one workshop management system built for Saudi Arabia. Manage customers, vehicles, invoices, and grow your business.",
+      "subtitle": "The all-in-one workshop management system for repair shops. Manage customers, vehicles, invoices, and daily operations from one workspace.",
       "cta_start_trial": "Start Free Trial",
       "cta_watch_demo": "Watch Demo",
       "trial_info": "14-day free trial • No credit card required • Cancel anytime",
@@ -1701,30 +1701,30 @@
       "section_label": "FEATURES",
       "section_title": "Everything You Need to",
       "section_title_highlight": "Run Your Workshop",
-      "section_subtitle": "Powerful tools designed specifically for auto repair workshops in Saudi Arabia.",
+      "section_subtitle": "Practical tools designed for modern repair shops that need cleaner operations.",
       "vehicle_management": {
         "title": "Vehicle Management",
-        "description": "Track complete service history, maintenance schedules, and customer vehicles in SAR currency. Fully optimized for Saudi auto repair shops."
+        "description": "Track service history, maintenance schedules, customer vehicles, and repair records in one place."
       },
       "smart_invoicing": {
-        "title": "ZATCA E-Invoicing",
-        "description": "Generate professional invoices with automatic ZATCA QR code generation and full compliance for Saudi Arabia. Arabic invoicing supported."
+        "title": "Professional Invoicing",
+        "description": "Create clean invoices with customer details, totals, payment status, and tax-ready records."
       },
       "customer_portal": {
         "title": "Customer Communication",
-        "description": "Let customers view service history, estimates, track job progress, and communicate via WhatsApp with Arabic support included."
+        "description": "Let customers view service history, estimates, job progress, and repair updates more clearly."
       },
       "analytics_dashboard": {
         "title": "Business Analytics",
-        "description": "Real-time insights into revenue, job completion rates, mechanic productivity, and comprehensive workshop performance metrics in SAR."
+        "description": "Real-time insights into revenue, job completion rates, technician productivity, and workshop performance."
       },
       "appointment_booking": {
         "title": "Appointment Management",
-        "description": "Smart booking system with WhatsApp reminders, calendar sync, and Arabic customer notifications for higher conversion rates."
+        "description": "Smart booking tools with reminders, calendar workflows, and customer notifications for smoother scheduling."
       },
       "inventory_control": {
         "title": "Parts Inventory",
-        "description": "Track automotive parts inventory, set low-stock alerts, manage supplier details, and maintain cost tracking in SAR currency."
+        "description": "Track parts inventory, set low-stock alerts, manage supplier details, and keep cost visibility clear."
       }
     },
     "pricing": {
@@ -1784,27 +1784,27 @@
     },
     "testimonials": {
       "section_label": "TESTIMONIALS",
-      "section_title": "Trusted by Saudi Workshops",
-      "quote1": "TeraMotors transformed how we run our auto repair shop. The ZATCA compliance eliminated compliance headaches and saved us 10+ hours monthly on paperwork.",
+      "section_title": "Built for Busy Workshops",
+      "quote1": "TeraMotors gives our team one place to manage customers, vehicles, invoices, and repair work without jumping between tools.",
       "author1": "Ahmed Al-Rashid",
       "role1": "Owner, Quick Fix Auto Repair",
-      "quote2": "The Arabic customer portal and WhatsApp notifications increased our repeat business by 40%. Customers now track repairs in real-time.",
+      "quote2": "The customer updates and job tracking make it easier to keep repairs moving and customers informed.",
       "author2": "Fatima Al-Dosari",
       "role2": "Manager, Elite Motors Workshop",
-      "quote3": "Finally, workshop management software built for Saudi Arabia! SAR pricing, Arabic invoices, and ZATCA ready out of the box.",
+      "quote3": "The dashboard, reports, and job cards give the front desk and shop floor a much clearer operating rhythm.",
       "author3": "Mohammed Al-Otaibi",
       "role3": "Director, Professional Auto Care"
     },
     "cta": {
       "title": "Ready to Transform",
       "title_highlight": "Your Workshop?",
-      "description": "Join hundreds of workshops in Saudi Arabia already using TeraMotors. Start your free trial today.",
+      "description": "Start a 14-day trial and see how TeraMotors fits your workshop operations.",
       "cta_start_trial": "Start Free Trial",
       "contact_sales": "Contact Sales",
       "no_credit_card": "No credit card required • 14-day free trial"
     },
     "footer": {
-      "description": "The complete auto repair workshop management solution. ZATCA e-invoicing compliant. Built for Saudi Arabia.",
+      "description": "Workshop management software for repair shops that need cleaner records, smoother job tracking, and organized invoicing.",
       "product": "Product",
       "features": "Features",
       "pricing": "Pricing",
@@ -1821,7 +1821,7 @@
       "privacy": "Privacy",
       "terms": "Terms",
       "copyright": "All rights reserved",
-      "made_in": "Built for Saudi Workshops with Arabic Support",
+      "made_in": "Built for real workshop operations",
       "company_name": "TeraMotors"
     }
   },
