@@ -77,7 +77,7 @@ export default function ZatcaSettings() {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to save settings');
             }
-            toast.success('ZATCA settings saved!');
+            toast.success('Tax integration settings saved!');
         } catch (error) {
             toast.error(`Failed to save: ${(error as Error).message}`);
         } finally {
@@ -101,12 +101,12 @@ export default function ZatcaSettings() {
     return (
         <form onSubmit={handleSubmit} dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg shadow-gray-200/50 dark:shadow-black/30 border border-gray-100 dark:border-gray-800">
-                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Key className="w-6 h-6 me-3 text-[#F97402]" /> {t('settings.zatca.title', 'ZATCA E-Invoicing')}</h2>
+                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center"><Key className="w-6 h-6 me-3 text-[#F97402]" /> Tax Integration</h2>
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <FormLabel>API URL</FormLabel>
-                            <FormInput name="apiUrl" value={formData.apiUrl} onChange={handleInputChange} placeholder="ZATCA API Endpoint" />
+                            <FormInput name="apiUrl" value={formData.apiUrl} onChange={handleInputChange} placeholder="Tax API endpoint" />
                         </div>
                         <div>
                             <FormLabel>Device ID</FormLabel>

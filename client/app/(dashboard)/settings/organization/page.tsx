@@ -74,7 +74,7 @@ export default function OrganizationPage() {
     website: "",
     address: "",
     city: "",
-    country: "Saudi Arabia",
+    country: "United States",
     logo: undefined,
     vatNumber: "",
     crNumber: "",
@@ -88,12 +88,12 @@ export default function OrganizationPage() {
         await new Promise(resolve => setTimeout(resolve, 500));
         setFormData({
           name: "Quick Fix Auto Repairs",
-          email: "info@quickfix.sa",
-          phone: "+966 50 123 4567",
-          website: "https://quickfix.sa",
+          email: "info@quickfix.example",
+          phone: "+1 555 123 4567",
+          website: "https://quickfix.example",
           address: "123 Main Street",
-          city: "Riyadh",
-          country: "Saudi Arabia",
+          city: "Austin",
+          country: "United States",
           vatNumber: "123456789012345",
           crNumber: "1234567890",
         });
@@ -363,7 +363,7 @@ export default function OrganizationPage() {
                       value={formData.phone}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-500"
-                      placeholder="+966 50 123 4567"
+                      placeholder="+1 555 123 4567"
                     />
                   </div>
 
@@ -421,7 +421,7 @@ export default function OrganizationPage() {
                       value={formData.city}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-700 placeholder-gray-500"
-                      placeholder="Riyadh"
+                      placeholder="Austin"
                     />
                   </div>
 
@@ -435,12 +435,11 @@ export default function OrganizationPage() {
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-[#F97402]/20 focus:border-[#F97402] transition-all text-gray-900 dark:text-white bg-white dark:bg-gray-700"
                     >
-                      <option value="Saudi Arabia">Saudi Arabia</option>
+                      <option value="United States">United States</option>
+                      <option value="United Kingdom">United Kingdom</option>
+                      <option value="Canada">Canada</option>
+                      <option value="Australia">Australia</option>
                       <option value="United Arab Emirates">United Arab Emirates</option>
-                      <option value="Kuwait">Kuwait</option>
-                      <option value="Bahrain">Bahrain</option>
-                      <option value="Qatar">Qatar</option>
-                      <option value="Oman">Oman</option>
                     </select>
                   </div>
                 </div>
@@ -471,7 +470,7 @@ export default function OrganizationPage() {
                       placeholder="15 digit VAT number"
                     />
                     <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                      Required for ZATCA e-invoicing compliance
+                      Used for tax-ready invoices and local reporting
                     </p>
                   </div>
 

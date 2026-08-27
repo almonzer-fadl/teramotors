@@ -121,7 +121,7 @@ export default function InspectionSettings() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t('settings.inspection.default_fee', 'Default Inspection Fee (SAR)')}
+              {t('settings.inspection.default_fee', 'Default Inspection Fee')}
             </label>
             <input
               type="number"
