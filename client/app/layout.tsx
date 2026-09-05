@@ -18,7 +18,7 @@ export default function RootLayout({
         {/* Google Ads Conversion Tracking */}
         <Script id="google-ads-conversion" strategy="afterInteractive">
           {`
-            gtag('event', 'conversion', {'send_to': 'AW-17031322868/Lml7CMyC9sUaEPS3lbk_'});
+            gtag('event', 'conversion', {'send_to': 'AW-18198070383/Lml7CMyC9sUaEPS3lbk_'});
           `}
         </Script>
       </head>
