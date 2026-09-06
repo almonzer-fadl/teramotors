@@ -115,7 +115,7 @@ export default function AdminTenantsPage() {
             name: 'Tera Motors',
             slug: 'tera-motors',
             email: 'info@teramotors.sa',
-            phone: '+966 50 123 4567',
+            phone: '+966553022102',
             subscription: { tier: 'enterprise', status: 'active' },
             stats: { users: 12, customers: 450, invoices: 1240 },
             isActive: true,

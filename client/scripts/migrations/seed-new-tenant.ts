@@ -130,7 +130,7 @@ if (require.main === module) {
         city: 'Riyadh',
         country: 'SA',
       },
-      phone: '+966501234567',
+      phone: '+966553022102',
       email: 'info@testcompany.com',
     },
     adminUser: {

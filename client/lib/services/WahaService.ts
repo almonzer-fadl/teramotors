@@ -32,7 +32,7 @@ export class WahaService {
 
   /**
    * Format phone number to WhatsApp chat ID format
-   * +966501234567 → 966501234567@c.us
+   * +966553022102 → 966553022102@c.us
    */
   formatPhoneNumber(phoneNumber: string): string {
     const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');

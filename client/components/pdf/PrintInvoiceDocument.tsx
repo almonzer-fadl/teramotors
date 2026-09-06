@@ -182,7 +182,7 @@ const PrintInvoiceDocument = ({
           <div><strong>{t.crNumber}:</strong> 7051569718</div>
           <div><strong>{t.vatNumber}:</strong> 314211338900003</div>
           <div>الرياض، صناعية الرمال، المملكة العربية السعودية</div>
-          <div>+966 59 900 6314 · info@teramotors.com</div>
+          <div>+966553022102 · info@teramotors.com</div>
         </div>
       </div>
 

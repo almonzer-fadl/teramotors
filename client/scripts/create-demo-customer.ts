@@ -64,7 +64,7 @@ async function createDemoCustomer() {
         firstName: 'Demo',
         lastName: 'Customer',
         email: 'demo@customer.com',
-        phone: '+966501234567',
+        phone: '+966553022102',
         isActive: true,
         language: 'en',
         portalAccess: {

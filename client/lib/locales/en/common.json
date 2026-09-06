@@ -122,7 +122,7 @@
     "placeholders": {
       "workshop_name": "e.g., Quick Fix Auto Repairs",
       "business_email": "contact@yourworkshop.com",
-      "business_phone": "+1 555 123 4567",
+      "business_phone": "+966553022102",
       "website": "https://yourworkshop.com",
       "first_name": "John",
       "last_name": "Doe",
@@ -1333,55 +1333,55 @@
   },
   "landing": {
     "header": {
-        "auto_repair": "Auto Repair",
+        "auto_repair": "Auto Repair Services",
         "customer_portal": "Customer Portal"
     },
     "hero": {
-      "title": "Tera Auto Repair",
-      "subtitle": "Your Trusted Partner for Professional Auto Repair Services",
-      "description": "With over 15 years of experience, we provide expert automotive repair and maintenance services. From routine oil changes to complex engine repairs, we keep your vehicle running smoothly and safely.",
-      "book_appointment": "Book Appointment",
-      "call_now": "Call Now",
-      "phone": "+1 555 123 4567",
+      "title": "TeraMotors Auto Repair & Services",
+      "subtitle": "Your trusted workshop in Riyadh",
+      "description": "Since 2008, we have helped drivers and fleets in Saudi Arabia with experienced technicians, modern diagnostic tools, and careful service from oil changes to complex engine repairs.",
+      "book_appointment": "Book an Appointment",
+      "call_now": "Call Us",
+      "phone": "+966553022102",
       "satisfaction_value": "100%",
       "support_value": "24/7"
     },
     "subscriptions": {
-      "title": "Service Plans",
-      "subtitle": "Choose the perfect plan for your auto repair needs",
+      "title": "Flexible Service Plans",
+      "subtitle": "Choose the plan that fits your vehicle, usage, or company fleet",
       "basic": {
-        "title": "Basic Plan",
-        "feature1": "Basic vehicle inspection",
-        "feature2": "Oil change service",
-        "feature3": "Tire rotation",
-        "price": "$49/month"
+        "title": "Essential Plan",
+        "feature1": "Quick fluids and safety inspection",
+        "feature2": "Oil change with approved filters",
+        "feature3": "Tire rotation and service reminders",
+        "price": "SAR 109 / month"
       },
       "standard": {
         "title": "Standard Plan",
-        "feature1": "All Basic features",
-        "feature2": "Brake system check",
-        "feature3": "Battery testing",
+        "feature1": "Everything in Essential",
+        "feature2": "Full brake inspection and battery test",
+        "feature3": "Throttle cleaning and computer diagnostics",
         "feature4": "Priority scheduling",
-        "price": "$129/month"
+        "price": "SAR 221 / month"
       },
       "premium": {
         "title": "Premium Plan",
-        "feature1": "All Standard features",
-        "feature2": "Engine diagnostics",
-        "feature3": "Transmission service",
-        "feature4": "24/7 roadside assistance",
-        "feature5": "Free towing up to 50 miles",
-        "price": "Custom"
+        "feature1": "Advanced engine and transmission diagnostics",
+        "feature2": "A/C service and system fluid replacement",
+        "feature3": "24/7 roadside assistance within Riyadh",
+        "feature4": "Free in-city towing",
+        "feature5": "Regular vehicle condition reports",
+        "price": "SAR 371 / month"
       },
       "enterprise": {
-        "title": "Enterprise Plan",
-        "feature1": "All Premium features",
-        "feature2": "Fleet management",
-        "feature3": "Custom maintenance schedules",
-        "feature4": "Dedicated account manager",
-        "feature5": "Volume discounts",
-        "feature6": "Custom reporting",
-        "price": "Contact Us"
+        "title": "Fleet Plan",
+        "feature1": "Dedicated account manager for your fleet",
+        "feature2": "Custom maintenance schedules for each vehicle",
+        "feature3": "Operational and financial service reports",
+        "feature4": "Volume discounts and custom services",
+        "feature5": "Integration support for company systems",
+        "feature6": "Extended support and on-site service options",
+        "price": "Contact us for pricing"
       }
     },
     "services": {
@@ -1422,38 +1422,38 @@
     },
     "about": {
       "title": "About TeraMotors",
-      "subtitle": "Your Neighborhood Auto Repair Experts",
-      "description": "Founded in 2008, TeraMotors has been serving the community with honest, reliable auto repair services. Our certified technicians use state-of-the-art equipment and genuine parts to ensure your vehicle receives the best care possible.",
+      "subtitle": "A Saudi workshop with more than 15 years of experience",
+      "description": "TeraMotors started in Riyadh to give vehicle owners reliable service, clear communication, and professional repair work. Our certified team uses modern diagnostic equipment and trusted spare parts.",
       "experience": "15+ Years Experience",
       "certified_techs": "Certified Technicians",
       "warranty": "12-Month Warranty",
       "customer_satisfaction": "100% Customer Satisfaction",
-      "mission": "Our mission is to provide honest, transparent, and high-quality auto repair services that keep you and your family safe on the road.",
+      "mission": "Our mission is to deliver reliable Saudi automotive service that keeps your vehicle safe, efficient, and ready for the road.",
       "values": {
-        "honesty": "Honest, transparent pricing with no hidden fees",
-        "quality": "Only genuine parts and premium service",
-        "warranty": "Comprehensive warranty on all repairs",
-        "convenience": "Flexible scheduling and quick turnaround times"
+        "honesty": "Clear pricing with no hidden fees",
+        "quality": "Trusted parts and skilled workmanship",
+        "warranty": "Written warranty on every service",
+        "convenience": "Flexible appointments and timely updates"
       }
     },
     "testimonials": {
       "title": "What Our Customers Say",
-      "subtitle": "Real feedback from satisfied customers",
-      "alt_4": "Professional auto repair service with excellent customer satisfaction"
+      "subtitle": "Real feedback from customers in Saudi Arabia",
+      "alt_4": "Customer receiving a vehicle after TeraMotors service"
     },
     "gallery": {
       "title": "Our Workshop",
       "subtitle": "State-of-the-art facility with modern equipment"
     },
     "contact": {
-      "title": "Get In Touch",
-      "subtitle": "Ready to schedule your next service?",
-      "address": "صناعية, الرمال, الرياض 13252, المملكة العربية السعودية",
-      "phone": "+1 555 123 4567",
+      "title": "Contact Us",
+      "subtitle": "We are ready to help with your next service or repair request",
+      "address": "Industrial Area, Al Rimal, Riyadh 13252, Saudi Arabia",
+      "phone": "+966553022102",
       "email": "info@teramotors.com",
-      "hours": "Mon-Fri: 7AM-6PM, Sat: 8AM-4PM, Sun: Closed",
+      "hours": "Saturday-Thursday: 8 AM-8 PM • Friday: emergency support by arrangement",
       "book_online": "Book Online",
-      "call_us": "Call Us Now",
+      "call_us": "Call Us",
       "email_address": "info@teramotors.com"
     },
     "login": {
@@ -1465,7 +1465,7 @@
     },
     "footer": {
         "staff_login": "Staff Login",
-        "company_name": "TeraMotors Auto Repair"
+        "company_name": "TeraMotors Auto Repair & Services"
     }
   },
   "templates": {
@@ -1826,20 +1826,20 @@
     }
   },
     "landing_missing": {
-      "professional_service": "Professional Service",
-      "trusted_by_thousands": "Trusted by thousands of customers in more than 5 countries",
-      "trusted_by_leading_organizations": "We are proud to work with these respected organizations",
+      "professional_service": "Professional Saudi Service",
+      "trusted_by_thousands": "Trusted by hundreds of customers across Saudi Arabia and the Gulf",
+      "trusted_by_leading_organizations": "Serving government entities and private companies with professional standards",
       "years_experience": "Years Experience",
-      "satisfaction": "Satisfaction",
-      "support_24_7": "Support",
-      "happy_customers": "Happy Customers",
+      "satisfaction": "Satisfaction Rate",
+      "support_24_7": "Continuous Support",
+      "happy_customers": "Customers Served",
       "professional_auto_repair": "Professional Auto Repair",
       "our_services": "Our Services",
       "why_choose_us": "Why Choose Us",
       "workshop_portal": "Workshop Portal",
       "staff_management_access": "Staff & Management Access",
       "staff_login": "Staff Login",
-      "get_in_touch": "Get In Touch",
+      "get_in_touch": "Contact Us",
       "working_hours": "Working Hours",
       "hours": "Hours",
       "call_us": "Call Us",
@@ -1857,9 +1857,9 @@
       "password": "Password",
       "signing_in": "Signing in...",
       "forgot_your_password": "Forgot your password?",
-      "testimonial_1": "TeraMotors has been servicing my fleet for 5 years. Their attention to detail and honest pricing keeps me coming back.",
-      "testimonial_2": "When my car broke down unexpectedly, TeraMotors got me back on the road quickly and affordably. Highly recommended!",
-      "testimonial_3": "The team at TeraMotors understands cars like no one else. They've kept my classic car running perfectly for years.",
+      "testimonial_1": "They have managed my company fleet for five years. Their timing, clear pricing, and service quality make working with them easy.",
+      "testimonial_2": "My car broke down at home, and TeraMotors arranged towing and got me back on the road the same day. Professional service.",
+      "testimonial_3": "I only trust TeraMotors with my classic car. They know what they are doing and protect the original parts.",
       "subscriptions": "Service Plans",
       "basic_plan": "Basic Plan",
       "premium_plan": "Premium Plan",

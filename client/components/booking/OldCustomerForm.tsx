@@ -271,7 +271,7 @@ export function CustomerForm({ onSubmit, onBack, isSubmitting, language = 'en' }
               label={isArabic ? 'رقم الهاتف' : 'Phone Number'}
               icon={Phone}
               type="tel"
-              placeholder="+966xxxxxxxxx"
+              placeholder="+966553022102"
               required
             />
           </motion.div>

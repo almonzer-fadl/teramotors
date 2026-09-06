@@ -52,7 +52,7 @@ describe('Model Tenant Isolation', () => {
       firstName: 'Ahmed',
       lastName: 'Ali',
       email: 'ahmed@example.com',
-      phone: '+966501234567',
+      phone: '+966553022102',
     });
 
     // Create customer for tenant 2 with same email (should work)
@@ -61,7 +61,7 @@ describe('Model Tenant Isolation', () => {
       firstName: 'Mohamed',
       lastName: 'Salem',
       email: 'ahmed@example.com', // Same email, different tenant
-      phone: '+966501234568',
+      phone: '+966553022102',
     });
 
     // Query tenant 1 customers
@@ -82,7 +82,7 @@ describe('Model Tenant Isolation', () => {
         firstName: 'Duplicate',
         lastName: 'User',
         email: 'ahmed@example.com', // Already exists for tenant1
-        phone: '+966509999999',
+        phone: '+966553022102',
       });
     }).rejects.toThrow();
   });

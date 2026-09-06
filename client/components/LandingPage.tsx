@@ -149,7 +149,7 @@ function LanguageSwitch() {
   return (
     <button
       onClick={toggleLanguage}
-      className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors"
+      className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors"
     >
       <Globe className="w-4 h-4" />
       <span className="font-medium">{i18n.language === 'en' ? 'العربية' : 'English'}</span>
@@ -247,7 +247,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors">
+    <div className="min-h-screen overflow-x-hidden bg-gray-50 dark:bg-gray-950 transition-colors">
       {/* Header */}
       <header className="bg-white dark:bg-gray-900 shadow-sm dark:shadow-gray-800/50 sticky top-0 z-50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -261,7 +261,7 @@ export default function LandingPage() {
                   className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl me-2 sm:me-3 object-contain"
                 />
                 <div className="flex flex-col">
-                  <span className="flex items-center space-x-2">
+                  <span className="flex items-center gap-2">
                     <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#063479] dark:text-white drop-shadow-sm font-logo" style={{ letterSpacing: '0.04em' }}>
                       Tera
                       <span className="text-[#F97402]">Motors</span>
@@ -274,7 +274,7 @@ export default function LandingPage() {
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center gap-8">
               <a href="#subscriptions" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.subscriptions.title")}</a>
               <a href="#about" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.about.title")}</a>
               <a href="#contact" className="text-gray-700 dark:text-gray-300 hover:text-[#F97402] dark:hover:text-[#F97402] transition-colors">{t("landing.contact.title")}</a>
@@ -283,14 +283,14 @@ export default function LandingPage() {
               </Link>
               <LanguageSwitch />
               <ThemeToggle />
-              <a href="tel:+966590090612" className="text-[#F97402] font-semibold flex items-center">
+              <a href="tel:+966553022102" className="text-[#F97402] font-semibold flex items-center">
                 <Phone className="w-4 h-4 me-1" />
-                +966590090612
+                +966553022102
               </a>
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="flex md:hidden items-center space-x-3">
+            <div className="flex md:hidden items-center gap-3">
               <ThemeToggle />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -343,11 +343,11 @@ export default function LandingPage() {
               <LanguageSwitch />
             </div>
             <a
-              href="tel:+966590090612"
+              href="tel:+966553022102"
               className="flex items-center py-3 px-4 bg-[#F97402] text-white rounded-lg font-semibold hover:bg-[#d6352a] transition-colors"
             >
               <Phone className="w-5 h-5 me-2" />
-              +966590090612
+              +966553022102
             </a>
           </div>
         </motion.div>
@@ -398,7 +398,7 @@ export default function LandingPage() {
                 transition={{ delay: 0.6, duration: 0.6 }}
               >
                 <motion.a
-                  href="tel:+966590090612"
+                  href="tel:+966553022102"
                   className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-[#F97402] to-[#d6352a] text-white font-semibold rounded-2xl hover:shadow-2xl hover:shadow-[#F97402]/25 transition-all duration-300 hover:-translate-y-1"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -631,7 +631,7 @@ export default function LandingPage() {
                 {values.map((value, index) => (
                   <motion.div
                     key={index}
-                    className="flex items-start space-x-3"
+                    className="flex items-start gap-3"
                     variants={staggerItem}
                   >
                     <CheckCircle className="w-6 h-6 text-[#F97402] flex-shrink-0 mt-0.5" />
@@ -754,12 +754,12 @@ export default function LandingPage() {
           >
             {/* Phone Card */}
             <motion.a
-              href="tel:+966590090612"
+              href="tel:+966553022102"
               className="group bg-white/5 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-white/10 dark:border-gray-700 hover:bg-white/10 dark:hover:bg-gray-700/50 hover:border-white/20 dark:hover:border-gray-600 transition-all duration-300"
               variants={staggerItem}
               whileHover={{ scale: 1.05, y: -4 }}
             >
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-[#F97402] to-[#d6352a] rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                   <Phone className="w-5 h-5 text-white" />
                 </div>
@@ -777,7 +777,7 @@ export default function LandingPage() {
               variants={staggerItem}
               whileHover={{ scale: 1.05, y: -4 }}
             >
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-[#F97402] to-[#d6352a] rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                   <Mail className="w-5 h-5 text-white" />
                 </div>
@@ -797,7 +797,7 @@ export default function LandingPage() {
               variants={staggerItem}
               whileHover={{ scale: 1.05, y: -4 }}
             >
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-[#F97402] to-[#d6352a] rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                   <MapPin className="w-5 h-5 text-white" />
                 </div>
@@ -843,7 +843,7 @@ export default function LandingPage() {
                   className="w-10 h-10 rounded-lg me-3 object-contain"
                 />
                 <div className="flex flex-col">
-                  <span className="flex items-center space-x-2">
+                  <span className="flex items-center gap-2">
                     <span className="text-xl font-extrabold tracking-tight text-white drop-shadow-sm font-logo" style={{ letterSpacing: '0.04em' }}>
                       Tera
                       <span className="text-[#F97402]">Motors</span>
@@ -857,8 +857,8 @@ export default function LandingPage() {
               <p className="text-gray-400 dark:text-gray-500 leading-relaxed mb-6 max-w-md">
                 {t("landing.about.description")}
               </p>
-              <div className="flex space-x-4">
-                <a href="tel:+966590090612" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors">
+              <div className="flex gap-4">
+                <a href="tel:+966553022102" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors">
                   <Phone className="w-5 h-5" />
                 </a>
                 <a href="mailto:info@teramotors.com" className="text-gray-400 dark:text-gray-500 hover:text-white dark:hover:text-gray-300 transition-colors">

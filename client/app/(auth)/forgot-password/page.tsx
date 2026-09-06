@@ -187,7 +187,7 @@ export default function ForgotPasswordPage() {
 
               <p className="text-center text-sm text-gray-500 dark:text-gray-300">
                 {t('auth.need_help')}{" "}
-                <a href="tel:+966599006314" className="font-semibold text-[#F97402] hover:underline">
+                <a href="tel:+966553022102" className="font-semibold text-[#F97402] hover:underline">
                   {t('auth.contact_support')}
                 </a>
               </p>
@@ -227,7 +227,7 @@ export default function ForgotPasswordPage() {
               <div className="pt-4 border-t border-gray-100 dark:border-gray-800 text-sm text-gray-500 dark:text-gray-300 space-y-1">
                 <p>{t('auth.need_help')}</p>
                 <a
-                  href="tel:+966599006314"
+                  href="tel:+966553022102"
                   className="font-semibold text-[#063479] dark:text-[#F97402] hover:underline inline-flex items-center gap-1"
                 >
                   {t('auth.contact_support')}
