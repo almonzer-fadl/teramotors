@@ -49,6 +49,39 @@ app.get('/api/debug/invoices', async (req, res) => {
   }
 });
 
+// Fetch tenant company info for an invoice and resolve logo URL
+async function getCompanyForInvoice(invoice) {
+  try {
+    const tenantId = invoice.tenantId;
+    if (!tenantId || !mongoose.connection.db) return null;
+    const tenant = await mongoose.connection.db.collection('tenants').findOne({ _id: tenantId });
+    if (!tenant) return null;
+
+    const company = {
+      name: tenant.companyInfo?.name || tenant.name,
+      nameAr: tenant.companyInfo?.nameAr,
+      crNumber: tenant.companyInfo?.crNumber,
+      vatNumber: tenant.companyInfo?.vatNumber,
+      logoUrl: '',
+    };
+
+    const logoUrl = tenant.branding?.logoUrl;
+    if (logoUrl) {
+      if (logoUrl.startsWith('data:') || logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+        company.logoUrl = logoUrl;
+      } else {
+        const origin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+        company.logoUrl = new URL(logoUrl, origin).toString();
+      }
+    }
+
+    return company;
+  } catch (err) {
+    console.error('Failed to fetch tenant company info:', err.message);
+    return null;
+  }
+}
+
 // PDF Generation Endpoint
 app.get('/api/invoices/:id/pdf', async (req, res) => {
   try {
@@ -93,12 +126,16 @@ app.get('/api/invoices/:id/pdf', async (req, res) => {
         .populate('partsUsed.partId');
     }
 
+    // Fetch tenant company info for logo/CR/VAT
+    const company = await getCompanyForInvoice(invoice);
+
     // Generate PDF
     const pdfGenerator = getPDFGenerator();
     const pdfBuffer = await pdfGenerator.generateInvoicePDF(invoice, jobCard, {
       language,
       format,
-      includeQRCode: true
+      includeQRCode: true,
+      company
     });
 
     const filename = `invoice-${id}-${language}-${new Date().toISOString().split('T')[0]}.pdf`;
@@ -143,9 +180,12 @@ app.get('/api/invoices/:id/view', async (req, res) => {
         .populate('partsUsed.partId');
     }
 
+    // Fetch tenant company info for logo/CR/VAT
+    const company = await getCompanyForInvoice(invoice);
+
     // Generate HTML using the PDF generator's HTML method
     const pdfGenerator = getPDFGenerator();
-    const html = await pdfGenerator.generateInvoiceHTML(invoice, jobCard, { language });
+    const html = await pdfGenerator.generateInvoiceHTML(invoice, jobCard, { language, company });
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.send(html);

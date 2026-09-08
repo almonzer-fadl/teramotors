@@ -4,6 +4,7 @@ import { getServerSession } from "@/lib/auth-server";
 import { NextRequest } from 'next/server';
 import { invoiceService } from '@/lib/services/InvoiceService';
 import { WhatsAppEventListeners } from '@/lib/services/WhatsAppEventListeners';
+import Tenant from '@/lib/models/Tenant';
 
 export async function GET(request: NextRequest) {
   try {
@@ -96,6 +97,34 @@ export async function POST(request: Request) {
     
 
     const body = await request.json();
+
+
+
+    // Use the tenant's own company identity for ZATCA QR generation
+
+    try {
+
+      const tenantId = (session.user as any).tenantId;
+
+      const tenant = await Tenant.findById(tenantId).select('companyInfo').lean();
+
+      if (tenant?.companyInfo) {
+
+        invoiceService.updateCompanyInfo(
+
+          tenant.companyInfo.name,
+
+          tenant.companyInfo.vatNumber
+
+        );
+
+      }
+
+    } catch (e) {
+
+      // Keep default company config if tenant lookup fails
+
+    }
 
 
 

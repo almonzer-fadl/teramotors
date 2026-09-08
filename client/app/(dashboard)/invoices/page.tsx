@@ -84,6 +84,7 @@ function InvoicesPageContent() {
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [selectedJobCard, setSelectedJobCard] = useState<any>(null);
+  const [selectedCompany, setSelectedCompany] = useState<any>(null);
   const [qrCodeData, setQrCodeData] = useState<string>("");
 
   useEffect(() => {
@@ -182,6 +183,7 @@ function InvoicesPageContent() {
         const data = await response.json();
         setSelectedInvoice(data.invoice);
         setSelectedJobCard(data.jobCard);
+        setSelectedCompany(data.company || null);
 
         const qrCode = data.invoice?.zatca?.qrCode || data.invoice?.zatca?.qrCodeImage;
         if (qrCode) {
@@ -286,10 +288,12 @@ function InvoicesPageContent() {
             setShowPrintModal(false);
             setSelectedInvoice(null);
             setSelectedJobCard(null);
+            setSelectedCompany(null);
           }}
           invoice={selectedInvoice}
           jobCard={selectedJobCard}
           language={'ar'}
+          company={selectedCompany}
         />
       )}
     </div>

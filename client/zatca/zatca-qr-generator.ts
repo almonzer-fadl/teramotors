@@ -23,7 +23,7 @@ export class ZATCAQRGenerator {
     // Validate company info (do not throw at import/build time)
     if (!ZATCAUtils.isValidSaudiVATNumber(this.companyVATNumber)) {
       // Use a safe placeholder to avoid hard failures during build. Real validation happens on generate.
-      this.companyVATNumber = '314211338900003';
+      this.companyVATNumber = '31450829500003';
     }
   }
 
@@ -90,7 +90,7 @@ export class ZATCAQRGenerator {
    */
   private generateQRCode(invoiceData: InvoiceData, totals: InvoiceTotals): string {
     const qrData: ZATCAQRData = {
-      sellerName: invoiceData.customer?.companyName || this.companyName,
+      sellerName: this.companyName,
       vatNumber: this.companyVATNumber,
       timestamp: ZATCAUtils.formatDateForZATCA(invoiceData.invoiceDate),
       totalAmount: totals.totalAmount.toFixed(2),

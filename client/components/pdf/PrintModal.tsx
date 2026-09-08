@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import PrintInvoiceDocument from './PrintInvoiceDocument';
+import { CompanyInfo } from '@/lib/company-info';
 
 interface PrintModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface PrintModalProps {
   invoice: any;
   jobCard?: any;
   language?: string;
+  company?: CompanyInfo | null;
 }
 
 const PrintModal = ({ 
@@ -17,7 +19,8 @@ const PrintModal = ({
   onClose, 
   invoice, 
   jobCard, 
-  language = 'ar' 
+  language = 'ar',
+  company
 }: PrintModalProps) => {
   const isRTL = true; // Force Arabic RTL layout
   const { t } = useTranslation('common');
@@ -131,6 +134,7 @@ const PrintModal = ({
                 jobCard={jobCard}
                 qrCodeData={qrSrc ?? undefined}
                 language={language}
+                company={company}
               />
             </div>
           </div>

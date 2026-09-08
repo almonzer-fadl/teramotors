@@ -69,6 +69,7 @@ export default function EstimateDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [estimate, setEstimate] = useState<Estimate | null>(null);
+  const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -88,6 +89,7 @@ export default function EstimateDetailPage() {
       if (response.ok) {
         const data = await response.json();
         setEstimate(data);
+        setCompany(data.company || null);
       } else {
         router.push('/estimates');
       }
@@ -242,6 +244,36 @@ export default function EstimateDetailPage() {
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 py-8">
+        {company && (
+          <div className="mb-8 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="px-6 sm:px-8 py-5 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex items-center gap-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={company.logoUrl || '/icon.png'}
+                  alt="Company Logo"
+                  className="h-14 w-14 rounded-xl object-contain bg-gray-50 dark:bg-gray-800 p-1 border border-gray-200 dark:border-gray-700"
+                />
+                <div>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {company.nameAr || company.name || 'TeraMotors Workshop'}
+                  </p>
+                  {company.name && company.nameAr && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{company.name}</p>
+                  )}
+                </div>
+              </div>
+              <div className="sm:ms-auto flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600 dark:text-gray-300">
+                {company.crNumber && (
+                  <span><strong className="text-gray-500 dark:text-gray-400">{t('settings.crNumber', { defaultValue: 'C.R.' })}:</strong> {company.crNumber}</span>
+                )}
+                {company.vatNumber && (
+                  <span><strong className="text-gray-500 dark:text-gray-400">{t('settings.vatNumber', { defaultValue: 'VAT' })}:</strong> {company.vatNumber}</span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
@@ -470,6 +502,7 @@ export default function EstimateDetailPage() {
           }}
           estimate={estimate}
           language={'ar'}
+          company={company}
         />
       )}
     </div>

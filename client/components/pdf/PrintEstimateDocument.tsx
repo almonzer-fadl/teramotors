@@ -2,18 +2,23 @@
 'use client';
 
 import { PRINT_ESTIMATE_STYLES } from './printEstimateStyles';
+import { CompanyInfo, DEFAULT_COMPANY_INFO, formatAddress, resolveLogoUrl } from '@/lib/company-info';
 
 interface PrintEstimateDocumentProps {
   estimate: any;
   jobCard?: any;
   language?: string;
+  company?: CompanyInfo | null;
 }
 
 const PrintEstimateDocument = ({
   estimate,
   jobCard,
-  language = 'ar'
+  language = 'ar',
+  company
 }: PrintEstimateDocumentProps) => {
+  const companyInfo: CompanyInfo = { ...DEFAULT_COMPANY_INFO, ...(company || {}) };
+  const companyLogo = resolveLogoUrl(companyInfo.logoUrl);
   const isRTL = language !== 'en'; // default RTL unless explicitly English
 
   // Calculate totals with discount and tax only on parts
@@ -126,17 +131,17 @@ const PrintEstimateDocument = ({
 
       <div className="header">
         <div className="logo-container">
-          <img src="/icon.png" alt="TeraMotors Logo" className="logo-image" />
+          <img src={companyLogo} alt="Company Logo" className="logo-image" />
           <div>
-            <div className="company-name">Tera<span className="highlight">Visions</span></div>
+            <div className="company-name">{companyInfo.name}</div>
             <div className="company-subtitle">Auto Repair Solutions</div>
           </div>
         </div>
         <div className="company-details">
-          <div><strong>{t.company}:</strong> تيرا فيجنز</div>
-          <div><strong>{t.crNumber}:</strong> 7051569718</div>
-          <div><strong>{t.vatNumber}:</strong> 314211338900003</div>
-          <div>الرياض، صناعيه الرمال، المملكة العربية السعودية</div>
+          <div><strong>{t.company}:</strong> {companyInfo.nameAr || companyInfo.name}</div>
+          {companyInfo.crNumber && <div><strong>{t.crNumber}:</strong> {companyInfo.crNumber}</div>}
+          {companyInfo.vatNumber && <div><strong>{t.vatNumber}:</strong> {companyInfo.vatNumber}</div>}
+          {formatAddress(companyInfo.address) && <div>{formatAddress(companyInfo.address)}</div>}
         </div>
       </div>
 

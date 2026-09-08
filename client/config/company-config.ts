@@ -14,9 +14,9 @@ export interface CompanyConfig {
   
   // Your company information - UPDATE THESE WITH YOUR ACTUAL DETAILS
   export const COMPANY_CONFIG: CompanyConfig = {
-    name: process.env.COMPANY_NAME || "شركه تيرا فيجنز",
-    vatNumber: process.env.COMPANY_VAT_NUMBER || "314211338900003", // Unified National Number
-    idNumber: process.env.COMPANY_ID_NUMBER || "7051569718", // Add your company ID here
+    name: process.env.COMPANY_NAME || "TeraMotors Workshop",
+    vatNumber: process.env.COMPANY_VAT_NUMBER || "31450829500003", // Unified National Number
+    idNumber: process.env.COMPANY_ID_NUMBER || "7054957985", // Add your company ID here
     address: {
       street: "صناعية, الرمال, الرياض",
       city: "Riyadh",

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import PrintEstimateDocument from './PrintEstimateDocument';
 import { PRINT_ESTIMATE_STYLES } from './printEstimateStyles';
+import { CompanyInfo } from '@/lib/company-info';
 
 interface PrintEstimateModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface PrintEstimateModalProps {
   estimate: any;
   jobCard?: any;
   language?: string;
+  company?: CompanyInfo | null;
 }
 
 const PrintEstimateModal = ({
@@ -18,7 +20,8 @@ const PrintEstimateModal = ({
   onClose,
   estimate,
   jobCard,
-  language = 'ar'
+  language = 'ar',
+  company
 }: PrintEstimateModalProps) => {
   const isRTL = true; // Force Arabic RTL layout
   const { t } = useTranslation('common');
@@ -126,6 +129,7 @@ const PrintEstimateModal = ({
                     estimate={estimate}
                     jobCard={jobCard}
                     language={language}
+                    company={company}
                   />
                 </div>
               </div>

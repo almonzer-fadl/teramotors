@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import { getServerSession } from "@/lib/auth-server";
 import { Invoice, JobCard, Customer, Vehicle, Service, Part } from '@/lib/models';
+import Tenant from '@/lib/models/Tenant';
 
 import { ZATCAQRGenerator } from '@/zatca/zatca-qr-generator';
 
@@ -73,7 +74,33 @@ export async function GET(
 
 
 
-    return new Response(JSON.stringify({ invoice, jobCard }), { status: 200 });
+    let company: any = null;
+
+    if (invoice.tenantId) {
+
+      const tenant = await Tenant.findById(invoice.tenantId)
+
+        .select('companyInfo branding')
+
+        .lean();
+
+      if (tenant) {
+
+        company = {
+
+          ...(tenant.companyInfo || {}),
+
+          logoUrl: tenant.branding?.logoUrl || undefined,
+
+        };
+
+      }
+
+    }
+
+
+
+    return new Response(JSON.stringify({ invoice, jobCard, company }), { status: 200 });
 
   } catch (error) {
 
