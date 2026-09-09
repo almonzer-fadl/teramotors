@@ -30,12 +30,12 @@ export const productionConfig = {
   email: {
     provider: 'resend',
     apiKey: process.env.RESEND_API_KEY || '',
-    from: process.env.EMAIL_FROM || 'TeraMotors <noreply@teramotors.com>',
+    from: process.env.EMAIL_FROM || 'TeraMotor <noreply@teramotors.com>',
     replyTo: process.env.EMAIL_REPLY_TO || 'support@teramotors.com',
     templates: {
       baseUrl: process.env.NEXT_PUBLIC_URL || 'https://teramotors.com',
       logoUrl: `${process.env.NEXT_PUBLIC_URL}/logo.png`,
-      companyName: 'TeraMotors',
+      companyName: 'TeraMotor',
       companyAddress: '123 Auto Repair St, Riyadh, Saudi Arabia',
       companyPhone: '+966553022102',
       companyEmail: 'info@teramotors.com'
@@ -112,7 +112,7 @@ export const productionConfig = {
   // ZATCA Configuration
   zatca: {
     environment: 'production',
-    sellerName: 'TeraMotors Auto Repair Shop',
+    sellerName: 'TeraMotor Auto Repair Shop',
     vatRegistrationNumber: process.env.ZATCA_VAT_NUMBER || '',
     branchId: process.env.ZATCA_BRANCH_ID || '001',
     branchName: 'Main Branch',
@@ -219,7 +219,7 @@ export const productionConfig = {
 
   // Business Configuration
   business: {
-    name: 'TeraMotors',
+    name: 'TeraMotor',
     type: 'Auto Repair Shop',
     currency: 'SAR',
     timezone: 'Asia/Riyadh',

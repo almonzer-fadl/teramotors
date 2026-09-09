@@ -63,7 +63,7 @@ const PrintEstimateDocument = ({
       grandTotal: "المجموع الإجمالي",
       notes: "ملاحظات",
       generatedOn: "تم الإنشاء في",
-      systemName: "نظام إدارة صيانة السيارات تيرا موتورز",
+      systemName: "نظام إدارة صيانة السيارات تيرا موتور",
       status: "الحالة",
       estimateNote: "هذا تقدير أولي وليس فاتورة نهائية"
     },
@@ -97,7 +97,7 @@ const PrintEstimateDocument = ({
       grandTotal: "Grand Total",
       notes: "Notes",
       generatedOn: "Generated on",
-      systemName: "TeraMotors Auto Repair Management System",
+      systemName: "TeraMotor Auto Repair Management System",
       status: "Status",
       estimateNote: "This is a preliminary estimate and not a final invoice"
     }
@@ -134,7 +134,6 @@ const PrintEstimateDocument = ({
           <img src={companyLogo} alt="Company Logo" className="logo-image" />
           <div>
             <div className="company-name">{companyInfo.name}</div>
-            <div className="company-subtitle">Auto Repair Solutions</div>
           </div>
         </div>
         <div className="company-details">

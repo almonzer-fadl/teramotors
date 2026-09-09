@@ -84,7 +84,7 @@ const PrintInvoiceDocument = ({
       grandTotal: 'المجموع الإجمالي',
       notes: 'ملاحظات',
       generatedOn: 'تم الإنشاء في',
-      systemName: 'نظام إدارة صيانة السيارات تيرا موتورز',
+      systemName: 'نظام إدارة صيانة السيارات تيرا موتور',
       status: 'الحالة',
       zatcaCompliant: 'متوافق مع ZATCA'
     },
@@ -122,7 +122,7 @@ const PrintInvoiceDocument = ({
       grandTotal: 'Grand Total',
       notes: 'Notes',
       generatedOn: 'Generated on',
-      systemName: 'TeraMotors Auto Repair Management System',
+      systemName: 'TeraMotor Auto Repair Management System',
       status: 'Status',
       zatcaCompliant: 'ZATCA Compliant'
     }
@@ -179,7 +179,6 @@ const PrintInvoiceDocument = ({
           <img src={companyLogo} alt="Company Logo" className="logo-image" />
           <div>
             <div className="company-name">{companyInfo.name}</div>
-            <div className="company-subtitle">Auto Repair Solutions</div>
           </div>
         </div>
         <div className="company-details">

@@ -88,7 +88,7 @@ export const getInvoicePrintCSS = () => `
   }
 
   .company-name .highlight {
-    color: #F13F33;
+    color: #2563EB;
   }
 
   .company-subtitle {
@@ -338,7 +338,7 @@ export const getInvoicePrintCSS = () => `
     }
 
     .company-name .highlight {
-      color: #F13F33 !important;
+      color: #2563EB !important;
     }
 
     .company-subtitle {

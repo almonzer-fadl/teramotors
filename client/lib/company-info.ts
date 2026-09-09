@@ -19,8 +19,8 @@ export interface CompanyInfo {
 }
 
 export const DEFAULT_COMPANY_INFO: CompanyInfo = {
-  name: 'TeraMotors Workshop',
-  nameAr: 'ورشة تيرا موتورز لصيانة السيارات',
+  name: 'TeraMotor Workshop',
+  nameAr: 'ورشة تيرا موتور لصيانة السيارات',
   vatNumber: '31450829500003',
   crNumber: '7054957985',
   address: {

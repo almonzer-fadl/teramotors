@@ -150,7 +150,7 @@ class PDFGenerator {
 
         .header {
             text-align: ${isRTL ? 'right' : 'left'};
-            border-bottom: 3px solid #F13F33;
+            border-bottom: 3px solid #2563EB;
             padding-bottom: 20px;
             margin-bottom: 30px;
             position: relative;
@@ -159,7 +159,7 @@ class PDFGenerator {
         .company-name {
             font-size: 28px;
             font-weight: 700;
-            color: #F13F33;
+            color: #2563EB;
             margin: 0;
             ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
         }
@@ -234,7 +234,7 @@ class PDFGenerator {
         .info-section h3 {
             font-size: 18px;
             font-weight: 600;
-            color: #F13F33;
+            color: #2563EB;
             margin-bottom: 15px;
             border-bottom: 2px solid #e5e7eb;
             padding-bottom: 5px;
@@ -255,7 +255,7 @@ class PDFGenerator {
         }
 
         .services-table th, .parts-table th {
-            background: #F13F33;
+            background: #2563EB;
             color: white;
             padding: 12px 8px;
             text-align: ${isRTL ? 'right' : 'left'};
@@ -290,8 +290,8 @@ class PDFGenerator {
         .grand-total {
             font-weight: 700;
             font-size: 18px;
-            color: #F13F33;
-            border-top: 2px solid #F13F33;
+            color: #2563EB;
+            border-top: 2px solid #2563EB;
             margin-top: 10px;
             padding-top: 10px;
             ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
@@ -302,13 +302,13 @@ class PDFGenerator {
             padding: 20px;
             background: #f8f9fa;
             border-radius: 8px;
-            border-${isRTL ? 'right' : 'left'}: 4px solid #F13F33;
+            border-${isRTL ? 'right' : 'left'}: 4px solid #2563EB;
         }
 
         .notes h3 {
             ${isRTL ? 'font-family: "Cairo", sans-serif;' : ''}
             font-weight: 600;
-            color: #F13F33;
+            color: #2563EB;
             margin-bottom: 10px;
         }
 
@@ -483,8 +483,8 @@ class PDFGenerator {
     return {
       ar: {
         title: "فاتورة",
-        company: "تيرا موتورز لصيانة السيارات",
-        companyEn: "TeraMotors Auto Repair",
+        company: "تيرا موتور لصيانة السيارات",
+        companyEn: "TeraMotor Auto Repair",
         crNumber: "رقم السجل التجاري",
         vatNumber: "الرقم الضريبي",
         invoiceNumber: "رقم الفاتورة #",
@@ -511,14 +511,14 @@ class PDFGenerator {
         grandTotal: "المجموع الإجمالي",
         notes: "ملاحظات",
         generatedOn: "تم الإنشاء في",
-        systemName: "نظام إدارة صيانة السيارات تيرا موتورز",
+        systemName: "نظام إدارة صيانة السيارات تيرا موتور",
         status: "الحالة",
         zatcaCompliant: "متوافق مع ZATCA"
       },
       en: {
         title: "Invoice",
-        company: "TeraMotors Auto Repair",
-        companyEn: "TeraMotors Auto Repair",
+        company: "TeraMotor Auto Repair",
+        companyEn: "TeraMotor Auto Repair",
         crNumber: "C.R. Number",
         vatNumber: "VAT Number",
         invoiceNumber: "Invoice #",
@@ -545,7 +545,7 @@ class PDFGenerator {
         grandTotal: "Grand Total",
         notes: "Notes",
         generatedOn: "Generated on",
-        systemName: "TeraMotors Auto Repair Management System",
+        systemName: "TeraMotor Auto Repair Management System",
         status: "Status",
         zatcaCompliant: "ZATCA Compliant"
       }

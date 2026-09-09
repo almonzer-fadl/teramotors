@@ -69,7 +69,7 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
   const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString();
   const formatCurrency = (amount: number) => `ر.س ${amount.toFixed(2)}`;
 
-  const companyName = company?.name || 'TeraMotors Workshop';
+  const companyName = company?.name || 'TeraMotor Workshop';
   const companyNameAr = company?.nameAr || company?.name || companyName;
   const crNumber = company?.crNumber || '';
   const vatNumber = company?.vatNumber || '';
@@ -79,7 +79,7 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
   const translations = {
     en: {
       title: "Repair Estimate",
-      company: "TeraMotors Auto Repair",
+      company: "TeraMotor Auto Repair",
       printButton: "🖨️ Print PDF",
       estimateNumber: "Estimate #",
       date: "Date",
@@ -108,12 +108,12 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
       totalAmount: "Total Amount",
       notes: "Notes",
       generatedOn: "Generated on",
-      systemName: "TeraMotors Auto Repair Management System",
+      systemName: "TeraMotor Auto Repair Management System",
       status: "Status"
     },
     ar: {
       title: "تقدير الإصلاح",
-      company: "تيرا موتورز لصيانة السيارات",
+      company: "تيرا موتور لصيانة السيارات",
       printButton: "🖨️ طباعة PDF",
       estimateNumber: "رقم التقدير #",
       date: "التاريخ",
@@ -142,7 +142,7 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
       totalAmount: "المبلغ الإجمالي",
       notes: "ملاحظات",
       generatedOn: "تم الإنشاء في",
-      systemName: "نظام إدارة تيرا موتورز لصيانة السيارات",
+      systemName: "نظام إدارة تيرا موتور لصيانة السيارات",
       status: "الحالة"
     }
   };
@@ -179,7 +179,7 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
             position: fixed;
             top: 20px;
             ${isRTL ? 'left: 20px;' : 'right: 20px;'}
-            background: #F13F33;
+            background: #2563EB;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -195,12 +195,12 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
 
         .header {
             text-align: center;
-            border-bottom: 3px solid #F13F33;
+            border-bottom: 3px solid #2563EB;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
         .header h1 {
-            color: #F13F33;
+            color: #2563EB;
             margin: 0;
             font-size: 2.5em;
         }
@@ -228,7 +228,7 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
             page-break-inside: avoid;
         }
         .section h2 {
-            color: #F13F33;
+            color: #2563EB;
             border-bottom: 2px solid #e5e7eb;
             padding-bottom: 10px;
             margin-bottom: 20px;
@@ -244,7 +244,7 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
             background: #f8fafc;
             padding: 15px;
             border-radius: 8px;
-            border-left: 4px solid #F13F33;
+            border-left: 4px solid #2563EB;
         }
         .info-item h3 {
             margin: 0 0 5px 0;
@@ -267,7 +267,7 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .items-table th {
-            background: #F13F33;
+            background: #2563EB;
             color: white;
             padding: 12px;
             text-align: left;
@@ -292,13 +292,13 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
         .status-rejected { background: #fecaca; color: #991b1b; }
         .summary {
             background: #f8fafc;
-            border: 2px solid #F13F33;
+            border: 2px solid #2563EB;
             border-radius: 8px;
             padding: 20px;
             margin-top: 20px;
         }
         .summary h3 {
-            color: #F13F33;
+            color: #2563EB;
             margin-top: 0;
         }
         .summary-row {
@@ -310,8 +310,8 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
         .summary-total {
             font-size: 1.3em;
             font-weight: bold;
-            color: #F13F33;
-            border-top: 2px solid #F13F33;
+            color: #2563EB;
+            border-top: 2px solid #2563EB;
             padding-top: 10px;
         }
         .footer {

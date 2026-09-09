@@ -2,18 +2,23 @@
 'use client';
 
 import { PRINT_INSPECTION_STYLES } from './printInspectionStyles';
+import { CompanyInfo, DEFAULT_COMPANY_INFO, formatAddress, resolveLogoUrl } from '@/lib/company-info';
 
 interface PrintInspectionDocumentProps {
   inspection: any;
   jobCard?: any;
   language?: string;
+  company?: CompanyInfo | null;
 }
 
 const PrintInspectionDocument = ({
   inspection,
   jobCard,
-  language = 'ar'
+  language = 'ar',
+  company
 }: PrintInspectionDocumentProps) => {
+  const companyInfo: CompanyInfo = { ...DEFAULT_COMPANY_INFO, ...(company || {}) };
+  const companyLogo = resolveLogoUrl(companyInfo.logoUrl);
   const isRTL = language !== 'en';
 
   const groupedItems = (inspection?.items || []).reduce((acc: Record<string, any[]>, item: any) => {
@@ -51,7 +56,7 @@ const PrintInspectionDocument = ({
       generalNotes: 'ملاحظات عامة',
       noGeneralNotes: 'لا توجد ملاحظات إضافية',
       generatedOn: 'تم الإنشاء في',
-      systemName: 'نظام إدارة صيانة السيارات تيرا موتورز',
+      systemName: 'نظام إدارة صيانة السيارات تيرا موتور',
       noItems: 'لا توجد بنود فحص',
       noCustomerInfo: 'لا توجد معلومات للعميل',
       noVehicleInfo: 'لا توجد معلومات للمركبة',
@@ -84,7 +89,7 @@ const PrintInspectionDocument = ({
       generalNotes: 'General Notes',
       noGeneralNotes: 'No additional notes',
       generatedOn: 'Generated on',
-      systemName: 'TeraMotors Auto Repair Management System',
+      systemName: 'TeraMotor Auto Repair Management System',
       noItems: 'No inspection items',
       noCustomerInfo: 'No customer information',
       noVehicleInfo: 'No vehicle information',
@@ -116,20 +121,17 @@ const PrintInspectionDocument = ({
 
       <div className="header">
         <div className="logo-container">
-          <img src="/icon.png" alt="TeraMotors Logo" className="logo-image" />
+          <img src={companyLogo} alt="Company Logo" className="logo-image" />
           <div>
-            <div className="company-name">
-              Tera<span className="highlight">Visions</span>
-            </div>
-            <div className="company-subtitle">Auto Repair Solutions</div>
+            <div className="company-name">{companyInfo.name}</div>
           </div>
         </div>
         <div className="company-details">
-          <div><strong>{t.companyLabel}:</strong> تيرا فيجنز</div>
-          <div><strong>{t.crNumber}:</strong> 7051569718</div>
-          <div><strong>{t.vatNumber}:</strong> 314211338900003</div>
-          <div>الرياض، صناعية الرمال</div>
-          <div>+966553022102 · info@teramotors.com</div>
+          <div><strong>{t.companyLabel}:</strong> {companyInfo.nameAr || companyInfo.name}</div>
+          {companyInfo.crNumber && <div><strong>{t.crNumber}:</strong> {companyInfo.crNumber}</div>}
+          {companyInfo.vatNumber && <div><strong>{t.vatNumber}:</strong> {companyInfo.vatNumber}</div>}
+          {formatAddress(companyInfo.address) && <div>{formatAddress(companyInfo.address)}</div>}
+          <div>{[companyInfo.phone, companyInfo.email].filter(Boolean).join(' · ')}</div>
         </div>
       </div>
 

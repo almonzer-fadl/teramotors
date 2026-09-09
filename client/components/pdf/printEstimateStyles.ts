@@ -1,11 +1,11 @@
 export const PRINT_ESTIMATE_STYLES = `
   :root {
-    --brand-orange: #F97402;
+    --brand-accent: #2563EB;
     --brand-navy: #063479;
-    --brand-muted: #FFF6ED;
-    --brand-muted-dark: #FFEAD8;
-    --brand-border: #FFE0C2;
-    --brand-note: rgba(249, 116, 2, 0.12);
+    --brand-muted: #EFF6FF;
+    --brand-muted-dark: #DBEAFE;
+    --brand-border: #BFDBFE;
+    --brand-note: rgba(37, 99, 235, 0.12);
   }
 
   .print-estimate-container {
@@ -93,7 +93,7 @@ export const PRINT_ESTIMATE_STYLES = `
   .print-estimate-container .document-title h1 {
     font-size: 28px;
     font-weight: 800;
-    color: var(--brand-orange);
+    color: var(--brand-accent);
     letter-spacing: 1px;
     margin: 0;
   }
@@ -108,7 +108,7 @@ export const PRINT_ESTIMATE_STYLES = `
     text-align: center;
     padding: 8px;
     background: var(--brand-note);
-    color: #92400e;
+    color: #1e40af;
     border-radius: 8px;
     font-size: 10pt;
     font-weight: 500;
@@ -212,7 +212,7 @@ export const PRINT_ESTIMATE_STYLES = `
   }
 
   .print-estimate-container .custom-table tbody tr:nth-child(even) td {
-    background-color: #FFF8F1;
+    background-color: #EFF6FF;
   }
 
   .print-estimate-container .totals-section {
@@ -254,12 +254,12 @@ export const PRINT_ESTIMATE_STYLES = `
     padding: 8px 10px;
     font-size: 14pt;
     font-weight: 700;
-    color: var(--brand-orange);
-    background-color: rgba(249, 116, 2, 0.08);
+    color: var(--brand-accent);
+    background-color: rgba(37, 99, 235, 0.08);
   }
 
   .print-estimate-container .grand-total span:last-child {
-    color: var(--brand-orange);
+    color: var(--brand-accent);
   }
 
   .print-estimate-container .notes {
@@ -304,7 +304,7 @@ export const PRINT_ESTIMATE_STYLES = `
 
   .print-estimate-container .status-pending {
     background-color: #FEF0D9;
-    color: #92400e;
+    color: #1e40af;
   }
 
   .print-estimate-container .status-approved {

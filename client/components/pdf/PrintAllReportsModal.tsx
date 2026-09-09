@@ -50,7 +50,7 @@ const PrintAllReportsModal = ({
       type: 'inspection' as DocumentType,
       title: 'تقرير الفحص',
       color: 'from-blue-600 to-blue-500',
-      component: <PrintInspectionDocument inspection={inspection} jobCard={jobCard} language={language} />
+      component: <PrintInspectionDocument inspection={inspection} jobCard={jobCard} language={language} company={company} />
     },
     {
       type: 'estimate' as DocumentType,

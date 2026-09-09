@@ -75,6 +75,7 @@ export default function InspectionDetailsPage() {
   const id = params.id as string;
 
   const [inspection, setInspection] = useState<VehicleInspection | null>(null);
+  const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -103,6 +104,18 @@ export default function InspectionDetailsPage() {
         setInspection(data);
       } else {
         router.push("/inspections");
+      }
+      try {
+        const profileResponse = await fetch('/api/settings/company-profile');
+        if (profileResponse.ok) {
+          const profile = await profileResponse.json();
+          setCompany({
+            ...(profile.companyInfo || {}),
+            logoUrl: profile.branding?.logoUrl || undefined,
+          });
+        }
+      } catch (profileError) {
+        // Company info is optional; document falls back to defaults
       }
     } catch (error) {
       router.push("/inspections");
@@ -718,6 +731,7 @@ export default function InspectionDetailsPage() {
           inspection={inspection}
           jobCard={selectedJobCard}
           language={'ar'}
+          company={company}
         />
       )}
 
@@ -731,7 +745,7 @@ export default function InspectionDetailsPage() {
           invoice={invoiceData.invoice}
           jobCard={selectedJobCard || invoiceData.jobCard}
           language={'ar'}
-          company={estimateData.company || invoiceData.company || null}
+          company={estimateData.company || invoiceData.company || company || null}
         />
       )}
     </div>
