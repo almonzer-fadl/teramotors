@@ -46,14 +46,19 @@ export async function sendEmail({ to, subject, text, html }: EmailOptions) {
     // 1) Use configured SMTP (e.g. Google) when available
     const transporter = getSMTPTransporter();
     if (transporter) {
-      const info = await transporter.sendMail({
-        from,
-        to,
-        subject,
-        text,
-        html,
-      });
-      return { id: info.messageId, message: 'Email sent via SMTP' };
+      try {
+        const info = await transporter.sendMail({
+          from,
+          to,
+          subject,
+          text,
+          html,
+        });
+        return { id: info.messageId, message: 'Email sent via SMTP' };
+      } catch (smtpError) {
+        console.error('[email] SMTP send failed:', smtpError);
+        throw smtpError;
+      }
     }
 
     // 2) Fallback to Resend if SMTP is not configured
