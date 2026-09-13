@@ -1,7 +1,7 @@
 import { connectToDatabase } from '@/lib/db'
 import User from '@/lib/models/User'
 import crypto from 'crypto'
-import { sendEmail } from '@/lib/email'
+import { sendEmailTemplate } from '@/lib/email'
 
 export async function POST(request: Request) {
   try {
@@ -19,13 +19,16 @@ export async function POST(request: Request) {
     user.resetPasswordExpires = expires
     await user.save()
 
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}/reset-password?token=${token}`
-    
-    await sendEmail({
+    // Build an absolute URL from the request origin so the link always works,
+    // regardless of the environment (local, preview, or production domain)
+    const origin = new URL(request.url).origin
+    const resetUrl = `${origin}/reset-password?token=${token}`
+
+    await sendEmailTemplate({
       to: user.email,
-      subject: 'Reset your password',
-      html: `<p>Please click this link to reset your password: <a href="${resetUrl}">${resetUrl}</a></p>`,
-      text: `Please copy and paste this URL into your browser to reset your password: ${resetUrl}`,
+      subject: 'Password Reset - TeraMotor',
+      template: 'password-reset',
+      data: { resetUrl },
     })
 
     return Response.json({ success: true })
