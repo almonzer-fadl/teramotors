@@ -230,7 +230,7 @@ function ResetPasswordComponent() {
               <div className="pt-4 border-t border-gray-100 dark:border-gray-800 text-sm text-gray-500 dark:text-gray-300 space-y-1">
                 <p>{t('auth.need_help')}</p>
                 <a
-                  href="https://wa.me/905075928117"
+                  href="https://wa.me/601167709123"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-semibold text-[#063479] dark:text-[#F97402] hover:underline inline-flex items-center gap-1"
