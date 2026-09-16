@@ -483,7 +483,7 @@ class PDFGenerator {
     return {
       ar: {
         title: "فاتورة",
-        company: "تيرا موتور لصيانة السيارات",
+        company: "مركز تيرا موتور لصيانة السيارات",
         companyEn: "TeraMotor Auto Repair",
         crNumber: "رقم السجل التجاري",
         vatNumber: "الرقم الضريبي",

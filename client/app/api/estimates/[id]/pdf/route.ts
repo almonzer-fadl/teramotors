@@ -113,7 +113,7 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
     },
     ar: {
       title: "تقدير الإصلاح",
-      company: "تيرا موتور لصيانة السيارات",
+      company: "مركز تيرا موتور لصيانة السيارات",
       printButton: "🖨️ طباعة PDF",
       estimateNumber: "رقم التقدير #",
       date: "التاريخ",
@@ -142,7 +142,7 @@ function generateEstimateHTML(estimate: any, language: string = 'en', isRTL: boo
       totalAmount: "المبلغ الإجمالي",
       notes: "ملاحظات",
       generatedOn: "تم الإنشاء في",
-      systemName: "نظام إدارة تيرا موتور لصيانة السيارات",
+      systemName: "نظام إدارة مركز تيرا موتور لصيانة السيارات",
       status: "الحالة"
     }
   };
