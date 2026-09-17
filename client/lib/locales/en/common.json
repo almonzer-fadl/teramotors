@@ -1337,12 +1337,12 @@
         "customer_portal": "Customer Portal"
     },
     "hero": {
-      "title": "TeraMotors Auto Repair & Services",
-      "subtitle": "Your trusted workshop in Riyadh",
+      "title": "TeraMotor Auto Service Center",
+      "subtitle": "Your trusted auto service center in Riyadh",
       "description": "Since 2008, we have helped drivers and fleets in Saudi Arabia with experienced technicians, modern diagnostic tools, and careful service from oil changes to complex engine repairs.",
       "book_appointment": "Book an Appointment",
       "call_now": "Call Us",
-      "phone": "+966553022102",
+      "phone": "+60 11-6770 9123",
       "satisfaction_value": "100%",
       "support_value": "24/7"
     },
@@ -1449,7 +1449,7 @@
       "title": "Contact Us",
       "subtitle": "We are ready to help with your next service or repair request",
       "address": "Industrial Area, Al Rimal, Riyadh 13252, Saudi Arabia",
-      "phone": "+966553022102",
+      "phone": "+60 11-6770 9123",
       "email": "info@teramotors.com",
       "hours": "Saturday-Thursday: 8 AM-8 PM • Friday: emergency support by arrangement",
       "book_online": "Book Online",
@@ -1465,7 +1465,7 @@
     },
     "footer": {
         "staff_login": "Staff Login",
-        "company_name": "TeraMotors Auto Repair & Services"
+        "company_name": "TeraMotor Auto Service Center"
     }
   },
   "templates": {
