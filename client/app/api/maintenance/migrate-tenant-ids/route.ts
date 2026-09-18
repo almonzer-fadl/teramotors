@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     if (!tenant) {
       tenant = await Tenant.create({
-        name: 'TeraMotors',
+        name: 'TeraMotor',
         slug: tenantSlug,
         status: 'active',
         companyInfo: {

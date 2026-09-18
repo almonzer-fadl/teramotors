@@ -148,7 +148,7 @@ export default function SubscriptionPage() {
     if (!selectedTier || selectedTier === 'free') return;
 
     if (selectedTier === 'enterprise') {
-      window.location.href = 'mailto:build@vantlaunch.com?subject=TeraMotors%20Enterprise%20Plan';
+      window.location.href = 'mailto:build@vantlaunch.com?subject=TeraMotor%20Enterprise%20Plan';
       return;
     }
 

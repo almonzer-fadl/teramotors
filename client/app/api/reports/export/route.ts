@@ -343,7 +343,7 @@ async function generateExcelReport(data: any): Promise<Buffer> {
     ...createHeader('TERAMOTORS WORKSHOP', 'Financial Executive Summary Report'),
     ['Report Generated:', new Date().toLocaleString()],
     ['Report Period:', data.dateRange],
-    ['Prepared By:', 'TeraMotors Management System'],
+    ['Prepared By:', 'TeraMotor Management System'],
     [''],
     ['FINANCIAL OVERVIEW'],
     [''],

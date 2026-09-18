@@ -46,7 +46,7 @@
     "creating_account": "Creating account...",
     "already_have_account": "Already have an account? Sign in",
     "forgot_your_password": "Forgot your password?",
-    "forgot_password_prompt": "Type the email you use with TeraMotors and we will send secure reset instructions.",
+    "forgot_password_prompt": "Type the email you use with TeraMotor and we will send secure reset instructions.",
     "reset_link_sent": "If this email exists in our system, a reset link has been delivered.",
     "send_reset_link": "Send reset link",
     "sending": "Sending...",
@@ -145,7 +145,7 @@
       "submitting": "Creating..."
     },
     "success": {
-      "title": "Welcome to TeraMotors!",
+      "title": "Welcome to TeraMotor!",
       "description": "Your workshop {{workshop}} has been created.",
       "default_workshop": "your workshop",
       "redirect": "Redirecting to login..."
@@ -1337,12 +1337,12 @@
         "customer_portal": "Customer Portal"
     },
     "hero": {
-      "title": "TeraMotor Auto Service Center",
+      "title": "TeraMotor Auto Repair & Services",
       "subtitle": "Your trusted auto service center in Riyadh",
       "description": "Since 2008, we have helped drivers and fleets in Saudi Arabia with experienced technicians, modern diagnostic tools, and careful service from oil changes to complex engine repairs.",
       "book_appointment": "Book an Appointment",
       "call_now": "Call Us",
-      "phone": "+60 11-6770 9123",
+      "phone": "+966553022102",
       "satisfaction_value": "100%",
       "support_value": "24/7"
     },
@@ -1421,9 +1421,9 @@
       }
     },
     "about": {
-      "title": "About TeraMotors",
+      "title": "About TeraMotor",
       "subtitle": "A Saudi workshop with more than 15 years of experience",
-      "description": "TeraMotors started in Riyadh to give vehicle owners reliable service, clear communication, and professional repair work. Our certified team uses modern diagnostic equipment and trusted spare parts.",
+      "description": "TeraMotor started in Riyadh to give vehicle owners reliable service, clear communication, and professional repair work. Our certified team uses modern diagnostic equipment and trusted spare parts.",
       "experience": "15+ Years Experience",
       "certified_techs": "Certified Technicians",
       "warranty": "12-Month Warranty",
@@ -1439,7 +1439,7 @@
     "testimonials": {
       "title": "What Our Customers Say",
       "subtitle": "Real feedback from customers in Saudi Arabia",
-      "alt_4": "Customer receiving a vehicle after TeraMotors service"
+      "alt_4": "Customer receiving a vehicle after TeraMotor service"
     },
     "gallery": {
       "title": "Our Workshop",
@@ -1449,7 +1449,7 @@
       "title": "Contact Us",
       "subtitle": "We are ready to help with your next service or repair request",
       "address": "Industrial Area, Al Rimal, Riyadh 13252, Saudi Arabia",
-      "phone": "+60 11-6770 9123",
+      "phone": "+966553022102",
       "email": "info@teramotors.com",
       "hours": "Saturday-Thursday: 8 AM-8 PM • Friday: emergency support by arrangement",
       "book_online": "Book Online",
@@ -1585,7 +1585,7 @@
     "breadcrumb": "Breadcrumb",
     "invoice_pdf": "Invoice PDF",
     "reschedule": "Reschedule",
-    "teramotors_logo": "TeraMotors Logo",
+    "teramotors_logo": "TeraMotor Logo",
     "zatca_qr": "Invoice QR",
     "description_of_inspection_item": "Description of this inspection item",
     "condition_good": "Good",
@@ -1662,11 +1662,11 @@
     }
   },
   "meta": {
-    "description": "Professional auto repair management system for TeraMotors"
+    "description": "Professional auto repair management system for TeraMotor"
   },
   "marketing": {
     "header": {
-      "company_name": "TeraMotors"
+      "company_name": "TeraMotor"
     },
     "navigation": {
       "features": "Features",
@@ -1689,7 +1689,7 @@
       "floating_this_week": "This week",
       "dashboard_preview": "Live dashboard preview",
       "dashboard_subtitle": "Track revenue, active job cards, and WhatsApp status from one screen.",
-      "dashboard_preview_alt": "Preview of the TeraMotors workshop dashboard"
+      "dashboard_preview_alt": "Preview of the TeraMotor workshop dashboard"
     },
     "stats": {
       "workshops": "Auto Repair Shops",
@@ -1785,7 +1785,7 @@
     "testimonials": {
       "section_label": "TESTIMONIALS",
       "section_title": "Built for Busy Workshops",
-      "quote1": "TeraMotors gives our team one place to manage customers, vehicles, invoices, and repair work without jumping between tools.",
+      "quote1": "TeraMotor gives our team one place to manage customers, vehicles, invoices, and repair work without jumping between tools.",
       "author1": "Ahmed Al-Rashid",
       "role1": "Owner, Quick Fix Auto Repair",
       "quote2": "The customer updates and job tracking make it easier to keep repairs moving and customers informed.",
@@ -1798,7 +1798,7 @@
     "cta": {
       "title": "Ready to Transform",
       "title_highlight": "Your Workshop?",
-      "description": "Start a 14-day trial and see how TeraMotors fits your workshop operations.",
+      "description": "Start a 14-day trial and see how TeraMotor fits your workshop operations.",
       "cta_start_trial": "Start Free Trial",
       "contact_sales": "Contact Sales",
       "no_credit_card": "No credit card required • 14-day free trial"
@@ -1822,7 +1822,7 @@
       "terms": "Terms",
       "copyright": "All rights reserved",
       "made_in": "Built for real workshop operations",
-      "company_name": "TeraMotors"
+      "company_name": "TeraMotor"
     }
   },
     "landing_missing": {
@@ -1858,8 +1858,8 @@
       "signing_in": "Signing in...",
       "forgot_your_password": "Forgot your password?",
       "testimonial_1": "They have managed my company fleet for five years. Their timing, clear pricing, and service quality make working with them easy.",
-      "testimonial_2": "My car broke down at home, and TeraMotors arranged towing and got me back on the road the same day. Professional service.",
-      "testimonial_3": "I only trust TeraMotors with my classic car. They know what they are doing and protect the original parts.",
+      "testimonial_2": "My car broke down at home, and TeraMotor arranged towing and got me back on the road the same day. Professional service.",
+      "testimonial_3": "I only trust TeraMotor with my classic car. They know what they are doing and protect the original parts.",
       "subscriptions": "Service Plans",
       "basic_plan": "Basic Plan",
       "premium_plan": "Premium Plan",
@@ -1973,7 +1973,7 @@
       "status_online": "WhatsApp Connected",
       "status_offline": "WhatsApp Offline",
       "status_missing": "Integration Missing",
-      "not_configured": "Connect your Ultramsg account to send WhatsApp messages from TeraMotors.",
+      "not_configured": "Connect your Ultramsg account to send WhatsApp messages from TeraMotor.",
       "not_configured_detail": "WhatsApp integration is not configured for this tenant.",
       "configured_label": "Configured",
       "not_configured_short": "Not Configured",

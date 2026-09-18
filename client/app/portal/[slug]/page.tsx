@@ -228,7 +228,7 @@ export default function CustomerPortalDashboard() {
               >
                 <img
                   src="/icon.png"
-                  alt="TeraMotors Logo"
+                  alt="TeraMotor Logo"
                   className="w-10 h-10 object-contain rounded-lg"
                 />
               </motion.div>

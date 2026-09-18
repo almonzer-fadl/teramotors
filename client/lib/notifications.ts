@@ -142,7 +142,7 @@ export class NotificationService {
     if (!data?.email) return;
 
     const template = this.templates[type];
-    const subject = `TeraMotors - ${template.title}`;
+    const subject = `TeraMotor - ${template.title}`;
     const html = this.generateEmailHTML(template.title, template.message, data);
     const text = this.generateEmailText(template.title, template.message, data);
 
@@ -324,7 +324,7 @@ export class NotificationService {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>TeraMotors Notification</title>
+        <title>TeraMotor Notification</title>
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -336,7 +336,7 @@ export class NotificationService {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🚗 TeraMotors</h1>
+            <h1>🚗 TeraMotor</h1>
             <p>Auto Repair Shop</p>
           </div>
           <div class="content">
@@ -344,7 +344,7 @@ export class NotificationService {
             <p>${this.formatMessage(message, data)}</p>
           </div>
           <div class="footer">
-            <p>TeraMotors Auto Repair Shop</p>
+            <p>TeraMotor Auto Repair Shop</p>
             <p>Contact: +966553022102 | Email: info@teramotors.com</p>
           </div>
         </div>
@@ -355,14 +355,14 @@ export class NotificationService {
 
   private static generateEmailText(title: string, message: string, data?: any): string {
     return `
-      TeraMotors Notification
+      TeraMotor Notification
       
       ${title}
       
       ${this.formatMessage(message, data)}
       
       ---
-      TeraMotors Auto Repair Shop
+      TeraMotor Auto Repair Shop
       Contact: +966553022102 | Email: info@teramotors.com
     `;
   }
