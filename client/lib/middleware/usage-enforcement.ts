@@ -15,10 +15,20 @@ export async function checkUsageLimit(
   const limitKey = resourceType === 'user' ? 'maxUsers' : 'maxVehicles';
   const countKey = resourceType === 'user' ? 'currentUsers' : 'currentVehicles';
 
-  const limit = tenant.subscription[limitKey];
-  const current = tenant.stats[countKey];
+  const limit = tenant.subscription?.[limitKey];
+  const current = tenant.stats?.[countKey] ?? 0;
 
-  if (action === 'create' && current >= limit) {
+  // Legacy tenants without an explicit subscription record are not subject to usage limits
+  const hasSubscriptionRecord = await Tenant.exists({
+    _id: tenantId,
+    subscription: { $exists: true, $ne: null },
+  });
+
+  if (!hasSubscriptionRecord) {
+    return { allowed: true, current, limit: -1 };
+  }
+
+  if (action === 'create' && typeof limit === 'number' && limit >= 0 && current >= limit) {
     return {
       allowed: false,
       reason: `${resourceType} limit reached (${current}/${limit})`,
