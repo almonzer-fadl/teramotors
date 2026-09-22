@@ -17,7 +17,7 @@ const UserSchema = new Schema({
   displayName: String, // Custom display name for the user
   role: {
     type: String,
-    enum: ['SUPER_ADMIN', 'admin', 'mechanic', 'inspector'],
+    enum: ['SUPER_ADMIN', 'admin', 'mechanic', 'inspector', 'finance'],
     default: 'mechanic'
   },
   phone: String, // +5511999999999

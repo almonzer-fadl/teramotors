@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
     }
 
-    // Check if user is admin
-    if ((session.user as any).role !== 'admin') {
+    // Check if user is admin or finance
+    if (!['admin', 'finance'].includes((session.user as any).role)) {
       return new Response(JSON.stringify({ error: 'Forbidden - Admin access required' }), { status: 403 })
     }
 
