@@ -249,7 +249,7 @@ export async function POST(request: NextRequest) {
           time: `${a.startTime || ''} - ${a.endTime || ''}`,
           customer: customerName(a.customerId),
           vehicle: vehicleName(a.vehicleId),
-          service: a.serviceId?.name || 'غير معروف',
+          service: (a.serviceId as any)?.name || 'غير معروف',
           status: a.status
         })),
         jobCards: jobCards.map(j => ({
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
           number: i.invoiceNumber || String(i._id).slice(-8),
           customer: customerName(i.customerId),
           vehicle: vehicleName(i.vehicleId),
-          plate: i.vehicleId?.licensePlate || '',
+          plate: (i.vehicleId as any)?.licensePlate || '',
           sub: Number(i.zatca?.subtotal ?? i.totalAmount ?? 0),
           vat: Number(i.zatca?.vatAmount ?? 0),
           total: Number(i.totalAmount ?? 0),
@@ -277,8 +277,8 @@ export async function POST(request: NextRequest) {
         })),
         payments: payments.map(p => ({
           date: p.paymentDate || p.createdAt,
-          customer: customerName(p.invoiceId?.customerId),
-          invoice: p.invoiceId?.invoiceNumber || '',
+          customer: customerName((p.invoiceId as any)?.customerId),
+          invoice: (p.invoiceId as any)?.invoiceNumber || '',
           method: p.paymentMethod || '',
           amount: Number(p.amount ?? 0)
         })),
