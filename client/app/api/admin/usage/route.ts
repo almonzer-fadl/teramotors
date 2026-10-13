@@ -11,10 +11,12 @@ export const GET = withTenantAuth(
       const tenants = await Tenant.find({}).select('name stats subscription').lean();
 
       const usageData = tenants.map(tenant => {
-        const userLimit = tenant.subscription.maxUsers || 0;
-        const vehicleLimit = tenant.subscription.maxVehicles || 0;
-        const currentUserCount = tenant.stats.currentUsers || 0;
-        const currentVehicleCount = tenant.stats.currentVehicles || 0;
+        const subscription = tenant.subscription;
+        // Legacy tenants without a subscription record are unlimited (-1)
+        const userLimit = subscription ? (subscription.maxUsers ?? 0) : -1;
+        const vehicleLimit = subscription ? (subscription.maxVehicles ?? 0) : -1;
+        const currentUserCount = tenant.stats?.currentUsers || 0;
+        const currentVehicleCount = tenant.stats?.currentVehicles || 0;
 
         const userPercentage = userLimit > 0 ? (currentUserCount / userLimit) * 100 : 0;
         const vehiclePercentage = vehicleLimit > 0 ? (currentVehicleCount / vehicleLimit) * 100 : 0;
