@@ -56,7 +56,7 @@ export default function UserManagementSettings() {
     const [newRole, setNewRole] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
-    const roles = ['admin', 'mechanic', 'inspector', 'customer']; // Define available roles
+    const roles = ['admin', 'mechanic', 'inspector', 'finance', 'customer']; // Define available roles
 
     const fetchUsers = async () => {
         setLoading(true);

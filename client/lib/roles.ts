@@ -31,12 +31,18 @@ export const getNavigationItems = (userRole: string) => {
     { tKey: 'sidebar.invoices', href: '/invoices', icon: 'CreditCard', roles: ['admin'] },
     { tKey: 'sidebar.payments', href: '/payments', icon: 'CreditCard', roles: ['admin'] },
     { tKey: 'sidebar.whatsapp', href: '/whatsapp', icon: 'MessageSquare', roles: ['admin'] },
-    { tKey: 'sidebar.reports', href: '/reports', icon: 'BarChart3', roles: ['admin'] },
+    { tKey: 'sidebar.reports', href: '/reports', icon: 'BarChart3', roles: ['admin', 'finance'] },
     { tKey: 'sidebar.settings', href: '/settings', icon: 'Settings', roles: ['admin'] },
   ]
 
+  // Finance items - read-only financial access (reports only, no invoice creation)
+  const financeItems = [
+    { tKey: 'sidebar.dashboard', href: '/dashboard', icon: 'LayoutDashboard', roles: ['finance'] },
+    { tKey: 'sidebar.reports', href: '/reports', icon: 'BarChart3', roles: ['finance'] },
+  ]
+
   // Combine all items and filter by role
-  const allItems = [...baseItems, ...adminOnlyItems]
+  const allItems = [...baseItems, ...adminOnlyItems, ...financeItems]
 
   return allItems.filter(item => item.roles.includes(userRole))
 }
@@ -94,6 +100,19 @@ export const permissions = {
     canManageSystem: false,
     canAccessAdminPanel: false,
     canManageTenants: false,
+  },
+  finance: {
+    canDelete: false,
+    canManageUsers: false,
+    canAccessSettings: false,
+    canAccessReports: true,
+    canCreateUsers: false,
+    canEditUsers: false,
+    canDeleteUsers: false,
+    canViewAllData: false,
+    canManageSystem: false,
+    canAccessAdminPanel: false,
+    canManageTenants: false,
   }
 }
 
@@ -108,6 +127,7 @@ export const roleDisplayNames = {
   admin: 'Administrator',
   mechanic: 'Mechanic',
   inspector: 'Inspector',
+  finance: 'Financial Manager',
 }
 
 // Role descriptions
@@ -116,4 +136,5 @@ export const roleDescriptions = {
   admin: 'Full tenant access including user management, settings, and reports. Can delete any data within their workshop.',
   mechanic: 'Can manage customers, vehicles, appointments, jobs, and estimates. Cannot delete data or access admin features.',
   inspector: 'Can perform vehicle inspections and create estimates. Cannot delete data or access admin features.',
+  finance: 'Read-only financial access. Can view dashboards and pull Excel/PDF reports, but cannot create invoices or modify data.',
 }
