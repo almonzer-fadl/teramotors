@@ -14,6 +14,8 @@ import {
   AlertTriangle,
   Loader2,
   HelpCircle,
+  FileSpreadsheet,
+  FileText,
 } from "lucide-react";
 import { PieChart, Pie, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts'; // Recharts imports
 import { fadeInUp, staggerContainer } from "@/lib/dashboard-animations";
@@ -328,6 +330,31 @@ const ReportCard = ({ titleKey, descriptionKey, href, icon: Icon, color, summary
 export default function ReportsPage() {
   const { t, i18n } = useTranslation("common");
   const isRTL = i18n.language === 'ar';
+  const [exporting, setExporting] = useState(false);
+
+  const handleExportExcel = async () => {
+    try {
+      setExporting(true);
+      const response = await fetch('/api/reports/export?format=excel&range=36500', { method: 'POST' });
+      if (!response.ok) throw new Error('export failed');
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `teramotors-all-invoices-${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportPdf = () => {
+    window.open('/api/reports/invoices/pdf', '_blank');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -345,6 +372,23 @@ export default function ReportsPage() {
           <p className="mt-2 text-base text-gray-700 dark:text-gray-300">
             {t("reports.description")}
           </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              onClick={handleExportExcel}
+              disabled={exporting}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-600/25 disabled:opacity-60 transition-all duration-200"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              {exporting ? t('reports.exporting', { defaultValue: 'Exporting...' }) : t('reports.export_excel', { defaultValue: 'Export all invoices (Excel)' })}
+            </button>
+            <button
+              onClick={handleExportPdf}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 shadow-lg shadow-red-600/25 transition-all duration-200"
+            >
+              <FileText className="w-4 h-4" />
+              {t('reports.export_pdf', { defaultValue: 'Export all invoices (PDF)' })}
+            </button>
+          </div>
         </motion.div>
 
         {/* Report Widgets */}
