@@ -8,8 +8,8 @@ import { INSPECTION_CONFIG } from '@/lib/config/inspection';
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session?.user || (session.user as any).role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     const tenantId = (session.user as any).tenantId;

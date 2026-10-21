@@ -45,5 +45,5 @@ export const PUT = withTenantAuth(
       );
     }
   },
-  { requireTenant: true }
+  { requireTenant: true, allowedRoles: ['admin'] }
 );

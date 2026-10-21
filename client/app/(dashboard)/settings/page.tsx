@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Building, Users, FileText, Globe, Share2, Palette, Clipboard, UserCircle, Calendar, CreditCard, type LucideIcon } from 'lucide-react';
 import { fadeInUp, staggerContainer } from '@/lib/dashboard-animations';
+import { useSession } from '@/lib/hooks/useSession';
 import CompanyProfileSettings from '@/components/settings/CompanyProfileSettings';
 import UserManagementSettings from '@/components/settings/UserManagementSettings';
 import InvoicingSettings from '@/components/settings/InvoicingSettings';
@@ -40,8 +42,16 @@ const tabs: SettingsTab[] = [
 
 export default function SettingsPage() {
     const { t, i18n } = useTranslation('common');
+    const { user, isLoading } = useSession();
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState(tabs[0].id);
     const isRTL = i18n.language === 'ar';
+
+    useEffect(() => {
+        if (!isLoading && user && user.role !== 'admin' && user.role !== 'SUPER_ADMIN') {
+            router.replace('/dashboard');
+        }
+    }, [isLoading, user, router]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800" dir={isRTL ? 'rtl' : 'ltr'}>
