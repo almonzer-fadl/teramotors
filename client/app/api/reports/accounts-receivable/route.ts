@@ -104,5 +104,5 @@ export const GET = withTenantAuth(
       return NextResponse.json({ error: 'Failed to fetch report data' }, { status: 500 });
     }
   },
-  { requireTenant: true, allowedRoles: ['admin'] }
+  { requireTenant: true, allowedRoles: ['admin', 'finance'] }
 );

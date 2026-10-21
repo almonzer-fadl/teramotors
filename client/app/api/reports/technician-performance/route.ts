@@ -27,8 +27,7 @@ export const GET = withTenantAuth(
       const jobCards = await JobCard.find({
         tenantId,
         status: 'completed',
-        mechanicId: { $exists: true },
-        actualEndTime: { $gte: startDate, $lte: endDate }
+        createdAt: { $gte: startDate, $lte: endDate }
       }).populate('mechanicId', 'firstName lastName').lean();
 
       const invoices = await Invoice.find({
@@ -47,15 +46,16 @@ export const GET = withTenantAuth(
       const techPerformance: { [key: string]: { totalRevenue: number; jobsCompleted: number; totalTime: number, mechanicName: string } } = {};
 
       jobCards.forEach(jc => {
-        const mechanicId = jc.mechanicId?._id.toString();
-        if (!mechanicId) return;
+        const mechanicId = (jc.mechanicId?._id?.toString?.()) || 'unassigned';
 
         if (!techPerformance[mechanicId]) {
           techPerformance[mechanicId] = {
             totalRevenue: 0,
             jobsCompleted: 0,
             totalTime: 0,
-            mechanicName: `${(jc.mechanicId as any)?.firstName || ''} ${(jc.mechanicId as any)?.lastName || 'Unknown'}`,
+            mechanicName: (jc.mechanicId as any)?.firstName
+              ? `${(jc.mechanicId as any)?.firstName || ''} ${(jc.mechanicId as any)?.lastName || ''}`.trim()
+              : 'غير محدد',
           };
         }
 
@@ -83,5 +83,5 @@ export const GET = withTenantAuth(
       return NextResponse.json({ error: 'Failed to fetch report data' }, { status: 500 });
     }
   },
-  { requireTenant: true, allowedRoles: ['admin'] }
+  { requireTenant: true, allowedRoles: ['admin', 'finance'] }
 );
