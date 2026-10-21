@@ -40,7 +40,40 @@ export default function DetailedReportPage() {
     const reportName = params.reportName as string;
 
     const [loading, setLoading] = useState(false);
+    const [exporting, setExporting] = useState(false);
     const [data, setData] = useState<any>(null);
+
+    const reportKeyMap: Record<string, string> = {
+        'profit-and-loss': 'pnl',
+        'sales': 'sales',
+        'accounts-receivable': 'ar',
+        'vat': 'vat',
+        'payments-received': 'payments',
+        'inventory-valuation': 'inventory',
+        'technician-performance': 'tech',
+    };
+
+    const handleExportExcel = async () => {
+        const key = reportKeyMap[reportName];
+        if (!key) return;
+        try {
+            setExporting(true);
+            const response = await fetch(`/api/reports/export?format=excel&report=${key}&range=36500`, { method: 'POST' });
+            if (!response.ok) throw new Error('export failed');
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `teramotors-${key}-${new Date().toISOString().split('T')[0]}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+        } finally {
+            setExporting(false);
+        }
+    };
     const [dateRange, setDateRange] = useState<DateRange | undefined>({
         from: addDays(new Date(), -30),
         to: new Date(),
@@ -151,6 +184,14 @@ export default function DetailedReportPage() {
                     </div>
                      <div className="flex items-center gap-2">
                         {reportName !== 'accounts-receivable' && reportName !== 'inventory-valuation' && <DateRangePicker date={dateRange} onDateChange={setDateRange} />}
+                        <button
+                            onClick={handleExportExcel}
+                            disabled={exporting}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-600/25 disabled:opacity-60 transition-all duration-200"
+                        >
+                            <Download className="w-4 h-4" />
+                            {exporting ? t('reports.exporting', { defaultValue: 'جاري التصدير...' }) : t('reports.export_excel_btn', { defaultValue: 'تصدير Excel' })}
+                        </button>
                     </div>
                 </motion.div>
 
