@@ -277,6 +277,85 @@ export default function InvoiceDetailPage() {
                 </div>
               </motion.div>
             )}
+
+            {!jobCard && (invoice?.items?.length > 0) && (
+              <motion.div
+                className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden"
+                variants={fadeInUp}
+              >
+                <div className="px-6 py-6">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center shadow-lg shadow-gray-500/25">
+                      <FileText className="w-6 h-6 text-white" />
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+                      {t('invoices.invoice_items', { defaultValue: 'Invoice Items' })}
+                    </h2>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="text-start text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                          <th className="text-start py-2 font-medium">{t('common.name', { defaultValue: 'Name' })}</th>
+                          <th className="text-end py-2 font-medium">{t('invoices.quantity', { defaultValue: 'Qty' })}</th>
+                          <th className="text-end py-2 font-medium">{t('invoices.unit_price', { defaultValue: 'Unit Price' })}</th>
+                          <th className="text-end py-2 font-medium">{t('invoices.amount', { defaultValue: 'Amount' })}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {invoice.items.map((item: any, idx: number) => (
+                          <tr key={idx} className="border-b border-gray-100 dark:border-gray-800/60">
+                            <td className="py-2 text-gray-800 dark:text-gray-200">
+                              {item.name}
+                              {item.category === 'service' && (
+                                <span className="ms-2 text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">{t('services.services')}</span>
+                              )}
+                            </td>
+                            <td className="py-2 text-end text-gray-600 dark:text-gray-300">{item.quantity}</td>
+                            <td className="py-2 text-end text-gray-600 dark:text-gray-300">{Number(item.unitPrice || 0).toFixed(2)}</td>
+                            <td className="py-2 text-end font-medium text-gray-800 dark:text-gray-200">{((item.quantity || 0) * (item.unitPrice || 0)).toFixed(2)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            <motion.div
+              className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-gray-800/30 border border-gray-100 dark:border-gray-800 overflow-hidden"
+              variants={fadeInUp}
+            >
+              <div className="px-6 py-6">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-700 rounded-xl flex items-center justify-center shadow-lg shadow-green-600/25">
+                    <DollarSign className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+                    {t('invoices.totals', { defaultValue: 'Totals' })}
+                  </h2>
+                </div>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between text-gray-600 dark:text-gray-300">
+                    <span>{t('services.services')}:</span>
+                    <span>{((jobCard?.services || []).reduce((sum: number, s: any) => sum + (Number(s.laborHours || 0) * Number(s.laborRate || 0)), 0) || (invoice?.items || []).filter((it: any) => it.category === 'service').reduce((sum: number, it: any) => sum + ((it.quantity || 0) * (it.unitPrice || 0)), 0)).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600 dark:text-gray-300">
+                    <span>{t('inventory.parts_used')}:</span>
+                    <span>{((jobCard?.partsUsed || []).reduce((sum: number, p: any) => sum + (Number(p.quantity || 0) * Number(p.cost || 0)), 0) || (invoice?.items || []).filter((it: any) => it.category === 'part').reduce((sum: number, it: any) => sum + ((it.quantity || 0) * (it.unitPrice || 0)), 0)).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600 dark:text-gray-300">
+                    <span>{t('invoices.taxes', { defaultValue: 'Taxes (15%)' })}:</span>
+                    <span>{Number(invoice?.zatca?.vatAmount || 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between pt-3 border-t border-gray-200 dark:border-gray-700 text-base font-bold text-gray-900 dark:text-white">
+                    <span>{t('invoices.total_amount')}:</span>
+                    <span className="text-green-600 dark:text-green-400">SAR {Number(invoice?.totalAmount || 0).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
           {/* QR Code Column */}

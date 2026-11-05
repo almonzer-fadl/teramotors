@@ -43,7 +43,7 @@ export const connectToDatabase = async (): Promise<void> => {
   
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "teramotors",
+      dbName: process.env.MONGODB_DB_NAME || "teramotors",
       serverSelectionTimeoutMS: 30000, // Increased to 30 seconds
       socketTimeoutMS: 60000, // Increased to 60 seconds
       connectTimeoutMS: 30000, // Increased to 30 seconds

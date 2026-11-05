@@ -130,6 +130,8 @@ export async function POST(request: Request) {
 
     const { estimateId, jobCardId, dueDate, notes, paymentMethod, discount, autoCloseJobCard = true } = body;
 
+    const vatRate = body.vatRate != null ? Number(body.vatRate) : undefined;
+
     const { customerId: manualCustomerId, vehicleId: manualVehicleId, services: manualServices, partsUsed: manualParts } = body;
 
 
@@ -148,6 +150,8 @@ export async function POST(request: Request) {
     let mechanicId;
 
     let zatcaData = null;
+
+    const invoiceItems: any[] = [];
 
 
 
@@ -175,6 +179,27 @@ export async function POST(request: Request) {
 
       }
 
+      // Store line items on the invoice for display
+
+      (jobCard.services || []).forEach((s: any) => {
+        invoiceItems.push({
+          name: s.serviceId?.name || 'Service',
+          quantity: Number(s.quantity || 0) || 1,
+          unitPrice: Number(s.laborHours || 0) * Number(s.laborRate || 0),
+          vatRate: 0,
+          category: 'service',
+        });
+      });
+      (jobCard.partsUsed || []).forEach((p: any) => {
+        invoiceItems.push({
+          name: p.partId?.name || 'Part',
+          quantity: Number(p.quantity || 0) || 1,
+          unitPrice: Number(p.cost || 0),
+          vatRate: 15,
+          category: 'part',
+        });
+      });
+
       
 
       // Generate ZATCA-compliant invoice
@@ -198,6 +223,8 @@ export async function POST(request: Request) {
         paymentMethod,
 
         discount: discount || jobCard.discount || 0, // Use job card discount if not provided in request
+
+        vatRate,
 
       });
 
@@ -297,6 +324,14 @@ export async function POST(request: Request) {
 
             });
 
+            invoiceItems.push({
+              name: s.name || 'Service',
+              quantity: Number(s.quantity || 0) || 1,
+              unitPrice: Number(s.laborRate || 0),
+              vatRate: 0,
+              category: 'service',
+            });
+
           });
 
         }
@@ -319,6 +354,14 @@ export async function POST(request: Request) {
 
               vatRate: 15, // 15% tax on parts
 
+            });
+
+            invoiceItems.push({
+              name: p.name || 'Part',
+              quantity: Number(p.quantity || 0) || 1,
+              unitPrice: Number(p.cost || 0),
+              vatRate: 15,
+              category: 'part',
             });
 
           });
@@ -470,6 +513,8 @@ export async function POST(request: Request) {
       paymentMethod,
 
       zatca: zatcaData,
+
+      items: invoiceItems,
 
       tenantId: (session.user as any).tenantId,
 

@@ -17,6 +17,14 @@ export interface IInvoice extends Document {
   paymentMethod?: 'cash' | 'card' | 'bank_transfer' | 'other';
   paymentDate?: Date;
   paidAt?: Date;
+  items?: {
+    name: string;
+    description?: string;
+    quantity: number;
+    unitPrice: number;
+    vatRate?: number;
+    category?: 'service' | 'part';
+  }[];
   zatca?: {
     qrCode?: string;
     qrCodeImage?: string;
@@ -80,6 +88,14 @@ const InvoiceSchema = new Schema<IInvoice>({
   paymentMethod: { type: String, enum: ['cash', 'card', 'bank_transfer', 'other'], required: false },
   paymentDate: { type: Date, required: false },
   paidAt: { type: Date, required: false },
+  items: [{
+    name: { type: String, required: false },
+    description: { type: String, required: false },
+    quantity: { type: Number, default: 1 },
+    unitPrice: { type: Number, default: 0 },
+    vatRate: { type: Number, default: 0 },
+    category: { type: String, enum: ['service', 'part'], default: 'part' },
+  }],
 
   // ZATCA compliance fields
   zatca: {
@@ -141,10 +157,9 @@ InvoiceSchema.statics.getNextInvoiceNumber = async function(
       return 'INV-0001';
     }
 
-    const prefixMatch = rawInvoiceNumber.match(/^([A-Za-z]+)-/);
-    const numberMatch = rawInvoiceNumber.match(/(\d+)$/);
-    const prefix = prefixMatch ? prefixMatch[1] : 'INV';
-    const lastNumber = numberMatch ? parseInt(numberMatch[1], 10) : 0;
+    const match = rawInvoiceNumber.match(/^(.+?)-(\d+)$/);
+    const prefix = match ? match[1] : 'INV';
+    const lastNumber = match ? parseInt(match[2], 10) : 0;
     const safeLastNumber = Number.isFinite(lastNumber) ? lastNumber : 0;
     const nextNumber = (safeLastNumber + 1).toString().padStart(4, '0');
     return `${prefix}-${nextNumber}`;

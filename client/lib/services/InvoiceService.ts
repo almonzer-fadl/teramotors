@@ -44,6 +44,7 @@ export class InvoiceService {
     dueDate?: Date;
     paymentMethod?: string;
     discount?: number;
+    vatRate?: number;
   }): Promise<InvoiceGenerationResult> {
     try {
       // Convert job card data to ZATCA invoice format
@@ -107,7 +108,7 @@ export class InvoiceService {
         description: 'Auto part',
         quantity: part.quantity || 1,
         unitPrice: part.cost || 0,
-        vatRate: ZATCAUtils.getStandardVATRate(),
+        vatRate: jobCardData.vatRate ?? ZATCAUtils.getStandardVATRate(),
         category: 'part',
       });
     });
@@ -161,7 +162,7 @@ export class InvoiceService {
         description: item.description,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
-        vatRate: item.vatRate || ZATCAUtils.getStandardVATRate(),
+        vatRate: item.vatRate ?? ZATCAUtils.getStandardVATRate(),
       }));
 
       const zatcaInvoiceData: InvoiceData = {

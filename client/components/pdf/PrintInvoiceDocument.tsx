@@ -36,10 +36,11 @@ const PrintInvoiceDocument = ({
     return sum + quantity * unitCost;
   }, 0);
   const subtotal = servicesTotal + partsTotal;
-  const tax = partsTotal * 0.15;
+  const storedVat = typeof invoice?.zatca?.vatAmount === 'number' ? invoice.zatca.vatAmount : undefined;
+  const tax = storedVat ?? (partsTotal * 0.15);
   const discount = typeof jobCard?.discount === 'number' ? jobCard.discount : (invoice?.discount || 0);
   const discountAmount = (subtotal + tax) * (discount / 100);
-  const grandTotal = subtotal + tax - discountAmount;
+  const grandTotal = typeof invoice?.totalAmount === 'number' ? invoice.totalAmount : (subtotal + tax - discountAmount);
 
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
 
@@ -79,7 +80,7 @@ const PrintInvoiceDocument = ({
       unitCost: 'تكلفة الوحدة',
       servicesTotal: 'مجموع الخدمات',
       partsTotal: 'مجموع القطع',
-      tax: 'ضريبة القطع (15%)',
+      tax: 'ضريبة (15%)',
       discount: 'الخصم',
       grandTotal: 'المجموع الإجمالي',
       notes: 'ملاحظات',
@@ -117,7 +118,7 @@ const PrintInvoiceDocument = ({
       unitCost: 'Unit Cost',
       servicesTotal: 'Services Total',
       partsTotal: 'Parts Total',
-      tax: 'VAT on Parts (15%)',
+      tax: 'Taxes (15%)',
       discount: 'Discount',
       grandTotal: 'Grand Total',
       notes: 'Notes',
@@ -309,17 +310,15 @@ const PrintInvoiceDocument = ({
               <span>{formatCurrency(servicesTotal)}</span>
             </div>
             {parts.length > 0 && (
-              <>
-                <div className="total-row">
-                  <span>{t.partsTotal}:</span>
-                  <span>{formatCurrency(partsTotal)}</span>
-                </div>
-                <div className="total-row">
-                  <span>{t.tax}:</span>
-                  <span>{formatCurrency(tax)}</span>
-                </div>
-              </>
+              <div className="total-row">
+                <span>{t.partsTotal}:</span>
+                <span>{formatCurrency(partsTotal)}</span>
+              </div>
             )}
+            <div className="total-row">
+              <span>{t.tax}:</span>
+              <span>{formatCurrency(tax)}</span>
+            </div>
             {discount > 0 && (
               <div className="total-row">
                 <span>{t.discount} ({discount}%):</span>
